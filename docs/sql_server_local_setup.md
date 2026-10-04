@@ -137,7 +137,33 @@ Every row in section 1 should say `PASS`, and the control totals should match ex
 
 ## Step 5. Install the SQL Server driver for Tableau
 
-Tableau on a Mac needs Microsoft's ODBC driver to talk to SQL Server. The simplest install is with [Homebrew](https://brew.sh). If you don't have Homebrew, install it first with the one-line command on brew.sh.
+Tableau on a Mac needs Microsoft's ODBC driver to talk to SQL Server. The simplest install is with [Homebrew](https://brew.sh), the standard Mac package manager.
+
+**5a. Install Homebrew (skip if `brew --version` already works)**
+
+If you see `zsh: command not found: brew`, Homebrew isn't installed yet:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+It asks for your Mac password (nothing shows as you type) and to press Enter. It may also install Apple's Command Line Tools, which takes 5–10 minutes. It finishes with `==> Installation successful!` and a `==> Next steps:` block. Run the lines it prints there, normally:
+
+```bash
+echo >> ~/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
+Then check:
+
+```bash
+brew --version
+```
+
+Expected: `Homebrew 4.x.x` or newer.
+
+**5b. Install the driver**
 
 ```bash
 brew tap microsoft/mssql-release https://github.com/Microsoft/homebrew-mssql-release
@@ -145,11 +171,16 @@ brew update
 HOMEBREW_ACCEPT_EULA=Y brew install msodbcsql18
 ```
 
-Expected last line:
+This also installs `unixodbc`, which the driver needs. Confirm the driver is registered:
+
+```bash
+odbcinst -q -d
+```
+
+Expected:
 
 ```
-==> Summary
-🍺  /opt/homebrew/Cellar/msodbcsql18/...
+[ODBC Driver 18 for SQL Server]
 ```
 
 If Tableau later says a driver is missing, its connection dialog links to the official driver download page.
