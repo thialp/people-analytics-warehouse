@@ -1,0 +1,23 @@
+location_id,city,country_code,country_name,region,currency_code,site_type
+LOC-001,Austin,US,United States,North America,USD,Headquarters
+LOC-002,New York,US,United States,North America,USD,Office
+LOC-003,San Francisco,US,United States,North America,USD,Office
+LOC-004,Atlanta,US,United States,North America,USD,Office
+LOC-005,Remote - US,US,United States,North America,USD,Remote
+LOC-006,Toronto,CA,Canada,North America,CAD,Office
+LOC-007,Sao Paulo,BR,Brazil,Latin America,BRL,Office
+LOC-008,Mexico City,MX,Mexico,Latin America,MXN,Office
+LOC-009,London,GB,United Kingdom,Europe,GBP,Regional Hub
+LOC-010,Dublin,IE,Ireland,Europe,EUR,Office
+LOC-011,Berlin,DE,Germany,Europe,EUR,Office
+LOC-012,Paris,FR,France,Europe,EUR,Office
+LOC-013,Warsaw,PL,Poland,Europe,PLN,Engineering Center
+LOC-014,Krakow,PL,Poland,Europe,PLN,Engineering Center
+LOC-015,Bangalore,IN,India,Asia Pacific,INR,Engineering Center
+LOC-016,Hyderabad,IN,India,Asia Pacific,INR,Engineering Center
+LOC-017,Singapore,SG,Singapore,Asia Pacific,SGD,Regional Hub
+LOC-018,Tokyo,JP,Japan,Asia Pacific,JPY,Office
+LOC-019,Sydney,AU,Australia,Asia Pacific,AUD,Office
+LOC-020,Dubai,AE,United Arab Emirates,Middle East & Africa,AED,Regional Hub
+LOC-021,Johannesburg,ZA,South Africa,Middle East & Africa,ZAR,Office
+LOC-022,Cape Town,ZA,South Africa,Middle East & Africa,ZAR,Office

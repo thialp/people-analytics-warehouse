@@ -1,0 +1,120 @@
+job_profile_id,job_family_code,job_family,job_title,grade,grade_level,career_track
+SWE-1,SWE,Software Engineering,Associate Software Engineer,1,Associate,Individual Contributor
+SWE-2,SWE,Software Engineering,Software Engineer,2,Professional,Individual Contributor
+SWE-3,SWE,Software Engineering,Senior Software Engineer,3,Senior,Individual Contributor
+SWE-4,SWE,Software Engineering,Lead Software Engineer,4,Lead,Individual Contributor
+SWE-5,SWE,Software Engineering,"Manager, Software Engineering",5,Manager / Staff,Manager or Expert
+SWE-6,SWE,Software Engineering,"Senior Manager, Software Engineering",6,Senior Manager / Principal,Manager or Expert
+SWE-7,SWE,Software Engineering,"Director, Software Engineering",7,Director,Leadership
+SWE-8,SWE,Software Engineering,"Senior Director, Software Engineering",8,Senior Director,Leadership
+SWE-9,SWE,Software Engineering,"Vice President, Software Engineering",9,Vice President,Leadership
+DAT-1,DAT,Data & Analytics,Associate Data Analyst,1,Associate,Individual Contributor
+DAT-2,DAT,Data & Analytics,Data Analyst,2,Professional,Individual Contributor
+DAT-3,DAT,Data & Analytics,Senior Data Analyst,3,Senior,Individual Contributor
+DAT-4,DAT,Data & Analytics,Lead Data Analyst,4,Lead,Individual Contributor
+DAT-5,DAT,Data & Analytics,"Manager, Data & Analytics",5,Manager / Staff,Manager or Expert
+DAT-6,DAT,Data & Analytics,"Senior Manager, Data & Analytics",6,Senior Manager / Principal,Manager or Expert
+DAT-7,DAT,Data & Analytics,"Director, Data & Analytics",7,Director,Leadership
+DAT-8,DAT,Data & Analytics,"Senior Director, Data & Analytics",8,Senior Director,Leadership
+DAT-9,DAT,Data & Analytics,"Vice President, Data & Analytics",9,Vice President,Leadership
+PRD-1,PRD,Product Management,Associate Product Manager,1,Associate,Individual Contributor
+PRD-2,PRD,Product Management,Product Manager,2,Professional,Individual Contributor
+PRD-3,PRD,Product Management,Senior Product Manager,3,Senior,Individual Contributor
+PRD-4,PRD,Product Management,Lead Product Manager,4,Lead,Individual Contributor
+PRD-5,PRD,Product Management,"Manager, Product Management",5,Manager / Staff,Manager or Expert
+PRD-6,PRD,Product Management,"Senior Manager, Product Management",6,Senior Manager / Principal,Manager or Expert
+PRD-7,PRD,Product Management,"Director, Product Management",7,Director,Leadership
+PRD-8,PRD,Product Management,"Senior Director, Product Management",8,Senior Director,Leadership
+PRD-9,PRD,Product Management,"Vice President, Product Management",9,Vice President,Leadership
+DSN-1,DSN,Design,Associate Product Designer,1,Associate,Individual Contributor
+DSN-2,DSN,Design,Product Designer,2,Professional,Individual Contributor
+DSN-3,DSN,Design,Senior Product Designer,3,Senior,Individual Contributor
+DSN-4,DSN,Design,Lead Product Designer,4,Lead,Individual Contributor
+DSN-5,DSN,Design,"Manager, Design",5,Manager / Staff,Manager or Expert
+DSN-6,DSN,Design,"Senior Manager, Design",6,Senior Manager / Principal,Manager or Expert
+DSN-7,DSN,Design,"Director, Design",7,Director,Leadership
+DSN-8,DSN,Design,"Senior Director, Design",8,Senior Director,Leadership
+DSN-9,DSN,Design,"Vice President, Design",9,Vice President,Leadership
+SEC-1,SEC,Security,Associate Security Engineer,1,Associate,Individual Contributor
+SEC-2,SEC,Security,Security Engineer,2,Professional,Individual Contributor
+SEC-3,SEC,Security,Senior Security Engineer,3,Senior,Individual Contributor
+SEC-4,SEC,Security,Lead Security Engineer,4,Lead,Individual Contributor
+SEC-5,SEC,Security,"Manager, Security",5,Manager / Staff,Manager or Expert
+SEC-6,SEC,Security,"Senior Manager, Security",6,Senior Manager / Principal,Manager or Expert
+SEC-7,SEC,Security,"Director, Security",7,Director,Leadership
+SEC-8,SEC,Security,"Senior Director, Security",8,Senior Director,Leadership
+SEC-9,SEC,Security,"Vice President, Security",9,Vice President,Leadership
+ITS-1,ITS,IT & Infrastructure,Associate Systems Engineer,1,Associate,Individual Contributor
+ITS-2,ITS,IT & Infrastructure,Systems Engineer,2,Professional,Individual Contributor
+ITS-3,ITS,IT & Infrastructure,Senior Systems Engineer,3,Senior,Individual Contributor
+ITS-4,ITS,IT & Infrastructure,Lead Systems Engineer,4,Lead,Individual Contributor
+ITS-5,ITS,IT & Infrastructure,"Manager, IT & Infrastructure",5,Manager / Staff,Manager or Expert
+ITS-6,ITS,IT & Infrastructure,"Senior Manager, IT & Infrastructure",6,Senior Manager / Principal,Manager or Expert
+ITS-7,ITS,IT & Infrastructure,"Director, IT & Infrastructure",7,Director,Leadership
+ITS-8,ITS,IT & Infrastructure,"Senior Director, IT & Infrastructure",8,Senior Director,Leadership
+ITS-9,ITS,IT & Infrastructure,"Vice President, IT & Infrastructure",9,Vice President,Leadership
+SAL-1,SAL,Sales,Associate Account Executive,1,Associate,Individual Contributor
+SAL-2,SAL,Sales,Account Executive,2,Professional,Individual Contributor
+SAL-3,SAL,Sales,Senior Account Executive,3,Senior,Individual Contributor
+SAL-4,SAL,Sales,Lead Account Executive,4,Lead,Individual Contributor
+SAL-5,SAL,Sales,"Manager, Sales",5,Manager / Staff,Manager or Expert
+SAL-6,SAL,Sales,"Senior Manager, Sales",6,Senior Manager / Principal,Manager or Expert
+SAL-7,SAL,Sales,"Director, Sales",7,Director,Leadership
+SAL-8,SAL,Sales,"Senior Director, Sales",8,Senior Director,Leadership
+SAL-9,SAL,Sales,"Vice President, Sales",9,Vice President,Leadership
+CSM-1,CSM,Client Success,Associate Client Success Manager,1,Associate,Individual Contributor
+CSM-2,CSM,Client Success,Client Success Manager,2,Professional,Individual Contributor
+CSM-3,CSM,Client Success,Senior Client Success Manager,3,Senior,Individual Contributor
+CSM-4,CSM,Client Success,Lead Client Success Manager,4,Lead,Individual Contributor
+CSM-5,CSM,Client Success,"Manager, Client Success",5,Manager / Staff,Manager or Expert
+CSM-6,CSM,Client Success,"Senior Manager, Client Success",6,Senior Manager / Principal,Manager or Expert
+CSM-7,CSM,Client Success,"Director, Client Success",7,Director,Leadership
+CSM-8,CSM,Client Success,"Senior Director, Client Success",8,Senior Director,Leadership
+CSM-9,CSM,Client Success,"Vice President, Client Success",9,Vice President,Leadership
+MKT-1,MKT,Marketing,Associate Marketing Specialist,1,Associate,Individual Contributor
+MKT-2,MKT,Marketing,Marketing Specialist,2,Professional,Individual Contributor
+MKT-3,MKT,Marketing,Senior Marketing Specialist,3,Senior,Individual Contributor
+MKT-4,MKT,Marketing,Lead Marketing Specialist,4,Lead,Individual Contributor
+MKT-5,MKT,Marketing,"Manager, Marketing",5,Manager / Staff,Manager or Expert
+MKT-6,MKT,Marketing,"Senior Manager, Marketing",6,Senior Manager / Principal,Manager or Expert
+MKT-7,MKT,Marketing,"Director, Marketing",7,Director,Leadership
+MKT-8,MKT,Marketing,"Senior Director, Marketing",8,Senior Director,Leadership
+MKT-9,MKT,Marketing,"Vice President, Marketing",9,Vice President,Leadership
+FIN-1,FIN,Finance,Associate Financial Analyst,1,Associate,Individual Contributor
+FIN-2,FIN,Finance,Financial Analyst,2,Professional,Individual Contributor
+FIN-3,FIN,Finance,Senior Financial Analyst,3,Senior,Individual Contributor
+FIN-4,FIN,Finance,Lead Financial Analyst,4,Lead,Individual Contributor
+FIN-5,FIN,Finance,"Manager, Finance",5,Manager / Staff,Manager or Expert
+FIN-6,FIN,Finance,"Senior Manager, Finance",6,Senior Manager / Principal,Manager or Expert
+FIN-7,FIN,Finance,"Director, Finance",7,Director,Leadership
+FIN-8,FIN,Finance,"Senior Director, Finance",8,Senior Director,Leadership
+FIN-9,FIN,Finance,"Vice President, Finance",9,Vice President,Leadership
+HRM-1,HRM,Human Resources,Associate HR Specialist,1,Associate,Individual Contributor
+HRM-2,HRM,Human Resources,HR Specialist,2,Professional,Individual Contributor
+HRM-3,HRM,Human Resources,Senior HR Specialist,3,Senior,Individual Contributor
+HRM-4,HRM,Human Resources,Lead HR Specialist,4,Lead,Individual Contributor
+HRM-5,HRM,Human Resources,"Manager, Human Resources",5,Manager / Staff,Manager or Expert
+HRM-6,HRM,Human Resources,"Senior Manager, Human Resources",6,Senior Manager / Principal,Manager or Expert
+HRM-7,HRM,Human Resources,"Director, Human Resources",7,Director,Leadership
+HRM-8,HRM,Human Resources,"Senior Director, Human Resources",8,Senior Director,Leadership
+HRM-9,HRM,Human Resources,"Vice President, Human Resources",9,Vice President,Leadership
+LGL-1,LGL,Legal & Compliance,Associate Counsel,1,Associate,Individual Contributor
+LGL-2,LGL,Legal & Compliance,Counsel,2,Professional,Individual Contributor
+LGL-3,LGL,Legal & Compliance,Senior Counsel,3,Senior,Individual Contributor
+LGL-4,LGL,Legal & Compliance,Lead Counsel,4,Lead,Individual Contributor
+LGL-5,LGL,Legal & Compliance,"Manager, Legal & Compliance",5,Manager / Staff,Manager or Expert
+LGL-6,LGL,Legal & Compliance,"Senior Manager, Legal & Compliance",6,Senior Manager / Principal,Manager or Expert
+LGL-7,LGL,Legal & Compliance,"Director, Legal & Compliance",7,Director,Leadership
+LGL-8,LGL,Legal & Compliance,"Senior Director, Legal & Compliance",8,Senior Director,Leadership
+LGL-9,LGL,Legal & Compliance,"Vice President, Legal & Compliance",9,Vice President,Leadership
+OPS-1,OPS,Operations,Associate Operations Analyst,1,Associate,Individual Contributor
+OPS-2,OPS,Operations,Operations Analyst,2,Professional,Individual Contributor
+OPS-3,OPS,Operations,Senior Operations Analyst,3,Senior,Individual Contributor
+OPS-4,OPS,Operations,Lead Operations Analyst,4,Lead,Individual Contributor
+OPS-5,OPS,Operations,"Manager, Operations",5,Manager / Staff,Manager or Expert
+OPS-6,OPS,Operations,"Senior Manager, Operations",6,Senior Manager / Principal,Manager or Expert
+OPS-7,OPS,Operations,"Director, Operations",7,Director,Leadership
+OPS-8,OPS,Operations,"Senior Director, Operations",8,Senior Director,Leadership
+OPS-9,OPS,Operations,"Vice President, Operations",9,Vice President,Leadership
+EXE-8,EXE,Executive Leadership,Senior Vice President,8,Senior Director,Leadership
+EXE-9,EXE,Executive Leadership,Executive Vice President,9,Vice President,Leadership

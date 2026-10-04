@@ -1,0 +1,36 @@
+name: Build and test warehouse
+
+# Runs on every push and pull request, and can be started by hand from the Actions tab.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Regenerate synthetic data
+        run: python generator/generate_data.py
+
+      - name: Check raw data is reproducible from the generator
+        run: git diff --stat --exit-code data/raw
+
+      - name: Build warehouse and run data tests
+        run: python pipeline/run_pipeline.py
+
+      - name: Check committed marts match the SQL
+        run: git diff --stat --exit-code data/marts
