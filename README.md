@@ -8,7 +8,7 @@
 
 | | |
 |---|---|
-| **Stack** | SQL (DuckDB) · Python · Tableau · GitHub Actions |
+| **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 19,276 workers · 4 fiscal years · 49 month-ends · 15 countries · 13 currencies · 592,823 worker-month snapshots |
 | **Output** | Two Tableau-ready marts in [`data/marts/`](data/marts/) |
 | **Controls** | 12 automated data tests; the build stops if any fails |
@@ -222,6 +222,16 @@ The warehouse is written to `warehouse/arcadia.duckdb`. Open it with the [DuckDB
 
 Every push runs the same build and tests on GitHub Actions ([`.github/workflows/pipeline.yml`](.github/workflows/pipeline.yml)).
 
+## Run it on SQL Server with Tableau
+
+The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau connection, the way enterprise BI teams usually work:
+
+- [`sqlserver/`](sqlserver/) holds T-SQL scripts that load the CSVs with `BULK INSERT` and build typed `dw` tables, an indexed worker month-end snapshot and a reporting view.
+- [`tableau/custom_sql_workforce_cost_bridge.sql`](tableau/custom_sql_workforce_cost_bridge.sql) is the cost bridge as **Tableau Custom SQL**: one `SELECT` with no CTEs, using derived tables and `CROSS APPLY (VALUES …)` to unpivot each worker into walk lines.
+- The SQL Server outputs were checked against the DuckDB marts and match row for row, to the cent. They use the same column names, so a workbook can switch between SQL Server and the CSVs with *Replace Data Source*.
+
+Step-by-step setup, with expected output at each step: [`docs/sql_server_local_setup.md`](docs/sql_server_local_setup.md).
+
 ## Repository layout
 
 ```
@@ -229,13 +239,15 @@ Every push runs the same build and tests on GitHub Actions ([`.github/workflows/
 ├── data/
 │   ├── raw/              raw warehouse tables (CSV)
 │   └── marts/            Tableau-ready outputs (CSV)
-├── sql/
+├── sql/                  DuckDB pipeline
 │   ├── 01_staging/       typing, corrections
 │   ├── 02_intermediate/  fiscal calendar, worker month-end snapshot
-│   └── 03_marts/         comp walk drivers, comp snapshot
+│   └── 03_marts/         workforce cost bridge, workforce cost snapshot
 ├── tests/                data-quality and reconciliation tests (SQL)
 ├── pipeline/             build runner
-└── docs/                 data dictionary, methodology, Tableau guide
+├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, plus validation
+├── tableau/              Tableau Custom SQL and connection settings
+└── docs/                 data dictionary, methodology, Tableau and SQL Server guides
 ```
 
 ---
