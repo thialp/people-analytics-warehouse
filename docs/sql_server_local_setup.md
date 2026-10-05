@@ -139,6 +139,23 @@ Every row in section 1 should say `PASS`, and the control totals should match ex
 
 Tableau on a Mac needs Microsoft's ODBC driver to talk to SQL Server. The simplest install is with [Homebrew](https://brew.sh), the standard Mac package manager.
 
+> **Intel Mac?** Homebrew no longer supports Intel Macs (the installer stops with *"only supported on Apple Silicon processors"*). Use the JDBC route instead, which needs no Homebrew and was tested end to end on an Intel MacBook Pro:
+>
+> 1. Download the **.tar.gz** from [Microsoft JDBC Driver for SQL Server](https://learn.microsoft.com/en-us/sql/connect/jdbc/download-microsoft-jdbc-driver-for-sql-server) and unzip it.
+> 2. Copy the jar into Tableau's driver folder:
+>    ```bash
+>    mkdir -p ~/Library/Tableau/Drivers
+>    cp ~/Downloads/sqljdbc_*/enu/jars/mssql-jdbc-*.jre11.jar ~/Library/Tableau/Drivers/
+>    ```
+> 3. Restart Tableau and connect with **To a Server → More… → Other Databases (JDBC)**:
+>    - **URL:** `jdbc:sqlserver://localhost:1433;databaseName=ArcadiaHR;encrypt=true;trustServerCertificate=true`
+>    - **Dialect:** SQL-92
+>    - **Username / Password:** `sa` and your password
+>
+> Then skip Step 6 and continue at Step 7. On Intel, drop `--platform linux/amd64` from Step 3: SQL Server runs natively.
+>
+> If Docker Desktop is closed, the container stops too. `docker update --restart unless-stopped arcadia-sql` makes it start again with Docker.
+
 **5a. Install Homebrew (skip if `brew --version` already works)**
 
 If you see `zsh: command not found: brew`, Homebrew isn't installed yet:
