@@ -54,6 +54,8 @@ README.md  data  docs  generator  pipeline  requirements.txt  sql  sqlserver  ta
 
 ## Step 3. Start SQL Server
 
+> **Shortcut:** Steps 3–4 can be replaced by a single `docker compose up -d`, which starts SQL Server, waits until it's healthy and builds the warehouse. See [`docker_compose_guide.md`](docker_compose_guide.md).
+
 Pick a password for the `sa` (admin) account. It needs at least 8 characters with upper case, lower case, a number and a symbol. Avoid `!`, because zsh treats it specially. This example uses `Arcadia#Local2026`:
 
 ```bash

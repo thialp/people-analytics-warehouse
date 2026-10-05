@@ -232,6 +232,15 @@ The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau 
 
 Step-by-step setup, with expected output at each step: [`docs/sql_server_local_setup.md`](docs/sql_server_local_setup.md).
 
+Or bring up the whole environment with Docker Compose. [`compose.yaml`](compose.yaml) starts SQL Server, waits for its healthcheck and builds and validates the warehouse:
+
+```bash
+cp .env.example .env   # set your own password
+docker compose up -d
+```
+
+Details: [`docs/docker_compose_guide.md`](docs/docker_compose_guide.md).
+
 ## Repository layout
 
 ```
@@ -246,8 +255,9 @@ Step-by-step setup, with expected output at each step: [`docs/sql_server_local_s
 ├── tests/                data-quality and reconciliation tests (SQL)
 ├── pipeline/             build runner
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, plus validation
+├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
 ├── tableau/              Tableau Custom SQL and connection settings
-└── docs/                 data dictionary, methodology, Tableau and SQL Server guides
+└── docs/                 data dictionary, methodology, Tableau, SQL Server and Docker guides
 ```
 
 ---

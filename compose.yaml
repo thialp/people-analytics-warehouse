@@ -1,0 +1,53 @@
+# Arcadia HR warehouse on SQL Server, as code.
+#
+#   docker compose up -d        start SQL Server, wait until it is healthy, then build the warehouse
+#   docker compose logs build   see the build and validation output
+#   docker compose down         stop and remove the containers (the database volume is kept)
+#   docker compose down -v      ...and delete the database volume too (clean slate)
+#
+# The sa password comes from a .env file next to this one (copy .env.example to .env).
+# See docs/docker_compose_guide.md for the full walkthrough.
+
+name: arcadia
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64            # native on Intel Macs, Rosetta on Apple Silicon
+    container_name: arcadia-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env (copy .env.example to .env)}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql       # database files live in a named volume and survive container rebuilds
+      - ./:/repo:ro                  # repo shared read-only, so BULK INSERT can read data/raw/*.csv
+    healthcheck:                     # "healthy" only once SQL Server actually answers a query
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped          # comes back on its own whenever Docker Desktop starts
+
+  build:
+    # One-off job: the same image, used only for its sqlcmd client.
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: arcadia-build
+    depends_on:
+      sqlserver:
+        condition: service_healthy   # waits for the healthcheck above, no more watching logs
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    volumes:
+      - ./:/repo:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:                         # "sqlserver" is the service name: containers reach each other by name
+      - /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -i /repo/sqlserver/build_all.sql
+    restart: "no"
+
+volumes:
+  sqldata:

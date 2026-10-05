@@ -16,3 +16,6 @@ Thumbs.db
 # Tableau local files
 *.twbr
 *.tmp
+
+# Local secrets (copy .env.example to .env)
+.env
