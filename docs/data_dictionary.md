@@ -99,7 +99,7 @@ Pay range `range_min`, `range_mid`, `range_max` in local currency by `fiscal_yea
 
 ## Marts (`data/marts/`)
 
-Pay measures in both marts are **annualized run-rates at the month-end**, in USD. Executive officers are excluded.
+Pay measures in the two cost marts are **annualized run-rates at the month-end**, in USD. Executive officers are excluded.
 
 | Measure | Definition |
 |---|---|
@@ -138,3 +138,46 @@ Grain: **month-end × department × country × grade × job family.**
 | `headcount`, `fte` | Workforce size |
 | `base_usd_*`, `loaded_usd_*` | Run-rate pay |
 | `range_mid_usd_constant` | Sum of range midpoints × FTE at plan FX. Compa-ratio = `SUM(base_usd_constant) / SUM(range_mid_usd_constant)` |
+
+### mart_headcount_fte_walk
+Grain: **month-end × department × country × job family × grade × movement category × movement reason.** For every slice and month, Opening + every movement = Closing, in headcount and FTE (test 13). Codes only: names come from the five `mart_dim_*` files below, which Tableau relates on matching column names.
+
+| Column | Description |
+|---|---|
+| `month_end_date` | The month being walked; → `mart_dim_month` |
+| `department_id` | → `mart_dim_department` |
+| `country_code` | → `mart_dim_country` |
+| `job_family_code` | → `mart_dim_job_family` |
+| `grade` | → `mart_dim_grade` |
+| `movement_order` | 1 to 8, for sorting a waterfall |
+| `movement_category` | Opening, Hires, Voluntary Terminations, Involuntary Terminations, Internal Moves Out, Internal Moves In, FTE Changes, Closing |
+| `movement_reason` | New Hire · Voluntary · Involuntary · Transfer · Reorganization · Location Change · Promotion · Demotion · Job Change · FTE Increase · FTE Reduction · Opening · Closing |
+| `headcount` | Signed headcount change; for Opening and Closing, the headcount itself |
+| `fte` | Signed FTE change; for Opening and Closing, the FTE itself |
+
+Rules: headcount includes executive officers. A move is booked out of the old slice and into the new one at the worker's prior FTE, so moves net to zero at any roll-up that contains both slices; an FTE change in the same month is a separate FTE Changes line. When several slice attributes change in one month, one reason is recorded: department (Reorganization if a reorg action is on file, otherwise Transfer), then country, then grade, then job family.
+
+**Walking across several months:** take Opening from the first month, Closing from the last month, and sum every other line in between. Test 14 guarantees the months chain together.
+
+### mart_dim_month
+One row per walked month-end: `month_end_date`, `prior_month_end_date`, `fiscal_year`, `fiscal_year_label` (`FY26`), `fiscal_quarter_label`, `fiscal_period`, `fiscal_month`, `is_fiscal_year_end`.
+
+### mart_dim_department
+One row per department: `department_id`, `department_name`, `sub_function`, `function_name`, `cost_center`.
+
+### mart_dim_country
+One row per country: `country_code`, `country_name`, `region`.
+
+### mart_dim_job_family
+One row per job family: `job_family_code`, `job_family`.
+
+### mart_dim_grade
+One row per grade: `grade`, `grade_level`, `career_track`.
+
+## Intermediate models used by the walk
+
+### int_worker_movement
+One row per worker per month for everyone active at the prior month-end, the current month-end or both: the worker's slice and FTE at each end, `movement_type` (Hire, Termination, Internal Move, No Change), `movement_reason` and `fte_changed`. Test 18 checks there is never a second row for the same worker and month.
+
+### int_worker_in_month_hire_and_exit
+Workers hired and terminated between the same two month-ends. A month-end walk cannot show them, so they are listed here instead of disappearing. The current synthetic data has none.

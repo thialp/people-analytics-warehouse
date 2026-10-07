@@ -32,7 +32,16 @@ TEST_DIR = ROOT / "tests"
 DB_PATH = ROOT / "warehouse" / "arcadia.duckdb"
 
 SCHEMAS = ["raw", "staging", "intermediate", "marts"]
-EXPORTS = ["mart_workforce_cost_bridge", "mart_workforce_cost_snapshot"]
+EXPORTS = [
+    "mart_workforce_cost_bridge",
+    "mart_workforce_cost_snapshot",
+    "mart_headcount_fte_walk",
+    "mart_dim_month",
+    "mart_dim_department",
+    "mart_dim_country",
+    "mart_dim_job_family",
+    "mart_dim_grade",
+]
 
 
 def log(msg: str = ""):
