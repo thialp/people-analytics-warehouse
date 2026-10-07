@@ -1,20 +1,28 @@
-# People Analytics Warehouse: Workforce Cost Bridge
+# People Analytics Warehouse
 
 [![Build and test warehouse](https://github.com/thialp/people-analytics-warehouse/actions/workflows/pipeline.yml/badge.svg)](https://github.com/thialp/people-analytics-warehouse/actions/workflows/pipeline.yml)
 
-**Why did our workforce cost change?** This project builds an HR data warehouse for a fictional global company and answers that question with SQL: a monthly, department-level walk of annualized pay run-rate that splits every dollar of change into hires, terminations, transfers, promotions, merit, mobility, FTE, fringe and currency, in both **nominal** and **constant** currency, reconciled to the cent.
+An HR data warehouse for a fictional global company, built to answer the two questions every workforce review starts with, in SQL that reconciles exactly:
 
-> **All data is synthetic.** Arcadia Systems is a fictional company. The data was generated from scratch by the simulation in [`generator/`](generator/). No real company data, people or pay is used. The business problem is a common one in enterprise HR and Finance analytics; the design, rules and code here are my own.
+| Case study | Question | Dashboard |
+|---|---|---|
+| **1. [Workforce Cost Bridge](#1-business-problem)** | *Why did our workforce cost change?* A monthly walk of annualized pay run-rate that splits every dollar of change into hires, terminations, transfers, promotions, merit, mobility, FTE, fringe and currency, in **nominal** and **constant** currency, reconciled to the cent. | Tableau Public: *coming soon* |
+| **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | Tableau Public: *coming soon* |
+
+Both case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot.
+
+> **All data is synthetic.** Arcadia Systems is a fictional company. The data was generated from scratch by the simulation in [`generator/`](generator/). No real company data, people or pay is used. The business problems are common ones in enterprise HR and Finance analytics; the design, rules and code here are my own.
 
 | | |
 |---|---|
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 19,276 workers · 4 fiscal years · 49 month-ends · 15 countries · 13 currencies · 592,823 worker-month snapshots |
-| **Output** | Two Tableau-ready marts in [`data/marts/`](data/marts/) |
-| **Controls** | 12 automated data tests; the build stops if any fails |
-| **Dashboard** | Tableau Public: *coming soon* |
+| **Output** | Three Tableau-ready marts and five dimension files in [`data/marts/`](data/marts/) |
+| **Controls** | 18 automated data tests; the build stops if any fails |
 
 ---
+
+> Sections 1 to 10 cover case study 1, the Workforce Cost Bridge. [Case study 2](#case-study-2-headcount--fte-walk) follows them.
 
 ## 1. Business problem
 
@@ -155,8 +163,14 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 10 | Transfers net to zero company-wide | Transfers creating or destroying cost |
 | 11 | Constant currency has no FX effect | FX leaking into constant-currency figures |
 | 12 | Executive officers excluded | Restricted pay in reporting |
+| 13 | **Opening + movements = Closing** for every slice and month, in headcount and FTE | A headcount walk that doesn't reconcile |
+| 14 | Headcount closing of one month = opening of the next, slice by slice | Breaks when walking across a date range |
+| 15 | Walk opening and closing = an independent count of the month-end snapshot | Dropped or double-counted people |
+| 16 | Internal moves net to zero company-wide, for every reason | Moves creating or destroying headcount |
+| 17 | Hires and leavers = a recount from the worker master's hire and termination dates | Snapshot logic drifting from the source of truth |
+| 18 | One movement row per worker per month | A worker counted twice in one month |
 
-The tests were checked against a deliberately broken build: with the correction logic removed from staging, five of them fail.
+The tests were checked against deliberately broken builds. With the correction logic removed from staging, five of them fail. Treating workers as gone on their last day worked instead of the day after (an off-by-one on the termination date) fails test 17; dropping reorganization moves from the walk fails tests 13 and 16.
 
 ## 8. Results
 
@@ -193,7 +207,7 @@ The two marts are built for Tableau and connect directly from Tableau Public:
 | [`mart_workforce_cost_bridge.csv`](data/marts/mart_workforce_cost_bridge.csv) | month × department × driver | *Why* did cost change? Waterfall by driver, filterable by department and period, with nominal/constant and base/loaded switches |
 | [`mart_workforce_cost_snapshot.csv`](data/marts/mart_workforce_cost_snapshot.csv) | month × department × country × grade × job family | *Where* is the cost? Mix, trend, compa-ratio and FX impact by country |
 
-Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_public_guide.md).
+Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_public_guide.md). The headcount walk has its own guide, in [case study 2](#case-study-2-headcount--fte-walk).
 
 ## 10. Lessons learned
 
@@ -201,7 +215,84 @@ Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_pub
 - **Corrections are the most common way a pay total goes wrong.** Same-day correction rows look like valid records until two of them add up. Resolving them in staging, with a test that fails without the fix, is cheaper than finding the problem in a dashboard.
 - **Pre-compute snapshots, then join on equality.** Joining every month to every record with a date range ("band join") is easy to write and slow at scale. Building one row per worker per month-end first lets the walk join on `worker_id + month_end_date`, which is fast and simple to test.
 - **Put measure semantics in SQL, not in the BI tool.** Signs, opening and closing balances and constant currency live in the mart. Tableau only sums, so every dashboard gets the same answer.
+- **A walk is only trusted if it reconciles where people look.** Booking every internal move out of one slice and into another, at prior FTE, makes the headcount walk tie for any department, country, grade or job family, not just for the company.
+- **Store history at the grain questions are asked.** A daily scaffold answers month-end questions with 30 times the rows; a month-end snapshot built once is smaller, faster and simpler to test ([`docs/performance.md`](docs/performance.md)).
 - **Constant currency needs one fixed rate set.** Re-basing the "constant" rate every year adds a fake FX jump at each year boundary. One plan-rate set keeps the comparison clean across all four years.
+
+---
+
+## Case study 2: Headcount & FTE Walk
+
+![Headcount & FTE Walk preview](docs/images/headcount_walk_preview.png)
+
+*Static preview drawn from the marts by [`docs/make_headcount_walk_preview.py`](docs/make_headcount_walk_preview.py). The interactive dashboard is on Tableau Public (coming soon).*
+
+### Business problem
+
+"How many people do we have?" sounds simple until HR, Finance and Recruiting each bring a different number. A headcount walk settles it by explaining the change, not just the level:
+
+```
+Opening headcount
+  + Hires
+  − Voluntary terminations  − Involuntary terminations
+  − Internal moves out  + Internal moves in
+  ± FTE changes (FTE only)
+= Closing headcount
+```
+
+Leaders need it to reconcile for **any** cut they ask for: a department, a country, a job family, a grade, or a combination, over any range of months. A walk that only ties at company level is not good enough, because the questions are always about a part of the company.
+
+### Approach
+
+| Step | Model | What it does |
+|---|---|---|
+| 1 | [`int_worker_month_end_snapshot`](sql/02_intermediate/int_worker_month_end_snapshot.sql) | One row per worker per month-end, from the effective-dated history (shared with case study 1) |
+| 2 | [`int_worker_movement`](sql/02_intermediate/int_worker_movement.sql) | Compares every worker's state at two consecutive month-ends and classifies the change: hire, termination, internal move (with one reason) or no change, plus any FTE change |
+| 3 | [`mart_headcount_fte_walk`](sql/03_marts/mart_headcount_fte_walk.sql) | Books each movement against a **slice** (department × country × job family × grade), then aggregates |
+| 4 | `mart_dim_*` | Five small dimension files; the fact carries codes only, so the export is 15 MB instead of 57 MB |
+
+**The design decision that makes it reconcile everywhere:** an internal move is booked *out of* the old slice and *into* the new one, at the worker's prior FTE. A promotion is then a move from grade 2 to grade 3 that nets to zero for the department; a transfer is a move between departments that nets to zero for the company. Any FTE change in the same month is booked separately as an FTE Change in the new slice, so moves never create or destroy FTE.
+
+| Challenge | How it's handled |
+|---|---|
+| Several attributes change in one month | One reason is recorded, by precedence: department (Reorganization if a reorg action is on file, otherwise Transfer), then country, then grade, then job family |
+| Termination date is the last day worked | A worker terminated on a month-end is still in that month's closing and leaves in the next month; test 17 recounts this from the worker master |
+| Hired and gone within one month | Never visible at a month-end, so listed separately in [`int_worker_in_month_hire_and_exit`](sql/02_intermediate/int_worker_in_month_hire_and_exit.sql) rather than lost (none in this dataset) |
+| Executive officers | Counted in headcount (they are excluded only where pay is shown) |
+
+### Results
+
+Company-wide headcount walk by fiscal year:
+
+| Movement | FY23 | FY24 | FY25 | FY26 |
+|---|---:|---:|---:|---:|
+| **Opening** | **11,012** | **11,846** | **11,968** | **12,510** |
+| Hires | +2,401 | +1,593 | +1,916 | +2,354 |
+| Voluntary terminations | −1,251 | −1,045 | −1,093 | −1,341 |
+| Involuntary terminations | −316 | −426 | −281 | −322 |
+| Internal moves (in = out) | 1,401 | 1,520 | 2,129 | 1,615 |
+| **Closing** | **11,846** | **11,968** | **12,510** | **13,201** |
+
+- **FY26 grew 5.5%** (+691) on 2,354 hires against 1,663 leavers. Voluntary turnover was 10.4% annualized, highest in Commercial (16.1% including involuntary).
+- **FY24's restructuring shows twice:** involuntary terminations rose to 426, the highest of the four years, and hires fell to 1,593, so headcount barely moved (+122).
+- **FY25's internal moves jumped to 2,129** with the reorganization into Data & AI Platform: a large shift between departments with no effect on the company total, which test 16 checks every month.
+- **FTE trails headcount by 261** at FY26 close (12,940.0 FTE for 13,201 people) because of part-time schedules. Reporting one without the other overstates capacity.
+
+### Performance: choosing the grain of history
+
+[`benchmarks/benchmark_headcount_walk.py`](benchmarks/benchmark_headcount_walk.py) compares three ways to build the walk, at the real size and at 10 times the size (192,760 workers). Full write-up: [`docs/performance.md`](docs/performance.md).
+
+| Design (at 192,760 workers) | Rows stored | Fits Tableau Public? | Seconds |
+|---|---:|---|---:|
+| Daily scaffold (one row per worker per day) | 180,039,090 | no | 10.48 |
+| As-of date-range join, recomputed for both month-ends | none | n/a | 2.32 |
+| **Month-end snapshot built once, then an equality join** | **5,928,230** | **yes** | **1.78** (1.03 build + 0.75 walk) |
+
+The daily scaffold stores 30 times more rows than the month-end snapshot and passes Tableau Public's 15-million-row limit even at the real size (18.0M rows). The snapshot is built once and reused by four models; after that, each walk runs three times faster than recomputing the date-range joins, and the two SQL designs return identical results.
+
+### Tableau
+
+Step-by-step build, with every calculated field and the numbers to check against: [`docs/tableau_headcount_walk_guide.md`](docs/tableau_headcount_walk_guide.md). The workbook has four dashboards (Executive Summary, Movement Drivers, Diagnostics, Methodology) and uses relationships across the six files, a date-range walk driven by parameters, annualized turnover from an average-headcount calculation, set and parameter actions, dynamic zone visibility, and a visible **Walk Gap** control that must read 0.
 
 ---
 
@@ -216,6 +307,9 @@ pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
 python pipeline/run_pipeline.py        # build the warehouse, run tests, export marts
+
+python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)
+pip install matplotlib && python docs/make_headcount_walk_preview.py   # optional: redraw the preview image
 ```
 
 The warehouse is written to `warehouse/arcadia.duckdb`. Open it with the [DuckDB CLI](https://duckdb.org/docs/installation/) or any SQL client to explore the tables.
@@ -250,10 +344,11 @@ Details: [`docs/docker_compose_guide.md`](docs/docker_compose_guide.md).
 │   └── marts/            Tableau-ready outputs (CSV)
 ├── sql/                  DuckDB pipeline
 │   ├── 01_staging/       typing, corrections
-│   ├── 02_intermediate/  fiscal calendar, worker month-end snapshot
-│   └── 03_marts/         workforce cost bridge, workforce cost snapshot
+│   ├── 02_intermediate/  fiscal calendar, worker month-end snapshot, worker movement
+│   └── 03_marts/         cost bridge, cost snapshot, headcount & FTE walk, dimensions
 ├── tests/                data-quality and reconciliation tests (SQL)
 ├── pipeline/             build runner
+├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, plus validation
 ├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
 ├── tableau/              Tableau Custom SQL and connection settings
