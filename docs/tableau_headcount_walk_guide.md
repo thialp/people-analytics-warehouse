@@ -67,7 +67,7 @@ Create four parameters (right-click the Data pane → **Create Parameter**):
 | **Measure** | String | List: `Headcount`, `FTE` | Headcount |
 | **Show Methodology** | Boolean | True / False | False |
 
-Show the first three as controls on every dashboard (right-click → **Show Parameter**).
+Show **Start Month** and **End Month** as controls on every dashboard (right-click → **Show Parameter**). **Measure** is switched with the pill buttons described in Section 6.
 
 ## 4. Calculated fields
 
@@ -195,26 +195,38 @@ If a number is off, the usual cause is a type (Step 2.4) or a filter left on a s
 ## 5. Sheets
 
 ### Executive Summary
-1. **KPI band.** One sheet per KPI (Closing, Net Change %, Hires, Voluntary Turnover, Internal Moves): put the field on **Text**, mark type **Text**, size the font large, and add a smaller line underneath with the comparison (for example `Opening` in the tooltip-style caption).
-2. **Headcount waterfall.** This is the main exhibit.
-   - Columns: `Movement Category`. Sort it by `Movement Order` (right-click → Sort → Field → Movement Order, Minimum, Ascending).
-   - Filter out `Closing`.
-   - Rows: `SUM([Walk Value])` → right-click → **Quick Table Calculation → Running Total**.
-   - Mark type **Gantt Bar**. Create `-SUM([Walk Value])` and drag it to **Size**.
-   - **Analysis → Totals → Show Row Grand Totals**, and rename the total *Closing*.
-   - Color: create the calculated field below and drag it to **Color**. In **Edit Colors**, set Level to warm gray `#8C8A84`, Increase to teal `#00938D` and Decrease to coral `#E4572E`. If the grand total bar takes a different color, click it in the color legend and set it to the same gray.
+1. **KPI band.** Five cards under the header, drawn as map layers so the numbers, the notes and the card layout all come from calculated fields. Follow [the KPI cards guide](tableau_kpi_cards_guide.md); it replaces five separate text sheets with one sheet.
+2. **Headcount waterfall.** This is the main exhibit. It is a Gantt chart, so every bar is a start position plus a length, and the running total has to be an aggregate calculation. (Putting a *dimension* on Color splits the marks into groups and restarts the running total inside each group. That is the most common way this chart breaks.)
+   - Create three calculated fields:
      ```
-     // Bar Type
-     CASE [Movement Category]
-         WHEN "Opening" THEN "Level"
-         WHEN "Hires" THEN "Increase"
-         WHEN "Internal Moves In" THEN "Increase"
-         ELSE "Decrease"
+     // Waterfall Position
+     // Movement bars end at the running total; Opening and Closing sit on the total itself.
+     // Compute Using: Movement Category (sorted by Movement Order).
+     IF ATTR([Movement Category]) = "Closing"
+         THEN SUM([Walk Value])
+         ELSE RUNNING_SUM(SUM([Walk Value]))
      END
      ```
+     ```
+     // Waterfall Size
+     // Negative on purpose: a Gantt bar grows to the right of its start, so a negative size
+     // draws the bar backwards from the running total to where it began.
+     -SUM([Walk Value])
+     ```
+     ```
+     // Bar Type  (an aggregate, so it can go on Color without splitting the table calculation)
+     IF ATTR([Movement Category]) = "Opening" OR ATTR([Movement Category]) = "Closing" THEN "Level"
+     ELSEIF SUM([Walk Value]) >= 0 THEN "Increase"
+     ELSE "Decrease"
+     END
+     ```
+   - Columns: `Movement Category`, sorted by `Movement Order` (right-click → Sort → Field → Movement Order, Minimum, Ascending). Keep **Closing** in the view: it is its own bar, so no filter and no grand total are needed.
+   - Rows: `Waterfall Position` → right-click → **Compute Using → Movement Category**.
+   - Mark type **Gantt Bar**. Drag `Waterfall Size` to **Size**, and `Bar Type` to **Color**.
+   - **Edit Colors:** Level warm gray `#8C8A84`, Increase teal `#00938D`, Decrease coral `#E4572E`.
    - Right-click the axis → **Edit Axis** → tick **Include zero**. Bars start at zero so the size of each movement isn't exaggerated (Viz of the Day reviewers check this).
    - Title the sheet with the finding, for example *"FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people"*. Build it as a calculated title from `Hires`, `Voluntary Leavers`, `Involuntary Leavers` and the change in headcount so it updates with the range.
-   - **Check:** the grand total equals the `Closing` KPI.
+   - **Check:** the Closing bar's top equals the `Closing` KPI, and the last movement bar ends exactly where the Closing bar starts.
    - At company level Internal Moves In and Out cancel (+1,615 and −1,615). Hide them with a filter on this sheet if you prefer a cleaner company view; they matter on department views.
 3. **Headcount trend.** Columns: `Month End Date` (continuous month). Rows: `SUM(IF [Movement Category] = "Closing" THEN [Selected Value] END)`. Don't filter this to the range: show all history, and add a **reference band** from `Start Month` to `End Month` so the selected period stands out. Line in teal `#00938D`, band in teal at 10% opacity, and label only the last point.
 
@@ -233,7 +245,7 @@ Use a fixed size of **1400 × 850** for each dashboard, the same as the workforc
 
 Every dashboard starts with the same **header band**: a horizontal container with background navy `#13233A` holding the reverse logo (Image object, `docs/brand/arcadia_logo_horizontal_reverse.png`), the dashboard title in white with a one-line subtitle, and the parameter controls on the right. Put each chart on its own off-white `#FBFBF8` card (a container with a 1px `#E4E3DD` border) with 12px between cards.
 
-1. **Executive Summary**: header band, KPI cards across the top, waterfall (left, about 60%), and on the right the trend above turnover by function.
+1. **Executive Summary**: header band, the KPI card map sheet across the top, waterfall (left, about 60%), and on the right the trend above turnover by function.
 2. **Movement Drivers**: turnover by function (left), heatmap (right), internal moves (bottom).
 3. **Diagnostics**: control tile top right, slice table filling the rest.
 4. **Methodology**: a text object with the definitions from Section 7.
@@ -242,7 +254,20 @@ Actions (**Dashboard → Actions**):
 
 - **Filter action:** on Movement Drivers, clicking a function in the turnover chart filters the heatmap and internal moves to that function. Clearing the selection shows all values.
 - **Set action:** on Movement Drivers, selecting departments in the heatmap updates **Selected Departments**; add `Selected vs Rest` to the color of the turnover chart so a selection is compared against the rest of the company.
-- **Parameter action:** make a small sheet listing `Headcount` and `FTE` (a calculated field `"Headcount"` and one `"FTE"`, or a two-row text sheet), and add a parameter action that sets **Measure** on click. Readers switch measures by clicking, not through a dropdown.
+- **Parameter action (the Headcount / FTE pills):** no image buttons are needed. Build one small sheet, **Measure Toggle**:
+  ```
+  // Measure Option  (two rows: one for each choice)
+  IF [Movement Category] = "Opening" THEN "Headcount"
+  ELSEIF [Movement Category] = "Closing" THEN "FTE"
+  END
+  ```
+  ```
+  // Option State
+  IF [Measure Option] = [Measure] THEN "On" ELSE "Off" END
+  ```
+  Filter `Measure Option` to exclude Null. Put `Measure Option` on Rows (or Columns for a side-by-side pair), `Option State` on Color and `Measure Option` on Label. Set the mark type to **Square**, size it to fill the cell, and color On navy `#13233A`, Off off-white `#FBFBF8`. Set the label color to Automatic so white text appears on navy. Hide the headers and borders, and turn off tooltips. Then add a **Change Parameter** action: Source = this sheet, Run on **Select**, Target parameter = **Measure**, Field = `Measure Option`, and **Clearing the selection will: Keep current value**. Because the color is driven by the parameter, the selected pill always looks selected, with one sheet and no images.
+  The same pattern works for the Methodology pill: a one-row sheet whose color depends on `Show Methodology`.
+  Start Month and End Month stay as native parameter controls (compact dropdowns). Tableau cannot restyle those into pills, so keep them neutral and let the pills carry the emphasis.
 - **Dynamic zone visibility:** on the Executive Summary, add a container holding a short methodology note, and under **Layout → Control visibility using value** pick `Show Methodology`. A button sheet with a parameter action toggles it.
 - **Navigation:** add **Navigation** buttons along the top of each dashboard so all four read as one product.
 

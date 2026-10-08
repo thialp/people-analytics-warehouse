@@ -72,11 +72,11 @@ d3.json("headcount_data.json").then(D => {
   d3.select("#hsub").text(`How the workforce changed in ${fy}, and why · every line reconciles to the month-end snapshot`);
 
   const kpis = [
-    ["Closing headcount", fmt(W.closing), `<span class="up">${pct(net / W.opening)}</span> vs ${fmt(W.opening)} at the start of ${fy}`],
-    ["Closing FTE", d3.format(",.1f")(W.closing_fte), `${d3.format(",.0f")(W.closing - W.closing_fte)} FTE below headcount (part-time)`],
-    ["Hires", fmt(W.hires), `${p1(W.hires / W.avg_headcount)} of average headcount`],
-    ["Voluntary turnover", p1(W.voluntary / W.avg_headcount), `${fmt(W.voluntary)} leavers by choice · annualized`],
-    ["Internal moves", fmt(W.moves), `${fmt(W.promotions)} promotions · ${fmt(W.transfers)} transfers`],
+    ["Closing headcount", fmt(W.closing), `<span class="up">${pct(net / W.opening)}</span> vs ${fmt(W.opening)} at start`],
+    ["Closing FTE", d3.format(",.1f")(W.closing_fte), `${d3.format(",.0f")(W.closing - W.closing_fte)} below headcount (part-time)`],
+    ["Hires", fmt(W.hires), `${p1(W.hires / W.avg_headcount)} annualized hire rate`],
+    ["Voluntary turnover (annualized)", p1(W.voluntary / W.avg_headcount), `${fmt(W.voluntary)} leavers by choice`],
+    ["Internal moves", fmt(W.moves), `${fmt(W.promotions)} promotions · ${fmt(W.moves - W.promotions)} other moves`],
   ];
   d3.select("#kpis").selectAll("div").data(kpis).join("div").attr("class", "kpi")
     .html(d => `<div class="l">${d[0]}</div><div class="v">${d[1]}</div><div class="n">${d[2]}</div>`);
