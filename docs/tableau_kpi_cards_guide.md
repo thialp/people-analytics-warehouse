@@ -296,7 +296,7 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 2. Hide everything map-like: **Map → Background Maps → None**; **Map → Map Options**: untick *Show Map Search*, *Show View Toolbar* and *Allow Pan/Zoom*. Set the sheet to **Entire View** and tooltips to none (**Worksheet → Tooltip**, untick *Show tooltips*).
 3. Drag `kpi_pt Title 1` onto the map and drop it on **Add a Marks Layer**. Then in that layer's Marks card:
    - Mark type **Circle**, size at the **smallest**, Color opacity **0%**.
-   - Drag **no other field** except the label text.
+   - **Leave the rest of this Marks card empty.** The layer's only field is its anchor point (`kpi_pt …`); the words come from the Label slot below. Do not drag anything else (Movement Category, Department and so on) onto Color, Detail, Size or Tooltip: a dimension there splits the single mark into many and the label goes blank or repeats.
    - **Label → Text**: click **Label** on the Marks card, then the `…` button next to Text to open the Edit Label window.
      - *Title layers:* delete anything in the box and type the words as plain text (for example `Closing headcount`). Titles never change, so they are not fields.
      - *Value and note layers:* don't type. Click **Insert** in that window and pick the field (for example `KPI 1 Value`); the box then shows the field in angle brackets, and that is the live text.
