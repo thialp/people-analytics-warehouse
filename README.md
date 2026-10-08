@@ -299,7 +299,7 @@ The daily scaffold stores 30 times more rows than the month-end snapshot and pas
 
 ### Tableau
 
-Step-by-step build, with every calculated field and the numbers to check against: [`docs/tableau_headcount_walk_guide.md`](docs/tableau_headcount_walk_guide.md) (also as a [PDF](docs/tableau_headcount_walk_guide.pdf)). The workbook has four dashboards (Executive Summary, Movement Drivers, Diagnostics, Methodology) and uses relationships across the six files, a date-range walk driven by parameters, annualized turnover from an average-headcount calculation, set and parameter actions, dynamic zone visibility, and a visible **Walk Gap** control that must read 0.
+Step-by-step build, with every calculated field and the numbers to check against: [`docs/tableau_headcount_walk_guide.md`](docs/tableau_headcount_walk_guide.md) (also as a [PDF](docs/tableau_headcount_walk_guide.pdf)). The five KPI cards are built as map layers: [`docs/tableau_kpi_cards_guide.md`](docs/tableau_kpi_cards_guide.md) (also as a [PDF](docs/tableau_kpi_cards_guide.pdf)) with a copy-ready [config workbook](docs/Arcadia_KPI_Cards_Config.xlsx). The workbook has four dashboards (Executive Summary, Movement Drivers, Diagnostics, Methodology) and uses relationships across the six files, a date-range walk driven by parameters, annualized turnover from an average-headcount calculation, set and parameter actions, dynamic zone visibility, and a visible **Walk Gap** control that must read 0.
 
 ---
 
