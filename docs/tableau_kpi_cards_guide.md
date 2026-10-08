@@ -352,7 +352,8 @@ Set the dashboard background to `#F3F3EF`. Every item is **Floating**; add them 
 | 10 | Waterfall card | Sheet or Blank | 56 | 188 | 780 | 624 | Left, about 60% |
 | 11 | Headcount trend card | Sheet or Blank | 848 | 188 | 496 | 300 | Right top |
 | 12 | Turnover by function card | Sheet or Blank | 848 | 500 | 496 | 312 | Right bottom |
-| 13 | Footer note | Text | 56 | 820 | 1288 | 22 | Slate `#5A6170`, 8 pt |
+| 13 | Waterfall caption | Sheet | 68 | 756 | 756 | 48 | Floats over the waterfall card's bottom padding; set the waterfall sheet's bottom inner padding to 64 |
+| 14 | Footer note | Text | 56 | 820 | 1288 | 22 | Slate `#5A6170`, 8 pt |
 
 Chart cards (items 10–12): the sheet itself with Background `#FBFBF8`, Border 1px solid `#E4E3DD` and Inner padding 12. For a chart not yet built, use a Blank object with the same coordinates, background and border, then swap in the sheet later. Widths add up exactly (780 + 12 + 496 = 1288; 300 + 12 + 312 = 624).
 
