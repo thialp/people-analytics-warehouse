@@ -280,27 +280,22 @@ MAKEPOINT([kpi_lat Title], [kpi_lon C1])
 ```
 Title *n* uses `kpi_lat Title` and `kpi_lon Cn`; Value *n* uses `kpi_lat Value`; Note *n* uses `kpi_lat Sub` (the latitude of the note row).
 
-Two helper lines:
+Two corner points. Tableau always zooms a map to fit the extent of its marks, so without them it would stretch the five text points to fill the sheet and the Fit and Shift parameters would have no effect. Two invisible points at the opposite corners of the sheet fix the extent. (Use points, not a `MAKELINE` frame: on a worksheet a line drew as a dot at its midpoint, so its ends did not count toward the extent.)
 
 ```
-// kpi_Frame   (not Fit-scaled: it marks the sheet's true extent; drawn at 0% opacity)
-MAKELINE(MAKEPOINT([kpi_SheetH] / 2 * [kpi_Scale], -[kpi_SheetW] / 2 * [kpi_Scale]),
-         MAKEPOINT(-[kpi_SheetH] / 2 * [kpi_Scale],  [kpi_SheetW] / 2 * [kpi_Scale]))
+// kpi_Corner TL   (not Fit-scaled: the true corner of the sheet)
+MAKEPOINT([kpi_SheetH] / 2 * [kpi_Scale], -[kpi_SheetW] / 2 * [kpi_Scale])
 ```
 ```
-// kpi_Check   (card 1 bottom-left to card 5 top-left, Fit applied; used only to calibrate)
-MAKELINE(
-  MAKEPOINT(-([kpi_GridTop] + [kpi_CardH] - [kpi_SheetH] / 2) * [kpi_Scale] * [kpi_FitY],
-            ([kpi_GridLeft] - [kpi_SheetW] / 2) * [kpi_Scale] * [kpi_FitX]),
-  MAKEPOINT(-([kpi_GridTop] - [kpi_SheetH] / 2) * [kpi_Scale] * [kpi_FitY],
-            ([kpi_GridLeft] + 4 * ([kpi_CardW] + [kpi_GapX]) - [kpi_SheetW] / 2) * [kpi_Scale] * [kpi_FitX]))
+// kpi_Corner BR
+MAKEPOINT(-[kpi_SheetH] / 2 * [kpi_Scale], [kpi_SheetW] / 2 * [kpi_Scale])
 ```
 
 There is **no gate** on the points: every row produces the same point, so Tableau draws one mark per layer, and the label measures aggregate every row. The one rule: **no other dimension may be on a layer's Marks card**, or Tableau splits the layer into one mark per value.
 
 ## 5. Build the sheet
 
-1. In **KPI Cards**, double-click `kpi_Frame`. Tableau creates a map. This is the bottom layer. In the Marks card set **Color opacity to 0%**, so it is invisible.
+1. In **KPI Cards**, double-click `kpi_Corner TL`. Tableau creates a map. In the Marks card set the mark type to **Circle**, size to the smallest and **Color opacity to 0%**, so it is invisible. Then drag `kpi_Corner BR` onto the map, drop it on **Add a Marks Layer**, and give it the same settings.
 2. **Size is set on the dashboard, not the sheet.** A worksheet cannot have a fixed size, so in the sheet editor the map fills your window and the text looks misplaced. The layout math assumes the sheet is exactly 1400 × 110, which you get when you float it on the dashboard (Section 7). Build the dashboard shell first (Fixed 1400 × 850, sheet floating at x 0, y 78, width 1400, height 110), then click the sheet there and use the **Go to Sheet** arrow to edit; judge positions on the dashboard only.
 3. Hide everything map-like: **Map → Background Maps → None**; **Map → Map Options**: untick *Show Map Search*, *Show View Toolbar* and *Allow Pan/Zoom*. Set the sheet to **Entire View** and tooltips to none (**Worksheet → Tooltip**, untick *Show tooltips*).
 4. Drag `kpi_pt Title 1` onto the map and drop it on **Add a Marks Layer**. Then in that layer's Marks card:
@@ -310,7 +305,7 @@ There is **no gate** on the points: every row produces the same point, so Tablea
      - *Title layers:* Tableau only lets you edit label text once a field is on the Label shelf (otherwise the Text box is grayed out), so each title is a one-line calculated field holding its words (Section 4.3). Drag `KPI n Title` onto **Label** and the words appear.
      - *Value and note layers:* drag the field (for example `KPI 1 Value`) onto **Label**; that is the live text. Use the `…` button only to set font and color.
      - Set the font, size and color in the same window.
-   - In the Label pop-up: tick **Show mark labels** and **Allow labels to overlap other marks**; set **Alignment** (dropdown, default Automatic) to Horizontal **Left** and Vertical **Middle**. Automatic centers the text on its point instead of starting it there.
+   - In the Label pop-up: tick **Show mark labels** and **Allow labels to overlap other marks**; set **Alignment** (dropdown, default Automatic) to Horizontal **Right** and Vertical **Middle**. On a mark label this setting says where the text sits relative to the point: Automatic centers it on the point, Left puts it to the left of the point (the text *ends* there), and Right makes it *start* at the point, which is what we want.
 5. Repeat for all 15 text layers. Fonts:
 
 | Layer | Font |
@@ -320,17 +315,15 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 | Notes | Tableau Book, 8 pt, slate `#5A6170`; card 1's note is colored per field (Section 4.3) |
 
    Tableau Public embeds only Tableau's own fonts, so stay with these.
-6. Last, add `kpi_Check` as the top layer: Mark type Line, color magenta, width 2 (you will delete it after calibration).
-7. Hide the "null" indicator in the corner (right-click it → **Hide Indicator**).
+6. Hide the "null" indicator in the corner (right-click it → **Hide Indicator**).
 
-## 6. Calibrate (about 15 minutes)
+## 6. Calibrate (about 5 minutes)
 
 1. Make the dashboard (Section 7) with the background PNG underneath, and the sheet on top, then work from there.
-2. Look at the magenta check line: its two ends should land on the **bottom-left corner of card 1** and the **top-left corner of card 5**.
-3. If the line is too short or too long horizontally, change `kpi_FitX`; vertically, `kpi_FitY`. Change both in steps of 0.01. They should end up close to 1.1 (Tableau pads the fit by about 4.5% on each side).
-4. If the line is correct but a text piece looks off by a few pixels, change `kpi_ShiftX`/`kpi_ShiftY` or the text row offsets (`kpi_TitleDY`, `kpi_ValueDY`, `kpi_SubDY`).
-5. If a title is centered on its anchor instead of starting there, set the label alignment to **Left** in that layer.
-6. Delete the `kpi_Check` layer.
+2. With `kpi_FitX` and `kpi_FitY` at **1.1**, each title, value and note should start 16 px inside its card, and the three rows should sit about 19, 44 and 68 px below each card's top edge.
+3. If the text is a little too wide or too narrow across the five cards, change `kpi_FitX` by 0.01 at a time; if the rows are too spread out or too tight vertically, change `kpi_FitY`. (To adjust live, right-click the parameter, choose **Show Parameter**, and edit it on the dashboard; remove the control afterwards.)
+4. If everything is off by the same few pixels, change `kpi_ShiftX` / `kpi_ShiftY`, or the row offsets (`kpi_TitleDY`, `kpi_ValueDY`, `kpi_SubDY`).
+5. If the text *ends* at its anchor instead of starting there, set Horizontal alignment to **Right** (Section 5).
 
 ## 7. Put it on the dashboard
 
@@ -364,6 +357,8 @@ I ran the same text formulas in Python against the warehouse numbers and they re
 | A label is blank | A dimension is on that layer's Marks card, splitting the layer so the label sees a partial row set. Remove it. |
 | Two copies of a label | Same cause. |
 | The whole text block sits too low or too high | Adjust `kpi_ShiftY`, or the Fit values (Section 6). |
+| Fit and Shift parameters change nothing, and the text stretches across the whole sheet | The two corner layers are missing or not counted. Tableau re-fits the map to its marks each time, so the corners must be present (Section 4.4). |
+| Text ends at its anchor instead of starting there | Alignment is Left; set Horizontal to Right. |
 | Text clipped at the right of card 5 | The text is wider than the card; shorten the note or reduce the font. |
 | Text looks misplaced in the sheet editor | Expected: a worksheet can't have a fixed size. Judge on the dashboard (Section 7). |
 | Fonts look different on Tableau Public | Only Tableau's fonts are embedded; avoid others. |
