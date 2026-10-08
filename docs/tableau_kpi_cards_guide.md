@@ -293,16 +293,17 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 ## 5. Build the sheet
 
 1. In **KPI Cards**, double-click `kpi_Frame`. Tableau creates a map. This is the bottom layer. In the Marks card set **Color opacity to 0%**, so it is invisible.
-2. Hide everything map-like: **Map → Background Maps → None**; **Map → Map Options**: untick *Show Map Search*, *Show View Toolbar* and *Allow Pan/Zoom*. Set the sheet to **Entire View** and tooltips to none (**Worksheet → Tooltip**, untick *Show tooltips*).
-3. Drag `kpi_pt Title 1` onto the map and drop it on **Add a Marks Layer**. Then in that layer's Marks card:
+2. **Set the sheet size first.** The layout math assumes the sheet is exactly 1400 × 110. Open the **Entire View** dropdown in the toolbar, choose **Fixed Size → Custom**, and enter width 1400, height 110. Until you do, the sheet fills your screen and every text piece lands in the wrong place.
+3. Hide everything map-like: **Map → Background Maps → None**; **Map → Map Options**: untick *Show Map Search*, *Show View Toolbar* and *Allow Pan/Zoom*. Set the sheet to **Entire View** and tooltips to none (**Worksheet → Tooltip**, untick *Show tooltips*).
+4. Drag `kpi_pt Title 1` onto the map and drop it on **Add a Marks Layer**. Then in that layer's Marks card:
    - Mark type **Circle**, size at the **smallest**, Color opacity **0%**.
    - **Leave the rest of this Marks card empty.** The layer's only field is its anchor point (`kpi_pt …`); the words come from the Label slot below. Do not drag anything else (Movement Category, Department and so on) onto Color, Detail, Size or Tooltip: a dimension there splits the single mark into many and the label goes blank or repeats.
    - **Label → Text**: click **Label** on the Marks card, then the `…` button next to Text to open the Edit Label window.
      - *Title layers:* delete anything in the box and type the words as plain text (for example `Closing headcount`). Titles never change, so they are not fields.
      - *Value and note layers:* don't type. Click **Insert** in that window and pick the field (for example `KPI 1 Value`); the box then shows the field in angle brackets, and that is the live text.
      - Set the font, size and color in the same window.
-   - Label font, alignment **Left**, vertical **Middle**, *Allow labels to overlap other marks* on.
-4. Repeat for all 17 layers (15 anchor points, plus the two extra notes for card 1's Down and Flat states, which reuse `kpi_pt Sub 1`). Fonts:
+   - In the Label pop-up: tick **Show mark labels** and **Allow labels to overlap other marks**; set **Alignment** (dropdown, default Automatic) to Horizontal **Left** and Vertical **Middle**. Automatic centers the text on its point instead of starting it there.
+5. Repeat for all 17 layers (15 anchor points, plus the two extra notes for card 1's Down and Flat states, which reuse `kpi_pt Sub 1`). Fonts:
 
 | Layer | Font |
 |---|---|
@@ -311,8 +312,8 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 | Notes | Tableau Book, 8 pt, slate `#5A6170`; for `KPI 1 Note Up` use teal text `#006B66`, for `KPI 1 Note Down` dark coral `#B8401F` |
 
    Tableau Public embeds only Tableau's own fonts, so stay with these.
-5. Last, add `kpi_Check` as the top layer: Mark type Line, color magenta, width 2 (you will delete it after calibration).
-6. Hide the "null" indicator in the corner (right-click it → **Hide Indicator**).
+6. Last, add `kpi_Check` as the top layer: Mark type Line, color magenta, width 2 (you will delete it after calibration).
+7. Hide the "null" indicator in the corner (right-click it → **Hide Indicator**).
 
 ## 6. Calibrate (about 15 minutes)
 
