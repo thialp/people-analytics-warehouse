@@ -264,13 +264,13 @@ Five longitude fields (`i` is 0 to 4; write the number out in each field):
   * [kpi_Scale] * [kpi_FitX]
 ```
 
-Fifteen anchor points, one per title, value and note on each card (names `kpi_pt Title 1` … `kpi_pt Sub 5`):
+Fifteen anchor points. Each card has three pieces of text (a title, a value and a note), and each piece sits at its own spot, so each gets its own point: 5 cards × 3 pieces = 15. Names run `kpi_pt Title 1` … `kpi_pt Title 5`, `kpi_pt Value 1` … `kpi_pt Value 5` and `kpi_pt Note 1` … `kpi_pt Note 5`:
 
 ```
 // kpi_pt Title 1
 MAKEPOINT([kpi_lat Title], [kpi_lon C1])
 ```
-Title *n* uses `kpi_lat Title` and `kpi_lon Cn`; Value *n* uses `kpi_lat Value`; Note *n* (called `kpi_pt Sub n`) uses `kpi_lat Sub`.
+Title *n* uses `kpi_lat Title` and `kpi_lon Cn`; Value *n* uses `kpi_lat Value`; Note *n* uses `kpi_lat Sub` (the latitude of the note row).
 
 Two helper lines:
 
@@ -297,7 +297,10 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 3. Drag `kpi_pt Title 1` onto the map and drop it on **Add a Marks Layer**. Then in that layer's Marks card:
    - Mark type **Circle**, size at the **smallest**, Color opacity **0%**.
    - Drag **no other field** except the label text.
-   - **Label → Text** (click the `…` button): for a title, type the text directly; for a value or note, insert the field.
+   - **Label → Text**: click **Label** on the Marks card, then the `…` button next to Text to open the Edit Label window.
+     - *Title layers:* delete anything in the box and type the words as plain text (for example `Closing headcount`). Titles never change, so they are not fields.
+     - *Value and note layers:* don't type. Click **Insert** in that window and pick the field (for example `KPI 1 Value`); the box then shows the field in angle brackets, and that is the live text.
+     - Set the font, size and color in the same window.
    - Label font, alignment **Left**, vertical **Middle**, *Allow labels to overlap other marks* on.
 4. Repeat for all 17 layers (15 anchor points, plus the two extra notes for card 1's Down and Flat states, which reuse `kpi_pt Sub 1`). Fonts:
 
