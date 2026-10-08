@@ -174,10 +174,29 @@ One row per job family: `job_family_code`, `job_family`.
 ### mart_dim_grade
 One row per grade: `grade`, `grade_level`, `career_track`.
 
+### mart_dim_location
+One row per office: `location_id`, `city`, `country_code`, `country_name`, `region`, `site_type`, `latitude`, `longitude`. Coordinates are public city-centre points; `Remote - US` has none.
+
+### mart_location_headcount
+One row per month-end per office. Movements are positive counts; the column name carries the direction.
+
+| Column | Definition |
+|---|---|
+| `opening_headcount` | Workers at this office at the prior month-end |
+| `hires` | Workers who joined the company at this office |
+| `voluntary_terminations`, `involuntary_terminations` | Workers who left the company from this office |
+| `relocations_in`, `relocations_out` | Workers who changed office between the two month-ends, including within a country |
+| `closing_headcount`, `closing_fte` | Workers at this office at the month-end, and their FTE |
+
+`opening + hires − voluntary − involuntary + relocations_in − relocations_out = closing` for every row (test 19).
+
+### mart_mobility_flows
+One row per month-end per origin office per destination office: `from_location_id`, `from_city`, `from_region`, `from_latitude`, `from_longitude`, the same five for `to_`, `flow_scope` (`Domestic` or `International`), `has_coordinates` (false when either end is remote) and `workers`. Flows out of and into each office equal its relocations (test 22).
+
 ## Intermediate models used by the walk
 
 ### int_worker_movement
-One row per worker per month for everyone active at the prior month-end, the current month-end or both: the worker's slice and FTE at each end, `movement_type` (Hire, Termination, Internal Move, No Change), `movement_reason` and `fte_changed`. Test 18 checks there is never a second row for the same worker and month.
+One row per worker per month for everyone active at the prior month-end, the current month-end or both: the worker's slice, office and FTE at each end, `movement_type` (Hire, Termination, Internal Move, No Change), `movement_reason` and `fte_changed`. Test 18 checks there is never a second row for the same worker and month.
 
 ### int_worker_in_month_hire_and_exit
 Workers hired and terminated between the same two month-ends. A month-end walk cannot show them, so they are listed here instead of disappearing. The current synthetic data has none.

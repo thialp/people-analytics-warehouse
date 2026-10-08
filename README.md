@@ -1,15 +1,18 @@
 # People Analytics Warehouse
 
+<img src="docs/brand/arcadia_logo_horizontal.svg" alt="Arcadia Systems" height="56">
+
 [![Build and test warehouse](https://github.com/thialp/people-analytics-warehouse/actions/workflows/pipeline.yml/badge.svg)](https://github.com/thialp/people-analytics-warehouse/actions/workflows/pipeline.yml)
 
-An HR data warehouse for a fictional global company, built to answer the two questions every workforce review starts with, in SQL that reconciles exactly:
+An HR data warehouse for a fictional global company, built to answer the three questions every workforce review starts with, in SQL that reconciles exactly:
 
 | Case study | Question | Dashboard |
 |---|---|---|
 | **1. [Workforce Cost Bridge](#1-business-problem)** | *Why did our workforce cost change?* A monthly walk of annualized pay run-rate that splits every dollar of change into hires, terminations, transfers, promotions, merit, mobility, FTE, fringe and currency, in **nominal** and **constant** currency, reconciled to the cent. | Tableau Public: *coming soon* |
 | **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | Tableau Public: *coming soon* |
+| **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, where are we growing, and how do people move between offices?* An office-level walk and an origin-to-destination relocation table, drawn as a four-layer Tableau map with `MAKEPOINT`, `MAKELINE` and `BUFFER`. | Tableau Public: *coming soon* |
 
-Both case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot.
+All three case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot, and share one look ([`docs/brand/`](docs/brand/README.md)).
 
 > **All data is synthetic.** Arcadia Systems is a fictional company. The data was generated from scratch by the simulation in [`generator/`](generator/). No real company data, people or pay is used. The business problems are common ones in enterprise HR and Finance analytics; the design, rules and code here are my own.
 
@@ -17,12 +20,12 @@ Both case studies run on the same simulated company, the same effective-dated hi
 |---|---|
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 19,276 workers · 4 fiscal years · 49 month-ends · 15 countries · 13 currencies · 592,823 worker-month snapshots |
-| **Output** | Three Tableau-ready marts and five dimension files in [`data/marts/`](data/marts/) |
-| **Controls** | 18 automated data tests; the build stops if any fails |
+| **Output** | Five Tableau-ready marts and six dimension files in [`data/marts/`](data/marts/) |
+| **Controls** | 22 automated data tests; the build stops if any fails |
 
 ---
 
-> Sections 1 to 10 cover case study 1, the Workforce Cost Bridge. [Case study 2](#case-study-2-headcount--fte-walk) follows them.
+> Sections 1 to 10 cover case study 1, the Workforce Cost Bridge. [Case study 2](#case-study-2-headcount--fte-walk) and [case study 3](#case-study-3-global-workforce-footprint) follow them.
 
 ## 1. Business problem
 
@@ -169,6 +172,10 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 16 | Internal moves net to zero company-wide, for every reason | Moves creating or destroying headcount |
 | 17 | Hires and leavers = a recount from the worker master's hire and termination dates | Snapshot logic drifting from the source of truth |
 | 18 | One movement row per worker per month | A worker counted twice in one month |
+| 19 | **Opening + hires − leavers ± relocations = Closing** for every office and month | An office walk that doesn't reconcile |
+| 20 | Offices add up to the company headcount walk: opening, hires, leavers by type, closing headcount and FTE | The map and the walk telling different stories |
+| 21 | Relocations net to zero company-wide every month | Relocations creating or destroying people |
+| 22 | Flows out of and into each office equal its relocations; no self-loops; every office except remote has coordinates | Map lines that don't match the numbers, or offices missing from the map |
 
 The tests were checked against deliberately broken builds. With the correction logic removed from staging, five of them fail. Treating workers as gone on their last day worked instead of the day after (an off-by-one on the termination date) fails test 17; dropping reorganization moves from the walk fails tests 13 and 16.
 
@@ -207,7 +214,7 @@ The two marts are built for Tableau and connect directly from Tableau Public:
 | [`mart_workforce_cost_bridge.csv`](data/marts/mart_workforce_cost_bridge.csv) | month × department × driver | *Why* did cost change? Waterfall by driver, filterable by department and period, with nominal/constant and base/loaded switches |
 | [`mart_workforce_cost_snapshot.csv`](data/marts/mart_workforce_cost_snapshot.csv) | month × department × country × grade × job family | *Where* is the cost? Mix, trend, compa-ratio and FX impact by country |
 
-Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_public_guide.md). The headcount walk has its own guide, in [case study 2](#case-study-2-headcount--fte-walk).
+Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_public_guide.md). The headcount walk and the workforce map have their own guides, in [case study 2](#case-study-2-headcount--fte-walk) and [case study 3](#case-study-3-global-workforce-footprint).
 
 ## 10. Lessons learned
 
@@ -296,6 +303,43 @@ Step-by-step build, with every calculated field and the numbers to check against
 
 ---
 
+## Case study 3: Global Workforce Footprint
+
+![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
+
+*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive dashboard is on Tableau Public (coming soon).*
+
+### Business problem
+
+Location strategy questions (where to hire next, which hubs are growing, whether people are moving toward engineering centers or away from headquarters) are usually answered from a country column. A country hides the difference between two offices in the same country, and it can't show movement. This case study answers them at the office level, with every number tied back to the headcount walk.
+
+### Approach
+
+| Model | What it does |
+|---|---|
+| [`int_worker_movement`](sql/02_intermediate/int_worker_movement.sql) | Now carries each worker's office at both month-ends |
+| [`mart_location_headcount`](sql/03_marts/mart_location_headcount.sql) | One row per office per month: opening, hires, leavers by type, relocations in and out, closing (headcount and FTE) |
+| [`mart_mobility_flows`](sql/03_marts/mart_mobility_flows.sql) | Origin and destination office for every relocation, with both ends' coordinates, so Tableau can draw `MAKELINE` without relating the location table twice |
+| [`mart_dim_location`](sql/03_marts/mart_dim_location.sql) | Offices with public city-centre coordinates. Remote workers get none, rather than an invented point |
+
+A relocation is any change of office between two month-ends, including between two offices in the same country, which the slice-level walk in case study 2 can't see (Bangalore to Hyderabad is the busiest corridor, and both are in India). Four tests (19 to 22) tie the office walk to the company walk and the flows to the office walk.
+
+### Results (FY26)
+
+| Finding | Number |
+|---|---|
+| Fastest-growing region | Asia Pacific, +7.0% (3,217 → 3,443), against +5.5% company-wide |
+| Share in the two India engineering centers | 20% of the company (2,625 people), larger than headquarters in Austin (1,627) |
+| Relocations | 241 people changed office; 64 moved between countries |
+| Busiest corridor | Bangalore ↔ Hyderabad, 62 people |
+| Within 1,000 km of London | Dublin, Paris and Berlin: 1,822 people across four offices |
+
+### Tableau
+
+Step-by-step build: [`docs/tableau_workforce_map_guide.md`](docs/tableau_workforce_map_guide.md). One map with four layers (countries, relocation paths with `MAKELINE`, a `BUFFER` radius around the selected office, offices with `MAKEPOINT`), a parameter action that moves the radius when an office is clicked, `DISTANCE` to count the people inside it, and the 2025 viewport parameter and dynamic color range where Tableau Public supports them.
+
+---
+
 ## Run it yourself
 
 Requires Python 3.11+.
@@ -310,6 +354,7 @@ python pipeline/run_pipeline.py        # build the warehouse, run tests, export 
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)
 pip install matplotlib && python docs/make_headcount_walk_preview.py   # optional: redraw the preview image
+bash docs/brand/build/build.sh                  # optional: rebuild the logo and the map preview (needs Node)
 ```
 
 The warehouse is written to `warehouse/arcadia.duckdb`. Open it with the [DuckDB CLI](https://duckdb.org/docs/installation/) or any SQL client to explore the tables.
@@ -345,7 +390,7 @@ Details: [`docs/docker_compose_guide.md`](docs/docker_compose_guide.md).
 ├── sql/                  DuckDB pipeline
 │   ├── 01_staging/       typing, corrections
 │   ├── 02_intermediate/  fiscal calendar, worker month-end snapshot, worker movement
-│   └── 03_marts/         cost bridge, cost snapshot, headcount & FTE walk, dimensions
+│   └── 03_marts/         cost bridge, cost snapshot, headcount & FTE walk, office walk, mobility flows, dimensions
 ├── tests/                data-quality and reconciliation tests (SQL)
 ├── pipeline/             build runner
 ├── benchmarks/           grain benchmark for the headcount walk
@@ -353,6 +398,7 @@ Details: [`docs/docker_compose_guide.md`](docs/docker_compose_guide.md).
 ├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
 ├── tableau/              Tableau Custom SQL and connection settings
 └── docs/                 data dictionary, methodology, Tableau, SQL Server and Docker guides
+    └── brand/            Arcadia logo, color palettes (Tableau Preferences.tps), style rules
 ```
 
 ---
