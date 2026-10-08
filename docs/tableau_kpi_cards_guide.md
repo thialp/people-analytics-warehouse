@@ -33,7 +33,7 @@ The dashboard is 1400 × 850. The header band is 0–76. The KPI sheet floats at
 | Card size | 244 × 86 |
 | Gap between cards | 17 (card lefts at 56, 317, 578, 839, 1100) |
 | Text inset from the card's left edge | 16 |
-| Title / value / note baselines below the card top | 19 / 44 / 68 |
+| Title / value / note centers below the card top | 17 / 44 / 71 |
 
 Why the 56 px gutter: Tableau pads the map's fitted extent by roughly 4.5% on each side, so text anchored in the outer 9% of the sheet drifts off. The first text anchor sits at 72 px, which stays inside.
 
@@ -52,7 +52,7 @@ Create these 16 parameters (Float unless noted; none are shown on the dashboard)
 | `kpi_CardW` / `kpi_CardH` | 244 / 86 | Card size |
 | `kpi_GapX` | 17 | Space between cards |
 | `kpi_PadX` | 16 | Text inset from the card's left edge |
-| `kpi_TitleDY` / `kpi_ValueDY` / `kpi_SubDY` | 19 / 44 / 68 | Text center below the card top |
+| `kpi_TitleDY` / `kpi_ValueDY` / `kpi_SubDY` | 17 / 44 / 71 | Text center below the card top |
 
 ## 4. Calculated fields
 
@@ -133,7 +133,7 @@ Every other string repeats one of these two patterns: the **comma pattern** (for
 
 | Card | Value field | Note field(s) |
 |---|---|---|
-| 1 Closing headcount | `KPI 1 Value` | `KPI 1 Note Up`, `Note Down`, `Note Flat` |
+| 1 Closing headcount | `KPI 1 Value` | `KPI 1 Note Up`, `Note Down`, `Note Flat`, `Note Rest` |
 | 2 Closing FTE | `KPI 2 Value` | `KPI 2 Note` |
 | 3 Hires | `KPI 3 Value` | `KPI 3 Note` |
 | 4 Voluntary turnover (annualized) | `KPI 4 Value` | `KPI 4 Note` |
@@ -147,28 +147,29 @@ THEN STR(DIV(INT([K Close HC]), 1000)) + "," + RIGHT("00" + STR(INT([K Close HC]
 ELSE STR(INT([K Close HC])) END
 ```
 ```
-// KPI 1 Note Up   (teal text)
-IF [K Valid] AND [K Net Pct] > 0 THEN "+" + [K Net Pct Str] + " vs " + [K Open Str] + " at start" END
+// KPI 1 Note Up   (teal, Tableau Semibold)
+IF [K Valid] AND [K Net Pct] > 0 THEN "+" + [K Net Pct Str] END
 ```
 ```
-// KPI 1 Note Down   (dark coral text)
-IF [K Valid] AND [K Net Pct] < 0 THEN "−" + [K Net Pct Str] + " vs " + [K Open Str] + " at start" END
+// KPI 1 Note Down   (dark coral, Tableau Semibold)
+IF [K Valid] AND [K Net Pct] < 0 THEN "−" + [K Net Pct Str] END
 ```
 ```
-// KPI 1 Note Flat   (slate text)
-IF [K Valid] AND [K Net Pct] = 0 THEN [K Net Pct Str] + " vs " + [K Open Str] + " at start" END
+// KPI 1 Note Flat   (slate, Tableau Semibold)
+IF [K Valid] AND [K Net Pct] = 0 THEN [K Net Pct Str] END
 ```
-All three go on the **Label** shelf of the same layer (`kpi_pt Note 1`); only one is ever non-empty, so the color follows the sign. In the Edit Label window put them on one line with no spaces, `<KPI 1 Note Up><KPI 1 Note Down><KPI 1 Note Flat>`, then select each field and color it separately: Up teal `#006B66`, Down dark coral `#B8401F`, Flat slate `#5A6170`.
+```
+// KPI 1 Note Rest   (slate, Tableau Book)
+IF [K Valid] THEN "vs " + [K Open Str] + " at start" END
+```
+All four go on the **Label** shelf of the same layer (`kpi_pt Note 1`). In the Edit Label window put them on one line with a typed space before the last one: `<KPI 1 Note Up><KPI 1 Note Down><KPI 1 Note Flat> <KPI 1 Note Rest>`. Only one of Up, Down and Flat is ever non-empty, so the colored percentage is followed directly by the gray "vs 12,510 at start", and the color follows the sign. Select each field in the window and set its color: Up teal `#006B66`, Down dark coral `#B8401F`, Flat slate `#5A6170`, Rest slate `#5A6170`.
 
 ```
-// KPI 2 Value   (12,940.0: round to tenths, then split whole and tenth)
-IF NOT [K Valid] THEN "—" ELSE
-  IF DIV(INT(ROUND([K Close FTE] * 10, 0)), 10) >= 1000
-  THEN STR(DIV(DIV(INT(ROUND([K Close FTE] * 10, 0)), 10), 1000)) + "," +
-       RIGHT("00" + STR(DIV(INT(ROUND([K Close FTE] * 10, 0)), 10) % 1000), 3)
-  ELSE STR(DIV(INT(ROUND([K Close FTE] * 10, 0)), 10)) END
-  + "." + STR(INT(ROUND([K Close FTE] * 10, 0)) % 10)
-END
+// KPI 2 Value   (whole number: FTE is fractional underneath, but a card reads cleaner without ".0")
+IF NOT [K Valid] THEN "—"
+ELSEIF ROUND([K Close FTE], 0) >= 1000
+THEN STR(DIV(INT(ROUND([K Close FTE], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([K Close FTE], 0)) % 1000), 3)
+ELSE STR(INT(ROUND([K Close FTE], 0))) END
 ```
 ```
 // KPI 2 Note
@@ -320,7 +321,7 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 ## 6. Calibrate (about 5 minutes)
 
 1. Make the dashboard (Section 7) with the background PNG underneath, and the sheet on top, then work from there.
-2. With `kpi_FitX` and `kpi_FitY` at **1.1**, each title, value and note should start 16 px inside its card, and the three rows should sit about 19, 44 and 68 px below each card's top edge.
+2. With `kpi_FitX` and `kpi_FitY` at **1.1**, each title, value and note should start 16 px inside its card, and the three rows should sit about 17, 44 and 71 px below each card's top edge.
 3. If the text is a little too wide or too narrow across the five cards, change `kpi_FitX` by 0.01 at a time; if the rows are too spread out or too tight vertically, change `kpi_FitY`. (To adjust live, right-click the parameter, choose **Show Parameter**, and edit it on the dashboard; remove the control afterwards.)
 4. If everything is off by the same few pixels, change `kpi_ShiftX` / `kpi_ShiftY`, or the row offsets (`kpi_TitleDY`, `kpi_ValueDY`, `kpi_SubDY`).
 5. If the text *ends* at its anchor instead of starting there, set Horizontal alignment to **Right** (Section 5).
@@ -343,7 +344,7 @@ Start Month 2025-07-31, End Month 2026-06-30:
 | Card | Value | Note |
 |---|---|---|
 | 1 Closing headcount | 13,201 | +5.5% vs 12,510 at start |
-| 2 Closing FTE | 12,940.0 | 261 below headcount (part-time) |
+| 2 Closing FTE | 12,940 | 261 below headcount (part-time) |
 | 3 Hires | 2,354 | 18.3% annualized hire rate |
 | 4 Voluntary turnover (annualized) | 10.4% | 1,341 leavers by choice |
 | 5 Internal moves | 1,615 | 1,038 promotions · 577 other moves |

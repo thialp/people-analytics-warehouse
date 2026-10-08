@@ -188,7 +188,7 @@ IF [Selected Departments] THEN "Selected" ELSE "Rest of company" END
 | Voluntary Turnover (annualized) | 10.4% |
 | Walk Gap | 0 |
 
-With Measure = FTE: Opening 12,281.7, Closing 12,940.0, FTE Changes −34.1.
+With Measure = FTE: Opening 12,281.7, Closing 12,940.0 (shown as 12,940 on the card), FTE Changes −34.1.
 
 If a number is off, the usual cause is a type (Step 2.4) or a filter left on a sheet.
 
