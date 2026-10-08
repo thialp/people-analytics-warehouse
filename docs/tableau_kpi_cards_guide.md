@@ -333,6 +333,29 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 3. Drag the **KPI Cards** sheet, also **Floating**, at the same position and size, and move it above the image in the layout tree. Set its background to **None** and hide its title.
 4. Check that no other object overlaps this band, and that every other card on the page starts at the same left gutter, x = 56.
 
+
+### Full dashboard grid (1400 × 850)
+
+Set the dashboard background to `#F3F3EF`. Every item is **Floating**; add them in this order so later items sit on top. The side gutter is 56 px everywhere.
+
+| # | Item | Type | x | y | w | h | Notes |
+|---|---|---|---|---|---|---|---|
+| 1 | Header band | Blank | 0 | 0 | 1400 | 76 | Background `#13233A` |
+| 2 | Logo | Image | 56 | 14 | 177 | 48 | `arcadia_logo_horizontal_reverse.png`, Fit image on, Center off |
+| 3 | Title and subtitle | Text | 256 | 10 | 470 | 58 | Title white, Tableau Bold 18–20 pt; subtitle `#C9D1DC`, Tableau Book 9 pt |
+| 4 | Start Month | Parameter control | 744 | 22 | 140 | 32 | Compact dropdown, white background, title hidden |
+| 5 | End Month | Parameter control | 892 | 22 | 140 | 32 | Same |
+| 6 | Headcount / FTE pills | Sheet (Measure Toggle) | 1044 | 22 | 150 | 32 | No title, background none |
+| 7 | Methodology pill | Sheet | 1204 | 22 | 140 | 32 | Right edge 1344 |
+| 8 | KPI card background | Image | 0 | 78 | 1400 | 110 | `arcadia_kpi_cards_bg.png`, Fit image on, Center off |
+| 9 | KPI cards | Sheet | 0 | 78 | 1400 | 110 | Background none, title hidden, above the image |
+| 10 | Waterfall card | Sheet or Blank | 56 | 188 | 780 | 624 | Left, about 60% |
+| 11 | Headcount trend card | Sheet or Blank | 848 | 188 | 496 | 300 | Right top |
+| 12 | Turnover by function card | Sheet or Blank | 848 | 500 | 496 | 312 | Right bottom |
+| 13 | Footer note | Text | 56 | 820 | 1288 | 22 | Slate `#5A6170`, 8 pt |
+
+Chart cards (items 10–12): the sheet itself with Background `#FBFBF8`, Border 1px solid `#E4E3DD` and Inner padding 12. For a chart not yet built, use a Blank object with the same coordinates, background and border, then swap in the sheet later. Widths add up exactly (780 + 12 + 496 = 1288; 300 + 12 + 312 = 624).
+
 ## 8. Header controls
 
 The header buttons (Start, End, Headcount, FTE, Methodology) do **not** need an image per state. See the *Parameter action* entry in [the headcount guide, Section 6](tableau_headcount_walk_guide.md#6-dashboards-and-actions): one small sheet colors the selected option from the parameter itself, so the selected state follows automatically.
