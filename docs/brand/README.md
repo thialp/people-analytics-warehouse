@@ -18,6 +18,10 @@ In Tableau: drag an **Image** object into the header container, choose the PNG, 
 
 The logo is original, so it is safe to publish; Tableau Public's Viz of the Day guidance asks authors not to use logos they don't own.
 
+## Icons
+
+64 line icons restyled from Heroicons (MIT), named for what they mean in a workforce report, with a ready-to-install Tableau shape pack: [`icons/`](icons/README.md).
+
 ## Colors
 
 Every color has one job. The categorical order below passed a color-blindness check in this order (protanopia, deuteranopia, tritanopia), so keep it.
