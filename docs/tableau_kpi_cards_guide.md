@@ -231,7 +231,15 @@ IF NOT [K Valid] THEN "" ELSE
 END
 ```
 
-The titles are not fields: type them directly into each title layer's label (Section 5).
+Titles are constant text, held in five one-line fields so they can sit on the Label shelf:
+
+| Field | Formula |
+|---|---|
+| `KPI 1 Title` | `"Closing headcount"` |
+| `KPI 2 Title` | `"Closing FTE"` |
+| `KPI 3 Title` | `"Hires"` |
+| `KPI 4 Title` | `"Voluntary turnover (annualized)"` |
+| `KPI 5 Title` | `"Internal moves"` |
 
 ### 4.4 Geometry
 
@@ -299,8 +307,8 @@ There is **no gate** on the points: every row produces the same point, so Tablea
    - Mark type **Circle**, size at the **smallest**, Color opacity **0%**.
    - **Leave the rest of this Marks card empty.** The layer's only field is its anchor point (`kpi_pt …`); the words come from the Label slot below. Do not drag anything else (Movement Category, Department and so on) onto Color, Detail, Size or Tooltip: a dimension there splits the single mark into many and the label goes blank or repeats.
    - **Label → Text**: click **Label** on the Marks card, then the `…` button next to Text to open the Edit Label window.
-     - *Title layers:* delete anything in the box and type the words as plain text (for example `Closing headcount`). Titles never change, so they are not fields.
-     - *Value and note layers:* don't type. Click **Insert** in that window and pick the field (for example `KPI 1 Value`); the box then shows the field in angle brackets, and that is the live text.
+     - *Title layers:* Tableau only lets you edit label text once a field is on the Label shelf (otherwise the Text box is grayed out), so each title is a one-line calculated field holding its words (Section 4.3). Drag `KPI n Title` onto **Label** and the words appear.
+     - *Value and note layers:* drag the field (for example `KPI 1 Value`) onto **Label**; that is the live text. Use the `…` button only to set font and color.
      - Set the font, size and color in the same window.
    - In the Label pop-up: tick **Show mark labels** and **Allow labels to overlap other marks**; set **Alignment** (dropdown, default Automatic) to Horizontal **Left** and Vertical **Middle**. Automatic centers the text on its point instead of starting it there.
 5. Repeat for all 17 layers (15 anchor points, plus the two extra notes for card 1's Down and Flat states, which reuse `kpi_pt Sub 1`). Fonts:
