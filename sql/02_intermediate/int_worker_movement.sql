@@ -19,6 +19,10 @@
 --   grade went up/down  -> Promotion / Demotion
 --   job family changed  -> Job Change
 --
+-- Office (location_id) is carried for the location marts but is not part of
+-- the slice: a move between two offices in the same country is a relocation in
+-- mart_location_headcount, not an internal move in the headcount walk.
+--
 -- Workers hired and terminated inside the same month appear in neither
 -- snapshot, so a month-end walk never sees them. They are counted separately in
 -- int_worker_in_month_hire_and_exit rather than silently lost.
@@ -30,7 +34,7 @@ WITH month_pairs AS (
 ),
 
 snap AS (
-    SELECT month_end_date, worker_id, department_id, country_code, job_family, grade, fte
+    SELECT month_end_date, worker_id, department_id, location_id, country_code, job_family, grade, fte
     FROM intermediate.int_worker_month_end_snapshot
 ),
 
@@ -67,6 +71,7 @@ compared AS (
         pri.worker_id IS NOT NULL AS in_prior,
         cur.worker_id IS NOT NULL AS in_current,
         pri.department_id AS prior_department_id, cur.department_id AS current_department_id,
+        pri.location_id   AS prior_location_id,   cur.location_id   AS current_location_id,
         pri.country_code  AS prior_country_code,  cur.country_code  AS current_country_code,
         pri.job_family    AS prior_job_family,    cur.job_family    AS current_job_family,
         pri.grade         AS prior_grade,         cur.grade         AS current_grade,
