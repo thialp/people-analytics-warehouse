@@ -4,7 +4,7 @@
 
 The five cards under the header (Closing headcount, Closing FTE, Hires, Voluntary turnover, Internal moves) are **one Tableau sheet**. Every title, number and note on it is text drawn as a map layer, positioned by calculated fields. A transparent card image sits underneath. The result:
 
-- Five cards, 17 text pieces, one sheet, one query.
+- Five cards, 15 text layers, one sheet, one query.
 - Numbers, notes and colors update with the Start Month, End Month and any filter.
 - The layout (card width, gaps, text positions) is controlled by 16 parameters, so you can restyle the band without redrawing anything.
 - No images carry numbers, so nothing is stale and everything is searchable and accessible as a sheet.
@@ -158,7 +158,7 @@ IF [K Valid] AND [K Net Pct] < 0 THEN "−" + [K Net Pct Str] + " vs " + [K Open
 // KPI 1 Note Flat   (slate text)
 IF [K Valid] AND [K Net Pct] = 0 THEN [K Net Pct Str] + " vs " + [K Open Str] + " at start" END
 ```
-The three notes sit on the same spot; only one is ever non-empty, so the color follows the sign without any color field.
+All three go on the **Label** shelf of the same layer (`kpi_pt Note 1`); only one is ever non-empty, so the color follows the sign. In the Edit Label window put them on one line with no spaces, `<KPI 1 Note Up><KPI 1 Note Down><KPI 1 Note Flat>`, then select each field and color it separately: Up teal `#006B66`, Down dark coral `#B8401F`, Flat slate `#5A6170`.
 
 ```
 // KPI 2 Value   (12,940.0: round to tenths, then split whole and tenth)
@@ -301,7 +301,7 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 ## 5. Build the sheet
 
 1. In **KPI Cards**, double-click `kpi_Frame`. Tableau creates a map. This is the bottom layer. In the Marks card set **Color opacity to 0%**, so it is invisible.
-2. **Set the sheet size first.** The layout math assumes the sheet is exactly 1400 × 110. Open the **Entire View** dropdown in the toolbar, choose **Fixed Size → Custom**, and enter width 1400, height 110. Until you do, the sheet fills your screen and every text piece lands in the wrong place.
+2. **Size is set on the dashboard, not the sheet.** A worksheet cannot have a fixed size, so in the sheet editor the map fills your window and the text looks misplaced. The layout math assumes the sheet is exactly 1400 × 110, which you get when you float it on the dashboard (Section 7). Build the dashboard shell first (Fixed 1400 × 850, sheet floating at x 0, y 78, width 1400, height 110), then click the sheet there and use the **Go to Sheet** arrow to edit; judge positions on the dashboard only.
 3. Hide everything map-like: **Map → Background Maps → None**; **Map → Map Options**: untick *Show Map Search*, *Show View Toolbar* and *Allow Pan/Zoom*. Set the sheet to **Entire View** and tooltips to none (**Worksheet → Tooltip**, untick *Show tooltips*).
 4. Drag `kpi_pt Title 1` onto the map and drop it on **Add a Marks Layer**. Then in that layer's Marks card:
    - Mark type **Circle**, size at the **smallest**, Color opacity **0%**.
@@ -311,13 +311,13 @@ There is **no gate** on the points: every row produces the same point, so Tablea
      - *Value and note layers:* drag the field (for example `KPI 1 Value`) onto **Label**; that is the live text. Use the `…` button only to set font and color.
      - Set the font, size and color in the same window.
    - In the Label pop-up: tick **Show mark labels** and **Allow labels to overlap other marks**; set **Alignment** (dropdown, default Automatic) to Horizontal **Left** and Vertical **Middle**. Automatic centers the text on its point instead of starting it there.
-5. Repeat for all 17 layers (15 anchor points, plus the two extra notes for card 1's Down and Flat states, which reuse `kpi_pt Sub 1`). Fonts:
+5. Repeat for all 15 text layers. Fonts:
 
 | Layer | Font |
 |---|---|
 | Titles | Tableau Semibold, 8 pt, slate `#5A6170` |
 | Values | Tableau Bold, 20 pt, navy `#13233A` |
-| Notes | Tableau Book, 8 pt, slate `#5A6170`; for `KPI 1 Note Up` use teal text `#006B66`, for `KPI 1 Note Down` dark coral `#B8401F` |
+| Notes | Tableau Book, 8 pt, slate `#5A6170`; card 1's note is colored per field (Section 4.3) |
 
    Tableau Public embeds only Tableau's own fonts, so stay with these.
 6. Last, add `kpi_Check` as the top layer: Mark type Line, color magenta, width 2 (you will delete it after calibration).
@@ -325,7 +325,7 @@ There is **no gate** on the points: every row produces the same point, so Tablea
 
 ## 6. Calibrate (about 15 minutes)
 
-1. Make the dashboard (Section 7) with the background PNG underneath, and the sheet on top.
+1. Make the dashboard (Section 7) with the background PNG underneath, and the sheet on top, then work from there.
 2. Look at the magenta check line: its two ends should land on the **bottom-left corner of card 1** and the **top-left corner of card 5**.
 3. If the line is too short or too long horizontally, change `kpi_FitX`; vertically, `kpi_FitY`. Change both in steps of 0.01. They should end up close to 1.1 (Tableau pads the fit by about 4.5% on each side).
 4. If the line is correct but a text piece looks off by a few pixels, change `kpi_ShiftX`/`kpi_ShiftY` or the text row offsets (`kpi_TitleDY`, `kpi_ValueDY`, `kpi_SubDY`).
@@ -365,5 +365,5 @@ I ran the same text formulas in Python against the warehouse numbers and they re
 | Two copies of a label | Same cause. |
 | The whole text block sits too low or too high | Adjust `kpi_ShiftY`, or the Fit values (Section 6). |
 | Text clipped at the right of card 5 | The text is wider than the card; shorten the note or reduce the font. |
-| Layout changes when the dashboard is not fixed size | Use a fixed 1400 × 850 size. |
+| Text looks misplaced in the sheet editor | Expected: a worksheet can't have a fixed size. Judge on the dashboard (Section 7). |
 | Fonts look different on Tableau Public | Only Tableau's fonts are embedded; avoid others. |
