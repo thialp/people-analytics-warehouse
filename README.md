@@ -232,7 +232,7 @@ Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_pub
 
 ![Headcount & FTE Walk preview](docs/images/headcount_walk_preview.png)
 
-*Static preview drawn from the marts by [`docs/make_headcount_walk_preview.py`](docs/make_headcount_walk_preview.py). The interactive dashboard is on Tableau Public (coming soon).*
+*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive dashboard is on Tableau Public (coming soon).*
 
 ### Business problem
 
@@ -353,8 +353,7 @@ python generator/generate_data.py      # optional: rebuild the raw data (same se
 python pipeline/run_pipeline.py        # build the warehouse, run tests, export marts
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)
-pip install matplotlib && python docs/make_headcount_walk_preview.py   # optional: redraw the preview image
-bash docs/brand/build/build.sh                  # optional: rebuild the logo and the map preview (needs Node)
+bash docs/brand/build/build.sh                  # optional: rebuild the logo and both dashboard previews (needs Node)
 ```
 
 The warehouse is written to `warehouse/arcadia.duckdb`. Open it with the [DuckDB CLI](https://duckdb.org/docs/installation/) or any SQL client to explore the tables.

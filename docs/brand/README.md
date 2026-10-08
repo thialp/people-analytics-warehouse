@@ -62,9 +62,9 @@ These follow what Tableau Public's Viz of the Day team says it selects for: a cl
 2. **One navy header band** with the reverse logo on the left, the dashboard title, and the controls on the right. Same position on every dashboard.
 3. **KPI band of five tiles** under the header: label, big number, one line of context with the change in teal or coral.
 4. **Cards on a stone page.** Each chart sits on an off-white card with a 1px light-gray border and 12px gaps. No drop shadows, no gradients.
-5. **Bars start at zero.** The only exception is the headcount waterfall, whose axis break is stated in its title.
+5. **Bars start at zero, waterfalls included.** A truncated axis makes a 5% change look like a doubling.
 6. **Label directly, use few legends.** Label the bars and the few points that matter instead of numbering every mark.
 7. **Color means the same thing everywhere.** Teal is always growth, coral always loss, violet always movement between groups.
 8. **Every dashboard ends with a Methodology page** and allows the workbook to be downloaded.
 
-The source for the map preview is in [`build/`](build/); `bash docs/brand/build/build.sh` rebuilds the logos and the preview after `python pipeline/run_pipeline.py --no-export`.
+The source for both dashboard previews is in [`build/`](build/); `bash docs/brand/build/build.sh` rebuilds the logos and the previews after `python pipeline/run_pipeline.py --no-export`.

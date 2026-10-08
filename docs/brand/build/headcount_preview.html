@@ -1,0 +1,165 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Static preview of the Headcount & FTE Walk dashboard, in the Arcadia style.
+     Rendered by build.sh from headcount_data.json (export_headcount_data.py). -->
+<style>
+@font-face { font-family: Inter; font-weight: 400; src: url(node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; src: url(node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 700; src: url(node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2); }
+:root {
+  --navy: #13233A; --teal: #00938D; --coral: #E4572E; --coral-dark: #B8401F; --violet: #5B4FB3;
+  --ink: #13233A; --ink-2: #5A6170; --muted: #8C8A84; --grid: #E4E3DD; --surface: #FBFBF8; --page: #F3F3EF;
+}
+* { box-sizing: border-box; }
+body { margin: 0; width: 1400px; height: 846px; background: var(--page); font-family: Inter, sans-serif; color: var(--ink); }
+header { height: 76px; background: var(--navy); display: flex; align-items: center; padding: 0 28px; gap: 22px; }
+header img { height: 44px; }
+header .t { color: #fff; font-size: 21px; font-weight: 700; }
+header .s { color: #B9C2CF; font-size: 13px; margin-top: 3px; }
+header .pills { margin-left: auto; display: flex; gap: 8px; }
+.pill { border: 1px solid #3A4A63; color: #DCE3EC; font-size: 12px; padding: 7px 12px; border-radius: 999px; }
+.pill b { color: #fff; font-weight: 600; }
+.pill.on { background: #fff; color: var(--navy); border-color: #fff; }
+.kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 14px 28px 0; }
+.kpi { background: var(--surface); border: 1px solid var(--grid); border-radius: 10px; padding: 11px 14px; }
+.kpi .l { font-size: 12px; color: var(--ink-2); }
+.kpi .v { font-size: 26px; font-weight: 700; margin-top: 2px; }
+.kpi .n { font-size: 11.5px; color: var(--ink-2); margin-top: 1px; }
+.up { color: #006B66; font-weight: 600; }
+.down { color: #B8401F; font-weight: 600; }
+main { display: grid; grid-template-columns: 1fr 500px; gap: 12px; padding: 12px 28px 0; }
+.card { background: var(--surface); border: 1px solid var(--grid); border-radius: 10px; padding: 12px 14px; position: relative; }
+.card h3 { margin: 0 0 2px; font-size: 14px; font-weight: 700; }
+.card .sub { font-size: 11.5px; color: var(--ink-2); }
+.note { position: absolute; right: 12px; top: 12px; width: 250px; background: #fff; border: 1px solid var(--grid); border-radius: 8px; padding: 8px 10px; font-size: 11px; color: var(--ink-2); line-height: 1.55; }
+.note b { color: var(--ink); font-weight: 600; }
+.legend { display: flex; gap: 14px; font-size: 11px; color: var(--ink-2); margin-top: 6px; align-items: center; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.right { display: grid; grid-template-rows: 1fr 1fr; gap: 12px; height: 600px; }
+svg text { font-family: Inter, sans-serif; }
+footer { padding: 8px 28px; font-size: 11px; color: var(--muted); }
+</style></head>
+<body>
+<header>
+  <img src="../arcadia_logo_horizontal_reverse.svg" alt="Arcadia Systems">
+  <div><div class="t">Headcount &amp; FTE Walk</div>
+  <div class="s" id="hsub"></div></div>
+  <div class="pills"><span class="pill">Start <b>Jul 2025</b></span><span class="pill">End <b>Jun 2026</b></span><span class="pill on">Headcount</span><span class="pill">FTE</span><span class="pill">Methodology</span></div>
+</header>
+<div class="kpis" id="kpis"></div>
+<main>
+  <div class="card" style="height:600px">
+    <h3 id="wtitle"></h3>
+    <div class="sub">Opening + hires − leavers ± internal moves = closing · axis starts at zero</div>
+    <svg id="walk" width="770" height="540"></svg>
+    <div class="note" id="note"></div>
+  </div>
+  <div class="right">
+    <div class="card"><h3 id="ttitle"></h3><div class="sub">Closing headcount at each month-end · selected period shaded</div><svg id="trend" width="470" height="240"></svg></div>
+    <div class="card"><h3 id="ftitle"></h3><div class="sub">Leavers ÷ average headcount, annualized · Executive (a handful of officers) left out</div>
+      <div class="legend"><span><span class="sw" style="background:var(--coral)"></span>Voluntary</span><span><span class="sw" style="background:var(--coral-dark)"></span>Involuntary</span></div>
+      <svg id="func" width="470" height="210"></svg></div>
+  </div>
+</main>
+<footer>Arcadia Systems is a fictional company; all data is synthetic. Static preview of the Tableau Public dashboard · source: thialp/people-analytics-warehouse · mart_headcount_fte_walk and its dimension files</footer>
+
+<script src="node_modules/d3/dist/d3.min.js"></script>
+<script>
+const fmt = d3.format(","), pct = d3.format("+.1%"), p1 = d3.format(".1%");
+d3.json("headcount_data.json").then(D => {
+  const W = D.walk, fy = "FY" + String(D.fy).slice(-2);
+  const leavers = W.voluntary + W.involuntary, net = W.closing - W.opening;
+  d3.select("#hsub").text(`How the workforce changed in ${fy}, and why · every line reconciles to the month-end snapshot`);
+
+  const kpis = [
+    ["Closing headcount", fmt(W.closing), `<span class="up">${pct(net / W.opening)}</span> vs ${fmt(W.opening)} at the start of ${fy}`],
+    ["Closing FTE", d3.format(",.1f")(W.closing_fte), `${d3.format(",.0f")(W.closing - W.closing_fte)} FTE below headcount (part-time)`],
+    ["Hires", fmt(W.hires), `${p1(W.hires / W.avg_headcount)} of average headcount`],
+    ["Voluntary turnover", p1(W.voluntary / W.avg_headcount), `${fmt(W.voluntary)} leavers by choice · annualized`],
+    ["Internal moves", fmt(W.moves), `${fmt(W.promotions)} promotions · ${fmt(W.transfers)} transfers`],
+  ];
+  d3.select("#kpis").selectAll("div").data(kpis).join("div").attr("class", "kpi")
+    .html(d => `<div class="l">${d[0]}</div><div class="v">${d[1]}</div><div class="n">${d[2]}</div>`);
+
+  // Waterfall, from zero
+  d3.select("#wtitle").text(`${fy}: ${fmt(W.hires)} hires outpaced ${fmt(leavers)} leavers, adding ${fmt(net)} people`);
+  const steps = [
+    {name: "Opening", sub: "Jul 2025", v: W.opening, kind: "total"},
+    {name: "Hires", v: W.hires, kind: "up"},
+    {name: "Voluntary", sub: "leavers", v: -W.voluntary, kind: "down"},
+    {name: "Involuntary", sub: "leavers", v: -W.involuntary, kind: "down"},
+    {name: "Closing", sub: "Jun 2026", v: W.closing, kind: "total"},
+  ];
+  let run = 0;
+  steps.forEach(s => {
+    if (s.kind === "total") { s.y0 = 0; s.y1 = s.v; run = s.v; }
+    else { s.y0 = run; s.y1 = run + s.v; run += s.v; }
+  });
+  const svg = d3.select("#walk"), m = {l: 54, r: 20, t: 120, b: 52}, iw = 770 - m.l - m.r, ih = 540 - m.t - m.b;
+  const g = svg.append("g").attr("transform", `translate(${m.l},${m.t})`);
+  const x = d3.scaleBand().domain(steps.map(s => s.name)).range([0, iw]).padding(0.38);
+  const y = d3.scaleLinear().domain([0, d3.max(steps, s => Math.max(s.y0, s.y1)) * 1.08]).range([ih, 0]).nice();
+  g.append("g").selectAll("line").data(y.ticks(5)).join("line").attr("x1", 0).attr("x2", iw)
+    .attr("y1", d => y(d)).attr("y2", d => y(d)).attr("stroke", "#E4E3DD");
+  g.append("g").selectAll("text").data(y.ticks(5)).join("text").attr("x", -10).attr("y", d => y(d) + 4)
+    .attr("text-anchor", "end").attr("font-size", 11).attr("fill", "#8C8A84").text(d => d === 0 ? "0" : d3.format(".0f")(d / 1000) + "k");
+  // connectors at the running level between bars
+  g.append("g").selectAll("line").data(steps.slice(0, -1)).join("line")
+    .attr("x1", s => x(s.name) + x.bandwidth()).attr("x2", (s, i) => x(steps[i + 1].name))
+    .attr("y1", s => y(s.y1)).attr("y2", s => y(s.y1)).attr("stroke", "#8C8A84").attr("stroke-dasharray", "2 3");
+  const color = {total: "#8C8A84", up: "#00938D", down: "#E4572E"};
+  g.append("g").selectAll("rect").data(steps).join("rect")
+    .attr("x", s => x(s.name)).attr("width", x.bandwidth())
+    .attr("y", s => y(Math.max(s.y0, s.y1))).attr("height", s => Math.max(2, Math.abs(y(s.y0) - y(s.y1))))
+    .attr("rx", 4).attr("fill", s => color[s.kind]);
+  g.append("g").selectAll("text").data(steps).join("text")
+    .attr("x", s => x(s.name) + x.bandwidth() / 2).attr("y", s => y(Math.max(s.y0, s.y1)) - 8)
+    .attr("text-anchor", "middle").attr("font-size", 14).attr("font-weight", 700).attr("fill", "#13233A")
+    .text(s => s.kind === "total" ? fmt(s.v) : (s.v > 0 ? "+" : "−") + fmt(Math.abs(s.v)));
+  const lab = g.append("g").selectAll("text").data(steps).join("text")
+    .attr("x", s => x(s.name) + x.bandwidth() / 2).attr("y", ih + 20).attr("text-anchor", "middle").attr("font-size", 12).attr("fill", "#13233A");
+  lab.append("tspan").attr("font-weight", 600).text(s => s.name);
+  lab.append("tspan").attr("x", s => x(s.name) + x.bandwidth() / 2).attr("dy", 15).attr("fill", "#5A6170").attr("font-size", 11).text(s => s.sub || "");
+  g.append("line").attr("x1", 0).attr("x2", iw).attr("y1", ih).attr("y2", ih).attr("stroke", "#C9C7C0");
+
+  d3.select("#note").html(`<b>Not a bar, because they net to zero</b><br>` +
+    `${fmt(W.moves)} internal moves (${fmt(W.promotions)} promotions, ${fmt(W.transfers)} transfers) leave one team and join another, so they cancel at company level. Filter to a department to see them.<br>` +
+    `<b>FTE</b> ${d3.format(",.1f")(W.opening_fte)} → ${d3.format(",.1f")(W.closing_fte)}, including ${d3.format("+,.1f")(W.fte_changes)} from schedule changes.`);
+
+  // Trend
+  const T = D.trend.map(d => ({...d, date: new Date(d.month_end_date + "T00:00:00")}));
+  d3.select("#ttitle").text(`Headcount grew in three of four years; ${"FY24"} was flat`);
+  const ts = d3.select("#trend"), tm = {l: 44, r: 54, t: 18, b: 26}, tw = 470 - tm.l - tm.r, th = 240 - tm.t - tm.b;
+  const tg = ts.append("g").attr("transform", `translate(${tm.l},${tm.t})`);
+  const tx = d3.scaleTime().domain(d3.extent(T, d => d.date)).range([0, tw]);
+  const ty = d3.scaleLinear().domain([d3.min(T, d => d.closing) * 0.96, d3.max(T, d => d.closing) * 1.02]).range([th, 0]).nice();
+  const sel = T.filter(d => d.fiscal_year === D.fy);
+  tg.append("rect").attr("x", tx(sel[0].date)).attr("width", tx(sel.at(-1).date) - tx(sel[0].date)).attr("y", 0).attr("height", th).attr("fill", "#00938D").attr("fill-opacity", 0.08);
+  tg.append("g").selectAll("line").data(ty.ticks(4)).join("line").attr("x1", 0).attr("x2", tw).attr("y1", d => ty(d)).attr("y2", d => ty(d)).attr("stroke", "#E4E3DD");
+  tg.append("g").selectAll("text").data(ty.ticks(4)).join("text").attr("x", -8).attr("y", d => ty(d) + 4).attr("text-anchor", "end").attr("font-size", 10.5).attr("fill", "#8C8A84").text(d => d3.format(".1f")(d / 1000) + "k");
+  const starts = T.filter(d => d.date.getMonth() === 6);
+  tg.append("g").selectAll("text").data(starts).join("text").attr("x", d => tx(d.date)).attr("y", th + 18).attr("font-size", 10.5).attr("fill", "#5A6170").text(d => "FY" + String(d.fiscal_year).slice(-2));
+  tg.append("path").datum(T).attr("fill", "none").attr("stroke", "#00938D").attr("stroke-width", 2)
+    .attr("d", d3.line().x(d => tx(d.date)).y(d => ty(d.closing)));
+  const last = T.at(-1);
+  tg.append("circle").attr("cx", tx(last.date)).attr("cy", ty(last.closing)).attr("r", 4).attr("fill", "#00938D").attr("stroke", "#fff").attr("stroke-width", 1.5);
+  tg.append("text").attr("x", tx(last.date) + 7).attr("y", ty(last.closing) + 4).attr("font-size", 11.5).attr("font-weight", 700).attr("fill", "#13233A").text(fmt(last.closing));
+  const fy24 = T.filter(d => d.fiscal_year === 2024), dip = fy24[Math.floor(fy24.length / 2)];
+  tg.append("text").attr("x", tx(dip.date)).attr("y", ty(dip.closing) + 26).attr("text-anchor", "middle").attr("font-size", 10.5).attr("fill", "#5A6170").text("FY24 restructuring");
+
+  // Turnover by function
+  const F = D.by_function;
+  d3.select("#ftitle").text(`${F[0].function_name} has the highest turnover in ${fy}`);
+  const fs = d3.select("#func"), fm = {l: 108, r: 46, t: 6};
+  const fx = d3.scaleLinear().domain([0, d3.max(F, d => d.vol_rate + d.invol_rate)]).range([0, 470 - fm.l - fm.r]);
+  const rowH = Math.min(30, 200 / F.length);
+  const fg = fs.append("g").attr("transform", `translate(${fm.l},${fm.t})`).selectAll("g").data(F).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+  fg.append("text").attr("x", -10).attr("y", rowH / 2 + 3).attr("text-anchor", "end").attr("font-size", 11.5).attr("fill", "#13233A").text(d => d.function_name);
+  fg.append("rect").attr("y", rowH / 2 - 7).attr("height", 14).attr("width", d => fx(d.vol_rate)).attr("fill", "#E4572E").attr("rx", 2);
+  fg.append("rect").attr("x", d => fx(d.vol_rate) + 2).attr("y", rowH / 2 - 7).attr("height", 14).attr("width", d => Math.max(0, fx(d.invol_rate) - 2)).attr("fill", "#B8401F").attr("rx", 2);
+  fg.append("text").attr("x", d => fx(d.vol_rate + d.invol_rate) + 6).attr("y", rowH / 2 + 4).attr("font-size", 11).attr("font-weight", 600).attr("fill", "#13233A").text(d => p1(d.vol_rate + d.invol_rate));
+
+  document.body.dataset.ready = "1";
+});
+</script>
+</body></html>

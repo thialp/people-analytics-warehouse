@@ -13,6 +13,8 @@ The finished workbook has four dashboards, one per audience:
 
 ![Static preview](images/headcount_walk_preview.png)
 
+The workbook uses the Arcadia look shared by all three dashboards: navy header band with the logo, a row of KPI cards, charts on off-white cards, teal for growth, coral for leavers. Install the palettes and get the logo from [`docs/brand/`](brand/README.md) before you start.
+
 ---
 
 ## 1. Download the data
@@ -200,14 +202,25 @@ If a number is off, the usual cause is a type (Step 2.4) or a filter left on a s
    - Rows: `SUM([Walk Value])` → right-click → **Quick Table Calculation → Running Total**.
    - Mark type **Gantt Bar**. Create `-SUM([Walk Value])` and drag it to **Size**.
    - **Analysis → Totals → Show Row Grand Totals**, and rename the total *Closing*.
-   - Color: create `SUM([Walk Value]) > 0` and drag it to Color; blue for increases, red for decreases, gray for the Opening and total bars.
+   - Color: create the calculated field below and drag it to **Color**. In **Edit Colors**, set Level to warm gray `#8C8A84`, Increase to teal `#00938D` and Decrease to coral `#E4572E`. If the grand total bar takes a different color, click it in the color legend and set it to the same gray.
+     ```
+     // Bar Type
+     CASE [Movement Category]
+         WHEN "Opening" THEN "Level"
+         WHEN "Hires" THEN "Increase"
+         WHEN "Internal Moves In" THEN "Increase"
+         ELSE "Decrease"
+     END
+     ```
+   - Right-click the axis → **Edit Axis** → tick **Include zero**. Bars start at zero so the size of each movement isn't exaggerated (Viz of the Day reviewers check this).
+   - Title the sheet with the finding, for example *"FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people"*. Build it as a calculated title from `Hires`, `Voluntary Leavers`, `Involuntary Leavers` and the change in headcount so it updates with the range.
    - **Check:** the grand total equals the `Closing` KPI.
    - At company level Internal Moves In and Out cancel (+1,615 and −1,615). Hide them with a filter on this sheet if you prefer a cleaner company view; they matter on department views.
-3. **Headcount trend.** Columns: `Month End Date` (continuous month). Rows: `SUM(IF [Movement Category] = "Closing" THEN [Selected Value] END)`. Don't filter this to the range: show all history, and add a **reference band** from `Start Month` to `End Month` so the selected period stands out.
+3. **Headcount trend.** Columns: `Month End Date` (continuous month). Rows: `SUM(IF [Movement Category] = "Closing" THEN [Selected Value] END)`. Don't filter this to the range: show all history, and add a **reference band** from `Start Month` to `End Month` so the selected period stands out. Line in teal `#00938D`, band in teal at 10% opacity, and label only the last point.
 
 ### Movement Drivers
-4. **Turnover by function.** Rows: `Function Name`. Columns: `Voluntary Turnover (annualized)` and `Involuntary Turnover (annualized)` as a stacked bar (Measure Names on Color). Sort descending. Label the bar ends.
-5. **Net change heatmap.** Rows: `Function Name`, Columns: `Fiscal Period`, Color: `SUM(IF [Movement Category] <> "Opening" AND [Movement Category] <> "Closing" THEN [Selected Value] END)`, diverging blue–red palette centered at 0. This shows where growth and shrinkage happened month by month.
+4. **Turnover by function.** Rows: `Function Name`. Columns: `Voluntary Turnover (annualized)` and `Involuntary Turnover (annualized)` as a stacked bar (Measure Names on Color: coral `#E4572E` for voluntary, dark coral `#B8401F` for involuntary). Sort descending. Label the bar ends with the total rate, and title the sheet with the top function, for example *"Commercial has the highest turnover in FY26"*.
+5. **Net change heatmap.** Rows: `Function Name`, Columns: `Fiscal Period`, Color: `SUM(IF [Movement Category] <> "Opening" AND [Movement Category] <> "Closing" THEN [Selected Value] END)`, palette *Arcadia Coral-Teal Diverging* centered at 0 (coral for shrinking, teal for growing). This shows where growth and shrinkage happened month by month.
 6. **Internal moves by reason.** Rows: `Movement Reason`, filtered to `Internal Moves In`, bars by `Grade Level`. Promotions show as a move out of one grade and into the next, so a grade-level view of the walk explains career progression without any extra logic.
 
 ### Diagnostics
@@ -216,9 +229,11 @@ If a number is off, the usual cause is a type (Step 2.4) or a filter left on a s
 
 ## 6. Dashboards and actions
 
-Use a fixed size of **1200 × 900** for each dashboard.
+Use a fixed size of **1400 × 850** for each dashboard, the same as the workforce map, with the page background stone `#F3F3EF`.
 
-1. **Executive Summary**: title, KPI band across the top, waterfall (left two-thirds), trend (right third). Parameter controls in one row above the charts.
+Every dashboard starts with the same **header band**: a horizontal container with background navy `#13233A` holding the reverse logo (Image object, `docs/brand/arcadia_logo_horizontal_reverse.png`), the dashboard title in white with a one-line subtitle, and the parameter controls on the right. Put each chart on its own off-white `#FBFBF8` card (a container with a 1px `#E4E3DD` border) with 12px between cards.
+
+1. **Executive Summary**: header band, KPI cards across the top, waterfall (left, about 60%), and on the right the trend above turnover by function.
 2. **Movement Drivers**: turnover by function (left), heatmap (right), internal moves (bottom).
 3. **Diagnostics**: control tile top right, slice table filling the rest.
 4. **Methodology**: a text object with the definitions from Section 7.
