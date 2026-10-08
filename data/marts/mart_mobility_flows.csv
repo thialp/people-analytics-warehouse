@@ -1,0 +1,669 @@
+month_end_date,from_location_id,from_city,from_region,from_latitude,from_longitude,to_location_id,to_city,to_region,to_latitude,to_longitude,flow_scope,has_coordinates,workers
+2022-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2022-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2022-07-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2022-07-31,LOC-005,Remote - US,North America,,,LOC-002,New York,North America,40.7128,-74.0060,Domestic,false,1
+2022-07-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-008,Mexico City,Latin America,19.4326,-99.1332,International,true,1
+2022-07-31,LOC-009,London,Europe,51.5074,-0.1278,LOC-012,Paris,Europe,48.8566,2.3522,International,true,1
+2022-07-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2022-07-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2022-07-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,1
+2022-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2022-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2022-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2022-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2022-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2022-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2022-08-31,LOC-005,Remote - US,North America,,,LOC-002,New York,North America,40.7128,-74.0060,Domestic,false,1
+2022-08-31,LOC-005,Remote - US,North America,,,LOC-011,Berlin,Europe,52.5200,13.4050,International,false,1
+2022-08-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2022-08-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2022-08-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2022-08-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2022-08-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2022-08-31,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,LOC-008,Mexico City,Latin America,19.4326,-99.1332,International,true,1
+2022-08-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2022-08-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,3
+2022-08-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2022-09-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2022-09-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2022-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,3
+2022-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2022-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2022-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2022-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2022-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2022-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-008,Mexico City,Latin America,19.4326,-99.1332,International,true,1
+2022-09-30,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2022-09-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2022-09-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2022-09-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2022-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2022-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2022-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2022-09-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2022-09-30,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2022-10-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,3
+2022-10-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2022-10-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2022-10-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2022-10-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2022-10-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2022-10-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2022-10-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2022-10-31,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2022-10-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2022-10-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2022-10-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2022-10-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2022-10-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,5
+2022-10-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2022-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2022-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2022-11-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2022-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2022-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2022-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2022-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,2
+2022-11-30,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-005,Remote - US,North America,,,International,false,1
+2022-11-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2022-11-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,International,true,1
+2022-11-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2022-11-30,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2022-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2022-12-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2022-12-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2022-12-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-005,Remote - US,North America,,,Domestic,false,1
+2022-12-31,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2022-12-31,LOC-006,Toronto,North America,43.6532,-79.3832,LOC-005,Remote - US,North America,,,International,false,1
+2022-12-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2022-12-31,LOC-008,Mexico City,Latin America,19.4326,-99.1332,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,International,true,1
+2022-12-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2022-12-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2022-12-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2022-12-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,3
+2022-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2022-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,4
+2023-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2023-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2023-01-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2023-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2023-01-31,LOC-005,Remote - US,North America,,,LOC-002,New York,North America,40.7128,-74.0060,Domestic,false,1
+2023-01-31,LOC-005,Remote - US,North America,,,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,false,1
+2023-01-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,2
+2023-01-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2023-01-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2023-01-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,1
+2023-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2023-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2023-02-28,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2023-02-28,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-02-28,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-02-28,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2023-02-28,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,2
+2023-02-28,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2023-02-28,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2023-02-28,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2023-02-28,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2023-02-28,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2023-02-28,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2023-02-28,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2023-02-28,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2023-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2023-04-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-04-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-04-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-04-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-04-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-04-30,LOC-005,Remote - US,North America,,,LOC-002,New York,North America,40.7128,-74.0060,Domestic,false,1
+2023-04-30,LOC-011,Berlin,Europe,52.5200,13.4050,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2023-04-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,2
+2023-04-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2023-04-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2023-04-30,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,2
+2023-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2023-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2023-05-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2023-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,2
+2023-05-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2023-05-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2023-05-31,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2023-05-31,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2023-05-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,International,true,1
+2023-05-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2023-05-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2023-05-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2023-05-31,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-05-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,1
+2023-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2023-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2023-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,International,true,1
+2023-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2023-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-06-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2023-06-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-06-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-06-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2023-06-30,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2023-06-30,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,2
+2023-06-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2023-06-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2023-06-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2023-06-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2023-06-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2023-06-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2023-06-30,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2023-06-30,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2023-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2023-07-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2023-07-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-07-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,4
+2023-07-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-07-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,3
+2023-07-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2023-07-31,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,1
+2023-07-31,LOC-009,London,Europe,51.5074,-0.1278,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2023-07-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2023-07-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2023-07-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,3
+2023-07-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,4
+2023-07-31,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2023-07-31,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2023-07-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2023-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2023-08-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2023-08-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2023-08-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,4
+2023-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2023-08-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2023-08-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2023-08-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2023-08-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2023-08-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2023-08-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,6
+2023-08-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,International,true,1
+2023-08-31,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2023-08-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,1
+2023-09-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2023-09-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-09-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2023-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2023-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2023-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2023-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-005,Remote - US,North America,,,Domestic,false,2
+2023-09-30,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2023-09-30,LOC-005,Remote - US,North America,,,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,false,1
+2023-09-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2023-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2023-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2023-09-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2023-09-30,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-10-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-10-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-10-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2023-10-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2023-10-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2023-10-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-10-31,LOC-008,Mexico City,Latin America,19.4326,-99.1332,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2023-10-31,LOC-009,London,Europe,51.5074,-0.1278,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-10-31,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2023-10-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,2
+2023-10-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2023-10-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2023-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2023-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2023-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2023-11-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-11-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-11-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2023-11-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,International,true,1
+2023-11-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2023-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-012,Paris,Europe,48.8566,2.3522,International,true,1
+2023-11-30,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2023-11-30,LOC-009,London,Europe,51.5074,-0.1278,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2023-11-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2023-11-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2023-11-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2023-11-30,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2023-11-30,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,2
+2023-11-30,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2023-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,3
+2023-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-12-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2023-12-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2023-12-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2023-12-31,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2023-12-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2023-12-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2023-12-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2023-12-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2023-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2023-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2023-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2023-12-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,1
+2024-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,3
+2024-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2024-01-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2024-01-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-01-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2024-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2024-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2024-01-31,LOC-009,London,Europe,51.5074,-0.1278,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,2
+2024-01-31,LOC-009,London,Europe,51.5074,-0.1278,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2024-01-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2024-01-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2024-01-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2024-01-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2024-01-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2024-01-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2024-01-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2024-02-29,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-02-29,LOC-001,Austin,North America,30.2672,-97.7431,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2024-02-29,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-02-29,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2024-02-29,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-02-29,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2024-02-29,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2024-02-29,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-02-29,LOC-008,Mexico City,Latin America,19.4326,-99.1332,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2024-02-29,LOC-011,Berlin,Europe,52.5200,13.4050,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2024-02-29,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,2
+2024-02-29,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2024-02-29,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2024-02-29,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2024-02-29,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,2
+2024-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2024-04-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2024-04-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-04-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-04-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2024-04-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2024-04-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2024-04-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2024-04-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2024-04-30,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2024-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2024-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,3
+2024-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2024-05-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2024-05-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2024-05-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2024-05-31,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2024-05-31,LOC-006,Toronto,North America,43.6532,-79.3832,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2024-05-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,2
+2024-05-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2024-05-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2024-05-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2024-05-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2024-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2024-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2024-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2024-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-06-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2024-06-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-06-30,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,1
+2024-06-30,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2024-06-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2024-06-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2024-06-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2024-06-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2024-06-30,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2024-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,3
+2024-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2024-07-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-07-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2024-07-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2024-07-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2024-07-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-07-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-07-31,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,1
+2024-07-31,LOC-009,London,Europe,51.5074,-0.1278,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2024-07-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2024-07-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2024-07-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2024-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2024-08-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2024-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2024-08-31,LOC-005,Remote - US,North America,,,LOC-006,Toronto,North America,43.6532,-79.3832,International,false,1
+2024-08-31,LOC-005,Remote - US,North America,,,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,false,1
+2024-08-31,LOC-011,Berlin,Europe,52.5200,13.4050,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,International,true,1
+2024-08-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-008,Mexico City,Latin America,19.4326,-99.1332,International,true,1
+2024-08-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2024-08-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2024-08-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2024-08-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2024-09-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-09-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,4
+2024-09-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2024-09-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2024-09-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2024-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-09-30,LOC-005,Remote - US,North America,,,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,false,1
+2024-09-30,LOC-008,Mexico City,Latin America,19.4326,-99.1332,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2024-09-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2024-09-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2024-09-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2024-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,5
+2024-09-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2024-09-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2024-10-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-10-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2024-10-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-10-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,International,true,1
+2024-10-31,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2024-10-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2024-10-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2024-10-31,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,International,true,1
+2024-10-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,2
+2024-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,3
+2024-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2024-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2024-11-30,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2024-11-30,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,1
+2024-11-30,LOC-005,Remote - US,North America,,,LOC-014,Krakow,Europe,50.0647,19.9450,International,false,1
+2024-11-30,LOC-008,Mexico City,Latin America,19.4326,-99.1332,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2024-11-30,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2024-11-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,2
+2024-11-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2024-11-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2024-11-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2024-11-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,3
+2024-11-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2024-11-30,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2024-11-30,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2024-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2024-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2024-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2024-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,2
+2024-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2024-12-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-12-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2024-12-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2024-12-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2024-12-31,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2024-12-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2024-12-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2024-12-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2024-12-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2024-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2024-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,International,true,1
+2024-12-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2025-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,3
+2025-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2025-01-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-01-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-01-31,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2025-01-31,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,1
+2025-01-31,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2025-01-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2025-01-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2025-01-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2025-01-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2025-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2025-02-28,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-02-28,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-02-28,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2025-02-28,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-02-28,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-02-28,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-02-28,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2025-02-28,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2025-02-28,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2025-02-28,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2025-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2025-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,International,true,1
+2025-04-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2025-04-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-04-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-04-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-04-30,LOC-005,Remote - US,North America,,,LOC-002,New York,North America,40.7128,-74.0060,Domestic,false,1
+2025-04-30,LOC-005,Remote - US,North America,,,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,false,1
+2025-04-30,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2025-04-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2025-04-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2025-04-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2025-04-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,International,true,1
+2025-04-30,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2025-04-30,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2025-04-30,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2025-04-30,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,1
+2025-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,4
+2025-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-05-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-05-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-05-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2025-05-31,LOC-008,Mexico City,Latin America,19.4326,-99.1332,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-05-31,LOC-011,Berlin,Europe,52.5200,13.4050,LOC-005,Remote - US,North America,,,International,false,1
+2025-05-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2025-05-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,6
+2025-05-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,International,true,1
+2025-05-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2025-05-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2025-05-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2025-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2025-06-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-06-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-06-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,International,true,1
+2025-06-30,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2025-06-30,LOC-006,Toronto,North America,43.6532,-79.3832,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2025-06-30,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-06-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2025-06-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2025-06-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,4
+2025-06-30,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,3
+2025-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-07-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2025-07-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2025-07-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-07-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-07-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2025-07-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-07-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2025-07-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,International,true,1
+2025-07-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2025-07-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2025-07-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,6
+2025-07-31,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2025-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-08-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,2
+2025-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,3
+2025-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-08-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2025-08-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-08-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-08-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-019,Sydney,Asia Pacific,-33.8688,151.2093,International,true,1
+2025-08-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2025-08-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-08-31,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2025-08-31,LOC-008,Mexico City,Latin America,19.4326,-99.1332,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,International,true,1
+2025-08-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2025-08-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2025-08-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,3
+2025-08-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2025-09-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-09-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,2
+2025-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-09-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2025-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-09-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2025-09-30,LOC-009,London,Europe,51.5074,-0.1278,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2025-09-30,LOC-009,London,Europe,51.5074,-0.1278,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2025-09-30,LOC-009,London,Europe,51.5074,-0.1278,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2025-09-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2025-09-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,International,true,1
+2025-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2025-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2025-09-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2025-09-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2025-10-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-10-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-10-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,3
+2025-10-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2025-10-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2025-10-31,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2025-10-31,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2025-10-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,3
+2025-10-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,3
+2025-10-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,6
+2025-10-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2025-10-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2025-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2025-11-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,3
+2025-11-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-11-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-11-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-11-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2025-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-11-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2025-11-30,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2025-11-30,LOC-006,Toronto,North America,43.6532,-79.3832,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2025-11-30,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2025-11-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2025-11-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2025-11-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,2
+2025-11-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,1
+2025-11-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2025-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2025-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2025-12-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2025-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2025-12-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,International,true,1
+2025-12-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2025-12-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2025-12-31,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,2
+2025-12-31,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2025-12-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,2
+2025-12-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,2
+2025-12-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2025-12-31,LOC-018,Tokyo,Asia Pacific,35.6762,139.6503,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2025-12-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2026-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2026-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2026-01-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-005,Remote - US,North America,,,Domestic,false,1
+2026-01-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2026-01-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2026-01-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-005,Remote - US,North America,,,Domestic,false,1
+2026-01-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-012,Paris,Europe,48.8566,2.3522,International,true,1
+2026-01-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2026-01-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2026-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-005,Remote - US,North America,,,Domestic,false,1
+2026-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2026-01-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2026-01-31,LOC-009,London,Europe,51.5074,-0.1278,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2026-01-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2026-01-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2026-01-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2026-01-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,3
+2026-01-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2026-01-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2026-01-31,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2026-01-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2026-01-31,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,Domestic,true,3
+2026-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,4
+2026-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-006,Toronto,North America,43.6532,-79.3832,International,true,1
+2026-02-28,LOC-001,Austin,North America,30.2672,-97.7431,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2026-02-28,LOC-002,New York,North America,40.7128,-74.0060,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2026-02-28,LOC-002,New York,North America,40.7128,-74.0060,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2026-02-28,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2026-02-28,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2026-02-28,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2026-02-28,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-020,Dubai,Middle East & Africa,25.2048,55.2708,International,true,1
+2026-02-28,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,1
+2026-02-28,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,4
+2026-02-28,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,International,true,1
+2026-02-28,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-011,Berlin,Europe,52.5200,13.4050,International,true,1
+2026-02-28,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-013,Warsaw,Europe,52.2297,21.0122,International,true,1
+2026-02-28,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,3
+2026-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,2
+2026-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,2
+2026-04-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-014,Krakow,Europe,50.0647,19.9450,International,true,1
+2026-04-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2026-04-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2026-04-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-007,Sao Paulo,Latin America,-23.5505,-46.6333,International,true,1
+2026-04-30,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2026-04-30,LOC-005,Remote - US,North America,,,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,false,1
+2026-04-30,LOC-010,Dublin,Europe,53.3498,-6.2603,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2026-04-30,LOC-011,Berlin,Europe,52.5200,13.4050,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,International,true,1
+2026-04-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-014,Krakow,Europe,50.0647,19.9450,Domestic,true,1
+2026-04-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-013,Warsaw,Europe,52.2297,21.0122,Domestic,true,1
+2026-04-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,5
+2026-04-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1
+2026-04-30,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,LOC-002,New York,North America,40.7128,-74.0060,International,true,1
+2026-04-30,LOC-017,Singapore,Asia Pacific,1.3521,103.8198,LOC-004,Atlanta,North America,33.7490,-84.3880,International,true,1
+2026-04-30,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-022,Cape Town,Middle East & Africa,-33.9249,18.4241,Domestic,true,1
+2026-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,2
+2026-05-31,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2026-05-31,LOC-002,New York,North America,40.7128,-74.0060,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2026-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2026-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2026-05-31,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-005,Remote - US,North America,,,Domestic,false,1
+2026-05-31,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2026-05-31,LOC-005,Remote - US,North America,,,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,false,1
+2026-05-31,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,International,true,1
+2026-05-31,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,3
+2026-05-31,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,2
+2026-05-31,LOC-021,Johannesburg,Middle East & Africa,-26.2041,28.0473,LOC-010,Dublin,Europe,53.3498,-6.2603,International,true,1
+2026-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-003,San Francisco,North America,37.7749,-122.4194,Domestic,true,1
+2026-06-30,LOC-001,Austin,North America,30.2672,-97.7431,LOC-004,Atlanta,North America,33.7490,-84.3880,Domestic,true,1
+2026-06-30,LOC-002,New York,North America,40.7128,-74.0060,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2026-06-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2026-06-30,LOC-003,San Francisco,North America,37.7749,-122.4194,LOC-009,London,Europe,51.5074,-0.1278,International,true,1
+2026-06-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,true,1
+2026-06-30,LOC-004,Atlanta,North America,33.7490,-84.3880,LOC-002,New York,North America,40.7128,-74.0060,Domestic,true,1
+2026-06-30,LOC-005,Remote - US,North America,,,LOC-001,Austin,North America,30.2672,-97.7431,Domestic,false,1
+2026-06-30,LOC-013,Warsaw,Europe,52.2297,21.0122,LOC-001,Austin,North America,30.2672,-97.7431,International,true,1
+2026-06-30,LOC-014,Krakow,Europe,50.0647,19.9450,LOC-003,San Francisco,North America,37.7749,-122.4194,International,true,1
+2026-06-30,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,Domestic,true,5
+2026-06-30,LOC-016,Hyderabad,Asia Pacific,17.3850,78.4867,LOC-015,Bangalore,Asia Pacific,12.9716,77.5946,Domestic,true,1

@@ -1,0 +1,23 @@
+location_id,city,country_code,country_name,region,site_type,latitude,longitude
+LOC-001,Austin,US,United States,North America,Headquarters,30.2672,-97.7431
+LOC-002,New York,US,United States,North America,Office,40.7128,-74.0060
+LOC-003,San Francisco,US,United States,North America,Office,37.7749,-122.4194
+LOC-004,Atlanta,US,United States,North America,Office,33.7490,-84.3880
+LOC-005,Remote - US,US,United States,North America,Remote,,
+LOC-006,Toronto,CA,Canada,North America,Office,43.6532,-79.3832
+LOC-007,Sao Paulo,BR,Brazil,Latin America,Office,-23.5505,-46.6333
+LOC-008,Mexico City,MX,Mexico,Latin America,Office,19.4326,-99.1332
+LOC-009,London,GB,United Kingdom,Europe,Regional Hub,51.5074,-0.1278
+LOC-010,Dublin,IE,Ireland,Europe,Office,53.3498,-6.2603
+LOC-011,Berlin,DE,Germany,Europe,Office,52.5200,13.4050
+LOC-012,Paris,FR,France,Europe,Office,48.8566,2.3522
+LOC-013,Warsaw,PL,Poland,Europe,Engineering Center,52.2297,21.0122
+LOC-014,Krakow,PL,Poland,Europe,Engineering Center,50.0647,19.9450
+LOC-015,Bangalore,IN,India,Asia Pacific,Engineering Center,12.9716,77.5946
+LOC-016,Hyderabad,IN,India,Asia Pacific,Engineering Center,17.3850,78.4867
+LOC-017,Singapore,SG,Singapore,Asia Pacific,Regional Hub,1.3521,103.8198
+LOC-018,Tokyo,JP,Japan,Asia Pacific,Office,35.6762,139.6503
+LOC-019,Sydney,AU,Australia,Asia Pacific,Office,-33.8688,151.2093
+LOC-020,Dubai,AE,United Arab Emirates,Middle East & Africa,Regional Hub,25.2048,55.2708
+LOC-021,Johannesburg,ZA,South Africa,Middle East & Africa,Office,-26.2041,28.0473
+LOC-022,Cape Town,ZA,South Africa,Middle East & Africa,Office,-33.9249,18.4241

@@ -41,6 +41,9 @@ EXPORTS = [
     "mart_dim_country",
     "mart_dim_job_family",
     "mart_dim_grade",
+    "mart_dim_location",
+    "mart_location_headcount",
+    "mart_mobility_flows",
 ]
 
 
