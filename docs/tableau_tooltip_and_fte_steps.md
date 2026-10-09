@@ -142,7 +142,7 @@ ELSE [TT Share Str] + " of opening " + [TT Noun] + " · about " +
 END
 ```
 
-Part-time line (levels only). Two helpers read the bar's own level rows:
+Part-time line (levels only; the movement bars get a people-to-FTE bridge in [the alignment guide](tableau_measure_alignment_steps.md), which replaces `TT Part Time`). Two helpers read the bar's own level rows:
 ```
 // TT Level HC
 SUM(IF [In Range] AND (([Movement Category] = "Opening" AND [Month End Date] = [Start Month])
