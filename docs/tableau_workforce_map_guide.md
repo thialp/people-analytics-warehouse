@@ -195,6 +195,6 @@ These features are recent, so check them in your Tableau Public version; the das
 1. **File → Save to Tableau Public As…** → **Arcadia Global Workforce Footprint**.
 2. **Edit Details**: a one-paragraph description and the GitHub link `https://github.com/thialp/people-analytics-warehouse`.
 3. Allow **Download** of the workbook, so reviewers can open the spatial calculations.
-4. Send me the workbook URL to add to the README.
+4. Add the workbook URL to the README.
 
 **Before you publish, check:** the FY26 values in section 4 match, clicking an office moves the ring, and no sheet still carries a test filter.

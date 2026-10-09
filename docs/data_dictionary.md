@@ -154,6 +154,7 @@ Grain: **month-end × department × country × job family × grade × movement c
 | `movement_reason` | New Hire · Voluntary · Involuntary · Transfer · Reorganization · Location Change · Promotion · Demotion · Job Change · FTE Increase · FTE Reduction · Opening · Closing |
 | `headcount` | Signed headcount change; for Opening and Closing, the headcount itself |
 | `fte` | Signed FTE change; for Opening and Closing, the FTE itself |
+| `part_time_headcount` | Workers under 1.0 FTE. Filled on Opening and Closing rows only (the levels); every movement row carries 0, because a move or FTE change can flip a worker between full-time and part-time (test 23) |
 
 Rules: headcount includes executive officers. A move is booked out of the old slice and into the new one at the worker's prior FTE, so moves net to zero at any roll-up that contains both slices; an FTE change in the same month is a separate FTE Changes line. When several slice attributes change in one month, one reason is recorded: department (Reorganization if a reorg action is on file, otherwise Transfer), then country, then grade, then job family.
 

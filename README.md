@@ -9,7 +9,7 @@ An HR data warehouse for a fictional global company, built to answer the three q
 | Case study | Question | Dashboard |
 |---|---|---|
 | **1. [Workforce Cost Bridge](#1-business-problem)** | *Why did our workforce cost change?* A monthly walk of annualized pay run-rate that splits every dollar of change into hires, terminations, transfers, promotions, merit, mobility, FTE, fringe and currency, in **nominal** and **constant** currency, reconciled to the cent. | Tableau Public: *coming soon* |
-| **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | Tableau Public: *coming soon* |
+| **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | **[Executive Summary on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)** |
 | **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, where are we growing, and how do people move between offices?* An office-level walk and an origin-to-destination relocation table, drawn as a four-layer Tableau map with `MAKEPOINT`, `MAKELINE` and `BUFFER`. | Tableau Public: *coming soon* |
 
 All three case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot, and share one look ([`docs/brand/`](docs/brand/README.md)).
@@ -21,7 +21,7 @@ All three case studies run on the same simulated company, the same effective-dat
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 19,276 workers · 4 fiscal years · 49 month-ends · 15 countries · 13 currencies · 592,823 worker-month snapshots |
 | **Output** | Five Tableau-ready marts and six dimension files in [`data/marts/`](data/marts/) |
-| **Controls** | 22 automated data tests; the build stops if any fails |
+| **Controls** | 23 automated data tests; the build stops if any fails |
 
 ---
 
@@ -51,7 +51,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>calendar · worker month-end snapshot"]
         MART["marts<br/>comp walk · comp snapshot"]
-        TEST{{"12 data tests"}}
+        TEST{{"23 data tests"}}
     end
     TAB["Tableau Public"]
     HR --> RAW
@@ -176,6 +176,7 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 20 | Offices add up to the company headcount walk: opening, hires, leavers by type, closing headcount and FTE | The map and the walk telling different stories |
 | 21 | Relocations net to zero company-wide every month | Relocations creating or destroying people |
 | 22 | Flows out of and into each office equal its relocations; no self-loops; every office except remote has coordinates | Map lines that don't match the numbers, or offices missing from the map |
+| 23 | Part-time headcount (workers under 1.0 FTE) at every month's opening and closing equals a recount from the worker-level table, and opening equals the prior closing | A part-time count that drifts from the workers it describes |
 
 The tests were checked against deliberately broken builds. With the correction logic removed from staging, five of them fail. Treating workers as gone on their last day worked instead of the day after (an off-by-one on the termination date) fails test 17; dropping reorganization moves from the walk fails tests 13 and 16.
 
@@ -230,9 +231,9 @@ Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_pub
 
 ## Case study 2: Headcount & FTE Walk
 
-![Headcount & FTE Walk preview](docs/images/headcount_walk_preview.png)
+[![Headcount & FTE Walk: Executive Summary on Tableau Public](docs/images/executive_summary_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)
 
-*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive dashboard is on Tableau Public (coming soon).*
+*The Executive Summary, shown here in FTE mode. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)**: pick any From/To months and switch between headcount and FTE.*
 
 ### Business problem
 
@@ -283,7 +284,7 @@ Company-wide headcount walk by fiscal year:
 - **FY26 grew 5.5%** (+691) on 2,354 hires against 1,663 leavers. Voluntary turnover was 10.4% annualized, highest in Commercial (16.1% including involuntary).
 - **FY24's restructuring shows twice:** involuntary terminations rose to 426, the highest of the four years, and hires fell to 1,593, so headcount barely moved (+122).
 - **FY25's internal moves jumped to 2,129** with the reorganization into Data & AI Platform: a large shift between departments with no effect on the company total, which test 16 checks every month.
-- **FTE trails headcount by 261** at FY26 close (12,940.0 FTE for 13,201 people) because of part-time schedules. Reporting one without the other overstates capacity.
+- **FTE trails headcount by 261.0** at FY26 close (12,940.0 FTE for 13,201 people) because 924 of those people work part-time schedules. Reporting one without the other overstates capacity.
 
 ### Performance: choosing the grain of history
 
@@ -299,7 +300,17 @@ The daily scaffold stores 30 times more rows than the month-end snapshot and pas
 
 ### Tableau
 
-Step-by-step build, with every calculated field and the numbers to check against: [`docs/tableau_headcount_walk_guide.md`](docs/tableau_headcount_walk_guide.md) (also as a [PDF](docs/tableau_headcount_walk_guide.pdf)). The five KPI cards are built as map layers: [`docs/tableau_kpi_cards_guide.md`](docs/tableau_kpi_cards_guide.md) (also as a [PDF](docs/tableau_kpi_cards_guide.pdf)) with a copy-ready [config workbook](docs/Arcadia_KPI_Cards_Config.xlsx). The workbook has four dashboards (Executive Summary, Movement Drivers, Diagnostics, Methodology) and uses relationships across the six files, a date-range walk driven by parameters, annualized turnover from an average-headcount calculation, set and parameter actions, dynamic zone visibility, and a visible **Walk Gap** control that must read 0.
+**Published:** [Executive Summary on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary).
+
+| Part | What it does |
+|---|---|
+| Header | From / To month dropdowns, a Headcount \| FTE capsule toggle (parameter action on custom shapes), an info button that opens a definitions panel |
+| KPI band | Five cards drawn as text on map layers (`MAKEPOINT`), so one sheet and one query draw every title, value and note; cards beside the waterfall follow the toggle and name their unit |
+| Waterfall | A Gantt-bar walk whose title states the finding ("FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people") and whose tooltip bridges people to FTE ("2,354 people = 2,328.3 FTE") |
+| Trend | Closing headcount or FTE for every month-end, with the selected period shaded |
+| Turnover by function | Voluntary + involuntary annualized turnover, groups under 20 people hidden, title naming the top function |
+
+How it was built, with every worksheet, calculated field, color, position, tooltip and design decision: [`docs/executive_summary_build_book.md`](docs/executive_summary_build_book.md). The map-layer KPI technique has its own guide ([`docs/tableau_kpi_cards_guide.md`](docs/tableau_kpi_cards_guide.md), also as a [PDF](docs/tableau_kpi_cards_guide.pdf), with a [config workbook](docs/Arcadia_KPI_Cards_Config.xlsx)), and the original plan for the full workbook is in [`docs/tableau_headcount_walk_guide.md`](docs/tableau_headcount_walk_guide.md). Two more dashboards are planned on the same data: Movement Drivers and Diagnostics (a slice table with a **Walk Gap** control that must read 0).
 
 ---
 

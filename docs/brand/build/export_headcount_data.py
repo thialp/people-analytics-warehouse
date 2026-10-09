@@ -35,6 +35,7 @@ WALK = """
         SUM(fte)       FILTER (WHERE movement_category = 'FTE Changes')                   AS fte_changes,
         SUM(headcount) FILTER (WHERE movement_category = 'Closing' AND fiscal_month = 12) AS closing,
         SUM(fte)       FILTER (WHERE movement_category = 'Closing' AND fiscal_month = 12) AS closing_fte,
+        SUM(part_time_headcount) FILTER (WHERE movement_category = 'Closing' AND fiscal_month = 12) AS closing_part_time,
         SUM(headcount) FILTER (WHERE movement_category IN ('Opening', 'Closing')) / 2.0
             / COUNT(DISTINCT month_end_date)                                              AS avg_headcount
     FROM w

@@ -73,7 +73,7 @@ d3.json("headcount_data.json").then(D => {
 
   const kpis = [
     ["Closing headcount", fmt(W.closing), `<span class="up">${pct(net / W.opening)}</span> vs ${fmt(W.opening)} at start`],
-    ["Closing FTE", d3.format(",.1f")(W.closing_fte), `${d3.format(",.0f")(W.closing - W.closing_fte)} below headcount (part-time)`],
+    ["Closing FTE", d3.format(",.1f")(W.closing_fte), `${fmt(W.closing_part_time)} part-time · ${d3.format(",.1f")(W.closing - W.closing_fte)} below headcount`],
     ["Hires", fmt(W.hires), `${p1(W.hires / W.avg_headcount)} annualized hire rate`],
     ["Voluntary turnover (annualized)", p1(W.voluntary / W.avg_headcount), `${fmt(W.voluntary)} leavers by choice`],
     ["Internal moves", fmt(W.moves), `${fmt(W.promotions)} promotions · ${fmt(W.moves - W.promotions)} other moves`],
