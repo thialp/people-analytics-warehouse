@@ -71,8 +71,8 @@ CREATE TABLE raw.dim_job_profile (
     [career_track]    NVARCHAR(400) NULL
 );
 BULK INSERT raw.dim_job_profile
-FROM '/repo/data/raw/dim_job_profile.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+FROM '/repo/data/sqlserver/dim_job_profile.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_dim_job_profile INT = (SELECT COUNT(*) FROM raw.dim_job_profile);
 PRINT CONCAT('raw.dim_job_profile', '                 ', @n_dim_job_profile, ' rows');
 GO
@@ -97,8 +97,8 @@ CREATE TABLE raw.dim_location (
     [opened_date]     NVARCHAR(400) NULL
 );
 BULK INSERT raw.dim_location
-FROM '/repo/data/raw/dim_location.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+FROM '/repo/data/sqlserver/dim_location.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_dim_location INT = (SELECT COUNT(*) FROM raw.dim_location);
 PRINT CONCAT('raw.dim_location', '                    ', @n_dim_location, ' rows');
 GO
@@ -114,8 +114,8 @@ CREATE TABLE raw.dim_org_unit (
     [leader_job_level]   NVARCHAR(400) NULL
 );
 BULK INSERT raw.dim_org_unit
-FROM '/repo/data/raw/dim_org_unit.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+FROM '/repo/data/sqlserver/dim_org_unit.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_dim_org_unit INT = (SELECT COUNT(*) FROM raw.dim_org_unit);
 PRINT CONCAT('raw.dim_org_unit', '                    ', @n_dim_org_unit, ' rows');
 GO
@@ -233,8 +233,8 @@ CREATE TABLE raw.ref_fringe_rate (
     [method_note]               NVARCHAR(400) NULL
 );
 BULK INSERT raw.ref_fringe_rate
-FROM '/repo/data/raw/ref_fringe_rate.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+FROM '/repo/data/sqlserver/ref_fringe_rate.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_fringe_rate INT = (SELECT COUNT(*) FROM raw.ref_fringe_rate);
 PRINT CONCAT('raw.ref_fringe_rate', '                 ', @n_ref_fringe_rate, ' rows');
 GO
@@ -249,8 +249,8 @@ CREATE TABLE raw.ref_fringe_source (
     [source_url]   NVARCHAR(400) NULL
 );
 BULK INSERT raw.ref_fringe_source
-FROM '/repo/data/raw/ref_fringe_source.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+FROM '/repo/data/sqlserver/ref_fringe_source.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_fringe_source INT = (SELECT COUNT(*) FROM raw.ref_fringe_source);
 PRINT CONCAT('raw.ref_fringe_source', '               ', @n_ref_fringe_source, ' rows');
 GO
@@ -277,8 +277,8 @@ CREATE TABLE raw.ref_fx_rate_daily (
     [source]        NVARCHAR(400) NULL
 );
 BULK INSERT raw.ref_fx_rate_daily
-FROM '/repo/data/raw/ref_fx_rate_daily.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+FROM '/repo/data/sqlserver/ref_fx_rate_daily.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_fx_rate_daily INT = (SELECT COUNT(*) FROM raw.ref_fx_rate_daily);
 PRINT CONCAT('raw.ref_fx_rate_daily', '               ', @n_ref_fx_rate_daily, ' rows');
 GO

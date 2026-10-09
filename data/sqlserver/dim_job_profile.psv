@@ -1,0 +1,166 @@
+job_profile_id|job_family_code|job_family|job_title|job_level|level_name|career_track
+SWE-L1|SWE|Software Engineering|Associate Software Engineer|1|Associate|Individual Contributor
+SWE-L2|SWE|Software Engineering|Software Engineer|2|Professional|Individual Contributor
+SWE-L3|SWE|Software Engineering|Senior Software Engineer|3|Senior|Individual Contributor
+SWE-L4|SWE|Software Engineering|Lead Software Engineer|4|Lead|Individual Contributor
+SWE-L5|SWE|Software Engineering|Staff Software Engineer|5|Staff / Manager|Individual Contributor
+SWE-M5|SWE|Software Engineering|Manager, Software Engineering|5|Staff / Manager|People Manager
+SWE-L6|SWE|Software Engineering|Principal Software Engineer|6|Principal / Senior Manager|Individual Contributor
+SWE-M6|SWE|Software Engineering|Senior Manager, Software Engineering|6|Principal / Senior Manager|People Manager
+SWE-L7|SWE|Software Engineering|Director, Software Engineering|7|Director|People Leader
+SWE-L8|SWE|Software Engineering|Senior Director, Software Engineering|8|Senior Director|People Leader
+SWE-L9|SWE|Software Engineering|Vice President, Software Engineering|9|Vice President|People Leader
+SWE-L10|SWE|Software Engineering|Senior Vice President, Software Engineering|10|Senior Vice President|People Leader
+DAT-L1|DAT|Data & Analytics|Associate Data Analyst|1|Associate|Individual Contributor
+DAT-L2|DAT|Data & Analytics|Data Analyst|2|Professional|Individual Contributor
+DAT-L3|DAT|Data & Analytics|Senior Data Analyst|3|Senior|Individual Contributor
+DAT-L4|DAT|Data & Analytics|Lead Data Analyst|4|Lead|Individual Contributor
+DAT-L5|DAT|Data & Analytics|Staff Data Analyst|5|Staff / Manager|Individual Contributor
+DAT-M5|DAT|Data & Analytics|Manager, Data & Analytics|5|Staff / Manager|People Manager
+DAT-L6|DAT|Data & Analytics|Principal Data Analyst|6|Principal / Senior Manager|Individual Contributor
+DAT-M6|DAT|Data & Analytics|Senior Manager, Data & Analytics|6|Principal / Senior Manager|People Manager
+DAT-L7|DAT|Data & Analytics|Director, Data & Analytics|7|Director|People Leader
+DAT-L8|DAT|Data & Analytics|Senior Director, Data & Analytics|8|Senior Director|People Leader
+DAT-L9|DAT|Data & Analytics|Vice President, Data & Analytics|9|Vice President|People Leader
+DAT-L10|DAT|Data & Analytics|Senior Vice President, Data & Analytics|10|Senior Vice President|People Leader
+PRD-L1|PRD|Product Management|Associate Product Manager|1|Associate|Individual Contributor
+PRD-L2|PRD|Product Management|Product Manager|2|Professional|Individual Contributor
+PRD-L3|PRD|Product Management|Senior Product Manager|3|Senior|Individual Contributor
+PRD-L4|PRD|Product Management|Lead Product Manager|4|Lead|Individual Contributor
+PRD-L5|PRD|Product Management|Staff Product Manager|5|Staff / Manager|Individual Contributor
+PRD-M5|PRD|Product Management|Manager, Product Management|5|Staff / Manager|People Manager
+PRD-L6|PRD|Product Management|Principal Product Manager|6|Principal / Senior Manager|Individual Contributor
+PRD-M6|PRD|Product Management|Senior Manager, Product Management|6|Principal / Senior Manager|People Manager
+PRD-L7|PRD|Product Management|Director, Product Management|7|Director|People Leader
+PRD-L8|PRD|Product Management|Senior Director, Product Management|8|Senior Director|People Leader
+PRD-L9|PRD|Product Management|Vice President, Product Management|9|Vice President|People Leader
+PRD-L10|PRD|Product Management|Senior Vice President, Product Management|10|Senior Vice President|People Leader
+DSN-L1|DSN|Design|Associate Product Designer|1|Associate|Individual Contributor
+DSN-L2|DSN|Design|Product Designer|2|Professional|Individual Contributor
+DSN-L3|DSN|Design|Senior Product Designer|3|Senior|Individual Contributor
+DSN-L4|DSN|Design|Lead Product Designer|4|Lead|Individual Contributor
+DSN-L5|DSN|Design|Staff Product Designer|5|Staff / Manager|Individual Contributor
+DSN-M5|DSN|Design|Manager, Design|5|Staff / Manager|People Manager
+DSN-L6|DSN|Design|Principal Product Designer|6|Principal / Senior Manager|Individual Contributor
+DSN-M6|DSN|Design|Senior Manager, Design|6|Principal / Senior Manager|People Manager
+DSN-L7|DSN|Design|Director, Design|7|Director|People Leader
+DSN-L8|DSN|Design|Senior Director, Design|8|Senior Director|People Leader
+DSN-L9|DSN|Design|Vice President, Design|9|Vice President|People Leader
+DSN-L10|DSN|Design|Senior Vice President, Design|10|Senior Vice President|People Leader
+SEC-L1|SEC|Security|Associate Security Engineer|1|Associate|Individual Contributor
+SEC-L2|SEC|Security|Security Engineer|2|Professional|Individual Contributor
+SEC-L3|SEC|Security|Senior Security Engineer|3|Senior|Individual Contributor
+SEC-L4|SEC|Security|Lead Security Engineer|4|Lead|Individual Contributor
+SEC-L5|SEC|Security|Staff Security Engineer|5|Staff / Manager|Individual Contributor
+SEC-M5|SEC|Security|Manager, Security|5|Staff / Manager|People Manager
+SEC-L6|SEC|Security|Principal Security Engineer|6|Principal / Senior Manager|Individual Contributor
+SEC-M6|SEC|Security|Senior Manager, Security|6|Principal / Senior Manager|People Manager
+SEC-L7|SEC|Security|Director, Security|7|Director|People Leader
+SEC-L8|SEC|Security|Senior Director, Security|8|Senior Director|People Leader
+SEC-L9|SEC|Security|Vice President, Security|9|Vice President|People Leader
+SEC-L10|SEC|Security|Senior Vice President, Security|10|Senior Vice President|People Leader
+ITS-L1|ITS|IT & Infrastructure|Associate Systems Engineer|1|Associate|Individual Contributor
+ITS-L2|ITS|IT & Infrastructure|Systems Engineer|2|Professional|Individual Contributor
+ITS-L3|ITS|IT & Infrastructure|Senior Systems Engineer|3|Senior|Individual Contributor
+ITS-L4|ITS|IT & Infrastructure|Lead Systems Engineer|4|Lead|Individual Contributor
+ITS-L5|ITS|IT & Infrastructure|Staff Systems Engineer|5|Staff / Manager|Individual Contributor
+ITS-M5|ITS|IT & Infrastructure|Manager, IT & Infrastructure|5|Staff / Manager|People Manager
+ITS-L6|ITS|IT & Infrastructure|Principal Systems Engineer|6|Principal / Senior Manager|Individual Contributor
+ITS-M6|ITS|IT & Infrastructure|Senior Manager, IT & Infrastructure|6|Principal / Senior Manager|People Manager
+ITS-L7|ITS|IT & Infrastructure|Director, IT & Infrastructure|7|Director|People Leader
+ITS-L8|ITS|IT & Infrastructure|Senior Director, IT & Infrastructure|8|Senior Director|People Leader
+ITS-L9|ITS|IT & Infrastructure|Vice President, IT & Infrastructure|9|Vice President|People Leader
+ITS-L10|ITS|IT & Infrastructure|Senior Vice President, IT & Infrastructure|10|Senior Vice President|People Leader
+SAL-L1|SAL|Sales|Associate Account Executive|1|Associate|Individual Contributor
+SAL-L2|SAL|Sales|Account Executive|2|Professional|Individual Contributor
+SAL-L3|SAL|Sales|Senior Account Executive|3|Senior|Individual Contributor
+SAL-L4|SAL|Sales|Lead Account Executive|4|Lead|Individual Contributor
+SAL-L5|SAL|Sales|Staff Account Executive|5|Staff / Manager|Individual Contributor
+SAL-M5|SAL|Sales|Manager, Sales|5|Staff / Manager|People Manager
+SAL-L6|SAL|Sales|Principal Account Executive|6|Principal / Senior Manager|Individual Contributor
+SAL-M6|SAL|Sales|Senior Manager, Sales|6|Principal / Senior Manager|People Manager
+SAL-L7|SAL|Sales|Director, Sales|7|Director|People Leader
+SAL-L8|SAL|Sales|Senior Director, Sales|8|Senior Director|People Leader
+SAL-L9|SAL|Sales|Vice President, Sales|9|Vice President|People Leader
+SAL-L10|SAL|Sales|Senior Vice President, Sales|10|Senior Vice President|People Leader
+CSM-L1|CSM|Client Success|Associate Client Success Manager|1|Associate|Individual Contributor
+CSM-L2|CSM|Client Success|Client Success Manager|2|Professional|Individual Contributor
+CSM-L3|CSM|Client Success|Senior Client Success Manager|3|Senior|Individual Contributor
+CSM-L4|CSM|Client Success|Lead Client Success Manager|4|Lead|Individual Contributor
+CSM-L5|CSM|Client Success|Staff Client Success Manager|5|Staff / Manager|Individual Contributor
+CSM-M5|CSM|Client Success|Manager, Client Success|5|Staff / Manager|People Manager
+CSM-L6|CSM|Client Success|Principal Client Success Manager|6|Principal / Senior Manager|Individual Contributor
+CSM-M6|CSM|Client Success|Senior Manager, Client Success|6|Principal / Senior Manager|People Manager
+CSM-L7|CSM|Client Success|Director, Client Success|7|Director|People Leader
+CSM-L8|CSM|Client Success|Senior Director, Client Success|8|Senior Director|People Leader
+CSM-L9|CSM|Client Success|Vice President, Client Success|9|Vice President|People Leader
+CSM-L10|CSM|Client Success|Senior Vice President, Client Success|10|Senior Vice President|People Leader
+MKT-L1|MKT|Marketing|Associate Marketing Specialist|1|Associate|Individual Contributor
+MKT-L2|MKT|Marketing|Marketing Specialist|2|Professional|Individual Contributor
+MKT-L3|MKT|Marketing|Senior Marketing Specialist|3|Senior|Individual Contributor
+MKT-L4|MKT|Marketing|Lead Marketing Specialist|4|Lead|Individual Contributor
+MKT-L5|MKT|Marketing|Staff Marketing Specialist|5|Staff / Manager|Individual Contributor
+MKT-M5|MKT|Marketing|Manager, Marketing|5|Staff / Manager|People Manager
+MKT-L6|MKT|Marketing|Principal Marketing Specialist|6|Principal / Senior Manager|Individual Contributor
+MKT-M6|MKT|Marketing|Senior Manager, Marketing|6|Principal / Senior Manager|People Manager
+MKT-L7|MKT|Marketing|Director, Marketing|7|Director|People Leader
+MKT-L8|MKT|Marketing|Senior Director, Marketing|8|Senior Director|People Leader
+MKT-L9|MKT|Marketing|Vice President, Marketing|9|Vice President|People Leader
+MKT-L10|MKT|Marketing|Senior Vice President, Marketing|10|Senior Vice President|People Leader
+FIN-L1|FIN|Finance|Associate Financial Analyst|1|Associate|Individual Contributor
+FIN-L2|FIN|Finance|Financial Analyst|2|Professional|Individual Contributor
+FIN-L3|FIN|Finance|Senior Financial Analyst|3|Senior|Individual Contributor
+FIN-L4|FIN|Finance|Lead Financial Analyst|4|Lead|Individual Contributor
+FIN-L5|FIN|Finance|Staff Financial Analyst|5|Staff / Manager|Individual Contributor
+FIN-M5|FIN|Finance|Manager, Finance|5|Staff / Manager|People Manager
+FIN-L6|FIN|Finance|Principal Financial Analyst|6|Principal / Senior Manager|Individual Contributor
+FIN-M6|FIN|Finance|Senior Manager, Finance|6|Principal / Senior Manager|People Manager
+FIN-L7|FIN|Finance|Director, Finance|7|Director|People Leader
+FIN-L8|FIN|Finance|Senior Director, Finance|8|Senior Director|People Leader
+FIN-L9|FIN|Finance|Vice President, Finance|9|Vice President|People Leader
+FIN-L10|FIN|Finance|Senior Vice President, Finance|10|Senior Vice President|People Leader
+HRM-L1|HRM|Human Resources|Associate HR Specialist|1|Associate|Individual Contributor
+HRM-L2|HRM|Human Resources|HR Specialist|2|Professional|Individual Contributor
+HRM-L3|HRM|Human Resources|Senior HR Specialist|3|Senior|Individual Contributor
+HRM-L4|HRM|Human Resources|Lead HR Specialist|4|Lead|Individual Contributor
+HRM-L5|HRM|Human Resources|Staff HR Specialist|5|Staff / Manager|Individual Contributor
+HRM-M5|HRM|Human Resources|Manager, Human Resources|5|Staff / Manager|People Manager
+HRM-L6|HRM|Human Resources|Principal HR Specialist|6|Principal / Senior Manager|Individual Contributor
+HRM-M6|HRM|Human Resources|Senior Manager, Human Resources|6|Principal / Senior Manager|People Manager
+HRM-L7|HRM|Human Resources|Director, Human Resources|7|Director|People Leader
+HRM-L8|HRM|Human Resources|Senior Director, Human Resources|8|Senior Director|People Leader
+HRM-L9|HRM|Human Resources|Vice President, Human Resources|9|Vice President|People Leader
+HRM-L10|HRM|Human Resources|Senior Vice President, Human Resources|10|Senior Vice President|People Leader
+LGL-L1|LGL|Legal & Compliance|Associate Counsel|1|Associate|Individual Contributor
+LGL-L2|LGL|Legal & Compliance|Counsel|2|Professional|Individual Contributor
+LGL-L3|LGL|Legal & Compliance|Senior Counsel|3|Senior|Individual Contributor
+LGL-L4|LGL|Legal & Compliance|Lead Counsel|4|Lead|Individual Contributor
+LGL-L5|LGL|Legal & Compliance|Staff Counsel|5|Staff / Manager|Individual Contributor
+LGL-M5|LGL|Legal & Compliance|Manager, Legal & Compliance|5|Staff / Manager|People Manager
+LGL-L6|LGL|Legal & Compliance|Principal Counsel|6|Principal / Senior Manager|Individual Contributor
+LGL-M6|LGL|Legal & Compliance|Senior Manager, Legal & Compliance|6|Principal / Senior Manager|People Manager
+LGL-L7|LGL|Legal & Compliance|Director, Legal & Compliance|7|Director|People Leader
+LGL-L8|LGL|Legal & Compliance|Senior Director, Legal & Compliance|8|Senior Director|People Leader
+LGL-L9|LGL|Legal & Compliance|Vice President, Legal & Compliance|9|Vice President|People Leader
+LGL-L10|LGL|Legal & Compliance|Senior Vice President, Legal & Compliance|10|Senior Vice President|People Leader
+OPS-L1|OPS|Operations|Associate Operations Analyst|1|Associate|Individual Contributor
+OPS-L2|OPS|Operations|Operations Analyst|2|Professional|Individual Contributor
+OPS-L3|OPS|Operations|Senior Operations Analyst|3|Senior|Individual Contributor
+OPS-L4|OPS|Operations|Lead Operations Analyst|4|Lead|Individual Contributor
+OPS-L5|OPS|Operations|Staff Operations Analyst|5|Staff / Manager|Individual Contributor
+OPS-M5|OPS|Operations|Manager, Operations|5|Staff / Manager|People Manager
+OPS-L6|OPS|Operations|Principal Operations Analyst|6|Principal / Senior Manager|Individual Contributor
+OPS-M6|OPS|Operations|Senior Manager, Operations|6|Principal / Senior Manager|People Manager
+OPS-L7|OPS|Operations|Director, Operations|7|Director|People Leader
+OPS-L8|OPS|Operations|Senior Director, Operations|8|Senior Director|People Leader
+OPS-L9|OPS|Operations|Vice President, Operations|9|Vice President|People Leader
+OPS-L10|OPS|Operations|Senior Vice President, Operations|10|Senior Vice President|People Leader
+EXE-CEO|EXE|Executive Leadership|Chief Executive Officer|12|Chief Executive Officer|Executive
+EXE-TEC|EXE|Executive Leadership|Chief Technology Officer|11|Executive Vice President|Executive
+EXE-PRD|EXE|Executive Leadership|Chief Product Officer|11|Executive Vice President|Executive
+EXE-COM|EXE|Executive Leadership|Chief Revenue Officer|11|Executive Vice President|Executive
+EXE-OPS|EXE|Executive Leadership|Chief Operating Officer|11|Executive Vice President|Executive
+EXE-FIN|EXE|Executive Leadership|Chief Financial Officer|11|Executive Vice President|Executive
+EXE-MKT|EXE|Executive Leadership|Chief Marketing Officer|10|Senior Vice President|Executive
+EXE-PPL|EXE|Executive Leadership|Chief People Officer|10|Senior Vice President|Executive
+EXE-LGL|EXE|Executive Leadership|General Counsel|10|Senior Vice President|Executive

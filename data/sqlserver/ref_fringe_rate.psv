@@ -1,0 +1,111 @@
+country_code|year|effective_start_date|effective_end_date|social_contribution_rate|retirement_severance_rate|statutory_pay_rate|employer_benefits_rate|fringe_rate|reference_salary_local|is_estimate|method_note
+US|2022|2022-01-01|2022-12-31|0.0835|0.0|0.0|0.1378|0.2213|125000.0|False|BLS ECEC: legally required + (insurance + retirement), over wages + paid leave
+US|2023|2023-01-01|2023-12-31|0.0835|0.0|0.0|0.135|0.2185|125000.0|False|BLS ECEC: legally required + (insurance + retirement), over wages + paid leave
+US|2024|2024-01-01|2024-12-31|0.0827|0.0|0.0|0.1364|0.2191|125000.0|False|BLS ECEC: legally required + (insurance + retirement), over wages + paid leave
+US|2025|2025-01-01|2025-12-31|0.082|0.0|0.0|0.1375|0.2195|125000.0|False|BLS ECEC: legally required + (insurance + retirement), over wages + paid leave
+US|2026|2026-01-01|2026-12-31|0.0827|0.0|0.0|0.1417|0.2244|125000.0|False|BLS ECEC: legally required + (insurance + retirement), over wages + paid leave
+CA|2022|2022-01-01|2022-12-31|0.0917|0.0|0.0|0.0|0.0917|126000.0|False|
+CA|2023|2023-01-01|2023-12-31|0.0917|0.0|0.0|0.0|0.0917|126000.0|False|
+CA|2024|2024-01-01|2024-12-31|0.0953|0.0|0.0|0.0|0.0953|126000.0|False|
+CA|2025|2025-01-01|2025-12-31|0.0965|0.0|0.0|0.0|0.0965|126000.0|False|
+CA|2026|2026-01-01|2026-12-31|0.0965|0.0|0.0|0.0|0.0965|126000.0|True|2025 OECD rate carried forward (2026 data not yet published)
+BR|2022|2022-01-01|2022-12-31|0.3089|0.0889|0.1111|0.0|0.5089|234900.0|False|Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus
+BR|2023|2023-01-01|2023-12-31|0.3089|0.0889|0.1111|0.0|0.5089|234900.0|False|Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus
+BR|2024|2024-01-01|2024-12-31|0.3089|0.0889|0.1111|0.0|0.5089|234900.0|False|Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus
+BR|2025|2025-01-01|2025-12-31|0.3089|0.0889|0.1111|0.0|0.5089|234900.0|False|Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus
+BR|2026|2026-01-01|2026-12-31|0.3089|0.0889|0.1111|0.0|0.5089|234900.0|False|Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus
+MX|2022|2022-01-01|2022-12-31|0.1148|0.0|0.0452|0.0|0.16|857800.0|False|Aguinaldo 15 days + 25% premium on 6 vacation days
+MX|2023|2023-01-01|2023-12-31|0.1123|0.0|0.0493|0.0|0.1616|857800.0|False|Aguinaldo 15 days + 25% premium on 12 vacation days
+MX|2024|2024-01-01|2024-12-31|0.1099|0.0|0.0493|0.0|0.1592|857800.0|False|Aguinaldo 15 days + 25% premium on 12 vacation days
+MX|2025|2025-01-01|2025-12-31|0.1086|0.0|0.0493|0.0|0.1579|857800.0|False|Aguinaldo 15 days + 25% premium on 12 vacation days
+MX|2026|2026-01-01|2026-12-31|0.1086|0.0|0.0493|0.0|0.1579|857800.0|True|2025 OECD rate carried forward (2026 data not yet published); Aguinaldo 15 days + 25% premium on 12 vacation days
+GB|2022|2022-01-01|2022-12-31|0.1211|0.0152|0.0|0.0|0.1363|86800.0|False|
+GB|2023|2023-01-01|2023-12-31|0.1173|0.0152|0.0|0.0|0.1325|86800.0|False|
+GB|2024|2024-01-01|2024-12-31|0.1186|0.0152|0.0|0.0|0.1338|86800.0|False|
+GB|2025|2025-01-01|2025-12-31|0.1414|0.0152|0.0|0.0|0.1566|86800.0|False|
+GB|2026|2026-01-01|2026-12-31|0.1414|0.0152|0.0|0.0|0.1566|86800.0|True|2025 OECD rate carried forward (2026 data not yet published)
+IE|2022|2022-01-01|2022-12-31|0.1111|0.0|0.0|0.0|0.1111|98700.0|False|
+IE|2023|2023-01-01|2023-12-31|0.1111|0.0|0.0|0.0|0.1111|98700.0|False|
+IE|2024|2024-01-01|2024-12-31|0.1111|0.0|0.0|0.0|0.1111|98700.0|False|
+IE|2025|2025-01-01|2025-12-31|0.1123|0.0|0.0|0.0|0.1123|98700.0|False|
+IE|2026|2026-01-01|2026-12-31|0.1135|0.015|0.0|0.0|0.1285|98700.0|False|2025 OECD rate + 0.11 pp: Employer PRSI 11.25% all year plus 11.40% from Oct 2026, vs 2025 average; Auto-enrolment employer 1.5% from 1 Jan 2026 (applied to full base)
+DE|2022|2022-01-01|2022-12-31|0.199|0.0|0.0|0.0|0.199|103500.0|False|
+DE|2023|2023-01-01|2023-12-31|0.2005|0.0|0.0|0.0|0.2005|103500.0|False|
+DE|2024|2024-01-01|2024-12-31|0.2019|0.0|0.0|0.0|0.2019|103500.0|False|
+DE|2025|2025-01-01|2025-12-31|0.2092|0.0|0.0|0.0|0.2092|103500.0|False|
+DE|2026|2026-01-01|2026-12-31|0.2112|0.0|0.0|0.0|0.2112|103500.0|False|2025 OECD rate + 0.20 pp: Average additional health contribution 2.5% -> 2.9%, employer pays half
+FR|2022|2022-01-01|2022-12-31|0.3643|0.0|0.0|0.0|0.3643|93900.0|False|
+FR|2023|2023-01-01|2023-12-31|0.3624|0.0|0.0|0.0|0.3624|93900.0|False|
+FR|2024|2024-01-01|2024-12-31|0.3643|0.0|0.0|0.0|0.3643|93900.0|False|
+FR|2025|2025-01-01|2025-12-31|0.3643|0.0|0.0|0.0|0.3643|93900.0|False|
+FR|2026|2026-01-01|2026-12-31|0.3643|0.0|0.0|0.0|0.3643|93900.0|True|2025 OECD rate carried forward (2026 data not yet published)
+NL|2022|2022-01-01|2022-12-31|0.1198|0.0|0.0|0.0|0.1198|101100.0|False|
+NL|2023|2023-01-01|2023-12-31|0.1198|0.0|0.0|0.0|0.1198|101100.0|False|
+NL|2024|2024-01-01|2024-12-31|0.1211|0.0|0.0|0.0|0.1211|101100.0|False|
+NL|2025|2025-01-01|2025-12-31|0.1261|0.0|0.0|0.0|0.1261|101100.0|False|
+NL|2026|2026-01-01|2026-12-31|0.1261|0.0|0.0|0.0|0.1261|101100.0|True|2025 OECD rate carried forward (2026 data not yet published)
+ES|2022|2022-01-01|2022-12-31|0.2987|0.0|0.0|0.0|0.2987|72200.0|False|
+ES|2023|2023-01-01|2023-12-31|0.3038|0.0|0.0|0.0|0.3038|72200.0|False|
+ES|2024|2024-01-01|2024-12-31|0.3055|0.0|0.0|0.0|0.3055|72200.0|False|
+ES|2025|2025-01-01|2025-12-31|0.3055|0.0|0.0|0.0|0.3055|72200.0|False|
+ES|2026|2026-01-01|2026-12-31|0.3063|0.0|0.0|0.0|0.3063|72200.0|False|2025 OECD rate + 0.08 pp: MEI employer share 0.67% -> 0.75%
+PT|2022|2022-01-01|2022-12-31|0.2376|0.0|0.0|0.0|0.2376|60200.0|False|
+PT|2023|2023-01-01|2023-12-31|0.2376|0.0|0.0|0.0|0.2376|60200.0|False|
+PT|2024|2024-01-01|2024-12-31|0.2376|0.0|0.0|0.0|0.2376|60200.0|False|
+PT|2025|2025-01-01|2025-12-31|0.2376|0.0|0.0|0.0|0.2376|60200.0|False|
+PT|2026|2026-01-01|2026-12-31|0.2376|0.0|0.0|0.0|0.2376|60200.0|True|2025 OECD rate carried forward (2026 data not yet published)
+PL|2022|2022-01-01|2022-12-31|0.1641|0.0|0.0|0.0|0.1641|259600.0|False|
+PL|2023|2023-01-01|2023-12-31|0.1641|0.0|0.0|0.0|0.1641|259600.0|False|
+PL|2024|2024-01-01|2024-12-31|0.1641|0.0|0.0|0.0|0.1641|259600.0|False|
+PL|2025|2025-01-01|2025-12-31|0.1628|0.0|0.0|0.0|0.1628|259600.0|False|
+PL|2026|2026-01-01|2026-12-31|0.1628|0.0|0.0|0.0|0.1628|259600.0|True|2025 OECD rate carried forward (2026 data not yet published)
+CH|2022|2022-01-01|2022-12-31|0.0638|0.0227|0.0|0.0|0.0865|134200.0|False|BVG mandatory minimum: employer half of the 10% age credit on coordinated salary
+CH|2023|2023-01-01|2023-12-31|0.0638|0.0233|0.0|0.0|0.0871|134200.0|False|BVG mandatory minimum: employer half of the 10% age credit on coordinated salary
+CH|2024|2024-01-01|2024-12-31|0.0638|0.0233|0.0|0.0|0.0871|134200.0|False|BVG mandatory minimum: employer half of the 10% age credit on coordinated salary
+CH|2025|2025-01-01|2025-12-31|0.0638|0.0239|0.0|0.0|0.0877|134200.0|False|BVG mandatory minimum: employer half of the 10% age credit on coordinated salary
+CH|2026|2026-01-01|2026-12-31|0.0638|0.0239|0.0|0.0|0.0877|134200.0|True|2025 OECD rate carried forward (2026 data not yet published); BVG mandatory minimum: employer half of the 10% age credit on coordinated salary
+SE|2022|2022-01-01|2022-12-31|0.3141|0.0|0.0|0.0|0.3141|981400.0|False|
+SE|2023|2023-01-01|2023-12-31|0.3141|0.0|0.0|0.0|0.3141|981400.0|False|
+SE|2024|2024-01-01|2024-12-31|0.3141|0.0|0.0|0.0|0.3141|981400.0|False|
+SE|2025|2025-01-01|2025-12-31|0.3141|0.0|0.0|0.0|0.3141|981400.0|False|
+SE|2026|2026-01-01|2026-12-31|0.3141|0.0|0.0|0.0|0.3141|981400.0|True|2025 OECD rate carried forward (2026 data not yet published)
+AE|2022|2022-01-01|2022-12-31|0.0|0.0345|0.0|0.0|0.0345|358100.0|False|Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy)
+AE|2023|2023-01-01|2023-12-31|0.0|0.0345|0.0|0.0|0.0345|358100.0|False|Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy)
+AE|2024|2024-01-01|2024-12-31|0.0|0.0345|0.0|0.0|0.0345|358100.0|False|Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy)
+AE|2025|2025-01-01|2025-12-31|0.0|0.0345|0.0|0.0|0.0345|358100.0|False|Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy)
+AE|2026|2026-01-01|2026-12-31|0.0|0.0345|0.0|0.0|0.0345|358100.0|False|Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy)
+ZA|2022|2022-01-01|2022-12-31|0.0129|0.0|0.0|0.0|0.0129|737100.0|False|
+ZA|2023|2023-01-01|2023-12-31|0.0129|0.0|0.0|0.0|0.0129|737100.0|False|
+ZA|2024|2024-01-01|2024-12-31|0.0129|0.0|0.0|0.0|0.0129|737100.0|False|
+ZA|2025|2025-01-01|2025-12-31|0.0129|0.0|0.0|0.0|0.0129|737100.0|False|
+ZA|2026|2026-01-01|2026-12-31|0.0129|0.0|0.0|0.0|0.0129|737100.0|False|
+IN|2022|2022-01-01|2022-12-31|0.0|0.0847|0.0|0.0|0.0847|2668100.0|False|PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule)
+IN|2023|2023-01-01|2023-12-31|0.0|0.0847|0.0|0.0|0.0847|2668100.0|False|PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule)
+IN|2024|2024-01-01|2024-12-31|0.0|0.0847|0.0|0.0|0.0847|2668100.0|False|PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule)
+IN|2025|2025-01-01|2025-12-31|0.0|0.0847|0.0|0.0|0.0847|2668100.0|False|PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule)
+IN|2026|2026-01-01|2026-12-31|0.0|0.0847|0.0|0.0|0.0847|2668100.0|False|PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule)
+SG|2022|2022-01-01|2022-12-31|0.0009|0.0817|0.0|0.0|0.0826|149900.0|False|CPF on ordinary wages up to the monthly ceiling; citizens and PRs
+SG|2023|2023-01-01|2023-12-31|0.0009|0.083|0.0|0.0|0.0839|149900.0|False|CPF on ordinary wages up to the monthly ceiling; citizens and PRs
+SG|2024|2024-01-01|2024-12-31|0.0009|0.0925|0.0|0.0|0.0934|149900.0|False|CPF on ordinary wages up to the monthly ceiling; citizens and PRs
+SG|2025|2025-01-01|2025-12-31|0.0009|0.1007|0.0|0.0|0.1016|149900.0|False|CPF on ordinary wages up to the monthly ceiling; citizens and PRs
+SG|2026|2026-01-01|2026-12-31|0.0009|0.1089|0.0|0.0|0.1098|149900.0|False|CPF on ordinary wages up to the monthly ceiling; citizens and PRs
+JP|2022|2022-01-01|2022-12-31|0.1534|0.0|0.0|0.0|0.1534|11242000.0|False|
+JP|2023|2023-01-01|2023-12-31|0.1561|0.0|0.0|0.0|0.1561|11242000.0|False|
+JP|2024|2024-01-01|2024-12-31|0.1574|0.0|0.0|0.0|0.1574|11242000.0|False|
+JP|2025|2025-01-01|2025-12-31|0.1561|0.0|0.0|0.0|0.1561|11242000.0|False|
+JP|2026|2026-01-01|2026-12-31|0.1561|0.0|0.0|0.0|0.1561|11242000.0|True|2025 OECD rate carried forward (2026 data not yet published)
+AU|2022|2022-01-01|2022-12-31|0.0537|0.1025|0.0|0.0|0.1562|152600.0|False|
+AU|2023|2023-01-01|2023-12-31|0.0604|0.1075|0.0|0.0|0.1679|152600.0|False|
+AU|2024|2024-01-01|2024-12-31|0.0604|0.1125|0.0|0.0|0.1729|152600.0|False|
+AU|2025|2025-01-01|2025-12-31|0.0604|0.1175|0.0|0.0|0.1779|152600.0|False|
+AU|2026|2026-01-01|2026-12-31|0.0604|0.12|0.0|0.0|0.1804|152600.0|True|2025 OECD rate carried forward (2026 data not yet published)
+KR|2022|2022-01-01|2022-12-31|0.1099|0.0833|0.0|0.0|0.1932|100845800.0|False|
+KR|2023|2023-01-01|2023-12-31|0.1111|0.0833|0.0|0.0|0.1944|100845800.0|False|
+KR|2024|2024-01-01|2024-12-31|0.1111|0.0833|0.0|0.0|0.1944|100845800.0|False|
+KR|2025|2025-01-01|2025-12-31|0.1111|0.0833|0.0|0.0|0.1944|100845800.0|False|
+KR|2026|2026-01-01|2026-12-31|0.1142|0.0833|0.0|0.0|0.1975|100845800.0|False|2025 OECD rate + 0.31 pp: Pension employer 4.5% -> 4.75%, health 3.545% -> 3.595%, long-term care
+PH|2022|2022-01-01|2022-12-31|0.0259|0.0|0.0833|0.0|0.1092|1788200.0|False|
+PH|2023|2023-01-01|2023-12-31|0.0307|0.0|0.0833|0.0|0.114|1788200.0|False|
+PH|2024|2024-01-01|2024-12-31|0.0374|0.0|0.0833|0.0|0.1207|1788200.0|False|
+PH|2025|2025-01-01|2025-12-31|0.0418|0.0|0.0833|0.0|0.1251|1788200.0|False|
+PH|2026|2026-01-01|2026-12-31|0.0418|0.0|0.0833|0.0|0.1251|1788200.0|False|
