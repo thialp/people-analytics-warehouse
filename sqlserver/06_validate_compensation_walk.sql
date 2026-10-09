@@ -21,7 +21,8 @@ INTO #walk
 FROM (
 :r /repo/tableau/custom_sql_compensation_walk.sql
 ) AS w;
-PRINT CONCAT('Custom SQL returned ', (SELECT COUNT(*) FROM #walk), ' rows in ',
+DECLARE @n INT = (SELECT COUNT(*) FROM #walk);
+PRINT CONCAT('Custom SQL returned ', @n, ' rows in ',
              DATEDIFF(SECOND, @started, SYSDATETIME()), ' seconds');
 GO
 
