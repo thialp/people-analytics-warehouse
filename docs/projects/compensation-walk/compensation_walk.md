@@ -235,8 +235,11 @@ Total loaded cost grew 6.5%, mostly because of headcount: hires minus exits adde
 | Test 36: ties to snapshot | `tests/` | Opening and Closing equal the month-end snapshot for every department and office |
 | Test 37: transfers net to zero | `tests/` | Within each view, Transfers In + Out = 0 in headcount, FTE and dollars, and every transfer has a reason |
 | Test 38: views agree | `tests/` | All six views add up to the same company totals for every step, and constant FX has no FX line |
+| Test 39: office moves tie to the walk | `tests/` | In the Office and Country views, people who joined a group equal the walk's Transfers In headcount and people who left equal Transfers Out, for every group and date pair ([office moves](office_moves.md)) |
+| Test 40: office-move views agree | `tests/` | Company, Office and Country views count the same movers; moves inside one country are exactly the Domestic scope; no flow starts and ends at one office |
 | Ledger rows and ledger identity | `sqlserver/05_validate.sql` | Same as test 34, on SQL Server |
 | Custom SQL as Tableau runs it | `sqlserver/06_validate_compensation_walk.sql` | Runs the exact Tableau file (`:r` include), times it, and checks shape, closure and the FY26 example above |
+| Office moves Custom SQL as Tableau runs it | `sqlserver/07_validate_office_moves.sql` | Runs both Custom SQL files, times them, checks shape and the FY26 example (345 movers), ties the moves to the walk's transfers, and checks every move group exists in the walk with the same name |
 | SQL Server vs DuckDB | development check | The Custom SQL, transpiled to DuckDB, returns the same rows, labels and values as the CSV (zero differences across 10,455 rows). `dw.WorkerPayLedger` matches the DuckDB ledger on all 41 columns. |
 | Against the Workforce Cost Bridge | development check | For every department and month, the Month over Month walk equals the bridge's Opening, Hires, Terminations, Transfers In and Out, total pay change and Closing, within 2 cents (1,460 department-months). Two independently written models agree. |
 | Mutation checks | development check | Removing the FX line, or pricing Transfers In at closing value, fails test 35 in thousands of groups. Dropping tenure raises from the ledger fails test 34. |

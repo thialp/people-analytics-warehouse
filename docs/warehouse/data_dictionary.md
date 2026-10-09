@@ -290,6 +290,9 @@ One row per month-end per office. Movements are positive counts; the column name
 ### mart_mobility_flows
 One row per month-end per origin office per destination office: `from_location_id`, `from_city`, `from_region`, `from_latitude`, `from_longitude`, the same five for `to_`, `flow_scope` (`Domestic` or `International`), `has_coordinates` (always true now that every office has coordinates) and `workers`. Flows out of and into each office equal its relocations (test 22).
 
+### mart_office_moves
+One row per date pair × view × group × `group_side` × origin office × destination office × `move_reason`: the people who changed office between two month-ends on the compensation walk's grid, keyed like the walk (`view_name`, `group_id`, `group_name`, `group_parent`) so one set of filters drives both. Columns for the date pair, the group and its side (`Both`, `From`, `To`), both offices with city, country, region and coordinates, `flow_scope`, `flow_scope_label`, `region_scope`, `move_reason` and `workers`. Compared From vs To only, so a person who moved twice counts once. In the Office and Country views `To` equals the walk's Transfers In and `From` equals Transfers Out (test 39); the views agree with each other (test 40). The DuckDB twin of `tableau/custom_sql_office_moves.sql`; not exported to CSV. Field reference: [office_moves.md](../projects/compensation-walk/office_moves.md).
+
 ## Intermediate models used by the walk
 
 ### int_worker_movement
