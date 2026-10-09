@@ -1,4 +1,4 @@
-# Headcount & FTE Walk: cards that match the waterfall, and a period picker that cannot break
+# Headcount & FTE Walk: cards that match the waterfall, and a clearer period picker
 
 Two problems from your screenshots, two fixes. **No data change is needed**: the walk file already carries both headcount and FTE on every line (and the new `part_time_headcount` column is in the CSV I sent). Load that CSV once and do everything below in Tableau.
 
@@ -202,7 +202,7 @@ In your screenshot the pill shows but the dark capsule behind it does not, becau
 1. Measure Toggle sheet: Format → Shading → Worksheet and Pane `#243A57`.
 2. Dashboard: select the Measure Toggle object → Layout pane → Background `#243A57`, Corner Radius 16 on all four corners.
 
-## 5. Period picker
+## 5. Period dropdowns
 
 ### 5.1 Same month is valid, and it is not "beginning equals close"
 
@@ -212,29 +212,11 @@ A walk always starts at the **end of the month before** the first month. So Star
 
 "From Jul 2025 To Jul 2025" reads as one whole month. (With the `WF Period` change above, the title says "Jul 2025".)
 
-### 5.2 End before start: make it impossible, with the trend chart as the picker
+### 5.2 End before start
 
-Tableau cannot filter one dropdown by another, and **Replace References** only swaps a parameter for another parameter (not for a calculated field), so the "auto-swap" idea does not work. A cleaner way: stop typing the two dates and let the viewer **select months on a chart**. A Change Parameter action can take the **earliest** selected month as the start and the **latest** as the end, so the pair is valid by construction, with no formula edits.
+Tableau cannot limit one parameter by another (a dropdown's list is fixed, **Replace References** only swaps a parameter for another parameter, and a chart-driven picker was tried and dropped as less intuitive than two dropdowns). So the controls stay as two plain dropdowns and a reversed pair is handled, not prevented: the cards show "—" and the waterfall title reads "Choose a start month on or before the end month". Nothing breaks, and the message says what to do.
 
-This is what the trend chart (top right) is for. When we build it, it will be a line of closing headcount by month-end with `Month End Date` as an **Exact Date** (continuous), because the parameter values are month-end dates and the action must pass exactly those. Then two actions on the dashboard (**Dashboard → Actions → Add Action → Change Parameter**):
-
-| | Action 1 | Action 2 |
-|---|---|---|
-| Name | Pick start | Pick end |
-| Source sheet | Trend | Trend |
-| Run action on | Select | Select |
-| Target parameter | Start Month | End Month |
-| Source field | Month End Date | Month End Date |
-| Aggregation | **Minimum** | **Maximum** |
-| Clearing the selection will | Keep current value | Keep current value |
-
-Drag a box across the months you want: Start becomes the first, End the last. Click one month: Start = End = that month (a valid one-month walk). Reversed ranges cannot happen.
-
-Presets work the same way: a small sheet with one mark per fiscal year (FY23, FY24, FY25, FY26, with `Month End Date` on Detail) and the same two actions pointing at it. Clicking "FY26" passes all twelve of its months, so Minimum and Maximum give Jul 2025 and Jun 2026.
-
-Once the chart is the picker, remove the two dropdowns from the header (the From/To labels in 5.1 only matter if you keep them) so there is no way back to a reversed pair. If you keep the dropdowns, a reversed pair still shows the existing message "Choose a start month on or before the end month" and the cards show "—"; nothing breaks.
-
-**Clean up what we tried:** delete the parameters `From (pick)` and `To (pick)` and the calculated fields `Range Start` and `Range End`. Keep the original `Start Month` and `End Month`; every formula already uses them.
+**Clean up what we tried:** delete the parameters `From (pick)` and `To (pick)`, the calculated fields `Range Start` and `Range End`, and, if you added them, the two Change Parameter actions *Pick start* and *Pick end* (Dashboard → Actions → select each → Delete). Keep the original `Start Month` and `End Month`; every formula already uses them.
 
 ## 6. Check (Jul to Aug 2025)
 
@@ -247,4 +229,4 @@ Once the chart is the picker, remove the two dropdowns from the header (the From
 | Hires tooltip | 381 people = 376.9 FTE (part-timers count as a fraction) | same line |
 | Cards 1 and 2 | 12,621 and 12,388.5 (always both) | same |
 
-Pick From Jul 2025 To Jul 2025: title "Jul 2025: …", opening 12,510, closing 12,572. Reversed pairs: not possible once the trend chart drives the period (drag across months, or click a fiscal-year chip).
+Pick From Jul 2025 To Jul 2025: title "Jul 2025: …", opening 12,510, closing 12,572. Reversed pair (From May 2026, To Aug 2025): cards show "—" and the title asks for a start on or before the end.
