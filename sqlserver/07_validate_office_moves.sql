@@ -22,7 +22,8 @@ INTO #moves
 FROM (
 :r /repo/tableau/custom_sql_office_moves.sql
 ) AS m;
-PRINT CONCAT('Office moves Custom SQL returned ', (SELECT COUNT(*) FROM #moves), ' rows in ',
+DECLARE @n INT = (SELECT COUNT(*) FROM #moves);
+PRINT CONCAT('Office moves Custom SQL returned ', @n, ' rows in ',
              DATEDIFF(SECOND, @started, SYSDATETIME()), ' seconds');
 GO
 
@@ -33,7 +34,8 @@ INTO #walk
 FROM (
 :r /repo/tableau/custom_sql_compensation_walk.sql
 ) AS w;
-PRINT CONCAT('Compensation walk Custom SQL returned ', (SELECT COUNT(*) FROM #walk), ' rows in ',
+DECLARE @n INT = (SELECT COUNT(*) FROM #walk);
+PRINT CONCAT('Compensation walk Custom SQL returned ', @n, ' rows in ',
              DATEDIFF(SECOND, @started, SYSDATETIME()), ' seconds');
 GO
 
