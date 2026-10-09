@@ -19,6 +19,7 @@ FROM (
     UNION ALL SELECT 'dw.FactBonusPayout rows',                           (SELECT COUNT(*) FROM dw.FactBonusPayout),                   131639
     UNION ALL SELECT 'dw.MonthEndCalendar rows',                          (SELECT COUNT(*) FROM dw.MonthEndCalendar),                  49
     UNION ALL SELECT 'dw.WorkerMonthEndSnapshot rows',                    (SELECT COUNT(*) FROM dw.WorkerMonthEndSnapshot),            1347949
+    UNION ALL SELECT 'dw.WorkerPayLedger rows',                           (SELECT COUNT(*) FROM dw.WorkerPayLedger),                   1347949
     UNION ALL SELECT 'dw.WorkerReportingChain rows',                      (SELECT COUNT(*) FROM dw.WorkerReportingChain),              918806
     UNION ALL SELECT 'org leaders at 2026-06-30',                         (SELECT COUNT(*) FROM rpt.vw_org_leader_summary WHERE month_end_date = '2026-06-30'), 44
 ) AS c;
@@ -56,4 +57,34 @@ ORDER BY month_end_date;
     2026-06-30   30015   29395.70   3195503264.83   3195503264.83
   (Nominal equals constant on 2026-06-30: the constant rate set is that day's rates.)
 */
+GO
+
+PRINT '5. The pay ledger explains every change in every worker''s cost (expected 0)';
+/* Between a worker's first month-end and any later one, the ledger's drivers must
+   add up to the change in value on all four measures. */
+WITH v AS (
+    SELECT
+        s.WorkerID, s.MonthEndDate,
+        ROW_NUMBER() OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate) AS rn,
+        s.BaseUsdNominal, s.BaseUsdConstant, s.LoadedUsdNominal, s.LoadedUsdConstant,
+        l.CumPromotionBaseNominal + l.CumDemotionBaseNominal + l.CumTenureBaseNominal + l.CumMarketBaseNominal
+          + l.CumRelocationBaseNominal + l.CumIntlTransferBaseNominal + l.CumFteBaseNominal + l.CumFxBaseNominal      AS ExplainedBN,
+        l.CumPromotionBaseConstant + l.CumDemotionBaseConstant + l.CumTenureBaseConstant + l.CumMarketBaseConstant
+          + l.CumRelocationBaseConstant + l.CumIntlTransferBaseConstant + l.CumFteBaseConstant                         AS ExplainedBC,
+        l.CumPromotionLoadedNominal + l.CumDemotionLoadedNominal + l.CumTenureLoadedNominal + l.CumMarketLoadedNominal
+          + l.CumRelocationLoadedNominal + l.CumIntlTransferLoadedNominal + l.CumFteLoadedNominal
+          + l.CumFringeLoadedNominal + l.CumFxLoadedNominal                                                            AS ExplainedLN,
+        l.CumPromotionLoadedConstant + l.CumDemotionLoadedConstant + l.CumTenureLoadedConstant + l.CumMarketLoadedConstant
+          + l.CumRelocationLoadedConstant + l.CumIntlTransferLoadedConstant + l.CumFteLoadedConstant
+          + l.CumFringeLoadedConstant                                                                                  AS ExplainedLC
+    FROM dw.WorkerMonthEndSnapshot AS s
+    JOIN dw.WorkerPayLedger AS l ON l.MonthEndDate = s.MonthEndDate AND l.WorkerID = s.WorkerID
+)
+SELECT COUNT(*) AS worker_months_not_explained
+FROM v
+JOIN v AS f ON f.WorkerID = v.WorkerID AND f.rn = 1
+WHERE ABS((v.BaseUsdNominal    - f.BaseUsdNominal)    - v.ExplainedBN) > 0.005
+   OR ABS((v.BaseUsdConstant   - f.BaseUsdConstant)   - v.ExplainedBC) > 0.005
+   OR ABS((v.LoadedUsdNominal  - f.LoadedUsdNominal)  - v.ExplainedLN) > 0.005
+   OR ABS((v.LoadedUsdConstant - f.LoadedUsdConstant) - v.ExplainedLC) > 0.005;
 GO

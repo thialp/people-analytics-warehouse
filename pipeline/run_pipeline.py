@@ -36,6 +36,7 @@ DB_PATH = ROOT / "warehouse" / "arcadia.duckdb"
 SCHEMAS = ["raw", "staging", "intermediate", "marts"]
 EXPORTS = [
     "mart_workforce_cost_bridge",
+    "mart_compensation_walk",
     "mart_workforce_cost_snapshot",
     "mart_headcount_fte_walk",
     "mart_dim_month",
