@@ -516,7 +516,7 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 **Thiago Alpoin** is a People Analytics leader in Austin, Texas, who builds workforce, compensation and finance data products: SQL pipelines that reconcile to the cent, and Tableau dashboards that leaders use to decide.
 
 - **Tableau Public:** [public.tableau.com/app/profile/thialp](https://public.tableau.com/app/profile/thialp)
-- **Figma:** [figma.com/@Thiago](https://www.figma.com/@Thiago)
+- **Figma:** [figma.com/@thialp](https://www.figma.com/@thialp)
 - **GitHub:** [github.com/thialp](https://github.com/thialp)
 - **LinkedIn:** [linkedin.com/in/thiagoalpoin](https://www.linkedin.com/in/thiagoalpoin)
 
