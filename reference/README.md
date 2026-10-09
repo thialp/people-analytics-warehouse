@@ -10,5 +10,5 @@ The generator turns these into USD per unit of local currency ([`generator/fx_ra
 
 Other public inputs live in code next to the citation for each number:
 
-- **Fringe rates** (OECD Taxing Wages, BLS Employer Costs for Employee Compensation, statutory sources): [`generator/fringe_research.py`](../generator/fringe_research.py), explained in [`docs/organization_and_pay_model.md`](../docs/organization_and_pay_model.md#fringe-rates).
+- **Fringe rates** (OECD Taxing Wages, BLS Employer Costs for Employee Compensation, statutory sources): [`generator/fringe_research.py`](../generator/fringe_research.py), explained in [`docs/company/organization_and_pay_model.md`](../docs/company/organization_and_pay_model.md#fringe-rates).
 - **Office postal codes and coordinates** (GeoNames postal-code centroids, CC BY 4.0): the `OFFICES` table in [`generator/reference_data.py`](../generator/reference_data.py).

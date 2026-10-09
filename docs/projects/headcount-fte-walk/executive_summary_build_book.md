@@ -2,7 +2,7 @@
 
 **Headcount & FTE Walk · Arcadia Systems** · [Open on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)
 
-![Executive Summary dashboard](images/executive_summary_dashboard.png)
+![Executive Summary dashboard](../../images/executive_summary_dashboard.png)
 
 This is the as-built record of the Executive Summary dashboard: the data, every worksheet, calculated field, parameter, color, font, position and tooltip, the decisions behind them, and the problems hit on the way. It is written so the dashboard can be rebuilt from scratch and so the next dashboard can reuse the same system.
 
@@ -47,7 +47,7 @@ The rule behind every element: **every number on the page reconciles to the mont
 
 ### 2.1 Files and relationships
 
-Six CSVs from [`data/marts/`](../data/marts/), connected in Tableau with **relationships** (not joins) from the fact table to each dimension:
+Six CSVs from [`data/marts/`](../../../data/marts), connected in Tableau with **relationships** (not joins) from the fact table to each dimension:
 
 | File | Rows | Related on |
 |---|---:|---|
@@ -81,8 +81,8 @@ For every slice and month, Opening + movements = Closing, and each month's Closi
 
 `part_time_headcount` counts workers under 1.0 FTE. It is filled on **Opening and Closing rows only**; movement rows carry 0, because a move or an FTE change can flip a worker between full- and part-time, so a signed movement count would mean nothing on its own.
 
-- SQL: [`sql/03_marts/mart_headcount_fte_walk.sql`](../sql/03_marts/mart_headcount_fte_walk.sql): `CASE WHEN prior_fte < 1 THEN 1 ELSE 0 END` on opening lines, `CASE WHEN current_fte < 1 THEN 1 ELSE 0 END` on closing lines.
-- Test: [`tests/test_23_part_time_ties_to_worker_master.sql`](../tests/test_23_part_time_ties_to_worker_master.sql) recounts part-time workers from `int_worker_movement` for every month and checks that each month's opening equals the prior month's closing.
+- SQL: [`sql/03_marts/mart_headcount_fte_walk.sql`](../../../sql/03_marts/mart_headcount_fte_walk.sql): `CASE WHEN prior_fte < 1 THEN 1 ELSE 0 END` on opening lines, `CASE WHEN current_fte < 1 THEN 1 ELSE 0 END` on closing lines.
+- Test: [`tests/test_23_part_time_ties_to_worker_master.sql`](../../../tests/test_23_part_time_ties_to_worker_master.sql) recounts part-time workers from `int_worker_movement` for every month and checks that each month's opening equals the prior month's closing.
 - FY26: 807 part-time at the opening (Jun 2025), 924 at the closing (Jun 2026).
 
 ## 3. Design system
@@ -106,7 +106,7 @@ For every slice and month, Opening + movements = Closing, and each month's Closi
 | Page | `#F3F3EF` | Dashboard background |
 | White | `#FFFFFF` | Header title, dropdown boxes |
 
-Palettes are installed from [`brand/Preferences.tps`](brand/Preferences.tps) (see [`brand/README.md`](brand/README.md)).
+Palettes are installed from [`brand/Preferences.tps`](../../brand/Preferences.tps) (see [`brand/README.md`](../../brand/README.md)).
 
 ### 3.2 Type
 
@@ -128,9 +128,9 @@ Only Tableau's own fonts, because Tableau Public embeds no others.
 
 - **Corner radius** (Tableau 2026.2, Layout pane → Corner Radius): chart cards and the info panel **10**, toggle capsule **16**, dropdowns and the header band **0**. 10 matches the KPI card background image.
 - Card treatment: background `#FBFBF8`, border 1 px `#E4E3DD`, inner padding 12.
-- Logo: [`brand/arcadia_logo_horizontal_reverse.png`](brand/arcadia_logo_horizontal_reverse.png) on the navy band.
-- KPI card background: [`brand/arcadia_kpi_cards_bg.png`](brand/arcadia_kpi_cards_bg.png) (transparent 1400 × 110, drawn at 2×).
-- Custom shapes: [`brand/shapes/Arcadia/`](brand/shapes/Arcadia/) (`seg_headcount_on/off`, `seg_fte_on/off`, `info_open`, `info_close`), drawn by [`brand/build/make_toggle_shapes.py`](brand/build/make_toggle_shapes.py). Install by copying the folder to `Documents/My Tableau Repository/Shapes/` and choosing **Reload Shapes**; Tableau saves them inside the workbook, so viewers see them.
+- Logo: [`brand/arcadia_logo_horizontal_reverse.png`](../../brand/arcadia_logo_horizontal_reverse.png) on the navy band.
+- KPI card background: [`brand/arcadia_kpi_cards_bg.png`](../../brand/arcadia_kpi_cards_bg.png) (transparent 1400 × 110, drawn at 2×).
+- Custom shapes: [`brand/shapes/Arcadia/`](../../brand/shapes/Arcadia) (`seg_headcount_on/off`, `seg_fte_on/off`, `info_open`, `info_close`), drawn by [`brand/build/make_toggle_shapes.py`](../../brand/build/make_toggle_shapes.py). Install by copying the folder to `Documents/My Tableau Repository/Shapes/` and choosing **Reload Shapes**; Tableau saves them inside the workbook, so viewers see them.
 
 ## 4. Dashboard layout
 
@@ -921,8 +921,8 @@ Start the next dashboard from these, in this order:
 | [`tableau_headcount_walk_guide.md`](tableau_headcount_walk_guide.md) | Original build plan for the four-dashboard workbook (data connection, core fields, later dashboards) |
 | [`tableau_kpi_cards_guide.md`](tableau_kpi_cards_guide.md) | The map-layer KPI card technique in full, with calibration |
 | [`Arcadia_KPI_Cards_Config.xlsx`](Arcadia_KPI_Cards_Config.xlsx) | KPI card parameters, fields and layers as copy-ready tables |
-| [`brand/README.md`](brand/README.md) | Logo, palettes, style rules |
-| [`data_dictionary.md`](data_dictionary.md) | Every column, including `part_time_headcount` |
-| [`methodology.md`](methodology.md) | Definitions and limits of the warehouse |
-| [`../sql/03_marts/mart_headcount_fte_walk.sql`](../sql/03_marts/mart_headcount_fte_walk.sql) | The walk mart |
-| [`../tests/`](../tests/) | The 23 data tests, including test 23 for part-time |
+| [`brand/README.md`](../../brand/README.md) | Logo, palettes, style rules |
+| [`data_dictionary.md`](../../warehouse/data_dictionary.md) | Every column, including `part_time_headcount` |
+| [`methodology.md`](../workforce-cost-bridge/methodology.md) | Definitions and limits of the warehouse |
+| [`../sql/03_marts/mart_headcount_fte_walk.sql`](../../../sql/03_marts/mart_headcount_fte_walk.sql) | The walk mart |
+| [`../tests/`](../../../tests) | The 23 data tests, including test 23 for part-time |

@@ -1,6 +1,6 @@
 # Building the Headcount & FTE Walk Dashboard in Tableau Public
 
-This guide builds the second dashboard, from [`mart_headcount_fte_walk`](../data/marts/mart_headcount_fte_walk.csv) and its five small dimension files. Plan on about two hours. Every step lists what you should see, so you can check as you go.
+This guide builds the second dashboard, from [`mart_headcount_fte_walk`](../../../data/marts/mart_headcount_fte_walk.csv) and its five small dimension files. Plan on about two hours. Every step lists what you should see, so you can check as you go.
 
 The finished workbook has four dashboards, one per audience:
 
@@ -11,11 +11,11 @@ The finished workbook has four dashboards, one per audience:
 | 3. Diagnostics | Analysts | Which slices moved, and does every line reconcile? |
 | 4. Methodology | Anyone | How the numbers are defined, and their limits |
 
-![Static preview](images/headcount_walk_preview.png)
+![Static preview](../../images/headcount_walk_preview.png)
 
 > **This is the original build plan.** The Executive Summary as published on [Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary) refines it in several places (an info panel instead of a Methodology dashboard, a capsule toggle drawn with custom shapes, cards that follow the Headcount | FTE toggle, a turnover chart with a dynamic title). Every final field, setting and color is in the [Executive Summary build book](executive_summary_build_book.md).
 
-The workbook uses the Arcadia look shared by all three dashboards: navy header band with the logo, a row of KPI cards, charts on off-white cards, teal for growth, coral for leavers. Install the palettes and get the logo from [`docs/brand/`](brand/README.md) before you start.
+The workbook uses the Arcadia look shared by all three dashboards: navy header band with the logo, a row of KPI cards, charts on off-white cards, teal for growth, coral for leavers. Install the palettes and get the logo from [`docs/brand/`](../../brand/README.md) before you start.
 
 ---
 
@@ -25,12 +25,12 @@ From the repository, open each file below and click **Download raw file** (the a
 
 | File | Rows | What it is |
 |---|---|---|
-| [`mart_headcount_fte_walk.csv`](../data/marts/mart_headcount_fte_walk.csv) | 292,696 | The walk (fact table), codes only, about 15 MB |
-| [`mart_dim_month.csv`](../data/marts/mart_dim_month.csv) | 48 | Month-ends with fiscal year, quarter, period |
-| [`mart_dim_department.csv`](../data/marts/mart_dim_department.csv) | 32 | Department, sub-function, function, cost center |
-| [`mart_dim_country.csv`](../data/marts/mart_dim_country.csv) | 15 | Country and region |
-| [`mart_dim_job_family.csv`](../data/marts/mart_dim_job_family.csv) | 14 | Job family names |
-| [`mart_dim_grade.csv`](../data/marts/mart_dim_grade.csv) | 9 | Grade level and career track |
+| [`mart_headcount_fte_walk.csv`](../../../data/marts/mart_headcount_fte_walk.csv) | 292,696 | The walk (fact table), codes only, about 15 MB |
+| [`mart_dim_month.csv`](../../../data/marts/mart_dim_month.csv) | 48 | Month-ends with fiscal year, quarter, period |
+| [`mart_dim_department.csv`](../../../data/marts/mart_dim_department.csv) | 32 | Department, sub-function, function, cost center |
+| [`mart_dim_country.csv`](../../../data/marts/mart_dim_country.csv) | 15 | Country and region |
+| [`mart_dim_job_family.csv`](../../../data/marts/mart_dim_job_family.csv) | 14 | Job family names |
+| [`mart_dim_grade.csv`](../../../data/marts/mart_dim_grade.csv) | 9 | Grade level and career track |
 
 Why six files and not one: names repeated on 292,696 rows would make a single file almost four times larger (57 MB). A star schema keeps the export small, and Tableau's relationships put it back together.
 

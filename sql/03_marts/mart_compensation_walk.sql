@@ -11,7 +11,7 @@
 --           + FTE Changes + Fringe Rate Changes + FX Translation  =  Closing
 --
 -- exactly, in headcount, FTE and all four dollar measures, for every row group.
--- Field reference and worked examples: docs/compensation_walk.md
+-- Field reference and worked examples: docs/projects/compensation-walk/compensation_walk.md
 CREATE OR REPLACE TABLE marts.mart_compensation_walk AS
 WITH grid AS (
     -- === GRID === every quarter-end to every later quarter-end (136 pairs) plus every

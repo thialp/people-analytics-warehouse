@@ -119,7 +119,7 @@ Street addresses are fictional. Postal codes are real codes for each business di
 
 ## Currency
 
-All FX rates are the **European Central Bank's euro foreign exchange reference rates**, published every TARGET business day ([`reference/`](../reference/README.md)). Arcadia reports in USD, so each rate is crossed through the euro: `USD per local = (USD per EUR) ÷ (local per EUR)`. The UAE dirham is not in the ECB basket and uses its USD peg (AED 3.6725 since 1997). On days with no ECB rate, the latest rate on or before the date applies.
+All FX rates are the **European Central Bank's euro foreign exchange reference rates**, published every TARGET business day ([`reference/`](../../reference/README.md)). Arcadia reports in USD, so each rate is crossed through the euro: `USD per local = (USD per EUR) ÷ (local per EUR)`. The UAE dirham is not in the ECB basket and uses its USD peg (AED 3.6725 since 1997). On days with no ECB rate, the latest rate on or before the date applies.
 
 Pay is held in local currency and stated in USD three ways:
 
@@ -254,4 +254,4 @@ Every component cites at least one source in `ref_fringe_source`; test 28 fails 
 | `PH-PWC` | [PwC Worldwide Tax Summaries, Philippines: SSS, PhilHealth, Pag-IBIG](https://taxsummaries.pwc.com/philippines/individual) |
 | `PH-13M` | [Philippines Presidential Decree 851: 13th month pay](https://www.dole.gov.ph/) |
 
-The research is code, not a spreadsheet: [`generator/fringe_research.py`](../generator/fringe_research.py) holds every input with its source and builds both tables; `python generator/fringe_research.py` prints the result.
+The research is code, not a spreadsheet: [`generator/fringe_research.py`](../../generator/fringe_research.py) holds every input with its source and builds both tables; `python generator/fringe_research.py` prints the result.

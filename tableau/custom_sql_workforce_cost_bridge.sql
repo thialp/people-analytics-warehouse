@@ -21,7 +21,7 @@
     4. aggregate      sum to month x department x driver
 
   For each department and month: Opening + all drivers = Closing.
-  Methodology: docs/methodology.md
+  Methodology: docs/projects/workforce-cost-bridge/methodology.md
 */
 SELECT
     w.month_end_date,

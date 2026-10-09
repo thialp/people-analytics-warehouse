@@ -1,6 +1,6 @@
 # KPI cards as map layers: the Headcount & FTE Walk card band
 
-![Headcount and FTE Walk preview](images/headcount_walk_preview.png)
+![Headcount and FTE Walk preview](../../images/headcount_walk_preview.png)
 
 The five cards under the header (Closing headcount, Closing FTE, Hires, Voluntary turnover, Internal moves) are **one Tableau sheet**. Every title, number and note on it is text drawn as a map layer, positioned by calculated fields. A transparent card image sits underneath. The result:
 
@@ -18,7 +18,7 @@ Download the companion workbook [`Arcadia_KPI_Cards_Config.xlsx`](Arcadia_KPI_Ca
 ## 1. What you need first
 
 - The Headcount & FTE Walk data source and the calculated fields from [that guide](tableau_headcount_walk_guide.md), Section 4: `In Range`, `Hires`, `Voluntary Leavers`, `Voluntary Turnover (annualized)`, `Hire Rate (annualized)`, `Internal Moves`, `Average Headcount`, `Months in Range`, and the parameters **Start Month** and **End Month**.
-- The card background image [`brand/arcadia_kpi_cards_bg.png`](brand/arcadia_kpi_cards_bg.png): a transparent 1400 × 110 picture (drawn at 2×) holding five rounded off-white cards with a 1px `#E4E3DD` border.
+- The card background image [`brand/arcadia_kpi_cards_bg.png`](../../brand/arcadia_kpi_cards_bg.png): a transparent 1400 × 110 picture (drawn at 2×) holding five rounded off-white cards with a 1px `#E4E3DD` border.
 - A new, empty worksheet named **KPI Cards**.
 
 ## 2. Layout in pixels

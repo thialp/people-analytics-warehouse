@@ -159,7 +159,7 @@ The rate in effect on each month-end (the latest ECB rate on or before it): `cur
 One rate per currency for constant-currency reporting: `rate_set` (`Latest close (2026-06-30)`), `rate_date`, `currency_code`, `usd_per_local`.
 
 #### ref_fringe_rate
-Employer cost on top of base salary, by country and calendar year, built from public sources (method in [organization and pay model](organization_and_pay_model.md#fringe-rates)).
+Employer cost on top of base salary, by country and calendar year, built from public sources (method in [organization and pay model](../company/organization_and_pay_model.md#fringe-rates)).
 
 | Column | Description |
 |---|---|
@@ -208,7 +208,7 @@ Grain: **month-end × department × driver.** For each department and month, Ope
 ### mart_compensation_walk
 Grain: **date pair × view × group × walk step × movement reason.** For any two month-ends on the grid (every quarter-end to every later quarter-end, plus month over month: 184 pairs) and every group in six views (Company, Function, Leader, Department, Office, Country): Opening + Hires + Exits + Transfers In/Out + Promotions + Demotions + Tenure Increases + Market Adjustments + Relocation Adjustments + International Transfer Adjustments + FTE Changes + Fringe Rate Changes + FX Translation = Closing, in headcount, FTE and the four dollar measures, as totals (`base_usd_*`, `loaded_usd_*`), as an average walk per FTE (`avg_*`) and as a percent walk (`pct_*`). Filter to one `view_name` and one date pair. Same columns as the Tableau Custom SQL `tableau/custom_sql_compensation_walk.sql`.
 
-Full field reference, rules and worked examples: [`compensation_walk.md`](compensation_walk.md).
+Full field reference, rules and worked examples: [`compensation_walk.md`](../projects/compensation-walk/compensation_walk.md).
 
 ### mart_workforce_cost_snapshot
 Grain: **month-end × department × country × grade × job family.**
