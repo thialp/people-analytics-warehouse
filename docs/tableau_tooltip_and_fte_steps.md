@@ -118,17 +118,18 @@ LEFT(DATENAME('month', [End Month]), 3) + " " + STR(YEAR([End Month]))
 ```
 ```
 // TT Share Str   (this bar as a share of the opening level, one decimal)
-IF [TT Open Ref] = 0 THEN "" ELSE
-  STR(DIV(INT(ROUND(ABS(SUM([Walk Value])) / [TT Open Ref] * 1000, 0)), 10)) + "." +
-  STR(INT(ROUND(ABS(SUM([Walk Value])) / [TT Open Ref] * 1000, 0)) % 10) + "%"
+// MAX() turns the fixed opening level into an aggregate, so it can sit beside SUM([Walk Value])
+IF MAX([TT Open Ref]) = 0 THEN "" ELSE
+  STR(DIV(INT(ROUND(ABS(SUM([Walk Value])) / MAX([TT Open Ref]) * 1000, 0)), 10)) + "." +
+  STR(INT(ROUND(ABS(SUM([Walk Value])) / MAX([TT Open Ref]) * 1000, 0)) % 10) + "%"
 END
 ```
 ```
-// TT Net Str   (closing vs opening, signed)
-IF [TT Open Ref] = 0 THEN "" ELSE
-  IF [TT Close Ref] >= [TT Open Ref] THEN "+" ELSE "−" END +
-  STR(DIV(INT(ROUND(ABS([TT Close Ref] - [TT Open Ref]) / [TT Open Ref] * 1000, 0)), 10)) + "." +
-  STR(INT(ROUND(ABS([TT Close Ref] - [TT Open Ref]) / [TT Open Ref] * 1000, 0)) % 10) + "%"
+// TT Net Str   (closing vs opening, signed; MAX() keeps it an aggregate like the other branches of TT Context)
+IF MAX([TT Open Ref]) = 0 THEN "" ELSE
+  IF MAX([TT Close Ref]) >= MAX([TT Open Ref]) THEN "+" ELSE "−" END +
+  STR(DIV(INT(ROUND(ABS(MAX([TT Close Ref]) - MAX([TT Open Ref])) / MAX([TT Open Ref]) * 1000, 0)), 10)) + "." +
+  STR(INT(ROUND(ABS(MAX([TT Close Ref]) - MAX([TT Open Ref])) / MAX([TT Open Ref]) * 1000, 0)) % 10) + "%"
 END
 ```
 ```
@@ -175,6 +176,8 @@ IF (ATTR([Movement Category]) = "Opening" OR ATTR([Movement Category]) = "Closin
 ELSE "" END
 ```
 (An empty string shows as a blank line, so movement bars simply have no part-time line.)
+
+Why the `MAX(...)`: `TT Open Ref` and `TT Close Ref` come from FIXED fields, which Tableau treats as non-aggregate, while `SUM([Walk Value])` is an aggregate. Tableau refuses to mix the two in one expression ("Cannot mix aggregate and non-aggregate arguments"). Wrapping the fixed value in `MAX()` is harmless (it is a single constant) and makes both sides aggregates.
 
 ### 3.2 Put it on the sheet
 
