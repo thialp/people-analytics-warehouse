@@ -8,7 +8,7 @@ Data source: Custom SQL `tableau/custom_sql_office_moves.sql` (field reference: 
 |---|---|---|---|---|
 | Company / Arcadia Systems | 345 | 227 | 118 | 143 lines; busiest Bengaluru to Hyderabad (28), then Hyderabad to Bengaluru (25), Bengaluru to Pune (19) |
 | Office / Bengaluru | 93 | 75 | 18 | 32 moved in, 61 moved out |
-| Country / India | 121 | 91 | 30 | 91 inside India, 15 in, 30 out |
+| Country / India | 136 | 91 | 45 | 91 inside India, 15 moved in from abroad, 30 moved out |
 | Function / Technology | 147 | | | 131 inside the function, 10 left it, 6 joined it |
 
 ## 1. Connect
@@ -112,7 +112,7 @@ Put them in one container named `Panel: Office moves`, so the `p_Panel` toggle c
 
 1. FY26, Company: 345 / 227 / 118, 143 lines.
 2. p_View Office, p_Group Bengaluru: 93 people, lines only from or to Bengaluru; the subtitle reads "Moves in or out of Bengaluru".
-3. p_View Country, p_Group India: 121, 91, 30.
+3. p_View Country, p_Group India: 136, 91, 45.
 4. p_View Function, p_Group Technology: 147.
 5. Pick a month-over-month pair: counts shrink to a handful of lines; no blank sheet and no error.
 6. A group with no moves in the period: the title shows the empty-state message, the stats show 0.
