@@ -38,18 +38,33 @@ ZN(-SUM(IF [In Range] AND [Movement Category] = "Voluntary Terminations" THEN [F
 // K Hires Show   (the number the card headlines)
 IF [Measure] = "Headcount" THEN [K Hires] ELSE ROUND([K Hires FTE], 0) END
 ```
-Four text helpers, all the same comma pattern as `K Open Str`. Shown once, for the first; make the other three by swapping the field:
+Four text helpers. Each one must return **text** (the `STR(...)` around every branch is what makes it text; a branch without it returns a number and breaks anything that adds it to a string):
 ```
 // K Hires HC Str
 IF [K Hires] >= 1000
 THEN STR(DIV(INT([K Hires]), 1000)) + "," + RIGHT("00" + STR(INT([K Hires]) % 1000), 3)
 ELSE STR(INT([K Hires])) END
 ```
-- `K Hires FTE Str` on `ROUND([K Hires FTE], 0)`
-- `K Vol HC Str` on `[K Leavers Vol]`
-- `K Vol FTE Str` on `ROUND([K Leavers Vol FTE], 0)`
+```
+// K Hires FTE Str
+IF ROUND([K Hires FTE], 0) >= 1000
+THEN STR(DIV(INT(ROUND([K Hires FTE], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([K Hires FTE], 0)) % 1000), 3)
+ELSE STR(INT(ROUND([K Hires FTE], 0))) END
+```
+```
+// K Vol HC Str
+IF [K Leavers Vol] >= 1000
+THEN STR(DIV(INT([K Leavers Vol]), 1000)) + "," + RIGHT("00" + STR(INT([K Leavers Vol]) % 1000), 3)
+ELSE STR(INT([K Leavers Vol])) END
+```
+```
+// K Vol FTE Str
+IF ROUND([K Leavers Vol FTE], 0) >= 1000
+THEN STR(DIV(INT(ROUND([K Leavers Vol FTE], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([K Leavers Vol FTE], 0)) % 1000), 3)
+ELSE STR(INT(ROUND([K Leavers Vol FTE], 0))) END
+```
 
-(Wrap each in `INT(...)` as in the example.) The hire rate as text:
+The hire rate as text:
 ```
 // K Hire Rate Str
 STR(DIV(INT(ROUND(ZN([Hire Rate (annualized)]) * 1000, 0)), 10)) + "." +
@@ -88,7 +103,7 @@ END
 
 ## 2. Waterfall title follows the toggle
 
-Two FIXED fields and three text helpers:
+Two FIXED fields and three text helpers (all written out below):
 ```
 // WF FTE Hires
 ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Hires" THEN [Fte] END) })
@@ -97,7 +112,20 @@ ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Hires" THEN [Fte] END)
 // WF FTE Leavers
 ZN({ FIXED : -SUM(IF [In Range] AND ([Movement Category] = "Voluntary Terminations" OR [Movement Category] = "Involuntary Terminations") THEN [Fte] END) })
 ```
-`WF FTE Hires Str` and `WF FTE Leavers Str`: the comma pattern on `ROUND([WF FTE Hires], 0)` and `ROUND([WF FTE Leavers], 0)`, wrapped in `INT(...)`. Then the signed net:
+Two text helpers (both must return **text**: if Tableau says "Can't add string and float values" on `WF Title`, one of these is returning a number, usually a branch missing its `STR(...)`):
+```
+// WF FTE Hires Str
+IF ROUND([WF FTE Hires], 0) >= 1000
+THEN STR(DIV(INT(ROUND([WF FTE Hires], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([WF FTE Hires], 0)) % 1000), 3)
+ELSE STR(INT(ROUND([WF FTE Hires], 0))) END
+```
+```
+// WF FTE Leavers Str
+IF ROUND([WF FTE Leavers], 0) >= 1000
+THEN STR(DIV(INT(ROUND([WF FTE Leavers], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([WF FTE Leavers], 0)) % 1000), 3)
+ELSE STR(INT(ROUND([WF FTE Leavers], 0))) END
+```
+Then the signed net:
 ```
 // WF FTE Net Str
 IF ROUND([WF FTE Close] - [WF FTE Open], 0) < 0 THEN "−" ELSE "+" END +
