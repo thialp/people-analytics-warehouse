@@ -63,19 +63,8 @@ Parameter dropdowns: this was tested and a rounded pill around them fights the c
 
 ## 4. Info button and definitions panel (replaces Methodology)
 
-1. Add a **Vertical** container, floating: x 1004, y 84, w 340, h 300. Name it `Info Panel`. Background `#FBFBF8`, Border 1 px `#E4E3DD`, Corner Radius 10, Inner padding 16.
-2. Drag a **Text** object into it and paste:
-
-   **How to read this page** (Tableau Semibold 10 pt, navy `#13233A`)
-
-   - **Headcount**: workers with an active record at month-end.
-   - **FTE**: scheduled hours divided by full-time hours, so part-time workers count as a fraction.
-   - **The walk**: opening + hires − leavers ± internal moves = closing. It reconciles exactly to the month-end snapshot.
-   - **Internal moves**: cancel out at company level; filter to a department to see them.
-   - **Voluntary turnover**: voluntary leavers ÷ average headcount, annualized. Shown only for groups of 20 or more people.
-   - Fiscal year starts July 1. Arcadia Systems and all data are fictional (synthetic).
-
-   Body text: Tableau Book 9 pt, slate `#5A6170`.
+1. Add a **Vertical** container, floating: x 1004, y 84, w 340, h 340. Name it `Info Panel`. Background `#FBFBF8`, Border 1 px `#E4E3DD`, Corner Radius 10, Inner padding 16.
+2. Drag a **Text** object into it. The final text (period rules, FTE and part-time, the toggle, turnover, internal moves) is in `tableau_final_polish_before_publish.md`, item 5. Make the panel **340 high**.
 3. Select the container → its dropdown arrow → **Add Show/Hide Button**. Float the button at x 1312, y 22, 32 × 32.
 4. Click the button → **Edit Button…**: Button style **Image**; for "when the item is hidden" choose `info_open.png`, for "when shown" choose `info_close.png` (files in `docs/brand/shapes/Arcadia/`). Tooltip: `Definitions`. Background none, border none.
 5. Hide the panel once (click the button) so the dashboard opens clean. It floats above everything, so it covers part of the trend chart area only while open.

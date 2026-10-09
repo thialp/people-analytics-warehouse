@@ -300,14 +300,14 @@ If a number is off, the usual cause is a type (Step 2.4) or a filter left on a s
    // WF Caption
    IF NOT [K Valid] THEN "" ELSE
    [WF Moves Str] + " internal moves (" + [WF Promos Str] + " promotions, " + [WF Other Str] +
-   " other) leave one team and join another, so they cancel at company level; filter to a department to see them. FTE " +
+   " other) move people between teams, so they net to zero at company level. FTE " +
    [WF FTE Open Str] + " → " + [WF FTE Close Str] + ", including " + [WF FTE Chg Str] + " from schedule changes."
    END
    ```
 
    - *Title:* on the waterfall sheet, drag `WF Title` to **Detail** (it has one value, so it does not split the marks), then **Worksheet → Show Title**, double-click the title, **Insert → `WF Title`**, and set Tableau Bold 12 pt navy. Add a second line of static text, Tableau Book 9 pt slate: `Opening + hires − leavers ± internal moves = closing · axis starts at zero`.
    - *Caption:* create a new worksheet **Waterfall Caption**: drag `WF Caption` to **Label** on a Text mark (Tableau Book 8 pt slate, alignment left, wrap on), hide headers and title, Entire View. On the dashboard float it at the bottom of the waterfall card (see the layout table in the KPI guide) and set the waterfall sheet's bottom **inner padding** to 64 so the chart stops above it.
-   - For FY26 these read: *"FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people"* and *"1,615 internal moves (1,038 promotions, 577 other) leave one team and join another, so they cancel at company level; filter to a department to see them. FTE 12,282 → 12,940, including −34 from schedule changes."*
+   - For FY26 these read: *"FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people"* and *"1,615 internal moves (1,038 promotions, 577 other) move people between teams, so they net to zero at company level. FTE 12,281.7 → 12,940.0, including −34.1 from schedule changes."*
    - The title and caption use headcount even when Measure is FTE (the caption already shows the FTE change). They ignore filters on the waterfall sheet because of FIXED; a filter action on the dashboard will not change them.
    - Hide the *Bar Type* legend (select it on the dashboard and delete it; the colors are explained by the labels), and add a filter so the **FTE Changes** bar only appears when Measure is FTE: create `Show Category` = `[Measure] = "FTE" OR [Movement Category] <> "FTE Changes"`, drag it to Filters and keep True.
    - **Check:** the Closing bar's top equals the `Closing` KPI, and the last movement bar ends exactly where the Closing bar starts.
