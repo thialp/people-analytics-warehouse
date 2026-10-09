@@ -30,10 +30,16 @@ GO
 """
 
 
-def block(table: str, columns: list[str]) -> str:
+def block(table: str, columns: list[str], quoted: bool) -> str:
     width = max(len(c) for c in columns) + 2
     cols = ",\n".join(f"    [{c}]{' ' * (width - len(c) - 2)} NVARCHAR(400) NULL" for c in columns)
     pad = " " * max(1, 36 - len(f"raw.{table}"))
+    # Files with quoted values (embedded commas) need the CSV parser; plain files use simple terminators.
+    options = (
+        "FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '\"', ROWTERMINATOR = '0x0a', TABLOCK"
+        if quoted
+        else "FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK"
+    )
     return f"""
 DROP TABLE IF EXISTS raw.{table};
 CREATE TABLE raw.{table} (
@@ -41,7 +47,7 @@ CREATE TABLE raw.{table} (
 );
 BULK INSERT raw.{table}
 FROM '/repo/data/raw/{table}.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH ({options});
 DECLARE @n_{table} INT = (SELECT COUNT(*) FROM raw.{table});
 PRINT CONCAT('raw.{table}', '{pad}', @n_{table}, ' rows');
 GO
@@ -53,7 +59,8 @@ def main():
     for path in sorted(RAW.glob("*.csv")):
         with path.open(newline="") as f:
             columns = next(csv.reader(f))
-        parts.append(block(path.stem, columns))
+        quoted = '"' in path.read_text()
+        parts.append(block(path.stem, columns, quoted))
     OUT.write_text("".join(parts))
     print(f"Wrote {OUT.relative_to(ROOT)} for {len(parts) - 1} raw tables")
 

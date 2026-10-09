@@ -20,7 +20,7 @@ CREATE TABLE raw.dim_country (
 );
 BULK INSERT raw.dim_country
 FROM '/repo/data/raw/dim_country.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_dim_country INT = (SELECT COUNT(*) FROM raw.dim_country);
 PRINT CONCAT('raw.dim_country', '                     ', @n_dim_country, ' rows');
 GO
@@ -38,7 +38,7 @@ CREATE TABLE raw.dim_department (
 );
 BULK INSERT raw.dim_department
 FROM '/repo/data/raw/dim_department.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_dim_department INT = (SELECT COUNT(*) FROM raw.dim_department);
 PRINT CONCAT('raw.dim_department', '                  ', @n_dim_department, ' rows');
 GO
@@ -55,7 +55,7 @@ CREATE TABLE raw.dim_job_level (
 );
 BULK INSERT raw.dim_job_level
 FROM '/repo/data/raw/dim_job_level.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_dim_job_level INT = (SELECT COUNT(*) FROM raw.dim_job_level);
 PRINT CONCAT('raw.dim_job_level', '                   ', @n_dim_job_level, ' rows');
 GO
@@ -133,7 +133,7 @@ CREATE TABLE raw.dim_worker (
 );
 BULK INSERT raw.dim_worker
 FROM '/repo/data/raw/dim_worker.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_dim_worker INT = (SELECT COUNT(*) FROM raw.dim_worker);
 PRINT CONCAT('raw.dim_worker', '                      ', @n_dim_worker, ' rows');
 GO
@@ -154,7 +154,7 @@ CREATE TABLE raw.fact_bonus_payout (
 );
 BULK INSERT raw.fact_bonus_payout
 FROM '/repo/data/raw/fact_bonus_payout.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_fact_bonus_payout INT = (SELECT COUNT(*) FROM raw.fact_bonus_payout);
 PRINT CONCAT('raw.fact_bonus_payout', '               ', @n_fact_bonus_payout, ' rows');
 GO
@@ -172,7 +172,7 @@ CREATE TABLE raw.fact_compensation_history (
 );
 BULK INSERT raw.fact_compensation_history
 FROM '/repo/data/raw/fact_compensation_history.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_fact_compensation_history INT = (SELECT COUNT(*) FROM raw.fact_compensation_history);
 PRINT CONCAT('raw.fact_compensation_history', '       ', @n_fact_compensation_history, ' rows');
 GO
@@ -196,7 +196,7 @@ CREATE TABLE raw.fact_job_history (
 );
 BULK INSERT raw.fact_job_history
 FROM '/repo/data/raw/fact_job_history.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_fact_job_history INT = (SELECT COUNT(*) FROM raw.fact_job_history);
 PRINT CONCAT('raw.fact_job_history', '                ', @n_fact_job_history, ' rows');
 GO
@@ -212,7 +212,7 @@ CREATE TABLE raw.fact_performance_review (
 );
 BULK INSERT raw.fact_performance_review
 FROM '/repo/data/raw/fact_performance_review.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_fact_performance_review INT = (SELECT COUNT(*) FROM raw.fact_performance_review);
 PRINT CONCAT('raw.fact_performance_review', '         ', @n_fact_performance_review, ' rows');
 GO
@@ -264,7 +264,7 @@ CREATE TABLE raw.ref_fx_rate_constant (
 );
 BULK INSERT raw.ref_fx_rate_constant
 FROM '/repo/data/raw/ref_fx_rate_constant.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_fx_rate_constant INT = (SELECT COUNT(*) FROM raw.ref_fx_rate_constant);
 PRINT CONCAT('raw.ref_fx_rate_constant', '            ', @n_ref_fx_rate_constant, ' rows');
 GO
@@ -291,7 +291,7 @@ CREATE TABLE raw.ref_fx_rate_monthly (
 );
 BULK INSERT raw.ref_fx_rate_monthly
 FROM '/repo/data/raw/ref_fx_rate_monthly.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_fx_rate_monthly INT = (SELECT COUNT(*) FROM raw.ref_fx_rate_monthly);
 PRINT CONCAT('raw.ref_fx_rate_monthly', '             ', @n_ref_fx_rate_monthly, ' rows');
 GO
@@ -307,7 +307,7 @@ CREATE TABLE raw.ref_job_level_base_salary (
 );
 BULK INSERT raw.ref_job_level_base_salary
 FROM '/repo/data/raw/ref_job_level_base_salary.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_job_level_base_salary INT = (SELECT COUNT(*) FROM raw.ref_job_level_base_salary);
 PRINT CONCAT('raw.ref_job_level_base_salary', '       ', @n_ref_job_level_base_salary, ' rows');
 GO
@@ -320,7 +320,7 @@ CREATE TABLE raw.ref_performance_bonus (
 );
 BULK INSERT raw.ref_performance_bonus
 FROM '/repo/data/raw/ref_performance_bonus.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_performance_bonus INT = (SELECT COUNT(*) FROM raw.ref_performance_bonus);
 PRINT CONCAT('raw.ref_performance_bonus', '           ', @n_ref_performance_bonus, ' rows');
 GO
@@ -337,7 +337,7 @@ CREATE TABLE raw.ref_salary_range (
 );
 BULK INSERT raw.ref_salary_range
 FROM '/repo/data/raw/ref_salary_range.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_salary_range INT = (SELECT COUNT(*) FROM raw.ref_salary_range);
 PRINT CONCAT('raw.ref_salary_range', '                ', @n_ref_salary_range, ' rows');
 GO
@@ -350,7 +350,7 @@ CREATE TABLE raw.ref_tenure_increase (
 );
 BULK INSERT raw.ref_tenure_increase
 FROM '/repo/data/raw/ref_tenure_increase.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '"', ROWTERMINATOR = '0x0a', TABLOCK);
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_tenure_increase INT = (SELECT COUNT(*) FROM raw.ref_tenure_increase);
 PRINT CONCAT('raw.ref_tenure_increase', '             ', @n_ref_tenure_increase, ' rows');
 GO
