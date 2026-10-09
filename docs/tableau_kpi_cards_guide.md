@@ -382,11 +382,11 @@ Start Month 2025-07-31, End Month 2026-06-30:
 
 | Card | Value | Note |
 |---|---|---|
-| 1 Closing headcount | 13,201 | +5.5% vs 12,510 at start |
-| 2 Closing FTE | 12,940.0 | 924 part-time · 261.0 below headcount |
-| 3 Hires | 2,354 | 18.3% annualized hire rate |
-| 4 Voluntary turnover (annualized) | 10.4% | 1,341 leavers by choice |
-| 5 Internal moves | 1,615 | 1,038 promotions · 577 other moves |
+| 1 Closing headcount | 30,024 | +5.6% vs 28,445 at start |
+| 2 Closing FTE | 29,404.7 | 2,213 part-time · 619.3 below headcount |
+| 3 Hires | 5,168 | 17.7% annualized hire rate |
+| 4 Voluntary turnover (annualized) | 9.7% | 2,843 leavers by choice |
+| 5 Internal moves | 3,623 | 2,138 promotions · 1,485 other moves |
 
 The same text formulas, run in Python against the warehouse numbers, reproduce this table exactly. Set Start Month after End Month: all five values should show "—".
 

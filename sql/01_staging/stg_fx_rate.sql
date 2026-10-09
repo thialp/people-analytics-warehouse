@@ -1,6 +1,7 @@
 -- stg_fx_rate
--- Month-end spot rates (actual) and the fixed plan rate used for constant-currency reporting,
--- side by side so every downstream join gets both with one lookup.
+-- Month-end rates (the latest ECB reference rate on or before each month-end) and
+-- the constant rate set used for constant-currency reporting, side by side so every
+-- downstream join gets both with one lookup. Rates are USD per 1 unit of local currency.
 CREATE OR REPLACE TABLE staging.stg_fx_rate AS
 SELECT
     m.currency_code,

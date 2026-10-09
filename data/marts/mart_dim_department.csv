@@ -1,33 +1,33 @@
-department_id,department_name,sub_function,function_name,cost_center
-D-101,Core Platform Engineering,Engineering,Technology,CC-1010
-D-102,Product Engineering,Engineering,Technology,CC-1020
-D-103,Mobile & Web Engineering,Engineering,Technology,CC-1030
-D-104,Analytics Engineering,Engineering,Technology,CC-1040
-D-105,Site Reliability,Infrastructure,Technology,CC-1050
-D-106,Information Security,Infrastructure,Technology,CC-1060
-D-107,Enterprise IT,Infrastructure,Technology,CC-1070
-D-108,Data & AI Platform,Engineering,Technology,CC-1080
-D-201,Product Management,Product,Product,CC-2010
-D-202,Design & Research,Product,Product,CC-2020
-D-301,Enterprise Sales - Americas,Sales,Commercial,CC-3010
-D-302,Enterprise Sales - EMEA,Sales,Commercial,CC-3020
-D-303,Enterprise Sales - APAC,Sales,Commercial,CC-3030
-D-304,Sales Operations,Sales,Commercial,CC-3040
-D-305,Client Success,Client Services,Commercial,CC-3050
-D-306,Technical Support,Client Services,Commercial,CC-3060
-D-307,Partnerships,Sales,Commercial,CC-3070
-D-401,Brand & Communications,Marketing,Marketing,CC-4010
-D-402,Growth Marketing,Marketing,Marketing,CC-4020
-D-501,FP&A,Finance,Corporate,CC-5010
-D-502,Accounting & Controllership,Finance,Corporate,CC-5020
-D-503,Treasury & Tax,Finance,Corporate,CC-5030
-D-601,HR Business Partners,People,Corporate,CC-6010
-D-602,Talent Acquisition,People,Corporate,CC-6020
-D-603,Total Rewards,People,Corporate,CC-6030
-D-604,People Analytics,People,Corporate,CC-6040
-D-701,Legal,Legal & Compliance,Corporate,CC-7010
-D-702,Compliance & Risk,Legal & Compliance,Corporate,CC-7020
-D-801,Customer Operations,Operations,Operations,CC-8010
-D-802,Trust & Safety Operations,Operations,Operations,CC-8020
-D-803,Workplace & Procurement,Operations,Operations,CC-8030
-D-901,Office of the CEO,Executive,Executive,CC-9010
+department_id,department_name,sub_function,function_name,parent_org_unit_id,cost_center,head_grade
+D-101,Core Platform Engineering,Engineering,Technology,ORG-TEC-ENG,CC-1010,9
+D-102,Product Engineering,Engineering,Technology,ORG-TEC-ENG,CC-1020,9
+D-103,Mobile & Web Engineering,Engineering,Technology,ORG-TEC-ENG,CC-1030,9
+D-104,Analytics Engineering,Engineering,Technology,ORG-TEC-ENG,CC-1040,8
+D-105,Site Reliability,Infrastructure,Technology,ORG-TEC-INF,CC-1050,9
+D-106,Information Security,Infrastructure,Technology,ORG-TEC-INF,CC-1060,8
+D-107,Enterprise IT,Infrastructure,Technology,ORG-TEC-INF,CC-1070,8
+D-108,Data & AI Platform,Engineering,Technology,ORG-TEC-ENG,CC-1080,8
+D-201,Product Management,Product,Product,ORG-PRD,CC-2010,9
+D-202,Design & Research,Product,Product,ORG-PRD,CC-2020,8
+D-301,Enterprise Sales - Americas,Sales,Commercial,ORG-COM-SAL,CC-3010,9
+D-302,Enterprise Sales - EMEA,Sales,Commercial,ORG-COM-SAL,CC-3020,9
+D-303,Enterprise Sales - APAC,Sales,Commercial,ORG-COM-SAL,CC-3030,8
+D-304,Sales Operations,Sales,Commercial,ORG-COM-SAL,CC-3040,8
+D-305,Client Success,Client Services,Commercial,ORG-COM-CLS,CC-3050,9
+D-306,Technical Support,Client Services,Commercial,ORG-COM-CLS,CC-3060,9
+D-307,Partnerships,Sales,Commercial,ORG-COM-SAL,CC-3070,8
+D-401,Brand & Communications,Marketing,Marketing,ORG-MKT,CC-4010,8
+D-402,Growth Marketing,Marketing,Marketing,ORG-MKT,CC-4020,8
+D-501,FP&A,Finance,Finance,ORG-FIN,CC-5010,8
+D-502,Accounting & Controllership,Finance,Finance,ORG-FIN,CC-5020,8
+D-503,Treasury & Tax,Finance,Finance,ORG-FIN,CC-5030,7
+D-601,HR Business Partners,People,People,ORG-PPL,CC-6010,8
+D-602,Talent Acquisition,People,People,ORG-PPL,CC-6020,8
+D-603,Total Rewards,People,People,ORG-PPL,CC-6030,7
+D-604,People Analytics,People,People,ORG-PPL,CC-6040,7
+D-701,Legal,Legal & Compliance,Legal & Compliance,ORG-LGL,CC-7010,7
+D-702,Compliance & Risk,Legal & Compliance,Legal & Compliance,ORG-LGL,CC-7020,8
+D-801,Customer Operations,Operations,Operations,ORG-OPS,CC-8010,9
+D-802,Trust & Safety Operations,Operations,Operations,ORG-OPS,CC-8020,9
+D-803,Workplace & Procurement,Operations,Operations,ORG-OPS,CC-8030,8
+D-901,Office of the CEO,Executive,Executive,ORG-000,CC-9010,12

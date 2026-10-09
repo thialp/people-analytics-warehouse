@@ -103,37 +103,43 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 |---|---|
 | `01_create_database.sql` | Creates the `ArcadiaHR` database and the `raw`, `dw` and `rpt` schemas |
 | `02_load_raw.sql` | Lands each CSV as text with `BULK INSERT` |
-| `03_build_dw.sql` | Types and cleans the data, resolves pay corrections, builds the fiscal calendar and the indexed worker month-end snapshot |
-| `04_create_reporting_views.sql` | Creates `rpt.vw_workforce_cost_snapshot` |
-| `05_validate.sql` | Checks row counts and control totals |
+| `03_build_dw.sql` | Types and cleans the data, resolves pay corrections, values pay at its posting-date FX rate, builds the fiscal calendar, the indexed worker month-end snapshot and the reporting chain |
+| `04_create_reporting_views.sql` | Creates `rpt.vw_workforce_cost_snapshot`, `rpt.vw_org_leader_summary` and `rpt.vw_fringe_rate` |
+| `05_validate.sql` | Checks row counts, reporting lines and control totals |
 
 Expected output, abbreviated (2–5 minutes under emulation):
 
 ```
 Created database ArcadiaHR
 Schemas ready: raw, dw, rpt
-raw.dim_worker                      19276 rows
-raw.fact_job_history                26832 rows
-raw.fact_compensation_history       65260 rows
+raw.dim_worker                      43569 rows
+raw.fact_job_history                89240 rows
+raw.fact_compensation_history       153830 rows
 ...
 TableName                       RowsLoaded
-dw.DimWorker                         19276
-dw.FactJobHistory                    26832
-dw.FactCompensationHistory           64898
+dw.DimWorker                         43569
+dw.FactJobHistory                    89240
+dw.FactCompensationHistory          152939
+dw.FactPerformanceReview            131639
+dw.FactBonusPayout                  131639
 dw.MonthEndCalendar                     49
-dw.WorkerMonthEndSnapshot           592823
-Created view rpt.vw_workforce_cost_snapshot
+dw.WorkerMonthEndSnapshot          1347949
+dw.WorkerReportingChain             918806
+Created views rpt.vw_workforce_cost_snapshot, rpt.vw_org_leader_summary, rpt.vw_fringe_rate
 1. Row counts
 check_name                          actual   expected  result
-dw.DimWorker rows                    19276      19276  PASS
+dw.DimWorker rows                    43569      43569  PASS
 ...
-3. Control totals (executive officers excluded)
+3. Everyone except the CEO reports to an employed manager (expected 0)
+workers_without_a_valid_manager
+0
+4. Control totals (executive officers excluded)
 month_end_date  headcount  fte       loaded_usd_nominal  loaded_usd_constant
-2022-06-30      11000      10883.10  1126993109.33       1151151241.43
-2026-06-30      13189      12928.00  1566743212.90       1551634565.71
+2022-06-30      25005      24733.20  2577787184.81       2613645368.50
+2026-06-30      30015      29395.70  3195503264.83       3195503264.83
 ```
 
-Every row in section 1 should say `PASS`, and the control totals should match exactly.
+Every row in section 1 should say `PASS`, sections 2 and 3 should show `0`, and the control totals should match exactly.
 
 **If `sqlcmd` isn't found,** older images keep it at `/opt/mssql-tools/bin/sqlcmd`. Use that path and drop the `-C`.
 
@@ -230,11 +236,11 @@ You should land on the Data Source page with `ArcadiaHR` selected and the `dw`, 
 4. Rename the data source (top left) to **Workforce Cost Bridge (SQL Server)**.
 5. Set the connection to **Extract** (top right), then go to a sheet. Tableau saves the extract.
 
-Expected: 20 columns and 11,317 rows. The extract takes about a minute under emulation.
+Expected: 20 columns and 13,835 rows. The extract takes about a minute under emulation.
 
 Why it's written this way: Tableau wraps Custom SQL in a subquery, so CTEs, `ORDER BY` and trailing `--` comments all break it. The query uses derived tables and `CROSS APPLY` instead. Comments at the top of the file explain each layer.
 
-Why Extract: the query aggregates about 600,000 worker-months on every refresh. An extract runs it once and makes the dashboard fast, which is the usual production pattern for heavy Custom SQL.
+Why Extract: the query aggregates about 1.35 million worker-months on every refresh. An extract runs it once and makes the dashboard fast, which is the usual production pattern for heavy Custom SQL.
 
 ## Step 8. Add the snapshot as a second data source
 
@@ -242,7 +248,7 @@ Why Extract: the query aggregates about 600,000 worker-months on every refresh. 
 2. Pick schema **rpt** and drag **vw_workforce_cost_snapshot** onto the canvas.
 3. Rename it **Workforce Cost Snapshot (SQL Server)** and set it to **Extract**.
 
-Expected: 24 columns and 136,806 rows.
+Expected: 24 columns and 197,603 rows.
 
 Keep the two data sources separate. They have different grains, and joining them would duplicate dollars.
 
@@ -274,17 +280,18 @@ Use the **Workforce Cost Bridge** data source.
 
 | Driver | Expected (USD) |
 |---|---:|
-| Opening Run-Rate | 1,421,100,125 |
-| Hires | +241,062,610 |
-| Terminations | −182,610,580 |
-| Transfers In / Out | +63,332,223 / −63,332,223 |
-| Promotions | +15,029,490 |
-| Merit & Adjustments | +49,922,724 |
-| International Mobility | +310,822 |
-| FTE Changes | −3,815,134 |
-| Fringe Rate Changes | +11,351,582 |
-| FX Rate Changes | +14,391,573 |
-| **Grand Total (Closing)** | **1,566,743,213** |
+| Opening Run-Rate | 3,042,851,180 |
+| Hires | +451,657,231 |
+| Terminations | −378,384,468 |
+| Transfers In / Out | +137,683,196 / −137,683,196 |
+| Promotions | +22,003,572 |
+| Demotions | −694,074 |
+| Tenure & Market Adjustments | +105,140,681 |
+| International Mobility | +702,852 |
+| FTE Changes | −12,321,035 |
+| Fringe Rate Changes | +8,979,057 |
+| FX Rate Changes | −44,431,732 |
+| **Grand Total (Closing)** | **3,195,503,265** |
 
 If these match, your SQL Server, Custom SQL and Tableau calculation all agree with the published data.
 

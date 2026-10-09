@@ -1,0 +1,111 @@
+country_code,country_name,region,fringe_year,social_contribution_rate,retirement_severance_rate,statutory_pay_rate,employer_benefits_rate,fringe_rate,is_estimate,method_note,source_count
+AE,United Arab Emirates,Middle East & Africa,2022,0.0,0.0345,0.0,0.0,0.0345,false,Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy),1
+AE,United Arab Emirates,Middle East & Africa,2023,0.0,0.0345,0.0,0.0,0.0345,false,Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy),1
+AE,United Arab Emirates,Middle East & Africa,2024,0.0,0.0345,0.0,0.0,0.0345,false,Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy),1
+AE,United Arab Emirates,Middle East & Africa,2025,0.0,0.0345,0.0,0.0,0.0345,false,Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy),1
+AE,United Arab Emirates,Middle East & Africa,2026,0.0,0.0345,0.0,0.0,0.0345,false,Expatriate staff: no GPSSA; gratuity on basic wage = 60% of base (Arcadia policy),1
+AU,Australia,Asia Pacific,2022,0.0537,0.1025,0.0,0.0,0.1562,false,,2
+AU,Australia,Asia Pacific,2023,0.0604,0.1075,0.0,0.0,0.1679,false,,2
+AU,Australia,Asia Pacific,2024,0.0604,0.1125,0.0,0.0,0.1729,false,,2
+AU,Australia,Asia Pacific,2025,0.0604,0.1175,0.0,0.0,0.1779,false,,2
+AU,Australia,Asia Pacific,2026,0.0604,0.12,0.0,0.0,0.1804,true,2025 OECD rate carried forward (2026 data not yet published),2
+BR,Brazil,Latin America,2022,0.3089,0.0889,0.1111,0.0,0.5089,false,Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus,1
+BR,Brazil,Latin America,2023,0.3089,0.0889,0.1111,0.0,0.5089,false,Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus,1
+BR,Brazil,Latin America,2024,0.3089,0.0889,0.1111,0.0,0.5089,false,Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus,1
+BR,Brazil,Latin America,2025,0.3089,0.0889,0.1111,0.0,0.5089,false,Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus,1
+BR,Brazil,Latin America,2026,0.3089,0.0889,0.1111,0.0,0.5089,false,Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus,1
+CA,Canada,North America,2022,0.0917,0.0,0.0,0.0,0.0917,false,,1
+CA,Canada,North America,2023,0.0917,0.0,0.0,0.0,0.0917,false,,1
+CA,Canada,North America,2024,0.0953,0.0,0.0,0.0,0.0953,false,,1
+CA,Canada,North America,2025,0.0965,0.0,0.0,0.0,0.0965,false,,1
+CA,Canada,North America,2026,0.0965,0.0,0.0,0.0,0.0965,true,2025 OECD rate carried forward (2026 data not yet published),1
+CH,Switzerland,Europe,2022,0.0638,0.0227,0.0,0.0,0.0865,false,BVG mandatory minimum: employer half of the 10% age credit on coordinated salary,2
+CH,Switzerland,Europe,2023,0.0638,0.0233,0.0,0.0,0.0871,false,BVG mandatory minimum: employer half of the 10% age credit on coordinated salary,2
+CH,Switzerland,Europe,2024,0.0638,0.0233,0.0,0.0,0.0871,false,BVG mandatory minimum: employer half of the 10% age credit on coordinated salary,2
+CH,Switzerland,Europe,2025,0.0638,0.0239,0.0,0.0,0.0877,false,BVG mandatory minimum: employer half of the 10% age credit on coordinated salary,2
+CH,Switzerland,Europe,2026,0.0638,0.0239,0.0,0.0,0.0877,true,2025 OECD rate carried forward (2026 data not yet published); BVG mandatory minimum: employer half of the 10% age credit on coordinated salary,2
+DE,Germany,Europe,2022,0.199,0.0,0.0,0.0,0.199,false,,1
+DE,Germany,Europe,2023,0.2005,0.0,0.0,0.0,0.2005,false,,1
+DE,Germany,Europe,2024,0.2019,0.0,0.0,0.0,0.2019,false,,1
+DE,Germany,Europe,2025,0.2092,0.0,0.0,0.0,0.2092,false,,1
+DE,Germany,Europe,2026,0.2112,0.0,0.0,0.0,0.2112,false,"2025 OECD rate + 0.20 pp: Average additional health contribution 2.5% -> 2.9%, employer pays half",2
+ES,Spain,Europe,2022,0.2987,0.0,0.0,0.0,0.2987,false,,1
+ES,Spain,Europe,2023,0.3038,0.0,0.0,0.0,0.3038,false,,1
+ES,Spain,Europe,2024,0.3055,0.0,0.0,0.0,0.3055,false,,1
+ES,Spain,Europe,2025,0.3055,0.0,0.0,0.0,0.3055,false,,1
+ES,Spain,Europe,2026,0.3063,0.0,0.0,0.0,0.3063,false,2025 OECD rate + 0.08 pp: MEI employer share 0.67% -> 0.75%,2
+FR,France,Europe,2022,0.3643,0.0,0.0,0.0,0.3643,false,,1
+FR,France,Europe,2023,0.3624,0.0,0.0,0.0,0.3624,false,,1
+FR,France,Europe,2024,0.3643,0.0,0.0,0.0,0.3643,false,,1
+FR,France,Europe,2025,0.3643,0.0,0.0,0.0,0.3643,false,,1
+FR,France,Europe,2026,0.3643,0.0,0.0,0.0,0.3643,true,2025 OECD rate carried forward (2026 data not yet published),1
+GB,United Kingdom,Europe,2022,0.1211,0.0152,0.0,0.0,0.1363,false,,3
+GB,United Kingdom,Europe,2023,0.1173,0.0152,0.0,0.0,0.1325,false,,3
+GB,United Kingdom,Europe,2024,0.1186,0.0152,0.0,0.0,0.1338,false,,3
+GB,United Kingdom,Europe,2025,0.1414,0.0152,0.0,0.0,0.1566,false,,3
+GB,United Kingdom,Europe,2026,0.1414,0.0152,0.0,0.0,0.1566,true,2025 OECD rate carried forward (2026 data not yet published),3
+IE,Ireland,Europe,2022,0.1111,0.0,0.0,0.0,0.1111,false,,1
+IE,Ireland,Europe,2023,0.1111,0.0,0.0,0.0,0.1111,false,,1
+IE,Ireland,Europe,2024,0.1111,0.0,0.0,0.0,0.1111,false,,1
+IE,Ireland,Europe,2025,0.1123,0.0,0.0,0.0,0.1123,false,,1
+IE,Ireland,Europe,2026,0.1135,0.015,0.0,0.0,0.1285,false,"2025 OECD rate + 0.11 pp: Employer PRSI 11.25% all year plus 11.40% from Oct 2026, vs 2025 average; Auto-enrolment employer 1.5% from 1 Jan 2026 (applied to full base)",3
+IN,India,Asia Pacific,2022,0.0,0.0847,0.0,0.0,0.0847,false,PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule),2
+IN,India,Asia Pacific,2023,0.0,0.0847,0.0,0.0,0.0847,false,PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule),2
+IN,India,Asia Pacific,2024,0.0,0.0847,0.0,0.0,0.0847,false,PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule),2
+IN,India,Asia Pacific,2025,0.0,0.0847,0.0,0.0,0.0847,false,PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule),2
+IN,India,Asia Pacific,2026,0.0,0.0847,0.0,0.0,0.0847,false,PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule),2
+JP,Japan,Asia Pacific,2022,0.1534,0.0,0.0,0.0,0.1534,false,,1
+JP,Japan,Asia Pacific,2023,0.1561,0.0,0.0,0.0,0.1561,false,,1
+JP,Japan,Asia Pacific,2024,0.1574,0.0,0.0,0.0,0.1574,false,,1
+JP,Japan,Asia Pacific,2025,0.1561,0.0,0.0,0.0,0.1561,false,,1
+JP,Japan,Asia Pacific,2026,0.1561,0.0,0.0,0.0,0.1561,true,2025 OECD rate carried forward (2026 data not yet published),1
+KR,South Korea,Asia Pacific,2022,0.1099,0.0833,0.0,0.0,0.1932,false,,2
+KR,South Korea,Asia Pacific,2023,0.1111,0.0833,0.0,0.0,0.1944,false,,2
+KR,South Korea,Asia Pacific,2024,0.1111,0.0833,0.0,0.0,0.1944,false,,2
+KR,South Korea,Asia Pacific,2025,0.1111,0.0833,0.0,0.0,0.1944,false,,2
+KR,South Korea,Asia Pacific,2026,0.1142,0.0833,0.0,0.0,0.1975,false,"2025 OECD rate + 0.31 pp: Pension employer 4.5% -> 4.75%, health 3.545% -> 3.595%, long-term care",3
+MX,Mexico,Latin America,2022,0.1148,0.0,0.0452,0.0,0.16,false,Aguinaldo 15 days + 25% premium on 6 vacation days,3
+MX,Mexico,Latin America,2023,0.1123,0.0,0.0493,0.0,0.1616,false,Aguinaldo 15 days + 25% premium on 12 vacation days,3
+MX,Mexico,Latin America,2024,0.1099,0.0,0.0493,0.0,0.1592,false,Aguinaldo 15 days + 25% premium on 12 vacation days,3
+MX,Mexico,Latin America,2025,0.1086,0.0,0.0493,0.0,0.1579,false,Aguinaldo 15 days + 25% premium on 12 vacation days,3
+MX,Mexico,Latin America,2026,0.1086,0.0,0.0493,0.0,0.1579,true,2025 OECD rate carried forward (2026 data not yet published); Aguinaldo 15 days + 25% premium on 12 vacation days,3
+NL,Netherlands,Europe,2022,0.1198,0.0,0.0,0.0,0.1198,false,,1
+NL,Netherlands,Europe,2023,0.1198,0.0,0.0,0.0,0.1198,false,,1
+NL,Netherlands,Europe,2024,0.1211,0.0,0.0,0.0,0.1211,false,,1
+NL,Netherlands,Europe,2025,0.1261,0.0,0.0,0.0,0.1261,false,,1
+NL,Netherlands,Europe,2026,0.1261,0.0,0.0,0.0,0.1261,true,2025 OECD rate carried forward (2026 data not yet published),1
+PH,Philippines,Asia Pacific,2022,0.0259,0.0,0.0833,0.0,0.1092,false,,2
+PH,Philippines,Asia Pacific,2023,0.0307,0.0,0.0833,0.0,0.114,false,,2
+PH,Philippines,Asia Pacific,2024,0.0374,0.0,0.0833,0.0,0.1207,false,,2
+PH,Philippines,Asia Pacific,2025,0.0418,0.0,0.0833,0.0,0.1251,false,,2
+PH,Philippines,Asia Pacific,2026,0.0418,0.0,0.0833,0.0,0.1251,false,,2
+PL,Poland,Europe,2022,0.1641,0.0,0.0,0.0,0.1641,false,,1
+PL,Poland,Europe,2023,0.1641,0.0,0.0,0.0,0.1641,false,,1
+PL,Poland,Europe,2024,0.1641,0.0,0.0,0.0,0.1641,false,,1
+PL,Poland,Europe,2025,0.1628,0.0,0.0,0.0,0.1628,false,,1
+PL,Poland,Europe,2026,0.1628,0.0,0.0,0.0,0.1628,true,2025 OECD rate carried forward (2026 data not yet published),1
+PT,Portugal,Europe,2022,0.2376,0.0,0.0,0.0,0.2376,false,,1
+PT,Portugal,Europe,2023,0.2376,0.0,0.0,0.0,0.2376,false,,1
+PT,Portugal,Europe,2024,0.2376,0.0,0.0,0.0,0.2376,false,,1
+PT,Portugal,Europe,2025,0.2376,0.0,0.0,0.0,0.2376,false,,1
+PT,Portugal,Europe,2026,0.2376,0.0,0.0,0.0,0.2376,true,2025 OECD rate carried forward (2026 data not yet published),1
+SE,Sweden,Europe,2022,0.3141,0.0,0.0,0.0,0.3141,false,,1
+SE,Sweden,Europe,2023,0.3141,0.0,0.0,0.0,0.3141,false,,1
+SE,Sweden,Europe,2024,0.3141,0.0,0.0,0.0,0.3141,false,,1
+SE,Sweden,Europe,2025,0.3141,0.0,0.0,0.0,0.3141,false,,1
+SE,Sweden,Europe,2026,0.3141,0.0,0.0,0.0,0.3141,true,2025 OECD rate carried forward (2026 data not yet published),1
+SG,Singapore,Asia Pacific,2022,0.0009,0.0817,0.0,0.0,0.0826,false,CPF on ordinary wages up to the monthly ceiling; citizens and PRs,2
+SG,Singapore,Asia Pacific,2023,0.0009,0.083,0.0,0.0,0.0839,false,CPF on ordinary wages up to the monthly ceiling; citizens and PRs,2
+SG,Singapore,Asia Pacific,2024,0.0009,0.0925,0.0,0.0,0.0934,false,CPF on ordinary wages up to the monthly ceiling; citizens and PRs,2
+SG,Singapore,Asia Pacific,2025,0.0009,0.1007,0.0,0.0,0.1016,false,CPF on ordinary wages up to the monthly ceiling; citizens and PRs,2
+SG,Singapore,Asia Pacific,2026,0.0009,0.1089,0.0,0.0,0.1098,false,CPF on ordinary wages up to the monthly ceiling; citizens and PRs,2
+US,United States,North America,2022,0.0835,0.0,0.0,0.1378,0.2213,false,"BLS ECEC: legally required + (insurance + retirement), over wages + paid leave",1
+US,United States,North America,2023,0.0835,0.0,0.0,0.135,0.2185,false,"BLS ECEC: legally required + (insurance + retirement), over wages + paid leave",1
+US,United States,North America,2024,0.0827,0.0,0.0,0.1364,0.2191,false,"BLS ECEC: legally required + (insurance + retirement), over wages + paid leave",1
+US,United States,North America,2025,0.082,0.0,0.0,0.1375,0.2195,false,"BLS ECEC: legally required + (insurance + retirement), over wages + paid leave",1
+US,United States,North America,2026,0.0827,0.0,0.0,0.1417,0.2244,false,"BLS ECEC: legally required + (insurance + retirement), over wages + paid leave",1
+ZA,South Africa,Middle East & Africa,2022,0.0129,0.0,0.0,0.0,0.0129,false,,1
+ZA,South Africa,Middle East & Africa,2023,0.0129,0.0,0.0,0.0,0.0129,false,,1
+ZA,South Africa,Middle East & Africa,2024,0.0129,0.0,0.0,0.0,0.0129,false,,1
+ZA,South Africa,Middle East & Africa,2025,0.0129,0.0,0.0,0.0,0.0129,false,,1
+ZA,South Africa,Middle East & Africa,2026,0.0129,0.0,0.0,0.0,0.0129,false,,1

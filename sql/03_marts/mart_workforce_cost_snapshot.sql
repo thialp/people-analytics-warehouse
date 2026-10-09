@@ -45,9 +45,7 @@ JOIN intermediate.int_month_end_calendar AS cal ON cal.month_end_date = s.month_
 LEFT JOIN staging.stg_department AS d ON d.department_id = s.department_id
 LEFT JOIN (SELECT DISTINCT country_code, country_name, region FROM staging.stg_location) AS loc
        ON loc.country_code = s.country_code
-LEFT JOIN (SELECT DISTINCT grade, grade_level, career_track FROM staging.stg_job_profile
-           WHERE job_family_code <> 'EXE') AS jp
-       ON jp.grade = s.grade
+LEFT JOIN staging.stg_job_level AS jp ON jp.grade = s.grade
 WHERE NOT s.is_executive_officer
 GROUP BY ALL
 ORDER BY s.month_end_date, s.department_id, s.country_code, s.grade, s.job_family;

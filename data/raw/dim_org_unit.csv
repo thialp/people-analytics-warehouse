@@ -1,0 +1,45 @@
+org_unit_id,org_unit_name,org_unit_type,parent_org_unit_id,function,leader_title,leader_job_level
+ORG-000,Arcadia Systems,Company,,,Chief Executive Officer,12
+ORG-TEC,Technology,Function,ORG-000,Technology,Chief Technology Officer,11
+ORG-PRD,Product,Function,ORG-000,Product,Chief Product Officer,11
+ORG-COM,Commercial,Function,ORG-000,Commercial,Chief Revenue Officer,11
+ORG-OPS,Operations,Function,ORG-000,Operations,Chief Operating Officer,11
+ORG-FIN,Finance,Function,ORG-000,Finance,Chief Financial Officer,11
+ORG-MKT,Marketing,Function,ORG-000,Marketing,Chief Marketing Officer,10
+ORG-PPL,People,Function,ORG-000,People,Chief People Officer,10
+ORG-LGL,Legal & Compliance,Function,ORG-000,Legal & Compliance,General Counsel,10
+ORG-TEC-ENG,Engineering,Sub-function,ORG-TEC,Technology,"Senior Vice President, Engineering",10
+ORG-TEC-INF,Infrastructure,Sub-function,ORG-TEC,Technology,"Senior Vice President, Infrastructure",10
+ORG-COM-SAL,Sales,Sub-function,ORG-COM,Commercial,"Senior Vice President, Sales",10
+ORG-COM-CLS,Client Services,Sub-function,ORG-COM,Commercial,"Senior Vice President, Client Services",10
+D-101,Core Platform Engineering,Department,ORG-TEC-ENG,Technology,Head of Core Platform Engineering,9
+D-102,Product Engineering,Department,ORG-TEC-ENG,Technology,Head of Product Engineering,9
+D-103,Mobile & Web Engineering,Department,ORG-TEC-ENG,Technology,Head of Mobile & Web Engineering,9
+D-104,Analytics Engineering,Department,ORG-TEC-ENG,Technology,Head of Analytics Engineering,8
+D-108,Data & AI Platform,Department,ORG-TEC-ENG,Technology,Head of Data & AI Platform,8
+D-105,Site Reliability,Department,ORG-TEC-INF,Technology,Head of Site Reliability,9
+D-106,Information Security,Department,ORG-TEC-INF,Technology,Head of Information Security,8
+D-107,Enterprise IT,Department,ORG-TEC-INF,Technology,Head of Enterprise IT,8
+D-201,Product Management,Department,ORG-PRD,Product,Head of Product Management,9
+D-202,Design & Research,Department,ORG-PRD,Product,Head of Design & Research,8
+D-301,Enterprise Sales - Americas,Department,ORG-COM-SAL,Commercial,Head of Enterprise Sales - Americas,9
+D-302,Enterprise Sales - EMEA,Department,ORG-COM-SAL,Commercial,Head of Enterprise Sales - EMEA,9
+D-303,Enterprise Sales - APAC,Department,ORG-COM-SAL,Commercial,Head of Enterprise Sales - APAC,8
+D-304,Sales Operations,Department,ORG-COM-SAL,Commercial,Head of Sales Operations,8
+D-307,Partnerships,Department,ORG-COM-SAL,Commercial,Head of Partnerships,8
+D-305,Client Success,Department,ORG-COM-CLS,Commercial,Head of Client Success,9
+D-306,Technical Support,Department,ORG-COM-CLS,Commercial,Head of Technical Support,9
+D-401,Brand & Communications,Department,ORG-MKT,Marketing,Head of Brand & Communications,8
+D-402,Growth Marketing,Department,ORG-MKT,Marketing,Head of Growth Marketing,8
+D-501,FP&A,Department,ORG-FIN,Finance,Head of FP&A,8
+D-502,Accounting & Controllership,Department,ORG-FIN,Finance,Head of Accounting & Controllership,8
+D-503,Treasury & Tax,Department,ORG-FIN,Finance,Head of Treasury & Tax,7
+D-601,HR Business Partners,Department,ORG-PPL,People,Head of HR Business Partners,8
+D-602,Talent Acquisition,Department,ORG-PPL,People,Head of Talent Acquisition,8
+D-603,Total Rewards,Department,ORG-PPL,People,Head of Total Rewards,7
+D-604,People Analytics,Department,ORG-PPL,People,Head of People Analytics,7
+D-701,Legal,Department,ORG-LGL,Legal & Compliance,Head of Legal,7
+D-702,Compliance & Risk,Department,ORG-LGL,Legal & Compliance,Head of Compliance & Risk,8
+D-801,Customer Operations,Department,ORG-OPS,Operations,Head of Customer Operations,9
+D-802,Trust & Safety Operations,Department,ORG-OPS,Operations,Head of Trust & Safety Operations,9
+D-803,Workplace & Procurement,Department,ORG-OPS,Operations,Head of Workplace & Procurement,8

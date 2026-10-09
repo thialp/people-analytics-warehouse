@@ -786,54 +786,58 @@ Panel text (heading Tableau Semibold 10 navy; body Tableau Book 9 slate; lead-in
 
 Period rules:
 
-- **Same month** (From Jul 2025, To Jul 2025) is a valid one-month walk: opening is the prior month-end (Jun 2025, 12,510), closing is Jul 2025 (12,572); the title reads "Jul 2025: …".
+- **Same month** (From Jul 2025, To Jul 2025) is a valid one-month walk: opening is the prior month-end (Jun 2025), closing is Jul 2025; the title reads "Jul 2025: …".
 - **Reversed** (From after To) cannot be prevented, because Tableau cannot limit one parameter's list by another. It is handled: cards show "—" and the waterfall title reads "Choose a start month on or before the end month".
 - Turnover rates, card 4 and the turnover bars hide any group averaging under 20 people.
 
 ## 10. Expected values
 
+These are the values for the current data (35 offices, 22 countries, 30,024 people at June 2026), rebuilt in October 2026 when the warehouse gained the org hierarchy, job levels and the new pay model. The first published version of the dashboard used the earlier, smaller dataset (13,201 people at June 2026); republishing with the refreshed CSVs updates every number below.
+
 ### FY26 (From Jul 2025, To Jun 2026)
 
 | Item | Headcount | FTE |
 |---|---|---|
-| Opening (Jun 2025) | 12,510 | 12,282 (12,281.7) |
-| Hires | +2,354 | +2,328 (2,328.3) |
-| Voluntary leavers | −1,341 | −1,319 (1,318.5) |
-| Involuntary leavers | −322 | −317 (317.4) |
-| FTE changes | — | −34 (34.1) |
-| Closing (Jun 2026) | 13,201 | 12,940 (12,940.0) |
-| Waterfall title | FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people | FY26 in FTE: 2,328 FTE hired, 1,636 FTE left, +658 FTE net |
+| Opening (Jun 2025) | 28,445 | 27,903 (27,903.2) |
+| Hires | +5,168 | +5,125 (5,125.2) |
+| Voluntary leavers | −2,843 | −2,782 (2,782.2) |
+| Involuntary leavers | −746 | −732 (732.0) |
+| FTE changes | — | −110 (109.5) |
+| Closing (Jun 2026) | 30,024 | 29,405 (29,404.7) |
+| Waterfall title | FY26: 5,168 hires outpaced 3,589 leavers, adding 1,579 people | FY26 in FTE: 5,125 FTE hired, 3,514 FTE left, +1,502 FTE net |
 
 | Card | Value | Note (Headcount mode) |
 |---|---|---|
-| Closing headcount | 13,201 | +5.5% vs 12,510 at start |
-| Closing FTE | 12,940.0 | 924 part-time · 261.0 below headcount |
-| Hires | 2,354 | 18.3% annualized · 2,328 FTE |
-| Voluntary turnover (annualized) | 10.4% | 1,341 left by choice · 1,319 FTE |
-| Internal moves | 1,615 | 1,038 promotions · 577 other moves |
+| Closing headcount | 30,024 | +5.6% vs 28,445 at start |
+| Closing FTE | 29,404.7 | 2,213 part-time · 619.3 below headcount |
+| Hires | 5,168 | 17.7% annualized · 5,125 FTE |
+| Voluntary turnover (annualized) | 9.7% | 2,843 left by choice · 2,782 FTE |
+| Internal moves | 3,623 | 2,138 promotions · 1,485 other moves |
 
-Caption: *1,615 internal moves (1,038 promotions, 577 other) move people between teams, so they net to zero at company level. FTE 12,282 → 12,940, including −34 from schedule changes.*
+Caption: *3,623 internal moves (2,138 promotions, 1,485 other) move people between teams, so they net to zero at company level. FTE 27,903 → 29,405, including −110 from schedule changes.*
 
-Turnover by function: Commercial 16.1% (13.0% voluntary + 3.1% involuntary; 399 and 95 leavers; average headcount 3,063), Operations 12.6%, Corporate 12.5%, Product 12.0%, Technology 11.6%, Marketing 11.2%; Executive hidden.
+Turnover by function: Commercial 14.4% (11.5% voluntary + 2.9% involuntary; 806 and 207 leavers; average headcount 7,036), Product 13.2%, Legal & Compliance 11.7%, Marketing 11.7%, Technology 11.6%, People 11.6%, Operations 11.2%, Finance 10.3%; Executive hidden. The old *Corporate* function is now three: Finance, People, and Legal & Compliance.
 
-Waterfall tooltips (Headcount): Opening "Active at the end of Jun 2025" · "807 part-time (6.5%) · FTE is 228.3 below headcount"; Hires "18.8% of opening headcount · about 196 per month" · "2,354 people = 2,328.3 FTE"; Voluntary "10.7% … about 112 per month" · "1,341 people = 1,318.5 FTE"; Involuntary "2.6% … about 27 per month" · "322 people = 317.4 FTE"; Closing "Active at the end of Jun 2026 · +5.5% vs opening" · "924 part-time (7.0%) · FTE is 261.0 below headcount".
+Waterfall tooltips (Headcount): Opening "Active at the end of Jun 2025" · "1,923 part-time (6.8%) · FTE is 541.8 below headcount"; Hires "18.2% of opening headcount · about 431 per month" · "5,168 people = 5,125.2 FTE"; Voluntary "10.0% … about 237 per month" · "2,843 people = 2,782.2 FTE"; Involuntary "2.6% … about 62 per month" · "746 people = 732.0 FTE"; Closing "Active at the end of Jun 2026 · +5.6% vs opening" · "2,213 part-time (7.4%) · FTE is 619.3 below headcount".
 
-FTE ties exactly: 12,281.7 + 2,328.3 − 1,318.5 − 317.4 − 34.1 = 12,940.0.
+FTE ties exactly: 27,903.2 + 5,125.2 − 2,782.2 − 732.0 − 109.5 = 29,404.7.
+
+Same month (From Jul 2025, To Jul 2025): opening Jun 2025 28,445, closing Jul 2025 28,597.
 
 ### Short-range check (From Jul 2025, To Aug 2025)
 
 | Item | Headcount | FTE |
 |---|---|---|
-| Hires | 381 | 376.9 |
-| Voluntary leavers | 226 | 221.3 |
-| Involuntary leavers | 44 | 43.4 |
-| FTE changes | 0 | −5.4 |
-| Opening → Closing | 12,510 → 12,621 | 12,281.7 → 12,388.5 |
+| Hires | 850 | 843.6 |
+| Voluntary leavers | 472 | 459.6 |
+| Involuntary leavers | 106 | 104.5 |
+| FTE changes | 0 | −17.1 |
+| Opening → Closing | 28,445 → 28,717 | 27,903.2 → 28,165.6 |
 
 ## 11. Publishing to Tableau Public
 
 1. Final checks: fixed 1400 × 850; worksheet tabs hidden; info panel closed; dashboard tab named **Executive Summary**; every control tested (both dropdowns, the toggle, the info button, the three tooltips).
-2. If **Server → Tableau Public → Save to Tableau Public As…** is greyed out (the whole submenu, as on a license without Tableau Public enabled), save a **Tableau Packaged Workbook (.twbx)**, open it in the free **Tableau Public** desktop app (version 2026.2 or newer, to open a 2026.2 workbook), sign in and use **File → Save to Tableau Public As…**. The .twbx carries the CSVs, the images and the custom shapes; Tableau Public builds the extract (292,696 rows, far below the 15-million-row limit).
+2. If **Server → Tableau Public → Save to Tableau Public As…** is greyed out (the whole submenu, as on a license without Tableau Public enabled), save a **Tableau Packaged Workbook (.twbx)**, open it in the free **Tableau Public** desktop app (version 2026.2 or newer, to open a 2026.2 workbook), sign in and use **File → Save to Tableau Public As…**. The .twbx carries the CSVs, the images and the custom shapes; Tableau Public builds the extract (436,501 rows with the current data, far below the 15-million-row limit).
 3. Title: `Headcount & FTE Walk · Arcadia Systems`. The description must be under 231 characters:
 
    > Why did headcount move? A reconciled workforce walk: hires, leavers and internal moves, in headcount or FTE. Arcadia Systems is a fictional company and all numbers are synthetic, not real data.

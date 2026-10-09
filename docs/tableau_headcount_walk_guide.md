@@ -180,17 +180,17 @@ IF [Selected Departments] THEN "Selected" ELSE "Rest of company" END
 
 | Field | Expected |
 |---|---|
-| Opening | 12,510 |
-| Hires | 2,354 |
-| Voluntary Leavers | 1,341 |
-| Involuntary Leavers | 322 |
-| Internal Moves | 1,615 (1,038 promotions, 577 transfers) |
-| Closing | 13,201 |
-| Net Change % | 5.5% |
-| Voluntary Turnover (annualized) | 10.4% |
+| Opening | 28,445 |
+| Hires | 5,168 |
+| Voluntary Leavers | 2,843 |
+| Involuntary Leavers | 746 |
+| Internal Moves | 3,623 (2,138 promotions, 1,485 other) |
+| Closing | 30,024 |
+| Net Change % | 5.6% |
+| Voluntary Turnover (annualized) | 9.7% |
 | Walk Gap | 0 |
 
-With Measure = FTE: Opening 12,281.7, Closing 12,940.0 (shown as 12,940 on the card), FTE Changes −34.1.
+With Measure = FTE: Opening 27,903.2, Closing 29,404.7 (shown as 29,405 on the card), FTE Changes −109.5.
 
 If a number is off, the usual cause is a type (Step 2.4) or a filter left on a sheet.
 
@@ -309,7 +309,7 @@ If a number is off, the usual cause is a type (Step 2.4) or a filter left on a s
 
    - *Title:* on the waterfall sheet, drag `WF Title` to **Detail** (it has one value, so it does not split the marks), then **Worksheet → Show Title**, double-click the title, **Insert → `WF Title`**, and set Tableau Bold 12 pt navy. Add a second line of static text, Tableau Book 9 pt slate: `Opening + hires − leavers ± internal moves = closing · axis starts at zero`.
    - *Caption:* create a new worksheet **Waterfall Caption**: drag `WF Caption` to **Label** on a Text mark (Tableau Book 8 pt slate, alignment left, wrap on), hide headers and title, Entire View. On the dashboard float it at the bottom of the waterfall card (see the layout table in the KPI guide) and set the waterfall sheet's bottom **inner padding** to 64 so the chart stops above it.
-   - For FY26 these read: *"FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people"* and *"1,615 internal moves (1,038 promotions, 577 other) move people between teams, so they net to zero at company level. FTE 12,282 → 12,940, including −34 from schedule changes."*
+   - For FY26 these read: *"FY26: 5,168 hires outpaced 3,589 leavers, adding 1,579 people"* and *"3,623 internal moves (2,138 promotions, 1,485 other) move people between teams, so they net to zero at company level. FTE 27,903 → 29,405, including −110 from schedule changes."*
    - The title and caption use headcount even when Measure is FTE (the caption already shows the FTE change). They ignore filters on the waterfall sheet because of FIXED; a filter action on the dashboard will not change them.
    - Hide the *Bar Type* legend (select it on the dashboard and delete it; the colors are explained by the labels), and add a filter so the **FTE Changes** bar only appears when Measure is FTE: create `Show Category` = `[Measure] = "FTE" OR [Movement Category] <> "FTE Changes"`, drag it to Filters and keep True.
    - **Check:** the Closing bar's top equals the `Closing` KPI, and the last movement bar ends exactly where the Closing bar starts.

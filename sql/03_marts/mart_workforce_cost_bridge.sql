@@ -9,17 +9,19 @@
 --   - Terminations             leavers, valued at their prior pay
 --   + Transfers In             movers into the department, valued at their PRIOR pay
 --   - Transfers Out            movers out of the department, valued at their prior pay
---   + Promotions               pay change for workers whose grade went up
---   + Merit & Adjustments      pay change for everyone else (merit, market adjustments)
+--   + Promotions               pay change for workers whose job level went up
+--   + Demotions                pay change for workers whose job level went down
+--   + Tenure & Market Adj.     pay change for everyone else: anniversary (tenure)
+--                              raises, market adjustments, same-country relocations
 --   + International Mobility   pay and fringe re-levelling when someone changes country
 --   + FTE Changes              moves between full-time and part-time
---   + Fringe Rate Changes      new fiscal-year fringe rates for the same country
+--   + Fringe Rate Changes      new calendar-year fringe rates for the same country
 --   + FX Rate Changes          month-over-month currency movement (nominal only)
 --   = Closing Run-Rate
 --
 -- Why transfers are valued at prior pay: it makes transfers net to exactly zero
 -- for the company as a whole. Any pay change a mover receives shows up as a
--- driver (promotion, merit, mobility...) in the department they moved into.
+-- driver (promotion, tenure raise, mobility...) in the department they moved into.
 --
 -- Rate decomposition for a continuing worker, with B = local base salary,
 -- F = FTE, X = USD per local unit, R = fringe rate, 0 = prior month-end,
@@ -125,7 +127,8 @@ valued AS (
         CASE
             WHEN country_c <> country_p THEN 'International Mobility'
             WHEN grade_c   >  grade_p   THEN 'Promotions'
-            ELSE 'Merit & Adjustments'
+            WHEN grade_c   <  grade_p   THEN 'Demotions'
+            ELSE 'Tenure & Market Adjustments'
         END                                       AS pay_driver
     FROM worker_pairs
 ),
@@ -198,13 +201,14 @@ driver_order AS (
         (3,  'Terminations',           'Headcount Movement'),
         (4,  'Transfers In',           'Headcount Movement'),
         (5,  'Transfers Out',          'Headcount Movement'),
-        (6,  'Promotions',             'Pay Rate'),
-        (7,  'Merit & Adjustments',    'Pay Rate'),
-        (8,  'International Mobility', 'Pay Rate'),
-        (9,  'FTE Changes',            'Workforce Mix'),
-        (10, 'Fringe Rate Changes',    'Fringe & FX'),
-        (11, 'FX Rate Changes',        'Fringe & FX'),
-        (12, 'Closing Run-Rate',       'Balance')
+        (6,  'Promotions',                  'Pay Rate'),
+        (7,  'Demotions',                   'Pay Rate'),
+        (8,  'Tenure & Market Adjustments', 'Pay Rate'),
+        (9,  'International Mobility',      'Pay Rate'),
+        (10, 'FTE Changes',                 'Workforce Mix'),
+        (11, 'Fringe Rate Changes',         'Fringe & FX'),
+        (12, 'FX Rate Changes',             'Fringe & FX'),
+        (13, 'Closing Run-Rate',            'Balance')
     ) AS t(driver_order, driver, driver_group)
 )
 
