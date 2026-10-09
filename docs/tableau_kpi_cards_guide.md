@@ -105,8 +105,21 @@ ZN(SUM(IF [In Range] AND [Movement Category] = "Internal Moves In"
 [K Moves] - [K Promotions]
 ```
 ```
+// K Close PT   (part-time workers, under 1.0 FTE, at the end month)
+ZN(SUM(IF [In Range] AND [Movement Category] = "Closing" AND [Month End Date] = [End Month]
+       THEN [Part Time Headcount] END))
+```
+```
 // K Part Time Gap  (headcount minus FTE)
 [K Close HC] - [K Close FTE]
+```
+```
+// K FTE T   (FTE in tenths: 12,940.0 -> 129400, so we can print one decimal with integer math)
+INT(ROUND([K Close FTE] * 10, 0))
+```
+```
+// K Gap T   (the part-time gap in tenths)
+INT(ROUND([K Part Time Gap] * 10, 0))
 ```
 
 Cards 1 and 2 always show **headcount** and **FTE** by name, so they ignore the Measure parameter; that parameter drives the waterfall.
@@ -165,22 +178,24 @@ IF [K Valid] THEN "vs " + [K Open Str] + " at start" END
 All four go on the **Label** shelf of the same layer (`kpi_pt Note 1`). In the Edit Label window put them on one line with a typed space before the last one: `<KPI 1 Note Up><KPI 1 Note Down><KPI 1 Note Flat> <KPI 1 Note Rest>`. Only one of Up, Down and Flat is ever non-empty, so the colored percentage is followed directly by the gray "vs 12,510 at start", and the color follows the sign. Select each field in the window and set its color: Up teal `#006B66`, Down dark coral `#B8401F`, Flat slate `#5A6170`, Rest slate `#5A6170`.
 
 ```
-// KPI 2 Value   (whole number: FTE is fractional underneath, but a card reads cleaner without ".0")
-IF NOT [K Valid] THEN "—"
-ELSEIF ROUND([K Close FTE], 0) >= 1000
-THEN STR(DIV(INT(ROUND([K Close FTE], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([K Close FTE], 0)) % 1000), 3)
-ELSE STR(INT(ROUND([K Close FTE], 0))) END
-```
-```
-// KPI 2 Note
-IF NOT [K Valid] THEN "" ELSE
-  IF INT(ROUND([K Part Time Gap], 0)) >= 1000
-  THEN STR(DIV(INT(ROUND([K Part Time Gap], 0)), 1000)) + "," +
-       RIGHT("00" + STR(INT(ROUND([K Part Time Gap], 0)) % 1000), 3)
-  ELSE STR(INT(ROUND([K Part Time Gap], 0))) END
-  + " below headcount (part-time)"
+// KPI 2 Value   (one decimal: FTE is fractional, and the decimal is what shows part-time schedules at work)
+IF NOT [K Valid] THEN "—" ELSE
+  IF [K FTE T] >= 10000
+  THEN STR(DIV([K FTE T], 10000)) + "," + RIGHT("00" + STR(DIV([K FTE T], 10) % 1000), 3)
+  ELSE STR(DIV([K FTE T], 10)) END
+  + "." + STR([K FTE T] % 10)
 END
 ```
+```
+// KPI 2 Note   ("924 part-time · 261.0 below headcount")
+IF NOT [K Valid] THEN "" ELSE
+  IF [K Close PT] >= 1000
+  THEN STR(DIV(INT([K Close PT]), 1000)) + "," + RIGHT("00" + STR(INT([K Close PT]) % 1000), 3)
+  ELSE STR(INT([K Close PT])) END
+  + " part-time · " + STR(DIV([K Gap T], 10)) + "." + STR([K Gap T] % 10) + " below headcount"
+END
+```
+Why the decimal: a part-time worker counts as 1 in headcount but as 0.8 or 0.5 in FTE, so FTE is never a whole number. Showing "12,940.0" with "924 part-time · 261.0 below headcount" on the same card tells the reader the gap is schedules, not missing people. If the note is too wide for the card, shorten it to `924 part-time · −261.0`. This needs the `part_time_headcount` column that was added to the walk file (see the tooltip guide, Section 1).
 ```
 // KPI 3 Value   (the comma pattern on [K Hires])
 IF NOT [K Valid] THEN "—"
@@ -368,7 +383,7 @@ Start Month 2025-07-31, End Month 2026-06-30:
 | Card | Value | Note |
 |---|---|---|
 | 1 Closing headcount | 13,201 | +5.5% vs 12,510 at start |
-| 2 Closing FTE | 12,940 | 261 below headcount (part-time) |
+| 2 Closing FTE | 12,940.0 | 924 part-time · 261.0 below headcount |
 | 3 Hires | 2,354 | 18.3% annualized hire rate |
 | 4 Voluntary turnover (annualized) | 10.4% | 1,341 leavers by choice |
 | 5 Internal moves | 1,615 | 1,038 promotions · 577 other moves |

@@ -6,8 +6,8 @@ Final header layout (1400 wide, floating, y 22 for all controls):
 
 | Object | x | y | w | h | Look |
 |---|---|---|---|---|---|
-| Start Month | 840 | 22 | 146 | 32 | white, radius 16 |
-| End Month | 996 | 22 | 146 | 32 | white, radius 16 |
+| Start Month | 840 | 22 | 146 | 32 | white, plain square (radius 0) |
+| End Month | 996 | 22 | 146 | 32 | white, plain square (radius 0) |
 | Measure Toggle (capsule) | 1152 | 22 | 150 | 32 | `#243A57`, radius 16, white sliding pill |
 | Info button | 1312 | 22 | 32 | 32 | outlined "i" icon, no background |
 
@@ -54,16 +54,16 @@ Select the object, then Layout pane → **Corner Radius**.
 |---|---|---|---|
 | Waterfall sheet (the card) | `#FBFBF8` | 1 px `#E4E3DD` | 10 |
 | Trend and Turnover sheets (when built) | `#FBFBF8` | 1 px `#E4E3DD` | 10 |
-| Start Month, End Month | `#FFFFFF` | none | 16 |
+| Start Month, End Month | `#FFFFFF` | none | 0 (plain; see the tooltip guide, Section 4) |
 | Measure Toggle | `#243A57` | none | 16 |
 | Info panel (section 4) | `#FBFBF8` | 1 px `#E4E3DD` | 10 |
 | Header band (Blank) | `#13233A` | none | 0 (keep it square, it bleeds to the edges) |
 
-Parameter dropdowns: set Outer padding 0 and Inner padding 2. If the inner box of the dropdown still shows square corners inside the pill, that is Tableau's own control border. Send me a screenshot and I will give you the fallback (a dark capsule behind both controls with white text).
+Parameter dropdowns: this was tested and a rounded pill around them fights the control's own square border, so they stay plain squares (radius 0, Outer and Inner padding 0). The capsule toggle and info button keep their rounding.
 
 ## 4. Info button and definitions panel (replaces Methodology)
 
-1. Add a **Vertical** container, floating: x 1004, y 84, w 340, h 252. Name it `Info Panel`. Background `#FBFBF8`, Border 1 px `#E4E3DD`, Corner Radius 10, Inner padding 16.
+1. Add a **Vertical** container, floating: x 1004, y 84, w 340, h 300. Name it `Info Panel`. Background `#FBFBF8`, Border 1 px `#E4E3DD`, Corner Radius 10, Inner padding 16.
 2. Drag a **Text** object into it and paste:
 
    **How to read this page** (Tableau Semibold 10 pt, navy `#13233A`)
@@ -91,6 +91,6 @@ The subtitle is cut off ("every line reconci…"). Replace line 2 of the title w
 | Check | Expected |
 |---|---|
 | Toggle | Headcount first. Selected side is a white pill with navy text; click FTE and the pill moves, the waterfall switches |
-| Corners | Waterfall card, toggle capsule and dropdowns all visibly rounded; same feel as the KPI cards |
+| Corners | Waterfall card and toggle capsule rounded like the KPI cards; dropdowns plain squares |
 | Info | Click the "i": panel opens and the icon turns into an X; click again to close |
 | Header | Subtitle fully visible, controls aligned on one row, right edge at 1344 |

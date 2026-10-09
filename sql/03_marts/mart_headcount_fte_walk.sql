@@ -24,6 +24,11 @@
 -- dimension marts (mart_dim_*), which Tableau relates on matching field names.
 -- That keeps the export small enough for GitHub and Tableau Public.
 --
+-- part_time_headcount counts workers below 1.0 FTE. It is filled on the Opening and
+-- Closing lines only (the levels); movement lines carry 0, because a move or an
+-- FTE change can flip a worker between full-time and part-time and a signed
+-- count of that would not mean anything on its own.
+--
 -- Headcount counts everyone, executive officers included. (They are excluded
 -- only from the compensation marts, where pay is the sensitive part.)
 -- Sign convention: Opening and Closing are positive levels; movements carry
@@ -38,13 +43,14 @@ lines AS (
     SELECT month_end_date, prior_department_id AS department_id, prior_country_code AS country_code,
            prior_job_family AS job_family, prior_grade AS grade,
            1 AS movement_order, 'Opening' AS movement_category, 'Opening' AS movement_reason,
-           1 AS headcount, prior_fte AS fte
+           1 AS headcount, prior_fte AS fte,
+           CASE WHEN prior_fte < 1 THEN 1 ELSE 0 END AS part_time_headcount
     FROM m WHERE in_prior
 
     UNION ALL
     -- Hires
     SELECT month_end_date, current_department_id, current_country_code, current_job_family, current_grade,
-           2, 'Hires', movement_reason, 1, current_fte
+           2, 'Hires', movement_reason, 1, current_fte, 0
     FROM m WHERE movement_type = 'Hire'
 
     UNION ALL
@@ -53,19 +59,19 @@ lines AS (
            CASE WHEN movement_reason = 'Voluntary' THEN 3 ELSE 4 END,
            CASE WHEN movement_reason = 'Voluntary' THEN 'Voluntary Terminations'
                 ELSE 'Involuntary Terminations' END,
-           movement_reason, -1, -prior_fte
+           movement_reason, -1, -prior_fte, 0
     FROM m WHERE movement_type = 'Termination'
 
     UNION ALL
     -- Internal moves: out of the old slice ...
     SELECT month_end_date, prior_department_id, prior_country_code, prior_job_family, prior_grade,
-           5, 'Internal Moves Out', movement_reason, -1, -prior_fte
+           5, 'Internal Moves Out', movement_reason, -1, -prior_fte, 0
     FROM m WHERE movement_type = 'Internal Move'
 
     UNION ALL
     -- ... and into the new one, at the same (prior) FTE
     SELECT month_end_date, current_department_id, current_country_code, current_job_family, current_grade,
-           6, 'Internal Moves In', movement_reason, 1, prior_fte
+           6, 'Internal Moves In', movement_reason, 1, prior_fte, 0
     FROM m WHERE movement_type = 'Internal Move'
 
     UNION ALL
@@ -73,13 +79,14 @@ lines AS (
     SELECT month_end_date, current_department_id, current_country_code, current_job_family, current_grade,
            7, 'FTE Changes',
            CASE WHEN current_fte > prior_fte THEN 'FTE Increase' ELSE 'FTE Reduction' END,
-           0, current_fte - prior_fte
+           0, current_fte - prior_fte, 0
     FROM m WHERE fte_changed
 
     UNION ALL
     -- Closing
     SELECT month_end_date, current_department_id, current_country_code, current_job_family, current_grade,
-           8, 'Closing', 'Closing', 1, current_fte
+           8, 'Closing', 'Closing', 1, current_fte,
+           CASE WHEN current_fte < 1 THEN 1 ELSE 0 END
     FROM m WHERE in_current
 ),
 
@@ -98,7 +105,8 @@ SELECT
     l.movement_reason,
     CAST(SUM(l.headcount) AS INTEGER)                        AS headcount,
     -- exact decimals so exports are identical from run to run
-    ROUND(SUM(CAST(l.fte AS DECIMAL(18, 4))), 2)             AS fte
+    ROUND(SUM(CAST(l.fte AS DECIMAL(18, 4))), 2)             AS fte,
+    CAST(SUM(l.part_time_headcount) AS INTEGER)              AS part_time_headcount
 FROM lines AS l
 JOIN job_families AS jf ON jf.job_family = l.job_family
 GROUP BY ALL
