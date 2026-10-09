@@ -52,16 +52,7 @@ Expected, FY26: **12,940.0** and **924 part-time · 261.0 below headcount**. The
 
 If the note runs past the card edge, use the short form `924 part-time · −261.0` (replace the last line of the note with `+ " part-time · −" + STR(DIV([K Gap T], 10)) + "." + STR([K Gap T] % 10)`).
 
-**Optional, keeps the caption consistent.** The caption under the waterfall still says "FTE 12,282 → 12,940". For one decimal there, change `WF FTE Open Str` and `WF FTE Close Str` to the tenths pattern (shown for Open; Close is the same with `[WF FTE Close]`):
-```
-// WF FTE Open Str
-IF INT(ROUND([WF FTE Open] * 10, 0)) >= 10000
-THEN STR(DIV(INT(ROUND([WF FTE Open] * 10, 0)), 10000)) + "," +
-     RIGHT("00" + STR(DIV(INT(ROUND([WF FTE Open] * 10, 0)), 10) % 1000), 3)
-ELSE STR(DIV(INT(ROUND([WF FTE Open] * 10, 0)), 10)) END
-+ "." + STR(INT(ROUND([WF FTE Open] * 10, 0)) % 10)
-```
-and `WF FTE Chg Str` to `STR(ROUND(ABS([WF FTE Chg]), 1))` after the sign. The caption then reads "FTE 12,281.7 → 12,940.0, including −34.1 from schedule changes".
+**Caption under the waterfall: keep it in whole numbers.** The bars, the title and the caption all show FTE as whole numbers (12,282 + 2,328 − 1,319 − 317 − 34 = 12,940), so the waterfall card ties at a glance. The one-decimal figures live on the Closing FTE card and in the tooltip, where the part-time count explains them. The whole-number `WF FTE Open Str`, `WF FTE Close Str` and `WF FTE Chg Str` are in `tableau_final_polish_before_publish.md`, item 3.
 
 ## 3. Waterfall tooltip (dynamic)
 

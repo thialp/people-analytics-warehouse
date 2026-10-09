@@ -26,12 +26,12 @@ If line 1 prints "Multiple values" instead of the sentence, `TO Title` is being 
 
 Check that the navy is exactly `#13233A` on all three; the waterfall title currently reads darker than the trend title. Left-align every title and keep the same 12 px inner padding on the left.
 
-## 3. Waterfall caption: wording and decimals
+## 3. Waterfall caption: wording, and whole-number FTE
 
 Two problems in the caption under the waterfall:
 
-1. It says "filter to a department to see them", but this dashboard has no department filter. Replace the sentence.
-2. It reads "FTE 12,281.7 → 12,940, including −34 from schedule changes". Only the opening value got the decimal; the card above says 12,940.0.
+1. It said "filter to a department", but this dashboard has no department filter. The new wording replaces the sentence.
+2. In FTE mode it showed "FTE 12,281.7 → 12,940.0" while the Opening bar reads 12,282. Everything on the waterfall card is a whole number (12,282 + 2,328 − 1,319 − 317 − 34 = 12,940, which ties exactly), so the caption should be too. The one-decimal figures stay on the Closing FTE card and in the tooltip, where the part-time count explains them.
 
 Replace `WF Caption`:
 ```
@@ -42,23 +42,24 @@ IF NOT [K Valid] THEN "" ELSE
 [WF FTE Open Str] + " → " + [WF FTE Close Str] + ", including " + [WF FTE Chg Str] + " from schedule changes."
 END
 ```
-Make `WF FTE Close Str` the same tenths pattern as `WF FTE Open Str`, with `[WF FTE Close]` in place of `[WF FTE Open]`:
+and put the three FTE helpers back to whole numbers (replace the formulas; every branch is wrapped in `STR`):
+```
+// WF FTE Open Str
+IF INT(ROUND([WF FTE Open], 0)) >= 1000
+THEN STR(DIV(INT(ROUND([WF FTE Open], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([WF FTE Open], 0)) % 1000), 3)
+ELSE STR(INT(ROUND([WF FTE Open], 0))) END
+```
 ```
 // WF FTE Close Str
-IF INT(ROUND([WF FTE Close] * 10, 0)) >= 10000
-THEN STR(DIV(INT(ROUND([WF FTE Close] * 10, 0)), 10000)) + "," +
-     RIGHT("00" + STR(DIV(INT(ROUND([WF FTE Close] * 10, 0)), 10) % 1000), 3)
-ELSE STR(DIV(INT(ROUND([WF FTE Close] * 10, 0)), 10)) END
-+ "." + STR(INT(ROUND([WF FTE Close] * 10, 0)) % 10)
+IF INT(ROUND([WF FTE Close], 0)) >= 1000
+THEN STR(DIV(INT(ROUND([WF FTE Close], 0)), 1000)) + "," + RIGHT("00" + STR(INT(ROUND([WF FTE Close], 0)) % 1000), 3)
+ELSE STR(INT(ROUND([WF FTE Close], 0))) END
 ```
-and `WF FTE Chg Str`, with the sign and the tenths:
 ```
 // WF FTE Chg Str
-IF [WF FTE Chg] < 0 THEN "−" ELSE "+" END
-+ STR(DIV(INT(ROUND(ABS([WF FTE Chg]) * 10, 0)), 10)) + "."
-+ STR(INT(ROUND(ABS([WF FTE Chg]) * 10, 0)) % 10)
+IF [WF FTE Chg] < 0 THEN "−" ELSE "+" END + STR(INT(ROUND(ABS([WF FTE Chg]), 0)))
 ```
-Expected caption: *"1,615 internal moves (1,038 promotions, 577 other) move people between teams, so they net to zero at company level. FTE 12,281.7 → 12,940.0, including −34.1 from schedule changes."* The three numbers tie: 12,281.7 + 2,328.3 hires − 1,318.5 voluntary − 317.4 involuntary − 34.1 = 12,940.0.
+Expected caption: *"1,615 internal moves (1,038 promotions, 577 other) move people between teams, so they net to zero at company level. FTE 12,282 → 12,940, including −34 from schedule changes."*
 
 ## 4. KPI card 5 note: stray spacing
 
@@ -107,7 +108,7 @@ Then resize the panel: Layout pane → height **340** (it was 300), keep x 1004,
 | Check | Expected (From Jul 2025, To Jun 2026) |
 |---|---|
 | Turnover title | Commercial has the highest turnover in FY26, on one line, with a one-line subtitle |
-| Waterfall caption | ends "FTE 12,281.7 → 12,940.0, including −34.1 from schedule changes." |
+| Waterfall caption | ends "FTE 12,282 → 12,940, including −34 from schedule changes." (same whole numbers as the bars) |
 | KPI 5 note | 1,038 promotions · 577 other moves |
 | Trend | subtitle "Selected period shaded" |
 | Info panel | opens at the "i", new text fits without scrolling, closes again |
