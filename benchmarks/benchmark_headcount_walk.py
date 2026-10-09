@@ -35,7 +35,7 @@ import duckdb
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "warehouse" / "arcadia.duckdb"
-OUT = ROOT / "docs" / "performance_results.md"
+OUT = ROOT / "docs" / "projects" / "headcount-fte-walk" / "performance_results.md"
 TABLEAU_PUBLIC_ROW_LIMIT = 15_000_000
 
 WALK_COUNTS = """

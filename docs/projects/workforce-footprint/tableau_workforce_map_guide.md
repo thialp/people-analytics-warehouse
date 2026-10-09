@@ -2,9 +2,9 @@
 
 This guide builds the third dashboard: one map that answers **where Arcadia's people are, where it is growing, and how people move between offices**. It is deliberately simple to read (one map, two bar charts, five numbers) and puts the technique into the map itself: four map layers built with Tableau's spatial functions, parameter actions, and the newer viewport and color-range features. Plan on about 90 minutes. Every step lists what you should see.
 
-![Static preview](images/workforce_map_preview.png)
+![Static preview](../../images/workforce_map_preview.png)
 
-Before you start, install the Arcadia palettes and get the logo from [`docs/brand/`](brand/README.md).
+Before you start, install the Arcadia palettes and get the logo from [`docs/brand/`](../../brand/README.md).
 
 ---
 
@@ -14,10 +14,10 @@ From the repository, open each file and click **Download raw file**. Save all fo
 
 | File | Rows | What it is |
 |---|---|---|
-| [`mart_location_headcount.csv`](../data/marts/mart_location_headcount.csv) | 1,581 | One row per office per month: opening, hires, leavers, relocations in and out, closing |
-| [`mart_dim_location.csv`](../data/marts/mart_dim_location.csv) | 35 | Offices with city, postal code, country, region, site type, GeoNames latitude and longitude and opening date |
-| [`mart_mobility_flows.csv`](../data/marts/mart_mobility_flows.csv) | 1,117 (1,447 people moved) | People who changed office, as origin and destination with both ends' coordinates |
-| [`mart_dim_month.csv`](../data/marts/mart_dim_month.csv) | 48 | Month-ends with fiscal year and fiscal month |
+| [`mart_location_headcount.csv`](../../../data/marts/mart_location_headcount.csv) | 1,581 | One row per office per month: opening, hires, leavers, relocations in and out, closing |
+| [`mart_dim_location.csv`](../../../data/marts/mart_dim_location.csv) | 35 | Offices with city, postal code, country, region, site type, GeoNames latitude and longitude and opening date |
+| [`mart_mobility_flows.csv`](../../../data/marts/mart_mobility_flows.csv) | 1,117 (1,447 people moved) | People who changed office, as origin and destination with both ends' coordinates |
+| [`mart_dim_month.csv`](../../../data/marts/mart_dim_month.csv) | 48 | Month-ends with fiscal year and fiscal month |
 
 Each office walk reconciles every month (opening + hires − leavers + relocations in − relocations out = closing), the offices add up to the company headcount walk, and the flows add up to each office's relocations. Tests 19 to 22 check all three on every build.
 
@@ -178,7 +178,7 @@ These features are recent, so check them in your Tableau Public version; the das
 
 - **Map viewport parameter (2025.2+):** create a parameter of type **Spatial**, allowable values **All**, and under **Dynamic value → Map Viewport** pick the Map sheet. Then filter the *Offices in view* table with `INTERSECTS([Office Point], [Map View])` = True. Zoom into Europe and the table lists only European offices. Tableau's help documents this for Desktop and Cloud; if the option isn't there in your Tableau Public, skip it.
 - **Dynamic color ranges (2025.2+):** in **Edit Colors → Advanced**, set the start and end of the growth color range to parameters (for example 0% and 12%), so colors mean the same thing in every fiscal year instead of rescaling to each year's spread.
-- **Custom color palettes (2025.3+) and custom themes (2025.1+):** the Arcadia palettes in [`docs/brand/`](brand/README.md) are ready to load, and exporting the styled workbook as a theme gives the other two dashboards the same look in one step.
+- **Custom color palettes (2025.3+) and custom themes (2025.1+):** the Arcadia palettes in [`docs/brand/`](../../brand/README.md) are ready to load, and exporting the styled workbook as a theme gives the other two dashboards the same look in one step.
 
 ## 9. Methodology text (paste into the Methodology page or an info button)
 

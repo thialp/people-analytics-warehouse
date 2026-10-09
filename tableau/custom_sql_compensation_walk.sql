@@ -3,7 +3,7 @@
   ===========================================================================
   Paste this whole query into Tableau: Data Source page > New Custom SQL.
   Same columns and numbers as data/marts/mart_compensation_walk.csv.
-  Field reference, rules and worked examples: docs/compensation_walk.md
+  Field reference, rules and worked examples: docs/projects/compensation-walk/compensation_walk.md
 
   WHAT IT ANSWERS
   For a pair of month-ends (From, To) and a group of people, why compensation

@@ -1,6 +1,6 @@
 # One-Command Setup with Docker Compose
 
-[`compose.yaml`](../compose.yaml) describes the whole SQL Server environment as code: the server, its settings, its storage, and the job that builds the warehouse. Any Mac with Docker Desktop gets the identical setup with one command, and the build waits on its own until SQL Server is ready.
+[`compose.yaml`](../../compose.yaml) describes the whole SQL Server environment as code: the server, its settings, its storage, and the job that builds the warehouse. Any Mac with Docker Desktop gets the identical setup with one command, and the build waits on its own until SQL Server is ready.
 
 ```
 docker compose up -d
@@ -116,7 +116,7 @@ Same as before: [`sql_server_local_setup.md`](sql_server_local_setup.md), Steps 
 | Require SSL | unchecked |
 
 - **If Tableau says a driver is missing,** use the JDBC route from the setup guide instead. It needs no admin rights, because the driver is a single file in your home folder.
-- **If you get a certificate error,** copy [`tableau/sqlserver_trust_local_certificate.tdc`](../tableau/sqlserver_trust_local_certificate.tdc) into `~/Documents/My Tableau Repository/Datasources/` and restart Tableau.
+- **If you get a certificate error,** copy [`tableau/sqlserver_trust_local_certificate.tdc`](../../tableau/sqlserver_trust_local_certificate.tdc) into `~/Documents/My Tableau Repository/Datasources/` and restart Tableau.
 
 ---
 

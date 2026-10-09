@@ -9,7 +9,7 @@ Steps
   2. Run the SQL models in sql/ in folder order: staging -> intermediate -> marts.
   3. Run every data test in tests/. A test is a query that returns the rows that
      break a rule, so zero rows means pass. Any failure stops the build.
-  4. Export the marts to data/marts/ as CSV for Tableau, and write docs/org_chart.md.
+  4. Export the marts to data/marts/ as CSV for Tableau, and write docs/company/org_chart.md.
 
 The warehouse is a single DuckDB file (warehouse/arcadia.duckdb) that you can
 open with any DuckDB client to explore the tables yourself.

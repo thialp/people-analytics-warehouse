@@ -6,8 +6,8 @@ Tableau Public doesn't have a GitHub connector. It reads local files (CSV, Excel
 
 For each file below, open it on GitHub and click the **Download raw file** button (the download arrow at the top right of the file view):
 
-- [`data/marts/mart_workforce_cost_bridge.csv`](../data/marts/mart_workforce_cost_bridge.csv), about 2 MB
-- [`data/marts/mart_workforce_cost_snapshot.csv`](../data/marts/mart_workforce_cost_snapshot.csv), about 30 MB. GitHub won't preview a file this size, but the download works.
+- [`data/marts/mart_workforce_cost_bridge.csv`](../../data/marts/mart_workforce_cost_bridge.csv), about 2 MB
+- [`data/marts/mart_workforce_cost_snapshot.csv`](../../data/marts/mart_workforce_cost_snapshot.csv), about 30 MB. GitHub won't preview a file this size, but the download works.
 
 Save both in one folder, for example `Documents/Tableau Public/arcadia/`.
 

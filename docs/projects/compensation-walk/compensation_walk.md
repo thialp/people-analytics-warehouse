@@ -4,9 +4,9 @@
 
 | | |
 |---|---|
-| Tableau Custom SQL (SQL Server) | [`tableau/custom_sql_compensation_walk.sql`](../tableau/custom_sql_compensation_walk.sql) |
-| Same result as a CSV (Tableau Public) | [`data/marts/mart_compensation_walk.csv`](../data/marts/mart_compensation_walk.csv), built by [`sql/03_marts/mart_compensation_walk.sql`](../sql/03_marts/mart_compensation_walk.sql) |
-| Warehouse support table | `dw.WorkerPayLedger` / [`int_worker_pay_ledger`](../sql/02_intermediate/int_worker_pay_ledger.sql) |
+| Tableau Custom SQL (SQL Server) | [`tableau/custom_sql_compensation_walk.sql`](../../../tableau/custom_sql_compensation_walk.sql) |
+| Same result as a CSV (Tableau Public) | [`data/marts/mart_compensation_walk.csv`](../../../data/marts/mart_compensation_walk.csv), built by [`sql/03_marts/mart_compensation_walk.sql`](../../../sql/03_marts/mart_compensation_walk.sql) |
+| Warehouse support table | `dw.WorkerPayLedger` / [`int_worker_pay_ledger`](../../../sql/02_intermediate/int_worker_pay_ledger.sql) |
 | Grain | date pair × view × group × walk step × movement reason |
 | Size (default grid) | 271,219 rows, 184 date pairs, 6 views, 107 groups |
 

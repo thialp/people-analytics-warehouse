@@ -171,7 +171,7 @@ Closing   30015   3195503264.60   3195503264.60
 4. FY26 company walk, loaded cost at constant FX ...
 ```
 
-The seconds it prints are about what a Tableau extract refresh of this data source will take. Field reference and rules: [`compensation_walk.md`](compensation_walk.md).
+The seconds it prints are about what a Tableau extract refresh of this data source will take. Field reference and rules: [`compensation_walk.md`](../projects/compensation-walk/compensation_walk.md).
 
 **If `sqlcmd` isn't found,** older images keep it at `/opt/mssql-tools/bin/sqlcmd`. Use that path and drop the `-C`.
 
@@ -258,12 +258,12 @@ In Tableau Desktop:
 
 You should land on the Data Source page with `ArcadiaHR` selected and the `dw`, `raw` and `rpt` schemas listed.
 
-**If you get an SSL or certificate error,** copy [`tableau/sqlserver_trust_local_certificate.tdc`](../tableau/sqlserver_trust_local_certificate.tdc) into `~/Documents/My Tableau Repository/Datasources/`, quit and reopen Tableau, and sign in again. The file tells the driver to trust the container's self-signed certificate.
+**If you get an SSL or certificate error,** copy [`tableau/sqlserver_trust_local_certificate.tdc`](../../tableau/sqlserver_trust_local_certificate.tdc) into `~/Documents/My Tableau Repository/Datasources/`, quit and reopen Tableau, and sign in again. The file tells the driver to trust the container's self-signed certificate.
 
 ## Step 7. Create the Custom SQL data source
 
 1. On the Data Source page, double-click **New Custom SQL** in the left panel.
-2. Paste the full contents of [`tableau/custom_sql_workforce_cost_bridge.sql`](../tableau/custom_sql_workforce_cost_bridge.sql).
+2. Paste the full contents of [`tableau/custom_sql_workforce_cost_bridge.sql`](../../tableau/custom_sql_workforce_cost_bridge.sql).
 3. Click **Preview Results** to check it runs, then **OK**.
 4. Rename the data source (top left) to **Workforce Cost Bridge (SQL Server)**.
 5. Set the connection to **Extract** (top right), then go to a sheet. Tableau saves the extract.

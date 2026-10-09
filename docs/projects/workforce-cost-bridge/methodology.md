@@ -8,7 +8,7 @@ This page explains how `mart_workforce_cost_bridge` turns two month-end snapshot
 |---|---|
 | **Run-rate** | Annualized pay of everyone active on a month-end. It answers "what would a year cost at today's workforce and pay?" and is not monthly spend. |
 | **Base** | Annual base salary (full-time rate) × FTE. |
-| **Loaded** | Base × (1 + fringe rate). Fringe covers employer social contributions, mandatory pension and severance funding, statutory extra pay (such as a 13th salary) and, in the US, employer health and retirement benefits. It varies by country and calendar year and comes from public sources ([organization and pay model](organization_and_pay_model.md#fringe-rates)). |
+| **Loaded** | Base × (1 + fringe rate). Fringe covers employer social contributions, mandatory pension and severance funding, statutory extra pay (such as a 13th salary) and, in the US, employer health and retirement benefits. It varies by country and calendar year and comes from public sources ([organization and pay model](../../company/organization_and_pay_model.md#fringe-rates)). |
 | **Nominal** | Converted to USD at the ECB reference rate on that month-end (the latest published rate on or before it). |
 | **Constant** | Converted to USD at one fixed rate set (the latest rates in the data, 2026-06-30) for every month, so currency movement is removed. |
 | **Posting** | Converted at the rate of the day the pay record took effect ("booked"). Carried in the snapshot as a third basis; the walk below uses month-end revaluation. |

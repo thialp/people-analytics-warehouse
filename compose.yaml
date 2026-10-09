@@ -6,7 +6,7 @@
 #   docker compose down -v      ...and delete the database volume too (clean slate)
 #
 # The sa password comes from a .env file next to this one (copy .env.example to .env).
-# See docs/docker_compose_guide.md for the full walkthrough.
+# See docs/setup/docker_compose_guide.md for the full walkthrough.
 
 name: arcadia
 

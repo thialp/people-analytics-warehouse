@@ -433,7 +433,7 @@ GO
    annualized cost has moved since their first month-end, so the change between
    ANY two month-ends is cum(d1) - cum(d0): one equality join per endpoint instead
    of a range scan of the pay history. Rules: sql/02_intermediate/int_worker_pay_ledger.sql
-   and docs/compensation_walk.md. Each month is split in a fixed order, so the
+   and docs/projects/compensation-walk/compensation_walk.md. Each month is split in a fixed order, so the
    steps add up exactly to the change in value:
      1. pay records that took effect in the month, minus the record each replaced,
         at the prior month-end FX rate, FTE and fringe rate, by action reason
