@@ -3,6 +3,9 @@
 CREATE OR REPLACE TABLE staging.stg_worker AS
 SELECT
     worker_id,
+    first_name,
+    last_name,
+    first_name || ' ' || last_name                  AS worker_name,
     CAST(original_hire_date AS DATE)                AS original_hire_date,
     CAST(NULLIF(termination_date, '') AS DATE)      AS termination_date,
     NULLIF(termination_type, '')                    AS termination_type,

@@ -1,23 +1,36 @@
-location_id,city,country_code,country_name,region,currency_code,site_type
-LOC-001,Austin,US,United States,North America,USD,Headquarters
-LOC-002,New York,US,United States,North America,USD,Office
-LOC-003,San Francisco,US,United States,North America,USD,Office
-LOC-004,Atlanta,US,United States,North America,USD,Office
-LOC-005,Remote - US,US,United States,North America,USD,Remote
-LOC-006,Toronto,CA,Canada,North America,CAD,Office
-LOC-007,Sao Paulo,BR,Brazil,Latin America,BRL,Office
-LOC-008,Mexico City,MX,Mexico,Latin America,MXN,Office
-LOC-009,London,GB,United Kingdom,Europe,GBP,Regional Hub
-LOC-010,Dublin,IE,Ireland,Europe,EUR,Office
-LOC-011,Berlin,DE,Germany,Europe,EUR,Office
-LOC-012,Paris,FR,France,Europe,EUR,Office
-LOC-013,Warsaw,PL,Poland,Europe,PLN,Engineering Center
-LOC-014,Krakow,PL,Poland,Europe,PLN,Engineering Center
-LOC-015,Bangalore,IN,India,Asia Pacific,INR,Engineering Center
-LOC-016,Hyderabad,IN,India,Asia Pacific,INR,Engineering Center
-LOC-017,Singapore,SG,Singapore,Asia Pacific,SGD,Regional Hub
-LOC-018,Tokyo,JP,Japan,Asia Pacific,JPY,Office
-LOC-019,Sydney,AU,Australia,Asia Pacific,AUD,Office
-LOC-020,Dubai,AE,United Arab Emirates,Middle East & Africa,AED,Regional Hub
-LOC-021,Johannesburg,ZA,South Africa,Middle East & Africa,ZAR,Office
-LOC-022,Cape Town,ZA,South Africa,Middle East & Africa,ZAR,Office
+location_id,office_name,site_type,street_address,city,state_province,postal_code,country_code,country_name,region,currency_code,latitude,longitude,geo_source,pay_zone_factor,opened_date
+LOC-001,Austin HQ,Headquarters,"410 Lantana Crossing, Floor 12",Austin,Texas,78701,US,United States,North America,USD,30.2713,-97.7426,GeoNames postal code centroid (CC BY 4.0),1.0,2012-01-01
+LOC-002,New York,Office,"77 Garnet Lane, Floor 30",New York,New York,10017,US,United States,North America,USD,40.7517,-73.9707,GeoNames postal code centroid (CC BY 4.0),1.12,2014-01-01
+LOC-003,San Francisco,Office,"250 Harbor Light Street, Suite 900",San Francisco,California,94105,US,United States,North America,USD,37.7864,-122.3892,GeoNames postal code centroid (CC BY 4.0),1.15,2013-01-01
+LOC-004,Atlanta,Office,"1180 Peachwood Parkway, Suite 400",Atlanta,Georgia,30308,US,United States,North America,USD,33.7718,-84.3757,GeoNames postal code centroid (CC BY 4.0),0.95,2016-01-01
+LOC-006,Toronto,Office,"18 Wellmont Street West, Floor 22",Toronto,Ontario,M5H,CA,Canada,North America,CAD,43.6496,-79.3833,GeoNames postal code centroid (CC BY 4.0),1.0,2015-01-01
+LOC-007,Sao Paulo,Regional Hub,"Rua Jacaranda Azul, 1450, 9o andar",Sao Paulo,Sao Paulo,04538-132,BR,Brazil,Latin America,BRL,-23.5856,-46.683,Map location of CEP 04538-132 (guiafacil.com/cep/04538132),1.0,2015-01-01
+LOC-008,Mexico City,Office,"Calle Bosque Alto 210, Piso 7",Mexico City,Ciudad de Mexico,11560,MX,Mexico,Latin America,MXN,19.4343,-99.1933,GeoNames postal code centroid (CC BY 4.0),1.0,2016-01-01
+LOC-009,London,Regional Hub,9 Fenwick Yard,London,England,EC2A,GB,United Kingdom,Europe,GBP,51.5237,-0.0877,GeoNames postal code centroid (CC BY 4.0),1.0,2013-01-01
+LOC-010,Dublin,Office,4 Linden Quay,Dublin,Leinster,D02,IE,Ireland,Europe,EUR,53.34,-6.2543,GeoNames postal code centroid (CC BY 4.0),1.0,2014-01-01
+LOC-011,Berlin,Office,Lindenhofstrasse 41,Berlin,Berlin,10117,DE,Germany,Europe,EUR,52.517,13.3872,GeoNames postal code centroid (CC BY 4.0),1.0,2016-01-01
+LOC-012,Paris,Office,18 Rue des Tilleuls Clairs,Paris,Ile-de-France,75008,FR,France,Europe,EUR,48.8763,2.3183,GeoNames postal code centroid (CC BY 4.0),1.0,2016-01-01
+LOC-013,Warsaw,Engineering Center,ul. Jasnych Ogrodow 12,Warsaw,Mazowieckie,00-844,PL,Poland,Europe,PLN,52.2335,20.9846,GeoNames postal code centroid (CC BY 4.0),1.0,2017-01-01
+LOC-014,Krakow,Engineering Center,ul. Srebrnej Wierzby 8,Krakow,Malopolskie,31-864,PL,Poland,Europe,PLN,50.0748,19.9964,GeoNames postal code centroid (CC BY 4.0),0.95,2018-01-01
+LOC-015,Bengaluru,Engineering Center,"Tower B, 88 Silver Oak Ring Road",Bengaluru,Karnataka,560103,IN,India,Asia Pacific,INR,13.0907,77.6423,GeoNames postal code centroid (CC BY 4.0),1.0,2014-01-01
+LOC-016,Hyderabad,Engineering Center,"Block 3, 21 Pearl Valley Road",Hyderabad,Telangana,500032,IN,India,Asia Pacific,INR,17.3939,78.4529,GeoNames postal code centroid (CC BY 4.0),0.97,2017-01-01
+LOC-017,Singapore,Regional Hub,"12 Marina Lantern Way, #20-01",Singapore,Singapore,018989,SG,Singapore,Asia Pacific,SGD,1.2823,103.8526,GeoNames postal code centroid (CC BY 4.0),1.0,2014-01-01
+LOC-018,Tokyo,Office,"Kiri Building 9F, 2-4 Marunouchi",Tokyo,Tokyo,100-0005,JP,Japan,Asia Pacific,JPY,35.6738,139.7616,GeoNames postal code centroid (CC BY 4.0),1.0,2016-01-01
+LOC-019,Sydney,Office,"Level 18, 60 Wattlebird Street",Sydney,New South Wales,2000,AU,Australia,Asia Pacific,AUD,-33.8718,151.2002,GeoNames postal code centroid (CC BY 4.0),1.0,2015-01-01
+LOC-020,Dubai,Regional Hub,"Gate Avenue, Level 6, Unit 604",Dubai,Dubai,,AE,United Arab Emirates,Middle East & Africa,AED,25.2085,55.2755,Dubai International Financial Centre (latitude.to); the UAE has no postal codes,1.0,2017-01-01
+LOC-021,Johannesburg,Office,"14 Acacia Ridge Drive, Sandton",Johannesburg,Gauteng,2196,ZA,South Africa,Middle East & Africa,ZAR,-26.1345,28.0529,GeoNames postal code centroid (CC BY 4.0),1.0,2017-01-01
+LOC-022,Cape Town,Office,3 Fynbos Wharf,Cape Town,Western Cape,8001,ZA,South Africa,Middle East & Africa,ZAR,-33.9258,18.4232,GeoNames postal code centroid (CC BY 4.0),0.97,2019-01-01
+LOC-023,Seattle,Office,"1500 Cedar Sound Avenue, Floor 9",Seattle,Washington,98101,US,United States,North America,USD,47.6114,-122.3305,GeoNames postal code centroid (CC BY 4.0),1.1,2017-01-01
+LOC-024,Chicago,Office,"320 Prairie Light Drive, Suite 1700",Chicago,Illinois,60606,US,United States,North America,USD,41.8868,-87.6386,GeoNames postal code centroid (CC BY 4.0),1.0,2018-01-01
+LOC-025,Vancouver,Office,"1088 Saltspray Street, Floor 14",Vancouver,British Columbia,V6C,CA,Canada,North America,CAD,49.2866,-123.1158,GeoNames postal code centroid (CC BY 4.0),0.98,2025-01-06
+LOC-026,Guadalajara,Engineering Center,"Avenida Paseo Jacaranda 3100, Piso 5",Zapopan,Jalisco,45116,MX,Mexico,Latin America,MXN,20.6847,-103.2189,GeoNames postal code centroid (CC BY 4.0),0.92,2023-03-01
+LOC-027,Munich,Office,Ahornweg 27,Munich,Bavaria,80333,DE,Germany,Europe,EUR,48.1452,11.5668,GeoNames postal code centroid (CC BY 4.0),1.05,2018-01-01
+LOC-028,Amsterdam,Regional Hub,Zilverspar 140,Amsterdam,North Holland,1082,NL,Netherlands,Europe,EUR,52.3311,4.8742,GeoNames postal code centroid (CC BY 4.0),1.0,2016-01-01
+LOC-029,Madrid,Office,Calle de los Almendros Blancos 61,Madrid,Madrid,28046,ES,Spain,Europe,EUR,40.4599,-3.6884,GeoNames postal code centroid (CC BY 4.0),1.0,2017-01-01
+LOC-030,Lisbon,Engineering Center,Rua das Acacias Douradas 22,Lisbon,Lisboa,1050-138,PT,Portugal,Europe,EUR,38.7167,-9.1333,GeoNames postal code centroid (CC BY 4.0),1.0,2023-09-04
+LOC-031,Zurich,Office,Lindengarten 9,Zurich,Zurich,8001,CH,Switzerland,Europe,CHF,47.3721,8.5417,GeoNames postal code centroid (CC BY 4.0),1.0,2019-01-01
+LOC-032,Stockholm,Office,Bjorkallen 15,Stockholm,Stockholm,111 57,SE,Sweden,Europe,SEK,59.3326,18.0649,GeoNames postal code centroid (CC BY 4.0),1.0,2019-01-01
+LOC-033,Pune,Engineering Center,"Wing C, 7 Monsoon Heights",Pune,Maharashtra,411014,IN,India,Asia Pacific,INR,18.5685,73.9158,GeoNames postal code centroid (CC BY 4.0),0.95,2024-07-01
+LOC-034,Melbourne,Office,"Level 11, 45 Bluegum Lane",Melbourne,Victoria,3000,AU,Australia,Asia Pacific,AUD,-37.813,144.9611,GeoNames postal code centroid (CC BY 4.0),0.97,2018-01-01
+LOC-035,Seoul,Office,"17F, 30 Hanbit-ro",Seoul,Seoul,06164,KR,South Korea,Asia Pacific,KRW,37.5108,127.0593,GeoNames postal code centroid (CC BY 4.0),1.0,2024-03-04
+LOC-036,Manila,Operations Center,"28th Avenue Skypark Tower, 15F",Taguig,Metro Manila,1634,PH,Philippines,Asia Pacific,PHP,14.5195,121.0621,GeoNames postal code centroid (CC BY 4.0),1.0,2022-10-03

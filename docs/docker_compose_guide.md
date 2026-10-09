@@ -85,11 +85,11 @@ Expected (the first run downloads about 1.5 GB):
 docker compose logs -f build
 ```
 
-Press `Ctrl+C` once you see the validation section. It should show six **PASS** rows, `0` missing rows, and:
+Press `Ctrl+C` once you see the validation section. It should show ten **PASS** rows, `0` missing rows, `0` workers without a valid manager, and:
 
 ```
-2022-06-30   11000   10883.10   1126993109.33   1151151241.43
-2026-06-30   13189   12928.00   1566743212.90   1551634565.71
+2022-06-30   25005   24733.20   2577787184.81   2613645368.50
+2026-06-30   30015   29395.70   3195503264.83   3195503264.83
 ```
 
 Then confirm the build job finished cleanly:
@@ -163,14 +163,16 @@ Expected:
 ```
 function_name|headcount|loaded_usd
 -------------|---------|----------
-Technology|5411|607,109,359
-Commercial|3085|379,742,839
-Operations|1993|207,038,509
-Corporate|1483|202,463,313
-Product|749|102,893,724
-Marketing|468|67,495,469
+Technology|12208|1,187,047,459
+Commercial|7092|818,152,097
+Operations|4402|386,389,639
+Product|1928|247,642,941
+Finance|1269|162,936,760
+People|1259|157,588,401
+Marketing|1016|129,245,040
+Legal & Compliance|841|106,500,928
 
-(6 rows affected)
+(8 rows affected)
 ```
 
 Just `asql` opens an interactive prompt. Type a query, then `GO` on its own line to run it, and `exit` to leave.

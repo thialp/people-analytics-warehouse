@@ -9,7 +9,7 @@ Steps
   2. Run the SQL models in sql/ in folder order: staging -> intermediate -> marts.
   3. Run every data test in tests/. A test is a query that returns the rows that
      break a rule, so zero rows means pass. Any failure stops the build.
-  4. Export the marts to data/marts/ as CSV for Tableau.
+  4. Export the marts to data/marts/ as CSV for Tableau, and write docs/org_chart.md.
 
 The warehouse is a single DuckDB file (warehouse/arcadia.duckdb) that you can
 open with any DuckDB client to explore the tables yourself.
@@ -23,6 +23,8 @@ import time
 from pathlib import Path
 
 import duckdb
+
+import build_org_chart
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
@@ -44,6 +46,10 @@ EXPORTS = [
     "mart_dim_location",
     "mart_location_headcount",
     "mart_mobility_flows",
+    "mart_dim_org_unit",
+    "mart_org_leader_summary",
+    "mart_reporting_line",
+    "mart_fringe_rate",
 ]
 
 
@@ -115,6 +121,7 @@ def main():
         sys.exit(1)
     if not args.no_export:
         export_marts(con)
+        build_org_chart.main(con)
     log(f"\nDone in {time.perf_counter() - started:.1f}s. All tests passed.")
 
 

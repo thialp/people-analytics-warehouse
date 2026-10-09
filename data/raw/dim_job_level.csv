@@ -1,0 +1,13 @@
+job_level,level_code,level_name,career_track,us_base_salary_usd,range_min_pct,range_max_pct
+1,L1,Associate,Individual Contributor,65000,0.85,1.35
+2,L2,Professional,Individual Contributor,82000,0.85,1.35
+3,L3,Senior,Individual Contributor,102000,0.85,1.35
+4,L4,Lead,Individual Contributor,125000,0.85,1.35
+5,L5,Staff / Manager,IC or People Manager,150000,0.85,1.35
+6,L6,Principal / Senior Manager,IC or People Manager,180000,0.85,1.35
+7,L7,Director,People Leader,220000,0.85,1.35
+8,L8,Senior Director,People Leader,265000,0.85,1.35
+9,L9,Vice President,People Leader,320000,0.85,1.35
+10,L10,Senior Vice President,Executive,400000,0.85,1.35
+11,L11,Executive Vice President,Executive,480000,0.85,1.35
+12,L12,Chief Executive Officer,Executive,650000,0.85,1.35

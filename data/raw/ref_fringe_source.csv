@@ -1,0 +1,181 @@
+country_code,year,component,source_id,source_title,source_url
+US,2022,social_contribution_rate,BLS-2022,"BLS, Employer Costs for Employee Compensation, March 2022, Table 4",https://www.bls.gov/news.release/archives/ecec_06162022.pdf
+US,2022,employer_benefits_rate,BLS-2022,"BLS, Employer Costs for Employee Compensation, March 2022, Table 4",https://www.bls.gov/news.release/archives/ecec_06162022.pdf
+US,2023,social_contribution_rate,BLS-2023,"BLS, Employer Costs for Employee Compensation, March 2023, Table 4",https://www.bls.gov/news.release/archives/ecec_06162023.htm
+US,2023,employer_benefits_rate,BLS-2023,"BLS, Employer Costs for Employee Compensation, March 2023, Table 4",https://www.bls.gov/news.release/archives/ecec_06162023.htm
+US,2024,social_contribution_rate,BLS-2024,"BLS, Employer Costs for Employee Compensation, March 2024, Table 4",https://www.bls.gov/news.release/archives/ecec_06182024.pdf
+US,2024,employer_benefits_rate,BLS-2024,"BLS, Employer Costs for Employee Compensation, March 2024, Table 4",https://www.bls.gov/news.release/archives/ecec_06182024.pdf
+US,2025,social_contribution_rate,BLS-2025,"BLS, Employer Costs for Employee Compensation, March 2025, Table 4",https://www.bls.gov/news.release/archives/ecec_06132025.htm
+US,2025,employer_benefits_rate,BLS-2025,"BLS, Employer Costs for Employee Compensation, March 2025, Table 4",https://www.bls.gov/news.release/archives/ecec_06132025.htm
+US,2026,social_contribution_rate,BLS-2026,"BLS, Employer Costs for Employee Compensation, March 2026, Table 4",https://www.bls.gov/news.release/archives/ecec_06122026.htm
+US,2026,employer_benefits_rate,BLS-2026,"BLS, Employer Costs for Employee Compensation, March 2026, Table 4",https://www.bls.gov/news.release/archives/ecec_06122026.htm
+CA,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+CA,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+CA,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+CA,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+CA,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+BR,2022,social_contribution_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2022,retirement_severance_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2022,statutory_pay_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2023,social_contribution_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2023,retirement_severance_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2023,statutory_pay_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2024,social_contribution_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2024,retirement_severance_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2024,statutory_pay_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2025,social_contribution_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2025,retirement_severance_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2025,statutory_pay_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2026,social_contribution_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2026,retirement_severance_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+BR,2026,statutory_pay_rate,BR-STAT,"Brazil employer payroll charges: INSS 20%, RAT, third parties ~5.8%, FGTS 8%, 13th salary, 1/3 vacation bonus",https://www.globalexpansion.com/countrypedia/Brazil
+MX,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+MX,2022,statutory_pay_rate,MX-LFT,Mexico Federal Labor Law art. 87: year-end bonus (aguinaldo) of at least 15 days' pay,https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf
+MX,2022,statutory_pay_rate,MX-VAC,"Mexico vacation reform (12 days from 1 Jan 2023), 25% vacation premium",https://global.lockton.com/us/en/news-insights/mexico-to-increase-paid-vacation-days-for-all-employees
+MX,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+MX,2023,statutory_pay_rate,MX-LFT,Mexico Federal Labor Law art. 87: year-end bonus (aguinaldo) of at least 15 days' pay,https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf
+MX,2023,statutory_pay_rate,MX-VAC,"Mexico vacation reform (12 days from 1 Jan 2023), 25% vacation premium",https://global.lockton.com/us/en/news-insights/mexico-to-increase-paid-vacation-days-for-all-employees
+MX,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+MX,2024,statutory_pay_rate,MX-LFT,Mexico Federal Labor Law art. 87: year-end bonus (aguinaldo) of at least 15 days' pay,https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf
+MX,2024,statutory_pay_rate,MX-VAC,"Mexico vacation reform (12 days from 1 Jan 2023), 25% vacation premium",https://global.lockton.com/us/en/news-insights/mexico-to-increase-paid-vacation-days-for-all-employees
+MX,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+MX,2025,statutory_pay_rate,MX-LFT,Mexico Federal Labor Law art. 87: year-end bonus (aguinaldo) of at least 15 days' pay,https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf
+MX,2025,statutory_pay_rate,MX-VAC,"Mexico vacation reform (12 days from 1 Jan 2023), 25% vacation premium",https://global.lockton.com/us/en/news-insights/mexico-to-increase-paid-vacation-days-for-all-employees
+MX,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+MX,2026,statutory_pay_rate,MX-LFT,Mexico Federal Labor Law art. 87: year-end bonus (aguinaldo) of at least 15 days' pay,https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf
+MX,2026,statutory_pay_rate,MX-VAC,"Mexico vacation reform (12 days from 1 Jan 2023), 25% vacation premium",https://global.lockton.com/us/en/news-insights/mexico-to-increase-paid-vacation-days-for-all-employees
+GB,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+GB,2022,social_contribution_rate,UK-LEVY,UK Apprenticeship Levy: 0.5% of pay bill above GBP 3 million,https://www.gov.uk/guidance/pay-apprenticeship-levy
+GB,2022,retirement_severance_rate,UK-AE,"UK workplace pension auto-enrolment: employer minimum 3% of qualifying earnings (GBP 6,240-50,270)",https://www.gov.uk/workplace-pensions/what-you-your-employer-and-the-government-pay
+GB,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+GB,2023,social_contribution_rate,UK-LEVY,UK Apprenticeship Levy: 0.5% of pay bill above GBP 3 million,https://www.gov.uk/guidance/pay-apprenticeship-levy
+GB,2023,retirement_severance_rate,UK-AE,"UK workplace pension auto-enrolment: employer minimum 3% of qualifying earnings (GBP 6,240-50,270)",https://www.gov.uk/workplace-pensions/what-you-your-employer-and-the-government-pay
+GB,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+GB,2024,social_contribution_rate,UK-LEVY,UK Apprenticeship Levy: 0.5% of pay bill above GBP 3 million,https://www.gov.uk/guidance/pay-apprenticeship-levy
+GB,2024,retirement_severance_rate,UK-AE,"UK workplace pension auto-enrolment: employer minimum 3% of qualifying earnings (GBP 6,240-50,270)",https://www.gov.uk/workplace-pensions/what-you-your-employer-and-the-government-pay
+GB,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+GB,2025,social_contribution_rate,UK-LEVY,UK Apprenticeship Levy: 0.5% of pay bill above GBP 3 million,https://www.gov.uk/guidance/pay-apprenticeship-levy
+GB,2025,retirement_severance_rate,UK-AE,"UK workplace pension auto-enrolment: employer minimum 3% of qualifying earnings (GBP 6,240-50,270)",https://www.gov.uk/workplace-pensions/what-you-your-employer-and-the-government-pay
+GB,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+GB,2026,social_contribution_rate,UK-LEVY,UK Apprenticeship Levy: 0.5% of pay bill above GBP 3 million,https://www.gov.uk/guidance/pay-apprenticeship-levy
+GB,2026,retirement_severance_rate,UK-AE,"UK workplace pension auto-enrolment: employer minimum 3% of qualifying earnings (GBP 6,240-50,270)",https://www.gov.uk/workplace-pensions/what-you-your-employer-and-the-government-pay
+IE,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+IE,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+IE,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+IE,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+IE,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+IE,2026,social_contribution_rate,IE-PRSI,Ireland employer PRSI 11.25% from October 2025,https://payroll.org/news-resources/news/news-detail/2026/01/05/ireland-s-budget-2026-brings-significant-changes-for-payroll
+IE,2026,retirement_severance_rate,IE-2026,Ireland employer PRSI changes and My Future Fund auto-enrolment from 1 Jan 2026,https://brightsg.com/blog/my-future-fund-prsi-budget-2026/
+DE,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+DE,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+DE,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+DE,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+DE,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+DE,2026,social_contribution_rate,DE-2026,German social insurance rates 2026 (average additional health contribution 2.9%),https://lohn-info.de/sozialversicherungsbeitraege2026.html
+FR,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+FR,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+FR,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+FR,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+FR,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+NL,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+NL,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+NL,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+NL,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+NL,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+ES,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+ES,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+ES,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+ES,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+ES,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+ES,2026,social_contribution_rate,ES-MEI,Spain intergenerational equity mechanism (MEI) schedule 2023-2029,https://institutosantalucia.es/actualidad/seguridad-social/mei-que-es-y-como-afecta-a-tu-nomina/
+PT,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+PT,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+PT,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+PT,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+PT,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+PL,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+PL,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+PL,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+PL,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+PL,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+CH,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+CH,2022,retirement_severance_rate,CH-BVG-22,"Swiss BVG key figures 2022-2023 (coordination deduction, upper limit)",https://finpension.ch/?p=8671
+CH,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+CH,2023,retirement_severance_rate,CH-BVG-22,"Swiss BVG key figures 2022-2023 (coordination deduction, upper limit)",https://finpension.ch/?p=8671
+CH,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+CH,2024,retirement_severance_rate,CH-BVG-22,"Swiss BVG key figures 2022-2023 (coordination deduction, upper limit)",https://finpension.ch/?p=8671
+CH,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+CH,2025,retirement_severance_rate,CH-BVG-25,"Swiss BVG key figures 2025-2026 (coordination deduction, upper limit)",https://www.allianz.ch/content/dam/onemarketing/azch/common/allianz/en/bvg/allianz-api-key-opi-figures-interest-conversion-rates.pdf
+CH,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+CH,2026,retirement_severance_rate,CH-BVG-25,"Swiss BVG key figures 2025-2026 (coordination deduction, upper limit)",https://www.allianz.ch/content/dam/onemarketing/azch/common/allianz/en/bvg/allianz-api-key-opi-figures-interest-conversion-rates.pdf
+SE,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+SE,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+SE,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+SE,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+SE,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+AE,2022,retirement_severance_rate,AE-EOSG,UAE Federal Decree-Law 33/2021: end-of-service gratuity of 21 days' basic wage per year (first 5 years),https://www.morganlewis.com/pubs/2021/12/united-arab-emirates-updates-federal-labour-law
+AE,2023,retirement_severance_rate,AE-EOSG,UAE Federal Decree-Law 33/2021: end-of-service gratuity of 21 days' basic wage per year (first 5 years),https://www.morganlewis.com/pubs/2021/12/united-arab-emirates-updates-federal-labour-law
+AE,2024,retirement_severance_rate,AE-EOSG,UAE Federal Decree-Law 33/2021: end-of-service gratuity of 21 days' basic wage per year (first 5 years),https://www.morganlewis.com/pubs/2021/12/united-arab-emirates-updates-federal-labour-law
+AE,2025,retirement_severance_rate,AE-EOSG,UAE Federal Decree-Law 33/2021: end-of-service gratuity of 21 days' basic wage per year (first 5 years),https://www.morganlewis.com/pubs/2021/12/united-arab-emirates-updates-federal-labour-law
+AE,2026,retirement_severance_rate,AE-EOSG,UAE Federal Decree-Law 33/2021: end-of-service gratuity of 21 days' basic wage per year (first 5 years),https://www.morganlewis.com/pubs/2021/12/united-arab-emirates-updates-federal-labour-law
+ZA,2022,social_contribution_rate,ZA-PWC,"PwC Worldwide Tax Summaries, South Africa: UIF 1% (cap ZAR 177.12/month), SDL 1%",https://taxsummaries.pwc.com/south-africa/corporate/other-taxes
+ZA,2023,social_contribution_rate,ZA-PWC,"PwC Worldwide Tax Summaries, South Africa: UIF 1% (cap ZAR 177.12/month), SDL 1%",https://taxsummaries.pwc.com/south-africa/corporate/other-taxes
+ZA,2024,social_contribution_rate,ZA-PWC,"PwC Worldwide Tax Summaries, South Africa: UIF 1% (cap ZAR 177.12/month), SDL 1%",https://taxsummaries.pwc.com/south-africa/corporate/other-taxes
+ZA,2025,social_contribution_rate,ZA-PWC,"PwC Worldwide Tax Summaries, South Africa: UIF 1% (cap ZAR 177.12/month), SDL 1%",https://taxsummaries.pwc.com/south-africa/corporate/other-taxes
+ZA,2026,social_contribution_rate,ZA-PWC,"PwC Worldwide Tax Summaries, South Africa: UIF 1% (cap ZAR 177.12/month), SDL 1%",https://taxsummaries.pwc.com/south-africa/corporate/other-taxes
+IN,2022,retirement_severance_rate,IN-EPF,"India Employees' Provident Funds Act 1952 (employer 12%; EDLI 0.5% and admin 0.5% on wages up to INR 15,000/month) and Payment of Gratuity Act 1972 (15/26 of monthly wage per year)",https://www.epfindia.gov.in/
+IN,2022,retirement_severance_rate,IN-CODES,India labour codes in force 21 Nov 2025: wages at least 50% of remuneration for PF and gratuity,https://www.littler.com/news-analysis/asap/indias-labor-law-overhaul-snapshot-key-changes
+IN,2023,retirement_severance_rate,IN-EPF,"India Employees' Provident Funds Act 1952 (employer 12%; EDLI 0.5% and admin 0.5% on wages up to INR 15,000/month) and Payment of Gratuity Act 1972 (15/26 of monthly wage per year)",https://www.epfindia.gov.in/
+IN,2023,retirement_severance_rate,IN-CODES,India labour codes in force 21 Nov 2025: wages at least 50% of remuneration for PF and gratuity,https://www.littler.com/news-analysis/asap/indias-labor-law-overhaul-snapshot-key-changes
+IN,2024,retirement_severance_rate,IN-EPF,"India Employees' Provident Funds Act 1952 (employer 12%; EDLI 0.5% and admin 0.5% on wages up to INR 15,000/month) and Payment of Gratuity Act 1972 (15/26 of monthly wage per year)",https://www.epfindia.gov.in/
+IN,2024,retirement_severance_rate,IN-CODES,India labour codes in force 21 Nov 2025: wages at least 50% of remuneration for PF and gratuity,https://www.littler.com/news-analysis/asap/indias-labor-law-overhaul-snapshot-key-changes
+IN,2025,retirement_severance_rate,IN-EPF,"India Employees' Provident Funds Act 1952 (employer 12%; EDLI 0.5% and admin 0.5% on wages up to INR 15,000/month) and Payment of Gratuity Act 1972 (15/26 of monthly wage per year)",https://www.epfindia.gov.in/
+IN,2025,retirement_severance_rate,IN-CODES,India labour codes in force 21 Nov 2025: wages at least 50% of remuneration for PF and gratuity,https://www.littler.com/news-analysis/asap/indias-labor-law-overhaul-snapshot-key-changes
+IN,2026,retirement_severance_rate,IN-EPF,"India Employees' Provident Funds Act 1952 (employer 12%; EDLI 0.5% and admin 0.5% on wages up to INR 15,000/month) and Payment of Gratuity Act 1972 (15/26 of monthly wage per year)",https://www.epfindia.gov.in/
+IN,2026,retirement_severance_rate,IN-CODES,India labour codes in force 21 Nov 2025: wages at least 50% of remuneration for PF and gratuity,https://www.littler.com/news-analysis/asap/indias-labor-law-overhaul-snapshot-key-changes
+SG,2022,retirement_severance_rate,SG-CPF,"CPF Board: monthly salary ceiling SGD 6,000 to 8,000 (2023-2026); employer rate 17% up to age 55",https://cpf.gov.sg/member/infohub/news/media-news/budget-2023-cpf-monthly-salary-ceiling-to-be-raised-to-8000-by-2026
+SG,2022,social_contribution_rate,SG-SDL,"GoBusiness Singapore: Skills Development Levy 0.25% of monthly pay, maximum SGD 11.25 per employee",https://gobusiness.gov.sg/about-skills-development-levy
+SG,2023,retirement_severance_rate,SG-CPF,"CPF Board: monthly salary ceiling SGD 6,000 to 8,000 (2023-2026); employer rate 17% up to age 55",https://cpf.gov.sg/member/infohub/news/media-news/budget-2023-cpf-monthly-salary-ceiling-to-be-raised-to-8000-by-2026
+SG,2023,social_contribution_rate,SG-SDL,"GoBusiness Singapore: Skills Development Levy 0.25% of monthly pay, maximum SGD 11.25 per employee",https://gobusiness.gov.sg/about-skills-development-levy
+SG,2024,retirement_severance_rate,SG-CPF,"CPF Board: monthly salary ceiling SGD 6,000 to 8,000 (2023-2026); employer rate 17% up to age 55",https://cpf.gov.sg/member/infohub/news/media-news/budget-2023-cpf-monthly-salary-ceiling-to-be-raised-to-8000-by-2026
+SG,2024,social_contribution_rate,SG-SDL,"GoBusiness Singapore: Skills Development Levy 0.25% of monthly pay, maximum SGD 11.25 per employee",https://gobusiness.gov.sg/about-skills-development-levy
+SG,2025,retirement_severance_rate,SG-CPF,"CPF Board: monthly salary ceiling SGD 6,000 to 8,000 (2023-2026); employer rate 17% up to age 55",https://cpf.gov.sg/member/infohub/news/media-news/budget-2023-cpf-monthly-salary-ceiling-to-be-raised-to-8000-by-2026
+SG,2025,social_contribution_rate,SG-SDL,"GoBusiness Singapore: Skills Development Levy 0.25% of monthly pay, maximum SGD 11.25 per employee",https://gobusiness.gov.sg/about-skills-development-levy
+SG,2026,retirement_severance_rate,SG-CPF,"CPF Board: monthly salary ceiling SGD 6,000 to 8,000 (2023-2026); employer rate 17% up to age 55",https://cpf.gov.sg/member/infohub/news/media-news/budget-2023-cpf-monthly-salary-ceiling-to-be-raised-to-8000-by-2026
+SG,2026,social_contribution_rate,SG-SDL,"GoBusiness Singapore: Skills Development Levy 0.25% of monthly pay, maximum SGD 11.25 per employee",https://gobusiness.gov.sg/about-skills-development-levy
+JP,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+JP,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+JP,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+JP,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+JP,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+AU,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+AU,2022,retirement_severance_rate,AU-SG,Australia superannuation guarantee rate schedule (10.5% Jul 2022 ... 12% Jul 2025),https://australiansuper.com/superannuation/superannuation-articles/2024/07/understanding-the-superannuation-guarantee
+AU,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+AU,2023,retirement_severance_rate,AU-SG,Australia superannuation guarantee rate schedule (10.5% Jul 2022 ... 12% Jul 2025),https://australiansuper.com/superannuation/superannuation-articles/2024/07/understanding-the-superannuation-guarantee
+AU,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+AU,2024,retirement_severance_rate,AU-SG,Australia superannuation guarantee rate schedule (10.5% Jul 2022 ... 12% Jul 2025),https://australiansuper.com/superannuation/superannuation-articles/2024/07/understanding-the-superannuation-guarantee
+AU,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+AU,2025,retirement_severance_rate,AU-SG,Australia superannuation guarantee rate schedule (10.5% Jul 2022 ... 12% Jul 2025),https://australiansuper.com/superannuation/superannuation-articles/2024/07/understanding-the-superannuation-guarantee
+AU,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+AU,2026,retirement_severance_rate,AU-SG,Australia superannuation guarantee rate schedule (10.5% Jul 2022 ... 12% Jul 2025),https://australiansuper.com/superannuation/superannuation-articles/2024/07/understanding-the-superannuation-guarantee
+KR,2022,social_contribution_rate,OECD-TW23,"OECD, Taxing Wages 2023, Table 1.2 (2022 data)",https://www.oecd.org/en/publications/taxing-wages-2023_8c99fa4d-en/full-report/component-4.html
+KR,2022,retirement_severance_rate,KR-SEV,Korea Employee Retirement Benefit Security Act: severance of 30 days' average wage per year of service,https://www.atlashxm.com/resources/employee-benefits-in-south-korea
+KR,2023,social_contribution_rate,OECD-TW24,"OECD, Taxing Wages 2024, Table 1.2 (2023 data)",https://www.oecd.org/en/publications/taxing-wages-2024_dbcbac85-en/full-report/component-4.html
+KR,2023,retirement_severance_rate,KR-SEV,Korea Employee Retirement Benefit Security Act: severance of 30 days' average wage per year of service,https://www.atlashxm.com/resources/employee-benefits-in-south-korea
+KR,2024,social_contribution_rate,OECD-TW25,"OECD, Taxing Wages 2025, Table 1.2 (2024 data)",https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/overview_715add19.html
+KR,2024,retirement_severance_rate,KR-SEV,Korea Employee Retirement Benefit Security Act: severance of 30 days' average wage per year of service,https://www.atlashxm.com/resources/employee-benefits-in-south-korea
+KR,2025,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+KR,2025,retirement_severance_rate,KR-SEV,Korea Employee Retirement Benefit Security Act: severance of 30 days' average wage per year of service,https://www.atlashxm.com/resources/employee-benefits-in-south-korea
+KR,2026,social_contribution_rate,OECD-TW26,"OECD, Taxing Wages 2026, Table 1.2 (2025 data)",https://www.oecd.org/en/publications/taxing-wages-2026_3a5169ef-en/full-report/overview_d93131c3.html
+KR,2026,social_contribution_rate,KR-2026,Korea 2026 national pension 9.5% (employer 4.75%) and health insurance 7.19%,https://www.crowe.com/kr/en-us/news/news20260101_en
+KR,2026,retirement_severance_rate,KR-SEV,Korea Employee Retirement Benefit Security Act: severance of 30 days' average wage per year of service,https://www.atlashxm.com/resources/employee-benefits-in-south-korea
+PH,2022,social_contribution_rate,PH-SSS23,"Philippines SSS schedule 2023 (14%, employer 9.5%, MSC cap PHP 30,000) vs 2021-2022 (13%, employer 8.5%, cap PHP 25,000)",https://forvismazars.com/ph/en/insights/hr-payroll-alerts/new-sss-contribution-rates-for-2023
+PH,2022,statutory_pay_rate,PH-13M,Philippines Presidential Decree 851: mandatory 13th month pay (1/12 of annual basic salary),https://www.dole.gov.ph/
+PH,2023,social_contribution_rate,PH-SSS23,"Philippines SSS schedule 2023 (14%, employer 9.5%, MSC cap PHP 30,000) vs 2021-2022 (13%, employer 8.5%, cap PHP 25,000)",https://forvismazars.com/ph/en/insights/hr-payroll-alerts/new-sss-contribution-rates-for-2023
+PH,2023,statutory_pay_rate,PH-13M,Philippines Presidential Decree 851: mandatory 13th month pay (1/12 of annual basic salary),https://www.dole.gov.ph/
+PH,2024,social_contribution_rate,PH-PWC,"PwC Worldwide Tax Summaries, Philippines: SSS 15% from 2025 (cap PHP 35,000), PhilHealth 5% (ceiling PHP 100,000) from 2024, Pag-IBIG PHP 200 from Feb 2024",https://taxsummaries.pwc.com/philippines/individual
+PH,2024,statutory_pay_rate,PH-13M,Philippines Presidential Decree 851: mandatory 13th month pay (1/12 of annual basic salary),https://www.dole.gov.ph/
+PH,2025,social_contribution_rate,PH-PWC,"PwC Worldwide Tax Summaries, Philippines: SSS 15% from 2025 (cap PHP 35,000), PhilHealth 5% (ceiling PHP 100,000) from 2024, Pag-IBIG PHP 200 from Feb 2024",https://taxsummaries.pwc.com/philippines/individual
+PH,2025,statutory_pay_rate,PH-13M,Philippines Presidential Decree 851: mandatory 13th month pay (1/12 of annual basic salary),https://www.dole.gov.ph/
+PH,2026,social_contribution_rate,PH-PWC,"PwC Worldwide Tax Summaries, Philippines: SSS 15% from 2025 (cap PHP 35,000), PhilHealth 5% (ceiling PHP 100,000) from 2024, Pag-IBIG PHP 200 from Feb 2024",https://taxsummaries.pwc.com/philippines/individual
+PH,2026,statutory_pay_rate,PH-13M,Philippines Presidential Decree 851: mandatory 13th month pay (1/12 of annual basic salary),https://www.dole.gov.ph/

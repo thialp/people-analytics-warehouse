@@ -6,9 +6,8 @@
 -- Tableau can draw the line with MAKELINE(MAKEPOINT(from), MAKEPOINT(to))
 -- without relating the location table twice.
 --
--- Moves to or from "Remote - US" have no coordinates on one end; they stay in
--- the table (so totals tie to mart_location_headcount) and has_coordinates
--- lets the map leave them out explicitly.
+-- Every office has coordinates (test 22), so has_coordinates is always true; the
+-- column is kept so existing map calculations keep working.
 CREATE OR REPLACE TABLE marts.mart_mobility_flows AS
 WITH moves AS (
     SELECT month_end_date, prior_location_id AS from_location_id, current_location_id AS to_location_id

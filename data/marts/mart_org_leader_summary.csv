@@ -1,0 +1,218 @@
+month_end_date,fiscal_year,org_unit_type,org_unit_id,org_unit_name,parent_org_unit_id,function_name,leader_title,worker_id,worker_name,job_title,grade,department_id,office_name,manager_worker_id,manager_name,direct_reports,total_reports,layers_from_ceo
+2022-06-30,2022,Company,ORG-000,Arcadia Systems,,,Chief Executive Officer,W100001,Grace Ramsey,Chief Executive Officer,12,D-901,Austin HQ,,,8,25013,0
+2022-06-30,2022,Function,ORG-COM,Commercial,ORG-000,Commercial,Chief Revenue Officer,W100004,Isaac Porter,Chief Revenue Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,6947,1
+2022-06-30,2022,Function,ORG-FIN,Finance,ORG-000,Finance,Chief Financial Officer,W100006,Jordan Reed,Chief Financial Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,1106,1
+2022-06-30,2022,Function,ORG-LGL,Legal & Compliance,ORG-000,Legal & Compliance,General Counsel,W100009,Grace Warren,General Counsel,10,D-901,Austin HQ,W100001,Grace Ramsey,2,643,1
+2022-06-30,2022,Function,ORG-MKT,Marketing,ORG-000,Marketing,Chief Marketing Officer,W100007,Isaac Barnes,Chief Marketing Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,2,900,1
+2022-06-30,2022,Function,ORG-OPS,Operations,ORG-000,Operations,Chief Operating Officer,W100005,Tyler Mercer,Chief Operating Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,3601,1
+2022-06-30,2022,Function,ORG-PPL,People,ORG-000,People,Chief People Officer,W100008,Grace Ellis,Chief People Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,4,875,1
+2022-06-30,2022,Function,ORG-PRD,Product,ORG-000,Product,Chief Product Officer,W100003,Ava Carter,Chief Product Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,1543,1
+2022-06-30,2022,Function,ORG-TEC,Technology,ORG-000,Technology,Chief Technology Officer,W100002,Marcus Carter,Chief Technology Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,9390,1
+2022-06-30,2022,Sub-function,ORG-COM-CLS,Client Services,ORG-COM,Commercial,"Senior Vice President, Client Services",W100013,Noah Bennett,"Senior Vice President, Client Success",10,D-305,Austin HQ,W100004,Isaac Porter,2,2829,2
+2022-06-30,2022,Sub-function,ORG-COM-SAL,Sales,ORG-COM,Commercial,"Senior Vice President, Sales",W100012,Hannah Dalton,"Senior Vice President, Sales",10,D-301,Austin HQ,W100004,Isaac Porter,5,4116,2
+2022-06-30,2022,Sub-function,ORG-TEC-ENG,Engineering,ORG-TEC,Technology,"Senior Vice President, Engineering",W100010,Isaac Holland,"Senior Vice President, Software Engineering",10,D-101,Austin HQ,W100002,Marcus Carter,4,6559,2
+2022-06-30,2022,Sub-function,ORG-TEC-INF,Infrastructure,ORG-TEC,Technology,"Senior Vice President, Infrastructure",W100011,Maria Barnes,"Senior Vice President, IT & Infrastructure",10,D-105,Austin HQ,W100002,Marcus Carter,3,2829,2
+2022-06-30,2022,Department,D-101,Core Platform Engineering,ORG-TEC-ENG,Technology,Head of Core Platform Engineering,W100014,Hannah Caldwell,"Vice President, Software Engineering",9,D-101,San Francisco,W100010,Isaac Holland,7,2314,3
+2022-06-30,2022,Department,D-102,Product Engineering,ORG-TEC-ENG,Technology,Head of Product Engineering,W102329,Claire Garrett,"Vice President, Software Engineering",9,D-102,Austin HQ,W100010,Isaac Holland,6,1928,3
+2022-06-30,2022,Department,D-103,Mobile & Web Engineering,ORG-TEC-ENG,Technology,Head of Mobile & Web Engineering,W104258,Isha Wong,"Vice President, Software Engineering",9,D-103,Hyderabad,W100010,Isaac Holland,5,1542,3
+2022-06-30,2022,Department,D-104,Analytics Engineering,ORG-TEC-ENG,Technology,Head of Analytics Engineering,W105801,Marcus Thornton,"Senior Director, Data & Analytics",8,D-104,New York,W100010,Isaac Holland,8,771,3
+2022-06-30,2022,Department,D-105,Site Reliability,ORG-TEC-INF,Technology,Head of Site Reliability,W106573,Aaron Holland,"Vice President, IT & Infrastructure",9,D-105,Seattle,W100011,Maria Barnes,4,1028,3
+2022-06-30,2022,Department,D-106,Information Security,ORG-TEC-INF,Technology,Head of Information Security,W107602,Chen Agarwal,"Senior Director, Security",8,D-106,Hyderabad,W100011,Maria Barnes,8,899,3
+2022-06-30,2022,Department,D-107,Enterprise IT,ORG-TEC-INF,Technology,Head of Enterprise IT,W108502,Grace Ramsey,"Senior Director, IT & Infrastructure",8,D-107,Chicago,W100011,Maria Barnes,8,899,3
+2022-06-30,2022,Department,D-201,Product Management,ORG-PRD,Product,Head of Product Management,W109402,Ethan Dawson,"Vice President, Product Management",9,D-201,Austin HQ,W100003,Ava Carter,4,1028,2
+2022-06-30,2022,Department,D-202,Design & Research,ORG-PRD,Product,Head of Design & Research,W110431,Noah Quinlan,"Senior Director, Product Management",8,D-202,Chicago,W100003,Ava Carter,8,513,2
+2022-06-30,2022,Department,D-301,Enterprise Sales - Americas,ORG-COM-SAL,Commercial,Head of Enterprise Sales - Americas,W110945,Olivia Lowell,"Vice President, Sales",9,D-301,Toronto,W100012,Hannah Dalton,5,1414,3
+2022-06-30,2022,Department,D-302,Enterprise Sales - EMEA,ORG-COM-SAL,Commercial,Head of Enterprise Sales - EMEA,W112360,Chloe Holland,"Vice President, Sales",9,D-302,Seattle,W100012,Hannah Dalton,4,1028,3
+2022-06-30,2022,Department,D-303,Enterprise Sales - APAC,ORG-COM-SAL,Commercial,Head of Enterprise Sales - APAC,W113389,Owen Brooks,"Senior Director, Sales",8,D-303,Chicago,W100012,Hannah Dalton,8,771,3
+2022-06-30,2022,Department,D-304,Sales Operations,ORG-COM-SAL,Commercial,Head of Sales Operations,W114161,Ethan Yates,"Senior Director, Operations",8,D-304,New York,W100012,Hannah Dalton,8,513,3
+2022-06-30,2022,Department,D-305,Client Success,ORG-COM-CLS,Commercial,Head of Client Success,W115061,Isaac Coleman,"Vice President, Client Success",9,D-305,New York,W100013,Noah Bennett,5,1542,3
+2022-06-30,2022,Department,D-306,Technical Support,ORG-COM-CLS,Commercial,Head of Technical Support,W116604,Noah Carter,"Vice President, Client Success",9,D-306,San Francisco,W100013,Noah Bennett,4,1285,3
+2022-06-30,2022,Department,D-307,Partnerships,ORG-COM-SAL,Commercial,Head of Partnerships,W114675,Claire Coleman,"Senior Director, Sales",8,D-307,Austin HQ,W100012,Hannah Dalton,7,385,3
+2022-06-30,2022,Department,D-401,Brand & Communications,ORG-MKT,Marketing,Head of Brand & Communications,W117890,James Whitaker,"Senior Director, Marketing",8,D-401,Austin HQ,W100007,Isaac Barnes,7,385,2
+2022-06-30,2022,Department,D-402,Growth Marketing,ORG-MKT,Marketing,Head of Growth Marketing,W118276,Nora Osborne,"Senior Director, Marketing",8,D-402,Chicago,W100007,Isaac Barnes,8,513,2
+2022-06-30,2022,Department,D-501,FP&A,ORG-FIN,Finance,Head of FP&A,W118790,Sophia Carter,"Senior Director, Finance",8,D-501,San Francisco,W100006,Jordan Reed,7,385,2
+2022-06-30,2022,Department,D-502,Accounting & Controllership,ORG-FIN,Finance,Head of Accounting & Controllership,W119176,Isaac Baxter,"Senior Director, Finance",8,D-502,Austin HQ,W100006,Jordan Reed,8,513,2
+2022-06-30,2022,Department,D-503,Treasury & Tax,ORG-FIN,Finance,Head of Treasury & Tax,W119690,Marcus Prescott,"Director, Finance",7,D-503,Seattle,W100006,Jordan Reed,10,205,2
+2022-06-30,2022,Department,D-601,HR Business Partners,ORG-PPL,People,Head of HR Business Partners,W119896,Zoe Coleman,"Senior Director, Human Resources",8,D-601,San Francisco,W100008,Grace Ellis,6,308,2
+2022-06-30,2022,Department,D-602,Talent Acquisition,ORG-PPL,People,Head of Talent Acquisition,W120205,Zoe Garrett,"Senior Director, Human Resources",8,D-602,Austin HQ,W100008,Grace Ellis,6,308,2
+2022-06-30,2022,Department,D-603,Total Rewards,ORG-PPL,People,Head of Total Rewards,W120514,Chloe Baxter,"Director, Data & Analytics",7,D-603,Austin HQ,W100008,Grace Ellis,7,153,2
+2022-06-30,2022,Department,D-604,People Analytics,ORG-PPL,People,Head of People Analytics,W120668,Owen Prescott,"Director, Human Resources",7,D-604,San Francisco,W100008,Grace Ellis,5,102,2
+2022-06-30,2022,Department,D-701,Legal,ORG-LGL,Legal & Compliance,Head of Legal,W120771,Gavin Sullivan,"Director, Legal & Compliance",7,D-701,Austin HQ,W100009,Grace Warren,12,256,2
+2022-06-30,2022,Department,D-702,Compliance & Risk,ORG-LGL,Legal & Compliance,Head of Compliance & Risk,W121028,Elena Whitaker,"Senior Director, Legal & Compliance",8,D-702,San Francisco,W100009,Grace Warren,7,385,2
+2022-06-30,2022,Department,D-801,Customer Operations,ORG-OPS,Operations,Head of Customer Operations,W121414,Jasmine Kobayashi,"Vice President, Operations",9,D-801,Hyderabad,W100005,Tyler Mercer,7,2057,2
+2022-06-30,2022,Department,D-802,Trust & Safety Operations,ORG-OPS,Operations,Head of Trust & Safety Operations,W123472,Kayla Mercer,"Vice President, Data & Analytics",9,D-802,San Francisco,W100005,Tyler Mercer,4,1156,2
+2022-06-30,2022,Department,D-803,Workplace & Procurement,ORG-OPS,Operations,Head of Workplace & Procurement,W124629,Sydney Vaughn,"Senior Director, Operations",8,D-803,New York,W100005,Tyler Mercer,7,385,2
+2023-06-30,2023,Company,ORG-000,Arcadia Systems,,,Chief Executive Officer,W100001,Grace Ramsey,Chief Executive Officer,12,D-901,Austin HQ,,,8,26921,0
+2023-06-30,2023,Function,ORG-COM,Commercial,ORG-000,Commercial,Chief Revenue Officer,W100004,Isaac Porter,Chief Revenue Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,7178,1
+2023-06-30,2023,Function,ORG-FIN,Finance,ORG-000,Finance,Chief Financial Officer,W100006,Jordan Reed,Chief Financial Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,1157,1
+2023-06-30,2023,Function,ORG-LGL,Legal & Compliance,ORG-000,Legal & Compliance,General Counsel,W100009,Grace Warren,General Counsel,10,D-901,Austin HQ,W100001,Grace Ramsey,2,723,1
+2023-06-30,2023,Function,ORG-MKT,Marketing,ORG-000,Marketing,Chief Marketing Officer,W100007,Isaac Barnes,Chief Marketing Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,2,939,1
+2023-06-30,2023,Function,ORG-OPS,Operations,ORG-000,Operations,Chief Operating Officer,W100005,Tyler Mercer,Chief Operating Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,3896,1
+2023-06-30,2023,Function,ORG-PPL,People,ORG-000,People,Chief People Officer,W100008,Grace Ellis,Chief People Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,4,1010,1
+2023-06-30,2023,Function,ORG-PRD,Product,ORG-000,Product,Chief Product Officer,W100003,Ava Carter,Chief Product Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,1684,1
+2023-06-30,2023,Function,ORG-TEC,Technology,ORG-000,Technology,Chief Technology Officer,W100002,Marcus Carter,Chief Technology Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,10326,1
+2023-06-30,2023,Sub-function,ORG-COM-CLS,Client Services,ORG-COM,Commercial,"Senior Vice President, Client Services",W100013,Noah Bennett,"Senior Vice President, Client Success",10,D-305,Austin HQ,W100004,Isaac Porter,2,2811,2
+2023-06-30,2023,Sub-function,ORG-COM-SAL,Sales,ORG-COM,Commercial,"Senior Vice President, Sales",W100012,Hannah Dalton,"Senior Vice President, Sales",10,D-301,Austin HQ,W100004,Isaac Porter,5,4365,2
+2023-06-30,2023,Sub-function,ORG-TEC-ENG,Engineering,ORG-TEC,Technology,"Senior Vice President, Engineering",W100010,Isaac Holland,"Senior Vice President, Software Engineering",10,D-101,Austin HQ,W100002,Marcus Carter,4,7232,2
+2023-06-30,2023,Sub-function,ORG-TEC-INF,Infrastructure,ORG-TEC,Technology,"Senior Vice President, Infrastructure",W100011,Maria Barnes,"Senior Vice President, IT & Infrastructure",10,D-105,Austin HQ,W100002,Marcus Carter,3,3092,2
+2023-06-30,2023,Department,D-101,Core Platform Engineering,ORG-TEC-ENG,Technology,Head of Core Platform Engineering,W100014,Hannah Caldwell,"Vice President, Software Engineering",9,D-101,San Francisco,W100010,Isaac Holland,7,2551,3
+2023-06-30,2023,Department,D-102,Product Engineering,ORG-TEC-ENG,Technology,Head of Product Engineering,W102329,Claire Garrett,"Vice President, Software Engineering",9,D-102,Austin HQ,W100010,Isaac Holland,6,2118,3
+2023-06-30,2023,Department,D-103,Mobile & Web Engineering,ORG-TEC-ENG,Technology,Head of Mobile & Web Engineering,W104258,Isha Wong,"Vice President, Software Engineering",9,D-103,Hyderabad,W100010,Isaac Holland,5,1685,3
+2023-06-30,2023,Department,D-104,Analytics Engineering,ORG-TEC-ENG,Technology,Head of Analytics Engineering,W105801,Marcus Thornton,"Senior Director, Data & Analytics",8,D-104,New York,W100010,Isaac Holland,8,874,3
+2023-06-30,2023,Department,D-105,Site Reliability,ORG-TEC-INF,Technology,Head of Site Reliability,W125732,Riley Hayes,"Vice President, Software Engineering",9,D-105,San Francisco,W100011,Maria Barnes,4,1092,3
+2023-06-30,2023,Department,D-106,Information Security,ORG-TEC-INF,Technology,Head of Information Security,W107602,Chen Agarwal,"Senior Director, Security",8,D-106,Hyderabad,W100011,Maria Barnes,8,1059,3
+2023-06-30,2023,Department,D-107,Enterprise IT,ORG-TEC-INF,Technology,Head of Enterprise IT,W108502,Grace Ramsey,"Senior Director, IT & Infrastructure",8,D-107,Chicago,W100011,Maria Barnes,7,938,3
+2023-06-30,2023,Department,D-201,Product Management,ORG-PRD,Product,Head of Product Management,W109402,Ethan Dawson,"Vice President, Product Management",9,D-201,Austin HQ,W100003,Ava Carter,4,1089,2
+2023-06-30,2023,Department,D-202,Design & Research,ORG-PRD,Product,Head of Design & Research,W110431,Noah Quinlan,"Senior Director, Product Management",8,D-202,Chicago,W100003,Ava Carter,8,593,2
+2023-06-30,2023,Department,D-301,Enterprise Sales - Americas,ORG-COM-SAL,Commercial,Head of Enterprise Sales - Americas,W110945,Olivia Lowell,"Vice President, Sales",9,D-301,Toronto,W100012,Hannah Dalton,5,1427,3
+2023-06-30,2023,Department,D-302,Enterprise Sales - EMEA,ORG-COM-SAL,Commercial,Head of Enterprise Sales - EMEA,W112360,Chloe Holland,"Vice President, Sales",9,D-302,Seattle,W100012,Hannah Dalton,4,1061,3
+2023-06-30,2023,Department,D-303,Enterprise Sales - APAC,ORG-COM-SAL,Commercial,Head of Enterprise Sales - APAC,W113389,Owen Brooks,"Senior Director, Sales",8,D-303,Chicago,W100012,Hannah Dalton,8,855,3
+2023-06-30,2023,Department,D-304,Sales Operations,ORG-COM-SAL,Commercial,Head of Sales Operations,W114161,Ethan Yates,"Senior Director, Operations",8,D-304,New York,W100012,Hannah Dalton,8,540,3
+2023-06-30,2023,Department,D-305,Client Success,ORG-COM-CLS,Commercial,Head of Client Success,W115061,Isaac Coleman,"Vice President, Client Success",9,D-305,New York,W100013,Noah Bennett,5,1559,3
+2023-06-30,2023,Department,D-306,Technical Support,ORG-COM-CLS,Commercial,Head of Technical Support,W116604,Noah Carter,"Vice President, Client Success",9,D-306,San Francisco,W100013,Noah Bennett,4,1250,3
+2023-06-30,2023,Department,D-307,Partnerships,ORG-COM-SAL,Commercial,Head of Partnerships,W114675,Claire Coleman,"Senior Director, Sales",8,D-307,Austin HQ,W100012,Hannah Dalton,7,477,3
+2023-06-30,2023,Department,D-401,Brand & Communications,ORG-MKT,Marketing,Head of Brand & Communications,W117890,James Whitaker,"Senior Director, Marketing",8,D-401,Austin HQ,W100007,Isaac Barnes,7,407,2
+2023-06-30,2023,Department,D-402,Growth Marketing,ORG-MKT,Marketing,Head of Growth Marketing,W118276,Nora Osborne,"Senior Director, Marketing",8,D-402,Chicago,W100007,Isaac Barnes,8,530,2
+2023-06-30,2023,Department,D-501,FP&A,ORG-FIN,Finance,Head of FP&A,W118790,Sophia Carter,"Senior Director, Finance",8,D-501,San Francisco,W100006,Jordan Reed,7,405,2
+2023-06-30,2023,Department,D-502,Accounting & Controllership,ORG-FIN,Finance,Head of Accounting & Controllership,W119176,Isaac Baxter,"Senior Director, Finance",8,D-502,Austin HQ,W100006,Jordan Reed,7,520,2
+2023-06-30,2023,Department,D-503,Treasury & Tax,ORG-FIN,Finance,Head of Treasury & Tax,W119690,Marcus Prescott,"Director, Finance",7,D-503,Seattle,W100006,Jordan Reed,12,229,2
+2023-06-30,2023,Department,D-601,HR Business Partners,ORG-PPL,People,Head of HR Business Partners,W119899,Karim Khalil,"Senior Director, Human Resources",8,D-601,Johannesburg,W100008,Grace Ellis,6,328,2
+2023-06-30,2023,Department,D-602,Talent Acquisition,ORG-PPL,People,Head of Talent Acquisition,W120205,Zoe Garrett,"Senior Director, Human Resources",8,D-602,Austin HQ,W100008,Grace Ellis,6,356,2
+2023-06-30,2023,Department,D-603,Total Rewards,ORG-PPL,People,Head of Total Rewards,W120514,Chloe Baxter,"Director, Data & Analytics",7,D-603,Austin HQ,W100008,Grace Ellis,11,178,2
+2023-06-30,2023,Department,D-604,People Analytics,ORG-PPL,People,Head of People Analytics,W120668,Owen Prescott,"Director, Human Resources",7,D-604,San Francisco,W100008,Grace Ellis,9,144,2
+2023-06-30,2023,Department,D-701,Legal,ORG-LGL,Legal & Compliance,Head of Legal,W120975,Maria Harmon,"Director, Legal & Compliance",7,D-701,New York,W100009,Grace Warren,13,292,2
+2023-06-30,2023,Department,D-702,Compliance & Risk,ORG-LGL,Legal & Compliance,Head of Compliance & Risk,W121032,Grace Santos,"Senior Director, Legal & Compliance",8,D-702,Singapore,W100009,Grace Warren,8,429,2
+2023-06-30,2023,Department,D-801,Customer Operations,ORG-OPS,Operations,Head of Customer Operations,W121414,Jasmine Kobayashi,"Vice President, Operations",9,D-801,Hyderabad,W100005,Tyler Mercer,7,2186,2
+2023-06-30,2023,Department,D-802,Trust & Safety Operations,ORG-OPS,Operations,Head of Trust & Safety Operations,W123472,Kayla Mercer,"Vice President, Data & Analytics",9,D-802,San Francisco,W100005,Tyler Mercer,4,1285,2
+2023-06-30,2023,Department,D-803,Workplace & Procurement,ORG-OPS,Operations,Head of Workplace & Procurement,W124629,Sydney Vaughn,"Senior Director, Operations",8,D-803,New York,W100005,Tyler Mercer,7,422,2
+2024-06-30,2024,Company,ORG-000,Arcadia Systems,,,Chief Executive Officer,W100001,Grace Ramsey,Chief Executive Officer,12,D-901,Austin HQ,,,8,27187,0
+2024-06-30,2024,Function,ORG-COM,Commercial,ORG-000,Commercial,Chief Revenue Officer,W100004,Isaac Porter,Chief Revenue Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,6839,1
+2024-06-30,2024,Function,ORG-FIN,Finance,ORG-000,Finance,Chief Financial Officer,W100006,Jordan Reed,Chief Financial Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,1188,1
+2024-06-30,2024,Function,ORG-LGL,Legal & Compliance,ORG-000,Legal & Compliance,General Counsel,W100009,Grace Warren,General Counsel,10,D-901,Austin HQ,W100001,Grace Ramsey,2,750,1
+2024-06-30,2024,Function,ORG-MKT,Marketing,ORG-000,Marketing,Chief Marketing Officer,W100007,Isaac Barnes,Chief Marketing Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,2,905,1
+2024-06-30,2024,Function,ORG-OPS,Operations,ORG-000,Operations,Chief Operating Officer,W100005,Tyler Mercer,Chief Operating Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,4004,1
+2024-06-30,2024,Function,ORG-PPL,People,ORG-000,People,Chief People Officer,W100008,Grace Ellis,Chief People Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,4,1077,1
+2024-06-30,2024,Function,ORG-PRD,Product,ORG-000,Product,Chief Product Officer,W100003,Ava Carter,Chief Product Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,1758,1
+2024-06-30,2024,Function,ORG-TEC,Technology,ORG-000,Technology,Chief Technology Officer,W100002,Marcus Carter,Chief Technology Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,10658,1
+2024-06-30,2024,Sub-function,ORG-COM-CLS,Client Services,ORG-COM,Commercial,"Senior Vice President, Client Services",W100013,Noah Bennett,"Senior Vice President, Client Success",10,D-305,Austin HQ,W100004,Isaac Porter,2,2668,2
+2024-06-30,2024,Sub-function,ORG-COM-SAL,Sales,ORG-COM,Commercial,"Senior Vice President, Sales",W100012,Hannah Dalton,"Senior Vice President, Sales",10,D-301,Austin HQ,W100004,Isaac Porter,5,4169,2
+2024-06-30,2024,Sub-function,ORG-TEC-ENG,Engineering,ORG-TEC,Technology,"Senior Vice President, Engineering",W100010,Isaac Holland,"Senior Vice President, Software Engineering",10,D-101,Austin HQ,W100002,Marcus Carter,4,7424,2
+2024-06-30,2024,Sub-function,ORG-TEC-INF,Infrastructure,ORG-TEC,Technology,"Senior Vice President, Infrastructure",W100011,Maria Barnes,"Senior Vice President, IT & Infrastructure",10,D-105,Austin HQ,W100002,Marcus Carter,3,3232,2
+2024-06-30,2024,Department,D-101,Core Platform Engineering,ORG-TEC-ENG,Technology,Head of Core Platform Engineering,W100018,Caleb Barnes,"Vice President, Software Engineering",9,D-101,Atlanta,W100010,Isaac Holland,7,2629,3
+2024-06-30,2024,Department,D-102,Product Engineering,ORG-TEC-ENG,Technology,Head of Product Engineering,W102329,Claire Garrett,"Vice President, Software Engineering",9,D-102,Austin HQ,W100010,Isaac Holland,6,2156,3
+2024-06-30,2024,Department,D-103,Mobile & Web Engineering,ORG-TEC-ENG,Technology,Head of Mobile & Web Engineering,W104258,Isha Wong,"Vice President, Software Engineering",9,D-103,Hyderabad,W100010,Isaac Holland,5,1730,3
+2024-06-30,2024,Department,D-104,Analytics Engineering,ORG-TEC-ENG,Technology,Head of Analytics Engineering,W105801,Marcus Thornton,"Senior Director, Data & Analytics",8,D-104,New York,W100010,Isaac Holland,8,905,3
+2024-06-30,2024,Department,D-105,Site Reliability,ORG-TEC-INF,Technology,Head of Site Reliability,W125732,Riley Hayes,"Vice President, Software Engineering",9,D-105,San Francisco,W100011,Maria Barnes,4,1126,3
+2024-06-30,2024,Department,D-106,Information Security,ORG-TEC-INF,Technology,Head of Information Security,W107602,Chen Agarwal,"Senior Director, Security",8,D-106,Hyderabad,W100011,Maria Barnes,9,1162,3
+2024-06-30,2024,Department,D-107,Enterprise IT,ORG-TEC-INF,Technology,Head of Enterprise IT,W108502,Grace Ramsey,"Senior Director, IT & Infrastructure",8,D-107,Chicago,W100011,Maria Barnes,9,941,3
+2024-06-30,2024,Department,D-201,Product Management,ORG-PRD,Product,Head of Product Management,W109402,Ethan Dawson,"Vice President, Product Management",9,D-201,Austin HQ,W100003,Ava Carter,4,1115,2
+2024-06-30,2024,Department,D-202,Design & Research,ORG-PRD,Product,Head of Design & Research,W110431,Noah Quinlan,"Senior Director, Product Management",8,D-202,Chicago,W100003,Ava Carter,8,641,2
+2024-06-30,2024,Department,D-301,Enterprise Sales - Americas,ORG-COM-SAL,Commercial,Head of Enterprise Sales - Americas,W110945,Olivia Lowell,"Vice President, Sales",9,D-301,Toronto,W100012,Hannah Dalton,5,1323,3
+2024-06-30,2024,Department,D-302,Enterprise Sales - EMEA,ORG-COM-SAL,Commercial,Head of Enterprise Sales - EMEA,W112360,Chloe Holland,"Vice President, Sales",9,D-302,Austin HQ,W100012,Hannah Dalton,4,1001,3
+2024-06-30,2024,Department,D-303,Enterprise Sales - APAC,ORG-COM-SAL,Commercial,Head of Enterprise Sales - APAC,W113389,Owen Brooks,"Senior Director, Sales",8,D-303,Chicago,W100012,Hannah Dalton,8,840,3
+2024-06-30,2024,Department,D-304,Sales Operations,ORG-COM-SAL,Commercial,Head of Sales Operations,W114161,Ethan Yates,"Senior Director, Operations",8,D-304,New York,W100012,Hannah Dalton,8,527,3
+2024-06-30,2024,Department,D-305,Client Success,ORG-COM-CLS,Commercial,Head of Client Success,W115061,Isaac Coleman,"Vice President, Client Success",9,D-305,New York,W100013,Noah Bennett,5,1514,3
+2024-06-30,2024,Department,D-306,Technical Support,ORG-COM-CLS,Commercial,Head of Technical Support,W116604,Noah Carter,"Vice President, Client Success",9,D-306,San Francisco,W100013,Noah Bennett,4,1152,3
+2024-06-30,2024,Department,D-307,Partnerships,ORG-COM-SAL,Commercial,Head of Partnerships,W114675,Claire Coleman,"Senior Director, Sales",8,D-307,Austin HQ,W100012,Hannah Dalton,8,473,3
+2024-06-30,2024,Department,D-401,Brand & Communications,ORG-MKT,Marketing,Head of Brand & Communications,W117890,James Whitaker,"Senior Director, Marketing",8,D-401,Austin HQ,W100007,Isaac Barnes,7,380,2
+2024-06-30,2024,Department,D-402,Growth Marketing,ORG-MKT,Marketing,Head of Growth Marketing,W118276,Nora Osborne,"Senior Director, Marketing",8,D-402,Chicago,W100007,Isaac Barnes,8,523,2
+2024-06-30,2024,Department,D-501,FP&A,ORG-FIN,Finance,Head of FP&A,W118790,Sophia Carter,"Senior Director, Finance",8,D-501,San Francisco,W100006,Jordan Reed,7,420,2
+2024-06-30,2024,Department,D-502,Accounting & Controllership,ORG-FIN,Finance,Head of Accounting & Controllership,W119176,Isaac Baxter,"Senior Director, Finance",8,D-502,Austin HQ,W100006,Jordan Reed,7,514,2
+2024-06-30,2024,Department,D-503,Treasury & Tax,ORG-FIN,Finance,Head of Treasury & Tax,W119690,Marcus Prescott,"Director, Finance",7,D-503,Seattle,W100006,Jordan Reed,13,251,2
+2024-06-30,2024,Department,D-601,HR Business Partners,ORG-PPL,People,Head of HR Business Partners,W119899,Karim Khalil,"Senior Director, Human Resources",8,D-601,Johannesburg,W100008,Grace Ellis,6,338,2
+2024-06-30,2024,Department,D-602,Talent Acquisition,ORG-PPL,People,Head of Talent Acquisition,W120205,Zoe Garrett,"Senior Director, Human Resources",8,D-602,Austin HQ,W100008,Grace Ellis,9,382,2
+2024-06-30,2024,Department,D-603,Total Rewards,ORG-PPL,People,Head of Total Rewards,W120514,Chloe Baxter,"Director, Data & Analytics",7,D-603,Austin HQ,W100008,Grace Ellis,10,189,2
+2024-06-30,2024,Department,D-604,People Analytics,ORG-PPL,People,Head of People Analytics,W120668,Owen Prescott,"Director, Human Resources",7,D-604,San Francisco,W100008,Grace Ellis,13,164,2
+2024-06-30,2024,Department,D-701,Legal,ORG-LGL,Legal & Compliance,Head of Legal,W120975,Maria Harmon,"Director, Legal & Compliance",7,D-701,New York,W100009,Grace Warren,16,301,2
+2024-06-30,2024,Department,D-702,Compliance & Risk,ORG-LGL,Legal & Compliance,Head of Compliance & Risk,W121032,Grace Santos,"Senior Director, Legal & Compliance",8,D-702,Singapore,W100009,Grace Warren,8,447,2
+2024-06-30,2024,Department,D-801,Customer Operations,ORG-OPS,Operations,Head of Customer Operations,W121414,Jasmine Kobayashi,"Vice President, Operations",9,D-801,Hyderabad,W100005,Tyler Mercer,7,2205,2
+2024-06-30,2024,Department,D-802,Trust & Safety Operations,ORG-OPS,Operations,Head of Trust & Safety Operations,W123472,Kayla Mercer,"Vice President, Data & Analytics",9,D-802,San Francisco,W100005,Tyler Mercer,4,1337,2
+2024-06-30,2024,Department,D-803,Workplace & Procurement,ORG-OPS,Operations,Head of Workplace & Procurement,W124629,Sydney Vaughn,"Senior Director, Operations",8,D-803,New York,W100005,Tyler Mercer,7,459,2
+2025-06-30,2025,Company,ORG-000,Arcadia Systems,,,Chief Executive Officer,W100001,Grace Ramsey,Chief Executive Officer,12,D-901,Austin HQ,,,8,28444,0
+2025-06-30,2025,Function,ORG-COM,Commercial,ORG-000,Commercial,Chief Revenue Officer,W100004,Isaac Porter,Chief Revenue Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,6943,1
+2025-06-30,2025,Function,ORG-FIN,Finance,ORG-000,Finance,Chief Financial Officer,W100006,Jordan Reed,Chief Financial Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,1211,1
+2025-06-30,2025,Function,ORG-LGL,Legal & Compliance,ORG-000,Legal & Compliance,General Counsel,W100009,Grace Warren,General Counsel,10,D-901,Austin HQ,W100001,Grace Ramsey,2,805,1
+2025-06-30,2025,Function,ORG-MKT,Marketing,ORG-000,Marketing,Chief Marketing Officer,W100007,Isaac Barnes,Chief Marketing Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,2,961,1
+2025-06-30,2025,Function,ORG-OPS,Operations,ORG-000,Operations,Chief Operating Officer,W100005,Tyler Mercer,Chief Operating Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,4173,1
+2025-06-30,2025,Function,ORG-PPL,People,ORG-000,People,Chief People Officer,W100008,Grace Ellis,Chief People Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,4,1178,1
+2025-06-30,2025,Function,ORG-PRD,Product,ORG-000,Product,Chief Product Officer,W100003,Ava Carter,Chief Product Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,1846,1
+2025-06-30,2025,Function,ORG-TEC,Technology,ORG-000,Technology,Chief Technology Officer,W100002,Marcus Carter,Chief Technology Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,11319,1
+2025-06-30,2025,Sub-function,ORG-COM-CLS,Client Services,ORG-COM,Commercial,"Senior Vice President, Client Services",W100013,Noah Bennett,"Senior Vice President, Client Success",10,D-305,Austin HQ,W100004,Isaac Porter,2,2679,2
+2025-06-30,2025,Sub-function,ORG-COM-SAL,Sales,ORG-COM,Commercial,"Senior Vice President, Sales",W100012,Hannah Dalton,"Senior Vice President, Sales",10,D-301,Austin HQ,W100004,Isaac Porter,5,4262,2
+2025-06-30,2025,Sub-function,ORG-TEC-ENG,Engineering,ORG-TEC,Technology,"Senior Vice President, Engineering",W100010,Isaac Holland,"Senior Vice President, Software Engineering",10,D-101,Austin HQ,W100002,Marcus Carter,5,7885,2
+2025-06-30,2025,Sub-function,ORG-TEC-INF,Infrastructure,ORG-TEC,Technology,"Senior Vice President, Infrastructure",W138117,Marcus Hayes,"Senior Vice President, Software Engineering",10,D-105,Austin HQ,W100002,Marcus Carter,3,3432,2
+2025-06-30,2025,Department,D-101,Core Platform Engineering,ORG-TEC-ENG,Technology,Head of Core Platform Engineering,W100018,Caleb Barnes,"Vice President, Software Engineering",9,D-101,Atlanta,W100010,Isaac Holland,7,2506,3
+2025-06-30,2025,Department,D-102,Product Engineering,ORG-TEC-ENG,Technology,Head of Product Engineering,W102329,Claire Garrett,"Vice President, Software Engineering",9,D-102,Austin HQ,W100010,Isaac Holland,5,2058,3
+2025-06-30,2025,Department,D-103,Mobile & Web Engineering,ORG-TEC-ENG,Technology,Head of Mobile & Web Engineering,W104258,Isha Wong,"Vice President, Software Engineering",9,D-103,Hyderabad,W100010,Isaac Holland,4,1766,3
+2025-06-30,2025,Department,D-104,Analytics Engineering,ORG-TEC-ENG,Technology,Head of Analytics Engineering,W105801,Marcus Thornton,"Senior Director, Data & Analytics",8,D-104,New York,W100010,Isaac Holland,8,370,3
+2025-06-30,2025,Department,D-105,Site Reliability,ORG-TEC-INF,Technology,Head of Site Reliability,W125732,Riley Hayes,"Vice President, Software Engineering",9,D-105,San Francisco,W138117,Marcus Hayes,4,1185,3
+2025-06-30,2025,Department,D-106,Information Security,ORG-TEC-INF,Technology,Head of Information Security,W107602,Chen Agarwal,"Senior Director, Security",8,D-106,Hyderabad,W138117,Marcus Hayes,9,1259,3
+2025-06-30,2025,Department,D-107,Enterprise IT,ORG-TEC-INF,Technology,Head of Enterprise IT,W108502,Grace Ramsey,"Senior Director, IT & Infrastructure",8,D-107,Chicago,W138117,Marcus Hayes,8,985,3
+2025-06-30,2025,Department,D-108,Data & AI Platform,ORG-TEC-ENG,Technology,Head of Data & AI Platform,W102330,Grace Dawson,"Vice President, Data & Analytics",9,D-108,Chicago,W100010,Isaac Holland,4,1180,3
+2025-06-30,2025,Department,D-201,Product Management,ORG-PRD,Product,Head of Product Management,W109405,Dylan Jennings,"Vice President, Product Management",9,D-201,New York,W100003,Ava Carter,7,1151,2
+2025-06-30,2025,Department,D-202,Design & Research,ORG-PRD,Product,Head of Design & Research,W110431,Noah Quinlan,"Senior Director, Product Management",8,D-202,Chicago,W100003,Ava Carter,8,693,2
+2025-06-30,2025,Department,D-301,Enterprise Sales - Americas,ORG-COM-SAL,Commercial,Head of Enterprise Sales - Americas,W110945,Olivia Lowell,"Vice President, Sales",9,D-301,Toronto,W100012,Hannah Dalton,5,1346,3
+2025-06-30,2025,Department,D-302,Enterprise Sales - EMEA,ORG-COM-SAL,Commercial,Head of Enterprise Sales - EMEA,W112360,Chloe Holland,"Vice President, Sales",9,D-302,Austin HQ,W100012,Hannah Dalton,4,1017,3
+2025-06-30,2025,Department,D-303,Enterprise Sales - APAC,ORG-COM-SAL,Commercial,Head of Enterprise Sales - APAC,W113389,Owen Brooks,"Senior Director, Sales",8,D-303,Chicago,W100012,Hannah Dalton,8,868,3
+2025-06-30,2025,Department,D-304,Sales Operations,ORG-COM-SAL,Commercial,Head of Sales Operations,W114161,Ethan Yates,"Senior Director, Operations",8,D-304,New York,W100012,Hannah Dalton,8,542,3
+2025-06-30,2025,Department,D-305,Client Success,ORG-COM-CLS,Commercial,Head of Client Success,W115061,Isaac Coleman,"Vice President, Client Success",9,D-305,New York,W100013,Noah Bennett,5,1503,3
+2025-06-30,2025,Department,D-306,Technical Support,ORG-COM-CLS,Commercial,Head of Technical Support,W116604,Noah Carter,"Vice President, Client Success",9,D-306,San Francisco,W100013,Noah Bennett,4,1174,3
+2025-06-30,2025,Department,D-307,Partnerships,ORG-COM-SAL,Commercial,Head of Partnerships,W114675,Claire Coleman,"Senior Director, Sales",8,D-307,Austin HQ,W100012,Hannah Dalton,7,484,3
+2025-06-30,2025,Department,D-401,Brand & Communications,ORG-MKT,Marketing,Head of Brand & Communications,W117890,James Whitaker,"Senior Director, Marketing",8,D-401,Austin HQ,W100007,Isaac Barnes,7,396,2
+2025-06-30,2025,Department,D-402,Growth Marketing,ORG-MKT,Marketing,Head of Growth Marketing,W118276,Nora Osborne,"Senior Director, Marketing",8,D-402,Austin HQ,W100007,Isaac Barnes,8,563,2
+2025-06-30,2025,Department,D-501,FP&A,ORG-FIN,Finance,Head of FP&A,W118790,Sophia Carter,"Senior Director, Finance",8,D-501,San Francisco,W100006,Jordan Reed,7,425,2
+2025-06-30,2025,Department,D-502,Accounting & Controllership,ORG-FIN,Finance,Head of Accounting & Controllership,W119176,Isaac Baxter,"Senior Director, Finance",8,D-502,Austin HQ,W100006,Jordan Reed,7,525,2
+2025-06-30,2025,Department,D-503,Treasury & Tax,ORG-FIN,Finance,Head of Treasury & Tax,W119690,Marcus Prescott,"Director, Finance",7,D-503,Seattle,W100006,Jordan Reed,13,258,2
+2025-06-30,2025,Department,D-601,HR Business Partners,ORG-PPL,People,Head of HR Business Partners,W119899,Karim Khalil,"Senior Director, Human Resources",8,D-601,Johannesburg,W100008,Grace Ellis,5,367,2
+2025-06-30,2025,Department,D-602,Talent Acquisition,ORG-PPL,People,Head of Talent Acquisition,W120205,Zoe Garrett,"Senior Director, Human Resources",8,D-602,Austin HQ,W100008,Grace Ellis,9,425,2
+2025-06-30,2025,Department,D-603,Total Rewards,ORG-PPL,People,Head of Total Rewards,W120514,Chloe Baxter,"Director, Data & Analytics",7,D-603,Austin HQ,W100008,Grace Ellis,12,197,2
+2025-06-30,2025,Department,D-604,People Analytics,ORG-PPL,People,Head of People Analytics,W120668,Owen Prescott,"Director, Human Resources",7,D-604,San Francisco,W100008,Grace Ellis,14,185,2
+2025-06-30,2025,Department,D-701,Legal,ORG-LGL,Legal & Compliance,Head of Legal,W120975,Maria Harmon,"Director, Legal & Compliance",7,D-701,New York,W100009,Grace Warren,18,319,2
+2025-06-30,2025,Department,D-702,Compliance & Risk,ORG-LGL,Legal & Compliance,Head of Compliance & Risk,W121032,Grace Santos,"Senior Director, Legal & Compliance",8,D-702,Singapore,W100009,Grace Warren,9,484,2
+2025-06-30,2025,Department,D-801,Customer Operations,ORG-OPS,Operations,Head of Customer Operations,W121414,Jasmine Kobayashi,"Vice President, Operations",9,D-801,Hyderabad,W100005,Tyler Mercer,7,2254,2
+2025-06-30,2025,Department,D-802,Trust & Safety Operations,ORG-OPS,Operations,Head of Trust & Safety Operations,W123472,Kayla Mercer,"Vice President, Data & Analytics",9,D-802,San Francisco,W100005,Tyler Mercer,9,1396,2
+2025-06-30,2025,Department,D-803,Workplace & Procurement,ORG-OPS,Operations,Head of Workplace & Procurement,W124629,Sydney Vaughn,"Senior Director, Operations",8,D-803,New York,W100005,Tyler Mercer,7,520,2
+2026-06-30,2026,Company,ORG-000,Arcadia Systems,,,Chief Executive Officer,W100001,Grace Ramsey,Chief Executive Officer,12,D-901,Austin HQ,,,8,30023,0
+2026-06-30,2026,Function,ORG-COM,Commercial,ORG-000,Commercial,Chief Revenue Officer,W100004,Isaac Porter,Chief Revenue Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,7092,1
+2026-06-30,2026,Function,ORG-FIN,Finance,ORG-000,Finance,Chief Financial Officer,W100006,Jordan Reed,Chief Financial Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,1269,1
+2026-06-30,2026,Function,ORG-LGL,Legal & Compliance,ORG-000,Legal & Compliance,General Counsel,W100009,Grace Warren,General Counsel,10,D-901,Austin HQ,W100001,Grace Ramsey,2,841,1
+2026-06-30,2026,Function,ORG-MKT,Marketing,ORG-000,Marketing,Chief Marketing Officer,W100007,Isaac Barnes,Chief Marketing Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,2,1016,1
+2026-06-30,2026,Function,ORG-OPS,Operations,ORG-000,Operations,Chief Operating Officer,W100005,Tyler Mercer,Chief Operating Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,3,4402,1
+2026-06-30,2026,Function,ORG-PPL,People,ORG-000,People,Chief People Officer,W100008,Grace Ellis,Chief People Officer,10,D-901,Austin HQ,W100001,Grace Ramsey,4,1259,1
+2026-06-30,2026,Function,ORG-PRD,Product,ORG-000,Product,Chief Product Officer,W100003,Ava Carter,Chief Product Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,1928,1
+2026-06-30,2026,Function,ORG-TEC,Technology,ORG-000,Technology,Chief Technology Officer,W100002,Marcus Carter,Chief Technology Officer,11,D-901,Austin HQ,W100001,Grace Ramsey,2,12208,1
+2026-06-30,2026,Sub-function,ORG-COM-CLS,Client Services,ORG-COM,Commercial,"Senior Vice President, Client Services",W100013,Noah Bennett,"Senior Vice President, Client Success",10,D-305,Austin HQ,W100004,Isaac Porter,2,2657,2
+2026-06-30,2026,Sub-function,ORG-COM-SAL,Sales,ORG-COM,Commercial,"Senior Vice President, Sales",W100012,Hannah Dalton,"Senior Vice President, Sales",10,D-301,Austin HQ,W100004,Isaac Porter,5,4433,2
+2026-06-30,2026,Sub-function,ORG-TEC-ENG,Engineering,ORG-TEC,Technology,"Senior Vice President, Engineering",W100010,Isaac Holland,"Senior Vice President, Software Engineering",10,D-101,Austin HQ,W100002,Marcus Carter,5,8562,2
+2026-06-30,2026,Sub-function,ORG-TEC-INF,Infrastructure,ORG-TEC,Technology,"Senior Vice President, Infrastructure",W138117,Marcus Hayes,"Senior Vice President, Software Engineering",10,D-105,Austin HQ,W100002,Marcus Carter,3,3644,2
+2026-06-30,2026,Department,D-101,Core Platform Engineering,ORG-TEC-ENG,Technology,Head of Core Platform Engineering,W100018,Caleb Barnes,"Vice President, Software Engineering",9,D-101,Atlanta,W100010,Isaac Holland,9,2654,3
+2026-06-30,2026,Department,D-102,Product Engineering,ORG-TEC-ENG,Technology,Head of Product Engineering,W102329,Claire Garrett,"Vice President, Software Engineering",9,D-102,Austin HQ,W100010,Isaac Holland,9,2207,3
+2026-06-30,2026,Department,D-103,Mobile & Web Engineering,ORG-TEC-ENG,Technology,Head of Mobile & Web Engineering,W104258,Isha Wong,"Vice President, Software Engineering",9,D-103,Hyderabad,W100010,Isaac Holland,8,1843,3
+2026-06-30,2026,Department,D-104,Analytics Engineering,ORG-TEC-ENG,Technology,Head of Analytics Engineering,W105801,Marcus Thornton,"Senior Director, Data & Analytics",8,D-104,New York,W100010,Isaac Holland,8,448,3
+2026-06-30,2026,Department,D-105,Site Reliability,ORG-TEC-INF,Technology,Head of Site Reliability,W125732,Riley Hayes,"Vice President, Software Engineering",9,D-105,San Francisco,W138117,Marcus Hayes,9,1247,3
+2026-06-30,2026,Department,D-106,Information Security,ORG-TEC-INF,Technology,Head of Information Security,W107602,Chen Agarwal,"Senior Director, Security",8,D-106,Hyderabad,W138117,Marcus Hayes,9,1353,3
+2026-06-30,2026,Department,D-107,Enterprise IT,ORG-TEC-INF,Technology,Head of Enterprise IT,W108502,Grace Ramsey,"Senior Director, IT & Infrastructure",8,D-107,Chicago,W138117,Marcus Hayes,9,1041,3
+2026-06-30,2026,Department,D-108,Data & AI Platform,ORG-TEC-ENG,Technology,Head of Data & AI Platform,W102330,Grace Dawson,"Vice President, Data & Analytics",9,D-108,Chicago,W100010,Isaac Holland,9,1405,3
+2026-06-30,2026,Department,D-201,Product Management,ORG-PRD,Product,Head of Product Management,W109405,Dylan Jennings,"Vice President, Product Management",9,D-201,New York,W100003,Ava Carter,7,1183,2
+2026-06-30,2026,Department,D-202,Design & Research,ORG-PRD,Product,Head of Design & Research,W110431,Noah Quinlan,"Senior Director, Product Management",8,D-202,Chicago,W100003,Ava Carter,9,743,2
+2026-06-30,2026,Department,D-301,Enterprise Sales - Americas,ORG-COM-SAL,Commercial,Head of Enterprise Sales - Americas,W110945,Olivia Lowell,"Vice President, Sales",9,D-301,Toronto,W100012,Hannah Dalton,5,1350,3
+2026-06-30,2026,Department,D-302,Enterprise Sales - EMEA,ORG-COM-SAL,Commercial,Head of Enterprise Sales - EMEA,W112360,Chloe Holland,"Vice President, Sales",9,D-302,Austin HQ,W100012,Hannah Dalton,3,1079,3
+2026-06-30,2026,Department,D-303,Enterprise Sales - APAC,ORG-COM-SAL,Commercial,Head of Enterprise Sales - APAC,W113389,Owen Brooks,"Senior Director, Sales",8,D-303,Chicago,W100012,Hannah Dalton,9,931,3
+2026-06-30,2026,Department,D-304,Sales Operations,ORG-COM-SAL,Commercial,Head of Sales Operations,W114161,Ethan Yates,"Senior Director, Operations",8,D-304,New York,W100012,Hannah Dalton,8,549,3
+2026-06-30,2026,Department,D-305,Client Success,ORG-COM-CLS,Commercial,Head of Client Success,W115061,Isaac Coleman,"Vice President, Client Success",9,D-305,New York,W100013,Noah Bennett,5,1470,3
+2026-06-30,2026,Department,D-306,Technical Support,ORG-COM-CLS,Commercial,Head of Technical Support,W116604,Noah Carter,"Vice President, Client Success",9,D-306,San Francisco,W100013,Noah Bennett,4,1185,3
+2026-06-30,2026,Department,D-307,Partnerships,ORG-COM-SAL,Commercial,Head of Partnerships,W114675,Claire Coleman,"Senior Director, Sales",8,D-307,Austin HQ,W100012,Hannah Dalton,9,519,3
+2026-06-30,2026,Department,D-401,Brand & Communications,ORG-MKT,Marketing,Head of Brand & Communications,W117890,James Whitaker,"Senior Director, Marketing",8,D-401,Austin HQ,W100007,Isaac Barnes,7,431,2
+2026-06-30,2026,Department,D-402,Growth Marketing,ORG-MKT,Marketing,Head of Growth Marketing,W118276,Nora Osborne,"Senior Director, Marketing",8,D-402,Austin HQ,W100007,Isaac Barnes,9,583,2
+2026-06-30,2026,Department,D-501,FP&A,ORG-FIN,Finance,Head of FP&A,W118790,Sophia Carter,"Senior Director, Finance",8,D-501,San Francisco,W100006,Jordan Reed,7,456,2
+2026-06-30,2026,Department,D-502,Accounting & Controllership,ORG-FIN,Finance,Head of Accounting & Controllership,W119176,Isaac Baxter,"Senior Director, Finance",8,D-502,Austin HQ,W100006,Jordan Reed,7,523,2
+2026-06-30,2026,Department,D-503,Treasury & Tax,ORG-FIN,Finance,Head of Treasury & Tax,W119690,Marcus Prescott,"Director, Finance",7,D-503,Seattle,W100006,Jordan Reed,14,287,2
+2026-06-30,2026,Department,D-601,HR Business Partners,ORG-PPL,People,Head of HR Business Partners,W119899,Karim Khalil,"Senior Director, Human Resources",8,D-601,Johannesburg,W100008,Grace Ellis,9,378,2
+2026-06-30,2026,Department,D-602,Talent Acquisition,ORG-PPL,People,Head of Talent Acquisition,W120205,Zoe Garrett,"Senior Director, Human Resources",8,D-602,Austin HQ,W100008,Grace Ellis,8,455,2
+2026-06-30,2026,Department,D-603,Total Rewards,ORG-PPL,People,Head of Total Rewards,W120514,Chloe Baxter,"Director, Data & Analytics",7,D-603,Austin HQ,W100008,Grace Ellis,11,214,2
+2026-06-30,2026,Department,D-604,People Analytics,ORG-PPL,People,Head of People Analytics,W120668,Owen Prescott,"Director, Human Resources",7,D-604,San Francisco,W100008,Grace Ellis,13,208,2
+2026-06-30,2026,Department,D-701,Legal,ORG-LGL,Legal & Compliance,Head of Legal,W120975,Maria Harmon,"Director, Legal & Compliance",7,D-701,New York,W100009,Grace Warren,19,332,2
+2026-06-30,2026,Department,D-702,Compliance & Risk,ORG-LGL,Legal & Compliance,Head of Compliance & Risk,W121032,Grace Santos,"Senior Director, Legal & Compliance",8,D-702,Singapore,W100009,Grace Warren,9,507,2
+2026-06-30,2026,Department,D-801,Customer Operations,ORG-OPS,Operations,Head of Customer Operations,W121414,Jasmine Kobayashi,"Vice President, Operations",9,D-801,Hyderabad,W100005,Tyler Mercer,7,2341,2
+2026-06-30,2026,Department,D-802,Trust & Safety Operations,ORG-OPS,Operations,Head of Trust & Safety Operations,W123472,Kayla Mercer,"Vice President, Data & Analytics",9,D-802,San Francisco,W100005,Tyler Mercer,8,1474,2
+2026-06-30,2026,Department,D-803,Workplace & Procurement,ORG-OPS,Operations,Head of Workplace & Procurement,W124629,Sydney Vaughn,"Senior Director, Operations",8,D-803,New York,W100005,Tyler Mercer,9,584,2

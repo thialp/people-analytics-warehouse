@@ -14,14 +14,14 @@ From the repository, open each file and click **Download raw file**. Save all fo
 
 | File | Rows | What it is |
 |---|---|---|
-| [`mart_location_headcount.csv`](../data/marts/mart_location_headcount.csv) | 1,056 | One row per office per month: opening, hires, leavers, relocations in and out, closing |
-| [`mart_dim_location.csv`](../data/marts/mart_dim_location.csv) | 22 | Offices with city, country, region, site type, latitude and longitude |
-| [`mart_mobility_flows.csv`](../data/marts/mart_mobility_flows.csv) | 668 (918 people moved) | People who changed office, as origin and destination with both ends' coordinates |
+| [`mart_location_headcount.csv`](../data/marts/mart_location_headcount.csv) | 1,581 | One row per office per month: opening, hires, leavers, relocations in and out, closing |
+| [`mart_dim_location.csv`](../data/marts/mart_dim_location.csv) | 35 | Offices with city, postal code, country, region, site type, GeoNames latitude and longitude and opening date |
+| [`mart_mobility_flows.csv`](../data/marts/mart_mobility_flows.csv) | 1,117 (1,447 people moved) | People who changed office, as origin and destination with both ends' coordinates |
 | [`mart_dim_month.csv`](../data/marts/mart_dim_month.csv) | 48 | Month-ends with fiscal year and fiscal month |
 
 Each office walk reconciles every month (opening + hires − leavers + relocations in − relocations out = closing), the offices add up to the company headcount walk, and the flows add up to each office's relocations. Tests 19 to 22 check all three on every build.
 
-"Remote - US" has no office, so it has no coordinates. It stays in the numbers and drops off the map on its own, because a point with no coordinates isn't drawn.
+Every office has a real postal code and the GeoNames coordinates of that postal code (Dubai has no postal code, since the UAE doesn't use them; its point is the DIFC). Six offices open during the window, so they appear on the map only from their opening month.
 
 ## 2. Connect and relate the tables
 
@@ -35,7 +35,7 @@ Each office walk reconciles every month (opening + hires − leavers + relocatio
    Each flow row then belongs to its origin office's month, so the fiscal-year filter reaches the flows too.
 5. Set types: every `*_latitude`, `*_longitude`, `latitude`, `longitude` → **Number (decimal)**. `month_end_date` → **Date**. `fiscal_year` and `fiscal_month` → **Number (whole)**. `country_name` → **Geographic role → Country/Region**.
 
-**Check:** a sheet with `Fiscal Year` on Rows and `SUM(Closing Headcount)` filtered to `Fiscal Month` = 12 shows 13,201 for 2026.
+**Check:** a sheet with `Fiscal Year` on Rows and `SUM(Closing Headcount)` filtered to `Fiscal Month` = 12 shows 30,024 for 2026.
 
 ## 3. Parameters
 
@@ -126,12 +126,12 @@ SUM(IF [In FY] AND [Fiscal Month] = 12 AND [Distance to Selected (km)] <= [Radiu
 
 | Field | Expected |
 |---|---|
-| Closing HC | 13,201 |
-| Growth %, Asia Pacific | +7.0% (3,217 → 3,443) |
-| Relocations | 241, of which 64 international |
-| Offices within 1,000 km of London | Dublin, Paris, Berlin, plus London itself |
-| People Within Radius | 1,822 |
-| Busiest corridor | Bangalore ↔ Hyderabad, 62 people |
+| Closing HC | 30,024 |
+| Growth %, Asia Pacific | +5.2% (9,320 → 9,803) |
+| Relocations | 392, of which 135 international |
+| Offices within 1,000 km of London | Paris, Amsterdam, Dublin, Zurich, Munich, Berlin, plus London itself |
+| People Within Radius | 3,903 |
+| Busiest corridor | Bengaluru ↔ Hyderabad, 55 people |
 
 ## 5. The map: four layers
 
@@ -139,7 +139,7 @@ SUM(IF [In FY] AND [Fiscal Month] = 12 AND [Distance to Selected (km)] <= [Radiu
 2. Drag `Location Id` and `City` to **Detail** so each office is its own mark. Put `Closing HC` on **Size** and `Growth %` on **Color** (palette *Arcadia Teal Sequential*). Under **Color → Effects**, set the border to white.
 3. **Add the relocation layer.** Drag `Relocation Path` onto the map and drop it on **Add a Marks Layer**. In that layer: `Corridor` on **Detail**, `Corridor People` on **Size**, color violet `#5B4FB3` at 60% opacity, mark type **Line**.
 4. **Add the radius layer.** Drag `Radius Ring` onto **Add a Marks Layer**. Color navy `#13233A` at 8% opacity with a navy border.
-5. **Add the country layer.** Drag `Country Name` onto **Add a Marks Layer**. Mark type **Map** (filled), color `#DCEDEA`, no border. These are the 15 countries with an office.
+5. **Add the country layer.** Drag `Country Name` onto **Add a Marks Layer**. Mark type **Map** (filled), color `#DCEDEA`, no border. These are the 22 countries with an office.
 6. **Order the layers** in the Marks card by dragging: Office Point on top, then Radius Ring, Relocation Path, Country Name at the bottom.
 7. On the Country, Radius and Path layers, click the layer's drop-down → **Disable Selection**, so clicks always land on an office.
 8. **Map → Background Maps → Light**. **Map → Map Layers**: washout 40%, untick everything except Base and Coastline.
@@ -149,7 +149,7 @@ SUM(IF [In FY] AND [Fiscal Month] = 12 AND [Distance to Selected (km)] <= [Radiu
 
 ## 6. The supporting sheets
 
-1. **KPI tiles** (five Text sheets): Closing HC with Growth % beneath; Offices (`COUNTD(Location Id)` where latitude isn't null) with remote headcount beneath; Fastest-growing region (sort `Region` by Growth % and keep the top 1); India share (`Closing HC` for country India ÷ total); Relocations, with international ones beneath (filter `Flow Scope`).
+1. **KPI tiles** (five Text sheets): Closing HC with Growth % beneath; Offices (`COUNTD(Location Id)`) with offices opened in the period beneath; Fastest-growing region (sort `Region` by Growth % and keep the top 1); India share (`Closing HC` for country India ÷ total); Relocations, with international ones beneath (filter `Flow Scope`).
 2. **Growth by region:** `Region` on Rows sorted by Growth %, `Growth %` on Columns as bars. Color the top bar teal and the rest `#9FCFCB` with a calculated field `RANK([Growth %]) = 1`. Label the bar ends; show `Opening HC → Closing HC` in the label or tooltip.
 3. **Busiest corridors:** `Corridor` on Rows, `Corridor People` on Columns, sorted descending, top 6 (**Filter → Top → By field**). Violet bars.
 4. **Offices in view** (optional, see section 8): a text table of City, Closing HC and Growth %.
@@ -184,11 +184,11 @@ These features are recent, so check them in your Tableau Public version; the das
 
 > **What this shows.** Headcount by office for Arcadia Systems, a fictional company with synthetic data. Offices are sized by fiscal year-end headcount and colored by growth over the year. Lines are relocations: people who were at one office at a month-end and at another at the next.
 >
-> **Definitions.** Headcount counts every worker active on the month-end. A relocation is any change of office, including between two offices in the same country. Lines combine both directions of a pair and show only corridors with at least the selected number of people. Distances and the radius are great-circle distances from city-centre coordinates, not commute times.
+> **Definitions.** Headcount counts every worker active on the month-end. A relocation is any change of office, including between two offices in the same country. Lines combine both directions of a pair and show only corridors with at least the selected number of people. Distances and the radius are great-circle distances from postal-code coordinates, not commute times.
 >
 > **Controls.** Each office reconciles every month (opening + hires − leavers + relocations in − relocations out = closing). Offices add up to the company headcount walk. Flows add up to each office's relocations. Relocations net to zero company-wide.
 >
-> **Limits.** Remote workers have no office and are not on the map; they appear in the headcount totals. Coordinates are city centres.
+> **Limits.** Coordinates are postal-code centroids, not building locations; street addresses are fictional.
 
 ## 10. Publish
 

@@ -1,6 +1,6 @@
 -- The flow map and the office walk must tell the same story: for every office
 -- and month, workers flowing out (and in) equal its relocations out (and in).
--- Also guards the map: no self-loops, and every office except remote has
+-- Also guards the map: no self-loops, and every office has
 -- coordinates.
 WITH flows_out AS (
     SELECT month_end_date, from_location_id AS location_id, SUM(workers) AS n
@@ -21,4 +21,4 @@ SELECT 'self loop', month_end_date, from_location_id
 FROM marts.mart_mobility_flows WHERE from_location_id = to_location_id
 UNION ALL
 SELECT 'missing coordinates', NULL, location_id
-FROM marts.mart_dim_location WHERE latitude IS NULL AND site_type <> 'Remote'
+FROM marts.mart_dim_location WHERE latitude IS NULL OR longitude IS NULL

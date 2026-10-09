@@ -16,7 +16,7 @@
     1. worker pairs   each worker's prior and current month-end state side by
                       side (FULL OUTER JOIN of two snapshot slices)
     2. measures       CROSS APPLY computes values and the rate decomposition once
-    3. driver lines   CROSS APPLY (VALUES ...) unpivots each worker into the 12
+    3. driver lines   CROSS APPLY (VALUES ...) unpivots each worker into the 13
                       walk lines; include_line keeps only the ones that apply
     4. aggregate      sum to month x department x driver
 
@@ -119,7 +119,8 @@ CROSS APPLY (
         CASE
             WHEN w.country_c <> w.country_p THEN 'International Mobility'
             WHEN w.grade_c   >  w.grade_p   THEN 'Promotions'
-            ELSE 'Merit & Adjustments'
+            WHEN w.grade_c   <  w.grade_p   THEN 'Demotions'
+            ELSE 'Tenure & Market Adjustments'
         END                                              AS pay_driver
 ) AS m
 
@@ -144,25 +145,29 @@ CROSS APPLY (VALUES
          CASE WHEN m.is_continuing = 1 AND m.pay_driver = 'Promotions'
                    AND (m.pay_base_nom <> 0 OR m.pay_base_con <> 0) THEN 1 ELSE 0 END,
          0,  0,     m.pay_base_nom, m.pay_base_con, m.pay_load_nom, m.pay_load_con),
-    (7,  'Merit & Adjustments',    'Pay Rate',           w.dept_c,
-         CASE WHEN m.is_continuing = 1 AND m.pay_driver = 'Merit & Adjustments'
+    (7,  'Demotions',              'Pay Rate',           w.dept_c,
+         CASE WHEN m.is_continuing = 1 AND m.pay_driver = 'Demotions'
                    AND (m.pay_base_nom <> 0 OR m.pay_base_con <> 0) THEN 1 ELSE 0 END,
          0,  0,     m.pay_base_nom, m.pay_base_con, m.pay_load_nom, m.pay_load_con),
-    (8,  'International Mobility', 'Pay Rate',           w.dept_c,   /* includes fringe re-levelling for the move */
+    (8,  'Tenure & Market Adjustments', 'Pay Rate',      w.dept_c,
+         CASE WHEN m.is_continuing = 1 AND m.pay_driver = 'Tenure & Market Adjustments'
+                   AND (m.pay_base_nom <> 0 OR m.pay_base_con <> 0) THEN 1 ELSE 0 END,
+         0,  0,     m.pay_base_nom, m.pay_base_con, m.pay_load_nom, m.pay_load_con),
+    (9,  'International Mobility', 'Pay Rate',           w.dept_c,   /* includes fringe re-levelling for the move */
          CASE WHEN m.is_continuing = 1 AND m.pay_driver = 'International Mobility' THEN 1 ELSE 0 END,
          0,  0,     m.pay_base_nom, m.pay_base_con,
                     m.pay_load_nom + m.fringe_load_nom, m.pay_load_con + m.fringe_load_con),
-    (9,  'FTE Changes',            'Workforce Mix',      w.dept_c,
+    (10, 'FTE Changes',            'Workforce Mix',      w.dept_c,
          CASE WHEN m.is_continuing = 1 AND w.f1 <> w.f0 THEN 1 ELSE 0 END,
          0,  w.f1 - w.f0, m.fte_base_nom, m.fte_base_con, m.fte_load_nom, m.fte_load_con),
-    (10, 'Fringe Rate Changes',    'Fringe & FX',        w.dept_c,
+    (11, 'Fringe Rate Changes',    'Fringe & FX',        w.dept_c,
          CASE WHEN m.is_continuing = 1 AND m.pay_driver <> 'International Mobility'
                    AND w.r1 <> w.r0 THEN 1 ELSE 0 END,
          0,  0,     0,             0,             m.fringe_load_nom, m.fringe_load_con),
-    (11, 'FX Rate Changes',        'Fringe & FX',        w.dept_c,
+    (12, 'FX Rate Changes',        'Fringe & FX',        w.dept_c,
          CASE WHEN m.is_continuing = 1 AND w.x1 <> w.x1p THEN 1 ELSE 0 END,
          0,  0,     m.fx_base_nom, 0,             m.fx_load_nom,     0),
-    (12, 'Closing Run-Rate',       'Balance',            w.dept_c,
+    (13, 'Closing Run-Rate',       'Balance',            w.dept_c,
          CASE WHEN w.movement_type <> 'Termination' THEN 1 ELSE 0 END,
          1,  w.f1,  m.base_nom_1,  m.base_con_1,  m.load_nom_1,  m.load_con_1)
 ) AS v (driver_order, driver, driver_group, department_id, include_line,
