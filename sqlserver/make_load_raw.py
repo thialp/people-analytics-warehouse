@@ -14,6 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
+PIPE = ROOT / "data" / "sqlserver"
 OUT = ROOT / "sqlserver" / "02_load_raw.sql"
 
 HEADER = """/*
@@ -34,19 +35,18 @@ def block(table: str, columns: list[str], quoted: bool) -> str:
     width = max(len(c) for c in columns) + 2
     cols = ",\n".join(f"    [{c}]{' ' * (width - len(c) - 2)} NVARCHAR(400) NULL" for c in columns)
     pad = " " * max(1, 36 - len(f"raw.{table}"))
-    # Files with quoted values (embedded commas) need the CSV parser; plain files use simple terminators.
-    options = (
-        "FORMAT = 'CSV', FIRSTROW = 2, FIELDQUOTE = '\"', ROWTERMINATOR = '0x0a', TABLOCK"
-        if quoted
-        else "FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK"
-    )
+    # Files with quoted values (embedded commas) are re-written pipe-delimited without quotes under
+    # data/sqlserver/, so every load uses plain terminators and never depends on the CSV parser.
+    folder, delim = ("sqlserver", "|") if quoted else ("raw", ",")
+    ext = "psv" if quoted else "csv"
+    options = f"FIRSTROW = 2, FIELDTERMINATOR = '{delim}', ROWTERMINATOR = '0x0a', TABLOCK"
     return f"""
 DROP TABLE IF EXISTS raw.{table};
 CREATE TABLE raw.{table} (
 {cols}
 );
 BULK INSERT raw.{table}
-FROM '/repo/data/raw/{table}.csv'
+FROM '/repo/data/{folder}/{table}.{ext}'
 WITH ({options});
 DECLARE @n_{table} INT = (SELECT COUNT(*) FROM raw.{table});
 PRINT CONCAT('raw.{table}', '{pad}', @n_{table}, ' rows');
@@ -60,6 +60,12 @@ def main():
         with path.open(newline="") as f:
             columns = next(csv.reader(f))
         quoted = '"' in path.read_text()
+        if quoted:
+            PIPE.mkdir(exist_ok=True)
+            with path.open(newline="") as src, (PIPE / f"{path.stem}.psv").open("w", newline="") as dst:
+                for row in csv.reader(src):
+                    assert not any("|" in c or "\n" in c for c in row), path.name
+                    dst.write("|".join(row) + "\n")
         parts.append(block(path.stem, columns, quoted))
     OUT.write_text("".join(parts))
     print(f"Wrote {OUT.relative_to(ROOT)} for {len(parts) - 1} raw tables")
