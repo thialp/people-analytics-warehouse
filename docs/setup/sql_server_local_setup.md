@@ -175,6 +175,18 @@ The seconds it prints are about what a Tableau extract refresh of this data sour
 
 **If `sqlcmd` isn't found,** older images keep it at `/opt/mssql-tools/bin/sqlcmd`. Use that path and drop the `-C`.
 
+### Optional: validate the office moves
+
+The office-moves query is a second Custom SQL, read by the map on the Compensation Walk dashboard. This script runs it and the compensation walk exactly as Tableau would, prints how long each took, and ties the moves to the walk's transfers:
+
+```bash
+docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C \
+  -i /repo/sqlserver/07_validate_office_moves.sql
+```
+
+Expected: section 1 and 2 rows say `PASS` (260,464 rows; FY26 has 345 people who changed office, 227 within one country and 118 across a border), and sections 3 and 4 show `0`.
+
 ## Step 5. Install the SQL Server driver for Tableau
 
 Tableau on a Mac needs Microsoft's ODBC driver to talk to SQL Server. The simplest install is with [Homebrew](https://brew.sh), the standard Mac package manager.

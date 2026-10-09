@@ -49,7 +49,7 @@ Right edge 1344, 12 px between cards. The panel body is 1104 x 254: map or chart
 | Part | Source |
 |---|---|
 | KPI cards, waterfall, top drivers | Custom SQL `tableau/custom_sql_compensation_walk.sql`; every sheet filters to one view and one date pair (averages must never be summed across groups) |
-| Office moves panel | `mart_mobility_flows` (map built for the footprint case study) |
+| Office moves panel | Custom SQL `tableau/custom_sql_office_moves.sql` (same date pair, views and group names as the walk, so the map follows the rail filters; see `../office_moves.md`) |
 | Career moves panel | `mart_headcount_fte_walk`: Internal Moves In, reason Promotion or Demotion, by grade |
 
-Checks against the warehouse: FY26 Company opening 28,436 people and $3,000.1M, closing 30,015 and $3,195.5M; per FTE $107,553.68 to $108,706.49 (+$1,152.81); 392 office moves (90 US, 167 other domestic, 135 cross-border); 2,138 promotions and 114 demotions, 16 into Director or Senior Director.
+Checks against the warehouse: FY26 Company opening 28,436 people and $3,000.1M, closing 30,015 and $3,195.5M; per FTE $107,553.68 to $108,706.49 (+$1,152.81); 345 people changed office (227 within one country, 118 across a border); 2,138 promotions and 114 demotions, 16 into Director or Senior Director.

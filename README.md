@@ -24,7 +24,7 @@ All four case studies run on the same simulated company, the same effective-date
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 43,569 workers ever employed (25,014 → 30,024) · 4 fiscal years · 49 month-ends · 35 offices · 22 countries · 17 currencies · 1,347,949 worker-month snapshots |
 | **Output** | Ten Tableau-ready marts and seven dimension files in [`data/marts/`](data/marts/) |
-| **Controls** | 38 automated data tests; the build stops if any fails |
+| **Controls** | 40 automated data tests; the build stops if any fails |
 
 ---
 
@@ -59,7 +59,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshot · reporting chain"]
         MART["marts<br/>walks · snapshots · org"]
-        TEST{{"33 data tests"}}
+        TEST{{"40 data tests"}}
     end
     TAB["Tableau Public"]
     HR --> RAW
@@ -420,6 +420,7 @@ Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_gu
 | [`int_worker_pay_ledger`](sql/02_intermediate/int_worker_pay_ledger.sql) / `dw.WorkerPayLedger` | A running total, per worker and month-end, of every pay event (by reason), FTE change, fringe change and FX movement. Between **any** two month-ends a driver is `cum(To) − cum(From)`, a prefix sum that turns a date-range scan into two equality joins |
 | [`tableau/custom_sql_compensation_walk.sql`](tableau/custom_sql_compensation_walk.sql) | One `SELECT` (no CTEs) that pairs every worker across 184 date pairs, **aggregates early** to about half a million rows, then **expands late** with `CROSS APPLY (VALUES …)` into six views and fifteen walk steps, and puts each group's opening and closing beside every line for the average walk |
 | [`mart_compensation_walk`](sql/03_marts/mart_compensation_walk.sql) | The same result for the CSV (Tableau Public), identical to the cent |
+| [`tableau/custom_sql_office_moves.sql`](tableau/custom_sql_office_moves.sql) / [`mart_office_moves`](sql/03_marts/mart_office_moves.sql) | Who changed office between two dates, from which office to which, under the walk's own date pairs, six views and group names, so a flow map on the same dashboard follows the same filters. Office and country moves tie to the walk's Transfers In and Out ([field reference](docs/projects/compensation-walk/office_moves.md)) |
 
 Three rules make the walk close in every group, under any filter: each line is priced on one side of the pair (**transfers move at their opening value**, so a mover's raise lands in the group they joined under the driver that caused it); drivers come from the ledger; and transfers are decided **per view**. Full field reference and calculations: [`docs/projects/compensation-walk/compensation_walk.md`](docs/projects/compensation-walk/compensation_walk.md).
 
@@ -437,7 +438,7 @@ Three rules make the walk close in every group, under any filter: each line is p
 
 Hiring is the cost story (+$79M), while tenure raises are the average-pay story. Because new hires join below the average, hires and exits together pull it down by $3,142 per FTE, which offsets most of what anniversary raises add.
 
-Five tests (34 to 38) prove the ledger explains every worker's change and that every one of the 19,321 group walks closes, ties to the snapshot, nets its transfers to zero and agrees across views. Month-over-month department walks also match the cost bridge of case study 1 within 2 cents.
+Seven tests (34 to 40) prove the ledger explains every worker's change, that every one of the 19,321 group walks closes, ties to the snapshot, nets its transfers to zero and agrees across views, and that the office moves tie to the walk's transfers in every office and country. Month-over-month department walks also match the cost bridge of case study 1 within 2 cents.
 
 ---
 
@@ -468,7 +469,8 @@ The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau 
 - [`sqlserver/`](sqlserver/) holds T-SQL scripts that load the CSVs with `BULK INSERT` and build typed `dw` tables, the pay history in USD at its posting-date rate (`OUTER APPLY TOP 1` as the as-of join), an indexed worker month-end snapshot, a recursive reporting-chain table and three reporting views. The load script is generated from the CSV headers ([`make_load_raw.py`](sqlserver/make_load_raw.py)).
 - [`tableau/custom_sql_workforce_cost_bridge.sql`](tableau/custom_sql_workforce_cost_bridge.sql) is the cost bridge as **Tableau Custom SQL**: one `SELECT` with no CTEs, using derived tables and `CROSS APPLY (VALUES …)` to unpivot each worker into walk lines.
 - [`tableau/custom_sql_compensation_walk.sql`](tableau/custom_sql_compensation_walk.sql) is the compensation walk, built on the `dw.WorkerPayLedger` running ledger; [`06_validate_compensation_walk.sql`](sqlserver/06_validate_compensation_walk.sql) runs that exact file inside SQL Server, times it and checks it.
-- Both Custom SQL files reproduce their DuckDB marts row for row, to the cent, and [`05_validate.sql`](sqlserver/05_validate.sql) checks the SQL Server build's row counts and control totals against the DuckDB values. Views and marts share column names, so a workbook can switch between SQL Server and the CSVs with *Replace Data Source*.
+- [`tableau/custom_sql_office_moves.sql`](tableau/custom_sql_office_moves.sql) is a second query on the same connection: the people who changed office, keyed like the walk so the map filters with the rest of the dashboard; [`07_validate_office_moves.sql`](sqlserver/07_validate_office_moves.sql) runs it, times it and ties it to the walk.
+- All three Custom SQL files reproduce their DuckDB marts row for row, to the cent, and [`05_validate.sql`](sqlserver/05_validate.sql) checks the SQL Server build's row counts and control totals against the DuckDB values. Views and marts share column names, so a workbook can switch between SQL Server and the CSVs with *Replace Data Source*.
 
 Step-by-step setup, with expected output at each step: [`docs/setup/sql_server_local_setup.md`](docs/setup/sql_server_local_setup.md).
 
