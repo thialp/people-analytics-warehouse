@@ -17,7 +17,7 @@ Order of work: build the sheet (Part 1), place it (Part 2), add the two actions 
    // Band Start   (the month-end before the start month: the walk opens there)
    DATEADD('day', -1, DATETRUNC('month', [Start Month]))
    ```
-   Right-click the left axis → **Add Reference Line** → **Band** tab → Scope **Per Pane**. From: `Band Start` (Minimum). To: `End Month` (the parameter). Fill: teal `#00938D` at 12% (Format → color with transparency), line **None**, label **None**. If Tableau does not list `Band Start`, choose the `Start Month` parameter instead (the band then begins at the start month's month-end, one month later; fine for a first version).
+   Right-click the **horizontal date axis at the bottom** (the one with Nov 1, 24 and so on; **not** the vertical value axis, which only offers numbers) → **Add Reference Line** → **Band** tab → Scope **Per Pane**. From → Value: `Band Start` (Minimum). To → Value: `End Month` (the parameter). Both appear in the lists only on the date axis, because they are dates. If a band already exists on the vertical axis, right-click it and **Remove** it first. Fill: teal `#00938D` at 12% (Format → color with transparency), line **None**, label **None**. If Tableau does not list `Band Start`, choose the `Start Month` parameter instead (the band then begins at the start month's month-end, one month later; fine for a first version).
 8. **Label only the latest point.** On the line layer: Label → Show mark labels → *Marks to label* **Most Recent**, font Tableau Semibold 9 pt navy `#13233A`, alignment right. Number format `#,##0`.
 9. **Axes.**
    - Vertical axis: Edit Axis → untick **Include zero** (this is a line, not bars), clear the title; Format number Custom `#,##0.0,"k"`; gridlines light `#E4E3DD`.
