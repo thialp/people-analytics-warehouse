@@ -205,6 +205,11 @@ Grain: **month-end × department × driver.** For each department and month, Ope
 
 **Walking across several months:** take Opening from the first month, Closing from the last month, and sum every other driver across the months in between. Test 08 guarantees the months chain together.
 
+### mart_compensation_walk
+Grain: **date pair × view × group × walk step × movement reason.** For any two month-ends on the grid (every quarter-end to every later quarter-end, plus month over month: 184 pairs) and every group in six views (Company, Function, Leader, Department, Office, Country): Opening + Hires + Exits + Transfers In/Out + Promotions + Demotions + Tenure Increases + Market Adjustments + Relocation Adjustments + International Transfer Adjustments + FTE Changes + Fringe Rate Changes + FX Translation = Closing, in headcount, FTE and the four dollar measures, as totals (`base_usd_*`, `loaded_usd_*`), as an average walk per FTE (`avg_*`) and as a percent walk (`pct_*`). Filter to one `view_name` and one date pair. Same columns as the Tableau Custom SQL `tableau/custom_sql_compensation_walk.sql`.
+
+Full field reference, rules and worked examples: [`compensation_walk.md`](compensation_walk.md).
+
 ### mart_workforce_cost_snapshot
 Grain: **month-end × department × country × grade × job family.**
 

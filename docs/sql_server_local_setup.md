@@ -103,9 +103,9 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 |---|---|
 | `01_create_database.sql` | Creates the `ArcadiaHR` database and the `raw`, `dw` and `rpt` schemas |
 | `02_load_raw.sql` | Lands each CSV as text with `BULK INSERT` |
-| `03_build_dw.sql` | Types and cleans the data, resolves pay corrections, values pay at its posting-date FX rate, builds the fiscal calendar, the indexed worker month-end snapshot and the reporting chain |
+| `03_build_dw.sql` | Types and cleans the data, resolves pay corrections, values pay at its posting-date FX rate, builds the fiscal calendar, the indexed worker month-end snapshot, the pay ledger behind the compensation walk and the reporting chain |
 | `04_create_reporting_views.sql` | Creates `rpt.vw_workforce_cost_snapshot`, `rpt.vw_org_leader_summary` and `rpt.vw_fringe_rate` |
-| `05_validate.sql` | Checks row counts, reporting lines and control totals |
+| `05_validate.sql` | Checks row counts, reporting lines, control totals and that the pay ledger explains every worker's change in cost |
 
 Expected output, abbreviated (2–5 minutes under emulation):
 
@@ -124,6 +124,7 @@ dw.FactPerformanceReview            131639
 dw.FactBonusPayout                  131639
 dw.MonthEndCalendar                     49
 dw.WorkerMonthEndSnapshot          1347949
+dw.WorkerPayLedger                 1347949
 dw.WorkerReportingChain             918806
 Created views rpt.vw_workforce_cost_snapshot, rpt.vw_org_leader_summary, rpt.vw_fringe_rate
 1. Row counts
@@ -137,9 +138,40 @@ workers_without_a_valid_manager
 month_end_date  headcount  fte       loaded_usd_nominal  loaded_usd_constant
 2022-06-30      25005      24733.20  2577787184.81       2613645368.50
 2026-06-30      30015      29395.70  3195503264.83       3195503264.83
+5. The pay ledger explains every change in every worker's cost (expected 0)
+worker_months_not_explained
+0
 ```
 
-Every row in section 1 should say `PASS`, sections 2 and 3 should show `0`, and the control totals should match exactly.
+Every row in section 1 should say `PASS`, sections 2, 3 and 5 should show `0`, and the control totals should match (SQL Server may show `.80` where DuckDB shows `.81`: each group is rounded to the cent before the total is added up).
+
+### Optional: validate the compensation walk
+
+The compensation walk is Tableau Custom SQL, not a view, so the build doesn't run it. This script runs the exact Tableau file inside SQL Server (`:r` includes it unchanged), prints how long it took, and checks the result:
+
+```bash
+docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C \
+  -i /repo/sqlserver/06_validate_compensation_walk.sql
+```
+
+Expected, abbreviated:
+
+```
+Custom SQL returned 271219 rows in <n> seconds
+1. Shape
+rows          271219   271219  PASS
+date pairs       184      184  PASS
+views              6        6  PASS
+2. Groups whose walk does not close: Opening + steps <> Closing (expected 0)
+0
+3. Company, 30 Jun 2022 to 30 Jun 2026
+Opening   25005   2577787184.61   2613645368.19
+Closing   30015   3195503264.60   3195503264.60
+4. FY26 company walk, loaded cost at constant FX ...
+```
+
+The seconds it prints are about what a Tableau extract refresh of this data source will take. Field reference and rules: [`compensation_walk.md`](compensation_walk.md).
 
 **If `sqlcmd` isn't found,** older images keep it at `/opt/mssql-tools/bin/sqlcmd`. Use that path and drop the `-C`.
 

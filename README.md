@@ -4,15 +4,16 @@
 
 [![Build and test warehouse](https://github.com/thialp/people-analytics-warehouse/actions/workflows/pipeline.yml/badge.svg)](https://github.com/thialp/people-analytics-warehouse/actions/workflows/pipeline.yml)
 
-An HR data warehouse for a fictional global company, built to answer the three questions every workforce review starts with, in SQL that reconciles exactly:
+An HR data warehouse for a fictional global company, built to answer the questions every workforce review starts with, in SQL that reconciles exactly:
 
 | Case study | Question | Dashboard |
 |---|---|---|
 | **1. [Workforce Cost Bridge](#1-business-problem)** | *Why did our workforce cost change?* A monthly walk of annualized pay run-rate that splits every dollar of change into hires, terminations, transfers, promotions, demotions, tenure raises, mobility, FTE, fringe and currency, in **nominal** and **constant** currency, reconciled to the cent. | Tableau Public: *coming soon* |
 | **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | **[Executive Summary on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)** |
 | **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, where are we growing, and how do people move between offices?* An office-level walk and an origin-to-destination relocation table, drawn as a four-layer Tableau map with `MAKEPOINT`, `MAKELINE` and `BUFFER`. | Tableau Public: *coming soon* |
+| **4. [Compensation Walk](#case-study-4-compensation-walk)** | *Between any two month-ends, why did pay in this group move, in total and on average?* Hires, exits and transfers, then promotions, demotions, tenure and market raises, relocation and international pay resets, FTE, fringe and FX, for six views of the organization and 184 date pairs, pre-computed in one Tableau Custom SQL so the workbook only filters and sums. | Tableau Public: *coming soon* |
 
-All three case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot, and share one look ([`docs/brand/`](docs/brand/README.md)).
+All four case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot, and share one look ([`docs/brand/`](docs/brand/README.md)).
 
 **The company.** Arcadia Systems has 30,024 people in 35 offices across 22 countries and five regions, organized under a CEO, eight function heads, four sub-function heads and 31 department heads, with every person in one reporting line that ends at the CEO ([org chart](docs/org_chart.md)). Pay follows a 12-level ladder with a base salary per level and country, raises on each hire anniversary, promotions one level at a time and an annual bonus set by the performance rating. FX rates are the **real ECB daily reference rates** and fringe rates are **researched by country and year** from OECD, BLS and statutory sources ([organization and pay model](docs/organization_and_pay_model.md)).
 
@@ -22,12 +23,12 @@ All three case studies run on the same simulated company, the same effective-dat
 |---|---|
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 43,569 workers ever employed (25,014 → 30,024) · 4 fiscal years · 49 month-ends · 35 offices · 22 countries · 17 currencies · 1,347,949 worker-month snapshots |
-| **Output** | Nine Tableau-ready marts and seven dimension files in [`data/marts/`](data/marts/) |
-| **Controls** | 33 automated data tests; the build stops if any fails |
+| **Output** | Ten Tableau-ready marts and seven dimension files in [`data/marts/`](data/marts/) |
+| **Controls** | 38 automated data tests; the build stops if any fails |
 
 ---
 
-> Sections 1 to 10 cover case study 1, the Workforce Cost Bridge. [Case study 2](#case-study-2-headcount--fte-walk) and [case study 3](#case-study-3-global-workforce-footprint) follow them.
+> Sections 1 to 10 cover case study 1, the Workforce Cost Bridge. Case studies [2](#case-study-2-headcount--fte-walk), [3](#case-study-3-global-workforce-footprint) and [4](#case-study-4-compensation-walk) follow them.
 
 ## 1. Business problem
 
@@ -406,6 +407,38 @@ A relocation is any change of office between two month-ends, including between t
 
 Step-by-step build: [`docs/tableau_workforce_map_guide.md`](docs/tableau_workforce_map_guide.md). One map with four layers (countries, relocation paths with `MAKELINE`, a `BUFFER` radius around the selected office, offices with `MAKEPOINT`), a parameter action that moves the radius when an office is clicked, `DISTANCE` to count the people inside it, and the 2025 viewport parameter and dynamic color range where Tableau Public supports them.
 
+## Case study 4: Compensation Walk
+
+### Business problem
+
+"Average pay went up 1.1% but cost went up 6.5%. Why?" Answering it means pricing every change in pay between two dates and attributing it to a cause (who joined, who left, who moved, who was promoted, who got an anniversary raise, what the fringe rates and exchange rates did), for any group and any pair of dates, in totals **and** averages. In Tableau that becomes a tangle of LOD expressions that has to stay right under every filter. Here it is pre-computed once, in the data source, and tested.
+
+### Approach
+
+| Piece | What it does |
+|---|---|
+| [`int_worker_pay_ledger`](sql/02_intermediate/int_worker_pay_ledger.sql) / `dw.WorkerPayLedger` | A running total, per worker and month-end, of every pay event (by reason), FTE change, fringe change and FX movement. Between **any** two month-ends a driver is `cum(To) − cum(From)`, a prefix sum that turns a date-range scan into two equality joins |
+| [`tableau/custom_sql_compensation_walk.sql`](tableau/custom_sql_compensation_walk.sql) | One `SELECT` (no CTEs) that pairs every worker across 184 date pairs, **aggregates early** to about half a million rows, then **expands late** with `CROSS APPLY (VALUES …)` into six views and fifteen walk steps, and puts each group's opening and closing beside every line for the average walk |
+| [`mart_compensation_walk`](sql/03_marts/mart_compensation_walk.sql) | The same result for the CSV (Tableau Public), identical to the cent |
+
+Three rules make the walk close in every group, under any filter: each line is priced on one side of the pair (**transfers move at their opening value**, so a mover's raise lands in the group they joined under the driver that caused it); drivers come from the ledger; and transfers are decided **per view**. Full field reference and calculations: [`docs/compensation_walk.md`](docs/compensation_walk.md).
+
+### Results (FY26, loaded cost at constant FX)
+
+| | Total | Average per FTE |
+|---|---:|---:|
+| Opening (30 Jun 2025) | $3,000.1M | $107,553.68 |
+| Hires − exits | +$79.4M | −$3,142.30 |
+| Tenure increases | +$97.7M | +$3,324.70 |
+| Promotions − demotions | +$18.6M | +$631.61 |
+| Fringe rate changes | +$8.2M | +$278.98 |
+| Market, relocation and international pay resets, FTE | −$8.6M | +$59.82 |
+| Closing (30 Jun 2026) | $3,195.5M | $108,706.49 |
+
+Hiring is the cost story (+$79M), while tenure raises are the average-pay story. Because new hires join below the average, hires and exits together pull it down by $3,142 per FTE, which offsets most of what anniversary raises add.
+
+Five tests (34 to 38) prove the ledger explains every worker's change and that every one of the 19,321 group walks closes, ties to the snapshot, nets its transfers to zero and agrees across views. Month-over-month department walks also match the cost bridge of case study 1 within 2 cents.
+
 ---
 
 ## Run it yourself
@@ -434,7 +467,8 @@ The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau 
 
 - [`sqlserver/`](sqlserver/) holds T-SQL scripts that load the CSVs with `BULK INSERT` and build typed `dw` tables, the pay history in USD at its posting-date rate (`OUTER APPLY TOP 1` as the as-of join), an indexed worker month-end snapshot, a recursive reporting-chain table and three reporting views. The load script is generated from the CSV headers ([`make_load_raw.py`](sqlserver/make_load_raw.py)).
 - [`tableau/custom_sql_workforce_cost_bridge.sql`](tableau/custom_sql_workforce_cost_bridge.sql) is the cost bridge as **Tableau Custom SQL**: one `SELECT` with no CTEs, using derived tables and `CROSS APPLY (VALUES …)` to unpivot each worker into walk lines.
-- The bridge Custom SQL reproduces the DuckDB mart row for row, to the cent, and [`05_validate.sql`](sqlserver/05_validate.sql) checks the SQL Server build's row counts and control totals against the DuckDB values. Views and marts share column names, so a workbook can switch between SQL Server and the CSVs with *Replace Data Source*.
+- [`tableau/custom_sql_compensation_walk.sql`](tableau/custom_sql_compensation_walk.sql) is the compensation walk, built on the `dw.WorkerPayLedger` running ledger; [`06_validate_compensation_walk.sql`](sqlserver/06_validate_compensation_walk.sql) runs that exact file inside SQL Server, times it and checks it.
+- Both Custom SQL files reproduce their DuckDB marts row for row, to the cent, and [`05_validate.sql`](sqlserver/05_validate.sql) checks the SQL Server build's row counts and control totals against the DuckDB values. Views and marts share column names, so a workbook can switch between SQL Server and the CSVs with *Replace Data Source*.
 
 Step-by-step setup, with expected output at each step: [`docs/sql_server_local_setup.md`](docs/sql_server_local_setup.md).
 
@@ -457,15 +491,15 @@ Details: [`docs/docker_compose_guide.md`](docs/docker_compose_guide.md).
 │   └── marts/            Tableau-ready outputs (CSV)
 ├── sql/                  DuckDB pipeline
 │   ├── 01_staging/       typing, corrections
-│   ├── 02_intermediate/  calendar, pay in USD, worker month-end snapshot, movement, reporting chain and line
-│   └── 03_marts/         cost bridge, cost snapshot, headcount & FTE walk, office walk, mobility flows, org chart, fringe, dimensions
+│   ├── 02_intermediate/  calendar, pay in USD, worker month-end snapshot, pay ledger, movement, reporting chain and line
+│   └── 03_marts/         cost bridge, compensation walk, cost snapshot, headcount & FTE walk, office walk, mobility flows, org chart, fringe, dimensions
 ├── tests/                data-quality and reconciliation tests (SQL)
 ├── pipeline/             build runner and org chart writer
 ├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, plus validation
 ├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
 ├── tableau/              Tableau Custom SQL and connection settings
-└── docs/                 data dictionary, methodology, organization and pay model, org chart, Tableau, SQL Server and Docker guides
+└── docs/                 data dictionary, methodology, compensation walk, organization and pay model, org chart, Tableau, SQL Server and Docker guides
     └── brand/            Arcadia logo, color palettes (Tableau Preferences.tps), style rules
 ```
 

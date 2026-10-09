@@ -10,7 +10,7 @@
                  RefSalaryRange, RefJobLevelBaseSalary, RefTenureIncrease,
                  RefPerformanceBonus
     derived      MonthEndCalendar, CompensationHistoryUsd,
-                 WorkerMonthEndSnapshot, WorkerReportingChain
+                 WorkerMonthEndSnapshot, WorkerPayLedger, WorkerReportingChain
 
   The raw files call the 1-12 ladder "job level"; dw and rpt call it Grade, the
   name the published marts and dashboards use.
@@ -428,6 +428,182 @@ ALTER TABLE dw.WorkerMonthEndSnapshot
     ADD CONSTRAINT PK_WorkerMonthEndSnapshot PRIMARY KEY CLUSTERED (MonthEndDate, WorkerID);
 GO
 
+/* ------------------------------------------------------- worker pay ledger
+   Same rows as WorkerMonthEndSnapshot. A running total, per worker, of WHY their
+   annualized cost has moved since their first month-end, so the change between
+   ANY two month-ends is cum(d1) - cum(d0): one equality join per endpoint instead
+   of a range scan of the pay history. Rules: sql/02_intermediate/int_worker_pay_ledger.sql
+   and docs/compensation_walk.md. Each month is split in a fixed order, so the
+   steps add up exactly to the change in value:
+     1. pay records that took effect in the month, minus the record each replaced,
+        at the prior month-end FX rate, FTE and fringe rate, by action reason
+     2. FTE   3. fringe rate (loaded only)   4. FX translation (nominal only)
+   OrgMoveReason / LocationMoveReason: the reason on the latest job record, as of
+   the month-end, that changed the worker's department / office. */
+DROP TABLE IF EXISTS #JobMove;
+SELECT WorkerID, EffectiveStartDate, ActionReason, DeptChanged, LocChanged, CountryChanged
+INTO #JobMove
+FROM (
+    SELECT
+        j.WorkerID, j.EffectiveStartDate, j.ActionReason,
+        CASE WHEN j.DepartmentID <> LAG(j.DepartmentID) OVER (PARTITION BY j.WorkerID ORDER BY j.EffectiveStartDate, j.JobRecordID) THEN 1 ELSE 0 END AS DeptChanged,
+        CASE WHEN j.LocationID   <> LAG(j.LocationID)   OVER (PARTITION BY j.WorkerID ORDER BY j.EffectiveStartDate, j.JobRecordID) THEN 1 ELSE 0 END AS LocChanged,
+        CASE WHEN l.CountryCode  <> LAG(l.CountryCode)  OVER (PARTITION BY j.WorkerID ORDER BY j.EffectiveStartDate, j.JobRecordID) THEN 1 ELSE 0 END AS CountryChanged
+    FROM dw.FactJobHistory AS j
+    JOIN dw.DimLocation AS l ON l.LocationID = j.LocationID
+) AS m
+WHERE DeptChanged = 1 OR LocChanged = 1;
+CREATE CLUSTERED INDEX CIX_JobMove ON #JobMove (WorkerID, EffectiveStartDate);
+GO
+
+DROP TABLE IF EXISTS dw.WorkerPayLedger;
+WITH month_pair AS (
+    SELECT
+        c.MonthEndDate, cal.PriorMonthEndDate, c.WorkerID,
+        CAST(p.FTE AS FLOAT) AS f0, p.FringeRate AS r0, p.FxRateActual AS x0,
+        CAST(c.BaseSalaryAnnualLocal AS FLOAT) AS b1, CAST(c.FTE AS FLOAT) AS f1, c.FringeRate AS r1,
+        c.FxRateActual AS x1, c.FxRateConstant AS k1, fx.UsdPerLocalActual AS x1p
+    FROM dw.WorkerMonthEndSnapshot AS c
+    JOIN dw.MonthEndCalendar AS cal ON cal.MonthEndDate = c.MonthEndDate
+    JOIN dw.WorkerMonthEndSnapshot AS p ON p.MonthEndDate = cal.PriorMonthEndDate AND p.WorkerID = c.WorkerID
+    JOIN dw.RefFxRate AS fx ON fx.CurrencyCode = c.CurrencyCode AND fx.RateDate = cal.PriorMonthEndDate
+),
+pay_record AS (
+    SELECT
+        WorkerID, EffectiveStartDate, ActionReason, CurrencyCode,
+        CAST(BaseSalaryAnnualLocal AS FLOAT) AS s,
+        LAG(CurrencyCode)                         OVER (PARTITION BY WorkerID ORDER BY EffectiveStartDate) AS PrevCurrencyCode,
+        CAST(LAG(BaseSalaryAnnualLocal) OVER (PARTITION BY WorkerID ORDER BY EffectiveStartDate) AS FLOAT) AS prev_s
+    FROM dw.FactCompensationHistory
+),
+pay_event AS (
+    SELECT
+        mp.MonthEndDate, mp.WorkerID, pr.ActionReason,
+        (pr.s * fxn.UsdPerLocalActual   - pr.prev_s * fxo.UsdPerLocalActual)   * mp.f0                AS d_bn,
+        (pr.s * fxn.UsdPerLocalConstant - pr.prev_s * fxo.UsdPerLocalConstant) * mp.f0                AS d_bc,
+        (pr.s * fxn.UsdPerLocalActual   - pr.prev_s * fxo.UsdPerLocalActual)   * mp.f0 * (1 + mp.r0)  AS d_ln,
+        (pr.s * fxn.UsdPerLocalConstant - pr.prev_s * fxo.UsdPerLocalConstant) * mp.f0 * (1 + mp.r0)  AS d_lc
+    FROM month_pair AS mp
+    JOIN pay_record AS pr
+      ON pr.WorkerID = mp.WorkerID
+     AND pr.EffectiveStartDate >  mp.PriorMonthEndDate
+     AND pr.EffectiveStartDate <= mp.MonthEndDate
+    JOIN dw.RefFxRate AS fxn ON fxn.CurrencyCode = pr.CurrencyCode     AND fxn.RateDate = mp.PriorMonthEndDate
+    JOIN dw.RefFxRate AS fxo ON fxo.CurrencyCode = pr.PrevCurrencyCode AND fxo.RateDate = mp.PriorMonthEndDate
+),
+pay_by_reason AS (
+    SELECT
+        MonthEndDate, WorkerID,
+        SUM(CASE WHEN ActionReason = 'Promotion'              THEN d_bn ELSE 0 END) AS promo_bn,
+        SUM(CASE WHEN ActionReason = 'Promotion'              THEN d_bc ELSE 0 END) AS promo_bc,
+        SUM(CASE WHEN ActionReason = 'Promotion'              THEN d_ln ELSE 0 END) AS promo_ln,
+        SUM(CASE WHEN ActionReason = 'Promotion'              THEN d_lc ELSE 0 END) AS promo_lc,
+        SUM(CASE WHEN ActionReason = 'Demotion'               THEN d_bn ELSE 0 END) AS demo_bn,
+        SUM(CASE WHEN ActionReason = 'Demotion'               THEN d_bc ELSE 0 END) AS demo_bc,
+        SUM(CASE WHEN ActionReason = 'Demotion'               THEN d_ln ELSE 0 END) AS demo_ln,
+        SUM(CASE WHEN ActionReason = 'Demotion'               THEN d_lc ELSE 0 END) AS demo_lc,
+        SUM(CASE WHEN ActionReason = 'Tenure Increase'        THEN d_bn ELSE 0 END) AS tenure_bn,
+        SUM(CASE WHEN ActionReason = 'Tenure Increase'        THEN d_bc ELSE 0 END) AS tenure_bc,
+        SUM(CASE WHEN ActionReason = 'Tenure Increase'        THEN d_ln ELSE 0 END) AS tenure_ln,
+        SUM(CASE WHEN ActionReason = 'Tenure Increase'        THEN d_lc ELSE 0 END) AS tenure_lc,
+        SUM(CASE WHEN ActionReason = 'Market Adjustment'      THEN d_bn ELSE 0 END) AS market_bn,
+        SUM(CASE WHEN ActionReason = 'Market Adjustment'      THEN d_bc ELSE 0 END) AS market_bc,
+        SUM(CASE WHEN ActionReason = 'Market Adjustment'      THEN d_ln ELSE 0 END) AS market_ln,
+        SUM(CASE WHEN ActionReason = 'Market Adjustment'      THEN d_lc ELSE 0 END) AS market_lc,
+        SUM(CASE WHEN ActionReason = 'Relocation Adjustment'  THEN d_bn ELSE 0 END) AS reloc_bn,
+        SUM(CASE WHEN ActionReason = 'Relocation Adjustment'  THEN d_bc ELSE 0 END) AS reloc_bc,
+        SUM(CASE WHEN ActionReason = 'Relocation Adjustment'  THEN d_ln ELSE 0 END) AS reloc_ln,
+        SUM(CASE WHEN ActionReason = 'Relocation Adjustment'  THEN d_lc ELSE 0 END) AS reloc_lc,
+        SUM(CASE WHEN ActionReason = 'International Transfer' THEN d_bn ELSE 0 END) AS intl_bn,
+        SUM(CASE WHEN ActionReason = 'International Transfer' THEN d_bc ELSE 0 END) AS intl_bc,
+        SUM(CASE WHEN ActionReason = 'International Transfer' THEN d_ln ELSE 0 END) AS intl_ln,
+        SUM(CASE WHEN ActionReason = 'International Transfer' THEN d_lc ELSE 0 END) AS intl_lc
+    FROM pay_event
+    GROUP BY MonthEndDate, WorkerID
+),
+step AS (
+    SELECT
+        mp.MonthEndDate, mp.WorkerID,
+        pb.promo_bn, pb.promo_bc, pb.promo_ln, pb.promo_lc, pb.demo_bn, pb.demo_bc, pb.demo_ln, pb.demo_lc,
+        pb.tenure_bn, pb.tenure_bc, pb.tenure_ln, pb.tenure_lc, pb.market_bn, pb.market_bc, pb.market_ln, pb.market_lc,
+        pb.reloc_bn, pb.reloc_bc, pb.reloc_ln, pb.reloc_lc, pb.intl_bn, pb.intl_bc, pb.intl_ln, pb.intl_lc,
+        mp.b1 * mp.x1p * (mp.f1 - mp.f0)                 AS fte_bn,
+        mp.b1 * mp.k1  * (mp.f1 - mp.f0)                 AS fte_bc,
+        mp.b1 * mp.x1p * (mp.f1 - mp.f0) * (1 + mp.r0)   AS fte_ln,
+        mp.b1 * mp.k1  * (mp.f1 - mp.f0) * (1 + mp.r0)   AS fte_lc,
+        mp.b1 * mp.x1p * mp.f1 * (mp.r1 - mp.r0)         AS fringe_ln,
+        mp.b1 * mp.k1  * mp.f1 * (mp.r1 - mp.r0)         AS fringe_lc,
+        mp.b1 * mp.f1 * (mp.x1 - mp.x1p)                 AS fx_bn,
+        mp.b1 * mp.f1 * (1 + mp.r1) * (mp.x1 - mp.x1p)   AS fx_ln
+    FROM month_pair AS mp
+    LEFT JOIN pay_by_reason AS pb ON pb.MonthEndDate = mp.MonthEndDate AND pb.WorkerID = mp.WorkerID
+)
+SELECT
+    s.MonthEndDate,
+    s.WorkerID,
+    om.ActionReason                                                                   AS OrgMoveReason,
+    CASE WHEN lm.CountryChanged = 1 THEN 'International Transfer'
+         WHEN lm.WorkerID IS NOT NULL THEN 'Relocation' END                          AS LocationMoveReason,
+    SUM(ISNULL(st.promo_bn, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumPromotionBaseNominal,
+    SUM(ISNULL(st.promo_bc, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumPromotionBaseConstant,
+    SUM(ISNULL(st.promo_ln, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumPromotionLoadedNominal,
+    SUM(ISNULL(st.promo_lc, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumPromotionLoadedConstant,
+    SUM(ISNULL(st.demo_bn, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumDemotionBaseNominal,
+    SUM(ISNULL(st.demo_bc, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumDemotionBaseConstant,
+    SUM(ISNULL(st.demo_ln, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumDemotionLoadedNominal,
+    SUM(ISNULL(st.demo_lc, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumDemotionLoadedConstant,
+    SUM(ISNULL(st.tenure_bn, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumTenureBaseNominal,
+    SUM(ISNULL(st.tenure_bc, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumTenureBaseConstant,
+    SUM(ISNULL(st.tenure_ln, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumTenureLoadedNominal,
+    SUM(ISNULL(st.tenure_lc, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumTenureLoadedConstant,
+    SUM(ISNULL(st.market_bn, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumMarketBaseNominal,
+    SUM(ISNULL(st.market_bc, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumMarketBaseConstant,
+    SUM(ISNULL(st.market_ln, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumMarketLoadedNominal,
+    SUM(ISNULL(st.market_lc, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumMarketLoadedConstant,
+    SUM(ISNULL(st.reloc_bn, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumRelocationBaseNominal,
+    SUM(ISNULL(st.reloc_bc, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumRelocationBaseConstant,
+    SUM(ISNULL(st.reloc_ln, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumRelocationLoadedNominal,
+    SUM(ISNULL(st.reloc_lc, 0))  OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumRelocationLoadedConstant,
+    SUM(ISNULL(st.intl_bn, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumIntlTransferBaseNominal,
+    SUM(ISNULL(st.intl_bc, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumIntlTransferBaseConstant,
+    SUM(ISNULL(st.intl_ln, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumIntlTransferLoadedNominal,
+    SUM(ISNULL(st.intl_lc, 0))   OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumIntlTransferLoadedConstant,
+    SUM(ISNULL(st.fte_bn, 0))    OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFteBaseNominal,
+    SUM(ISNULL(st.fte_bc, 0))    OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFteBaseConstant,
+    SUM(ISNULL(st.fte_ln, 0))    OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFteLoadedNominal,
+    SUM(ISNULL(st.fte_lc, 0))    OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFteLoadedConstant,
+    SUM(ISNULL(st.fringe_ln, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFringeLoadedNominal,
+    SUM(ISNULL(st.fringe_lc, 0)) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFringeLoadedConstant,
+    SUM(ISNULL(st.fx_bn, 0))     OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFxBaseNominal,
+    SUM(ISNULL(st.fx_ln, 0))     OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFxLoadedNominal,
+    SUM(CASE WHEN st.promo_bc  <> 0 THEN 1 ELSE 0 END) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumPromotionEvents,
+    SUM(CASE WHEN st.demo_bc   <> 0 THEN 1 ELSE 0 END) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumDemotionEvents,
+    SUM(CASE WHEN st.tenure_bc <> 0 THEN 1 ELSE 0 END) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumTenureEvents,
+    SUM(CASE WHEN st.market_bc <> 0 THEN 1 ELSE 0 END) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumMarketEvents,
+    SUM(CASE WHEN st.reloc_bc  <> 0 THEN 1 ELSE 0 END) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumRelocationEvents,
+    SUM(CASE WHEN st.intl_bc   <> 0 THEN 1 ELSE 0 END) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumIntlTransferEvents,
+    SUM(CASE WHEN st.fte_bc    <> 0 THEN 1 ELSE 0 END) OVER (PARTITION BY s.WorkerID ORDER BY s.MonthEndDate ROWS UNBOUNDED PRECEDING) AS CumFteEvents
+INTO dw.WorkerPayLedger
+FROM dw.WorkerMonthEndSnapshot AS s
+LEFT JOIN step AS st ON st.MonthEndDate = s.MonthEndDate AND st.WorkerID = s.WorkerID
+OUTER APPLY (
+    SELECT TOP 1 m.ActionReason FROM #JobMove AS m
+    WHERE m.WorkerID = s.WorkerID AND m.DeptChanged = 1 AND m.EffectiveStartDate <= s.MonthEndDate
+    ORDER BY m.EffectiveStartDate DESC
+) AS om
+OUTER APPLY (
+    SELECT TOP 1 m.WorkerID, m.CountryChanged FROM #JobMove AS m
+    WHERE m.WorkerID = s.WorkerID AND m.LocChanged = 1 AND m.EffectiveStartDate <= s.MonthEndDate
+    ORDER BY m.EffectiveStartDate DESC
+) AS lm;
+
+ALTER TABLE dw.WorkerPayLedger ALTER COLUMN WorkerID VARCHAR(12) NOT NULL;
+ALTER TABLE dw.WorkerPayLedger ALTER COLUMN MonthEndDate DATE NOT NULL;
+ALTER TABLE dw.WorkerPayLedger
+    ADD CONSTRAINT PK_WorkerPayLedger PRIMARY KEY CLUSTERED (MonthEndDate, WorkerID);
+DROP TABLE IF EXISTS #JobMove;
+GO
+
 /* ------------------------------------------------------ reporting chain
    Closure table: one row per worker per manager above them, at each fiscal
    year-end and the latest month-end (the DuckDB build keeps every month-end).
@@ -464,5 +640,6 @@ UNION ALL SELECT 'dw.FactPerformanceReview', COUNT(*) FROM dw.FactPerformanceRev
 UNION ALL SELECT 'dw.FactBonusPayout', COUNT(*) FROM dw.FactBonusPayout
 UNION ALL SELECT 'dw.MonthEndCalendar', COUNT(*) FROM dw.MonthEndCalendar
 UNION ALL SELECT 'dw.WorkerMonthEndSnapshot', COUNT(*) FROM dw.WorkerMonthEndSnapshot
+UNION ALL SELECT 'dw.WorkerPayLedger', COUNT(*) FROM dw.WorkerPayLedger
 UNION ALL SELECT 'dw.WorkerReportingChain', COUNT(*) FROM dw.WorkerReportingChain;
 GO
