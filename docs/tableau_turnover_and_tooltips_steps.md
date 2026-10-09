@@ -43,10 +43,16 @@ ELSE [TO Top Function] + " has the highest turnover in " + [WF Period] END
 3. **Marks (Measure Values layer):** type **Bar**. Color: Edit Colors → `Vol Rate Shown` coral `#E4572E`, `Invol Rate Shown` dark coral `#B8401F`. Size: slide to about two-thirds so the bars have gaps.
 4. **Remove Executive:** drag `Total Rate Shown` to **Filters** → Special → **Non-null values**. (Do not drag it to the Marks card yet.)
 5. **Sort:** right-click `Function Name` on Rows → Sort → By **Field**, descending, Field: `Total Rate Shown`, aggregation Sum.
-6. **Total label at the end of each bar (the "hidden bar").** Drag `Total Rate Shown` to **Columns**, to the right of the existing pill (it becomes its own pill, not part of Measure Values). Right-click it → **Dual Axis**. Right-click the top axis → **Synchronize Axis**, then untick **Show Header** on it. On the Marks card for `AGG(Total Rate Shown)`:
-   - Mark type **Text**. A text mark draws no bar at all, so nothing needs hiding, and it sits at x = total, which is exactly the end of the stacked bar.
-   - If `Measure Names` is on this card's Color, drag it off, so the Total does not show in the legend.
-   - Drag `Total Rate Shown` to **Label**: percentage, Tableau Semibold 9 pt navy `#13233A`. Label → Alignment → Horizontal **Right** (the text starts just past the bar end; if it lands on the wrong side, choose Left). If the label touches the bar, type two spaces before the field in Label → Text.
+6. **Total label just past the end of each bar (the "hidden bar").** A text mark is centered on its data point, so a label placed at the total itself sits half on top of the bar, and the Alignment setting does not move it. The fix is to place the invisible mark a little past the bar end and print the real total as its label.
+   1. New calculated field:
+      ```
+      // Total Label Pos   (where the label sits: just past the bar end)
+      [Total Rate Shown] + 0.009
+      ```
+   2. Drag `Total Label Pos` onto **Columns**, dropping it **on top of** the `AGG(Total Rate Shown)` pill so it replaces it. The pill becomes `AGG(Total Label Pos)`.
+   3. Right-click it → **Dual Axis**; right-click the top axis → **Synchronize Axis**, then untick **Show Header** on it.
+   4. On the Marks card for `AGG(Total Label Pos)`: mark type **Text**; drag `Total Rate Shown` to **Label** (percentage, Tableau Semibold 9 pt navy `#13233A`); drag `Measure Names` off Color if it is there. If the card reset when the pill was replaced, redo these three settings.
+   5. Tune the gap: 0.009 is about one label's half-width on the card. If the text still touches the bar use 0.011; if it floats too far away use 0.007.
 7. **Title:** drag `TO Title` to **Detail**; Worksheet → Show Title, double-click the title, Insert `TO Title` (Tableau Bold 12 pt navy). Add a second line: **Voluntary** (coral `#E4572E`, Tableau Semibold 9 pt) ` + ` **Involuntary** (dark coral `#B8401F`) ` leavers ÷ average headcount, annualized · groups under 20 people hidden` (slate `#5A6170`, Tableau Book 9 pt). Color each word by selecting it in the title editor.
 8. **Clean look:** hide the bottom axis (right-click → untick Show Header), Format → Lines: grid, zero line, row/column dividers **None**. Function labels: Tableau Book 9 pt navy; the header of `Function Name` hidden ("Function Name" title off). Shading: Worksheet and Pane `#FBFBF8`.
 9. **Tooltip** (Marks → Tooltip; untick *Include command buttons*). Put `Function Name`, `Total Rate Shown`, `Vol Rate Shown`, `Invol Rate Shown`, `Voluntary Leavers`, `Involuntary Leavers` and `Average Headcount` on **Detail** so they can be inserted, then:
