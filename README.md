@@ -9,7 +9,7 @@ An HR data warehouse for a fictional global company, built to answer the three q
 | Case study | Question | Dashboard |
 |---|---|---|
 | **1. [Workforce Cost Bridge](#1-business-problem)** | *Why did our workforce cost change?* A monthly walk of annualized pay run-rate that splits every dollar of change into hires, terminations, transfers, promotions, merit, mobility, FTE, fringe and currency, in **nominal** and **constant** currency, reconciled to the cent. | Tableau Public: *coming soon* |
-| **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | Tableau Public: *coming soon* |
+| **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | **[Executive Summary on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)** |
 | **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, where are we growing, and how do people move between offices?* An office-level walk and an origin-to-destination relocation table, drawn as a four-layer Tableau map with `MAKEPOINT`, `MAKELINE` and `BUFFER`. | Tableau Public: *coming soon* |
 
 All three case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot, and share one look ([`docs/brand/`](docs/brand/README.md)).
@@ -231,9 +231,9 @@ Step-by-step connection guide: [`docs/tableau_public_guide.md`](docs/tableau_pub
 
 ## Case study 2: Headcount & FTE Walk
 
-![Headcount & FTE Walk preview](docs/images/headcount_walk_preview.png)
+[![Headcount & FTE Walk: Executive Summary on Tableau Public](docs/images/executive_summary_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)
 
-*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive dashboard is on Tableau Public (coming soon).*
+*The Executive Summary, shown here in FTE mode. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)**: pick any From/To months and switch between headcount and FTE.*
 
 ### Business problem
 
@@ -300,7 +300,17 @@ The daily scaffold stores 30 times more rows than the month-end snapshot and pas
 
 ### Tableau
 
-Step-by-step build, with every calculated field and the numbers to check against: [`docs/tableau_headcount_walk_guide.md`](docs/tableau_headcount_walk_guide.md) (also as a [PDF](docs/tableau_headcount_walk_guide.pdf)). The five KPI cards are built as map layers: [`docs/tableau_kpi_cards_guide.md`](docs/tableau_kpi_cards_guide.md) (also as a [PDF](docs/tableau_kpi_cards_guide.pdf)) with a copy-ready [config workbook](docs/Arcadia_KPI_Cards_Config.xlsx). The workbook has four dashboards (Executive Summary, Movement Drivers, Diagnostics, Methodology) and uses relationships across the six files, a date-range walk driven by parameters, annualized turnover from an average-headcount calculation, set and parameter actions, dynamic zone visibility, and a visible **Walk Gap** control that must read 0.
+**Published:** [Executive Summary on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary).
+
+| Part | What it does |
+|---|---|
+| Header | From / To month dropdowns, a Headcount \| FTE capsule toggle (parameter action on custom shapes), an info button that opens a definitions panel |
+| KPI band | Five cards drawn as text on map layers (`MAKEPOINT`), so one sheet and one query draw every title, value and note; cards beside the waterfall follow the toggle and name their unit |
+| Waterfall | A Gantt-bar walk whose title states the finding ("FY26: 2,354 hires outpaced 1,663 leavers, adding 691 people") and whose tooltip bridges people to FTE ("2,354 people = 2,328.3 FTE") |
+| Trend | Closing headcount or FTE for every month-end, with the selected period shaded |
+| Turnover by function | Voluntary + involuntary annualized turnover, groups under 20 people hidden, title naming the top function |
+
+How it was built, with every worksheet, calculated field, color, position, tooltip and design decision: [`docs/executive_summary_build_book.md`](docs/executive_summary_build_book.md). The map-layer KPI technique has its own guide ([`docs/tableau_kpi_cards_guide.md`](docs/tableau_kpi_cards_guide.md), also as a [PDF](docs/tableau_kpi_cards_guide.pdf), with a [config workbook](docs/Arcadia_KPI_Cards_Config.xlsx)), and the original plan for the full workbook is in [`docs/tableau_headcount_walk_guide.md`](docs/tableau_headcount_walk_guide.md). Two more dashboards are planned on the same data: Movement Drivers and Diagnostics (a slice table with a **Walk Gap** control that must read 0).
 
 ---
 

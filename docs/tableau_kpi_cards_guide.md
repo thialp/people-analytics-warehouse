@@ -11,7 +11,7 @@ The five cards under the header (Closing headcount, Closing FTE, Hires, Voluntar
 
 **How it works in one paragraph.** A map sheet places marks by latitude and longitude, and Tableau can draw a text label on any mark. If we treat the sheet's pixels as a tiny flat map, a pixel position becomes a (latitude, longitude) pair, a label drawn at that point appears at that pixel, and a calculated field can compute the position from parameters. Each text piece is its own map layer (a Circle mark with 0% opacity, so only its label shows).
 
-> **Tested?** The SQL, the numbers and the string formulas in this guide were checked against the warehouse (see Section 9). I could not run Tableau Public here, so the layer settings are written from how the technique works. Section 6 (calibration) is where you tune it on your screen; budget 15 minutes for it.
+> **Tested?** The SQL, the numbers and the string formulas in this guide were checked against the warehouse (see Section 9). Label placement depends on the sheet's pixel size, so Section 6 (calibration) is where you tune it on your screen; budget 15 minutes for it.
 
 Download the companion workbook [`Arcadia_KPI_Cards_Config.xlsx`](Arcadia_KPI_Cards_Config.xlsx): every parameter, calculation, layer and dashboard setting in this guide as copy-ready tables, plus a validation tab with the FY26 numbers.
 
@@ -195,7 +195,7 @@ IF NOT [K Valid] THEN "" ELSE
   + " part-time · " + STR(DIV([K Gap T], 10)) + "." + STR([K Gap T] % 10) + " below headcount"
 END
 ```
-Why the decimal: a part-time worker counts as 1 in headcount but as 0.8 or 0.5 in FTE, so FTE is never a whole number. Showing "12,940.0" with "924 part-time · 261.0 below headcount" on the same card tells the reader the gap is schedules, not missing people. If the note is too wide for the card, shorten it to `924 part-time · −261.0`. This needs the `part_time_headcount` column that was added to the walk file (see the tooltip guide, Section 1).
+Why the decimal: a part-time worker counts as 1 in headcount but as 0.8 or 0.5 in FTE, so FTE is never a whole number. Showing "12,940.0" with "924 part-time · 261.0 below headcount" on the same card tells the reader the gap is schedules, not missing people. If the note is too wide for the card, shorten it to `924 part-time · −261.0`. This needs the `part_time_headcount` column that was added to the walk file (see the [Executive Summary build book](executive_summary_build_book.md), Section 1).
 ```
 // KPI 3 Value   (the comma pattern on [K Hires])
 IF NOT [K Valid] THEN "—"
@@ -388,7 +388,7 @@ Start Month 2025-07-31, End Month 2026-06-30:
 | 4 Voluntary turnover (annualized) | 10.4% | 1,341 leavers by choice |
 | 5 Internal moves | 1,615 | 1,038 promotions · 577 other moves |
 
-I ran the same text formulas in Python against the warehouse numbers and they reproduce this table exactly. Set Start Month after End Month: all five values should show "—".
+The same text formulas, run in Python against the warehouse numbers, reproduce this table exactly. Set Start Month after End Month: all five values should show "—".
 
 ## 10. If something looks wrong
 

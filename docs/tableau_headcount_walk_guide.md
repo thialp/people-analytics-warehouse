@@ -13,6 +13,8 @@ The finished workbook has four dashboards, one per audience:
 
 ![Static preview](images/headcount_walk_preview.png)
 
+> **This is the original build plan.** The Executive Summary as published on [Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary) refines it in several places (an info panel instead of a Methodology dashboard, a capsule toggle drawn with custom shapes, cards that follow the Headcount | FTE toggle, a turnover chart with a dynamic title). Every final field, setting and color is in the [Executive Summary build book](executive_summary_build_book.md).
+
 The workbook uses the Arcadia look shared by all three dashboards: navy header band with the logo, a row of KPI cards, charts on off-white cards, teal for growth, coral for leavers. Install the palettes and get the logo from [`docs/brand/`](brand/README.md) before you start.
 
 ---
@@ -372,6 +374,6 @@ Tooltips: on the waterfall, use viz-in-tooltip to show the 12-month trend of the
 1. **File → Save to Tableau Public As…** and name it **Arcadia Headcount & FTE Walk**.
 2. When it opens in the browser, click **Edit Details** and paste a one-paragraph description plus the GitHub link: `https://github.com/thialp/people-analytics-warehouse`.
 3. Under the workbook's settings, allow **Download** of the workbook so reviewers can open your calculated fields.
-4. Copy the workbook URL and add it to the README (the "Dashboard" row and Section 9), or send it to me to update.
+4. Copy the workbook URL and add it to the README (the "Dashboard" column and the case study).
 
 **Before you publish, check:** Walk Gap shows 0, the FY26 numbers in Section 4 match, and no sheet still carries a test filter.
