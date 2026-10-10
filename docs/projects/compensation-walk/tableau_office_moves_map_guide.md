@@ -95,18 +95,31 @@ Hide the titles, set the sheet background to none, **Fit: Entire View**. Expecte
 
 ## 5. Place on the dashboard (Summary, 1400 x 850)
 
-Floating, positions from the design sketch (Position and size in the layout pane):
+Items inside a layout container are tiled, not free-floating, so the panel is one floating container with the pieces nested in it. Sizes come from the design sketch (panel card 240, 512, 1104 x 306; the toggle floats at 1124, 524, 220 x 30).
 
-| Object | x, y | w x h |
-|---|---|---|
-| `Office Moves Title` | 258, 530 | 500 x 24 |
-| `Office Moves Subtitle` | 258, 554 | 500 x 20 |
-| `Office Moves Map` | 252, 578 | 728 x 232 |
-| `Stat Total` | 1000, 580 | 330 x 56 |
-| `Stat Within` | 1000, 642 | 330 x 56 |
-| `Stat Across` | 1000, 704 | 330 x 56 |
+```
+Panel: Office moves                  floating, x 252, y 530, w 1080, h 280, no background
+|-- Panel header                     vertical, w 1080, h 44
+|     |-- Office Moves Title         h 24
+|     `-- Office Moves Subtitle      h 20
+`-- Panel body                       horizontal, w 1080, h 236
+      |-- Office Moves Map           w 728, h 236
+      `-- Panel stats                vertical, w 352, h 236, outer padding left 20
+            |-- Stat Total           h 62
+            |-- Stat Within          h 62
+            `-- Stat Across          h 62
+```
 
-Put them in one container named `Panel: Office moves`, so the `p_Panel` toggle can show and hide the whole panel at once when the Career moves panel is built.
+Build it:
+
+1. **Container.** From the dashboard Objects list, drag a **Vertical** container onto the dashboard with **Floating** selected. In the **Layout** pane set Position x 252, y 530, size 1080 x 280, Background None. Rename it `Panel: Office moves` (item menu, **Rename Dashboard Item**).
+2. **Header.** Drag a second **Vertical** container into it, drop it at the top, size 1080 x 44. Drag `Office Moves Title` (h 24) and `Office Moves Subtitle` (h 20) into it.
+3. **Body.** Drag a **Horizontal** container below the header, size 1080 x 236. Drag `Office Moves Map` into it (728 x 236).
+4. **Stats.** Drag a **Vertical** container to the right of the map inside the body (352 x 236, outer padding left 20, so the numbers start at x 1000 as in the sketch). Drag the three stat sheets into it, 62 high each.
+5. In the Layout pane, set every container's **Background** to **None** and **Border** to **None**.
+6. **Toggle.** Add it after the container as a floating item so it sits on top, at 1124, 524, 220 x 30. It stays outside the container, so it is still visible when the panel is hidden.
+
+Titles are 500 wide, so the container's empty top right stays free for the toggle. Positions are within a couple of pixels of the sketch.
 
 ## 6. Check that it follows every filter
 
