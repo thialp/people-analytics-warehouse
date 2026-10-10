@@ -44,18 +44,29 @@ ZN(SUM(IF [Move In Scope] AND [flow_scope] = "Domestic" THEN [workers] END))
 // Movers Across
 ZN(SUM(IF [Move In Scope] AND [flow_scope] = "International" THEN [workers] END))
 
-// Moves Title
+// Top Route Movers   (people on the busiest route in the current selection)
+{ MAX({ FIXED [Corridor] : SUM(IF [Move In Scope] THEN [workers] END) }) }
+
+// Top Route
+{ MAX(IF { FIXED [Corridor] : SUM(IF [Move In Scope] THEN [workers] END) } = [Top Route Movers]
+      THEN [Corridor] END) }
+
+// Moves Title   (the panel headline: answers "where do people move?")
 IF [Movers] = 0 THEN "No one in this selection changed office in this period"
-ELSE STR([Movers]) + IF [Movers] = 1 THEN " person" ELSE " people" END + " changed office"
+ELSEIF [Movers] = 1 THEN "One person changed office: " + [Top Route]
+ELSE [Top Route] + " is the busiest route: " + STR([Top Route Movers]) + " of "
+     + STR([Movers]) + " people who moved"
 END
 
-// Moves Subtitle
-CASE [p_View]
-WHEN "Company" THEN "Everyone at Arcadia Systems"
-WHEN "Office"  THEN "Moves in or out of " + [p_Group]
-WHEN "Country" THEN "Moves in or out of " + [p_Group] + ", and inside it"
-ELSE "People in " + [p_Group]
-END
+// Moves Scope   (prefix for the subtitle; empty for the whole company)
+IF [p_View] = "Company" THEN "" ELSE [p_Group] + ": " END
+
+// Top Region Movers
+{ MAX({ FIXED [to_region] : SUM(IF [Move In Scope] THEN [workers] END) }) }
+
+// Top Region   (where most people landed)
+{ MAX(IF { FIXED [to_region] : SUM(IF [Move In Scope] THEN [workers] END) } = [Top Region Movers]
+      THEN [to_region] END) }
 ```
 
 `Movers`, `Movers Within` and `Movers Across` filter inside the calculation, not on the Filters shelf, so a selection with no moves shows 0 and the message instead of a blank sheet.
@@ -81,17 +92,14 @@ END
 
 Expected, Company FY26: 143 lines; the thickest runs between Bengaluru and Hyderabad. Set p_View to Office and p_Group to Bengaluru: every line starts or ends at Bengaluru.
 
-## 4. Title and stat sheets (each with no dimension on the view)
+## 4. Title and subtitle sheets (each with no dimension on the view)
 
 | Sheet | Text | Notes |
 |---|---|---|
-| `Office Moves Title` | `<Moves Title>` bold 14 pt navy | Panel title; shows the empty-state message |
-| `Office Moves Subtitle` | `<Moves Subtitle>` 11 pt slate | |
-| `Stat Total` | `<Movers>` 24 pt navy, then "People who changed office" 11 pt slate | |
-| `Stat Within` | `<Movers Within>` 24 pt violet `#5B4FB3`, then "Within one country" | |
-| `Stat Across` | `<Movers Across>` 24 pt coral `#E4572E`, then "Across a border" | |
+| `Office Moves Title` | `<Moves Title>` bold 14 pt navy | The story, and the empty-state message |
+| `Office Moves SubTitle` | `<Moves Scope>` `<Movers>` " people changed office · " `<Movers Within>` " within one country · " `<Movers Across>` " across a border" | 11 pt. One text mark, formatted in runs: slate for scope, count and "people changed office"; **violet `#5B4FB3`** for the within-country run; **coral `#E4572E`** for the across-a-border run. The colored words are the key to the map, the routes and the region bars, so the panel needs no legend |
 
-Hide the titles, set the sheet background to none, **Fit: Entire View**. Expected Company FY26: 345, 227, 118.
+Hide the titles, set the sheet background to none, **Fit: Entire View**. Expected Company FY26 subtitle: "345 people changed office · 227 within one country · 118 across a border"; title: "Bengaluru to Hyderabad is the busiest route: 28 of 345 people who moved". The three `Stat` sheets are no longer used: delete them.
 
 ### Sheet `Top Corridors`
 
@@ -111,35 +119,54 @@ RANK_UNIQUE([Movers]) <= 8 AND [Movers] > 0
 
 Expected Company FY26: Bengaluru to Hyderabad 28, Hyderabad to Bengaluru 25, Bengaluru to Pune 19 at the top. With p_View Office and p_Group Bengaluru, every bar starts or ends at Bengaluru.
 
+### Sheet `Region Moves`
+
+Where people landed, by region. No new data: `to_region` is already a column, and the same `Movers` measure splits by `flow_scope_label`, so each bar shows how many arrivals came from inside one country and how many crossed a border.
+
+1. **to_region** to **Rows**, **Movers** to **Columns**.
+2. **flow_scope_label** to **Color** (violet and coral as above). The bars stack: within one country, across a border.
+3. Sort **to_region** descending by **Movers**.
+4. Total at the bar end: **Analytics** pane, **Reference Line**, scope **Per Cell**, value **Movers**, aggregation **Total**, label **Value**, line **None**. Segment labels stay off: a 4-person segment is too thin to hold a number.
+5. Hide the axis, gridlines, zero lines and borders. Region labels 10 pt slate, sheet background none, **Fit: Entire View**. Title shown: "Where they landed", 11 pt bold slate.
+6. Tooltip: `<to_region>` then `<Movers> people · <flow_scope_label>`.
+
+Expected Company FY26 (within one country / across a border): Asia Pacific 121 (95 / 26), North America 120 (83 / 37), Europe 61 (25 / 36), Latin America 31 (16 / 15), Middle East & Africa 12 (8 / 4). The totals add to 345. With p_View Country and p_Group India: Asia Pacific 110 (91 / 19), North America 15, Europe 8, Latin America 3: 136 in all.
+
+Why not "net by region"? The net is nearly zero for every region (Asia Pacific -12, Europe +8, North America +2, Latin America +3, Middle East & Africa -1): moves mostly trade people between regions, so the bars would be invisible. Arrivals by region tell the story. Departures by region would need each move to appear twice (once per end); that is a data change for later, not for this chart.
+
 ## 5. Place on the dashboard (Summary, 1400 x 850)
 
-Items inside a layout container are tiled, not free-floating, so the panel is one floating container with the pieces nested in it. Sizes come from the design sketch (panel card 240, 512, 1104 x 306; the toggle floats at 1124, 524, 220 x 30).
+One spacing system: a **30 px frame** between the rail and the cards, between the cards and the right edge, and below the last card; **16 px** between cards, across and down; **16 px** padding inside every card. Every card edge lands on the KPI card grid (cards at x 246, 474, 702, 930, 1158, each 212 wide), so the rows line up. Full table: `design/README.md`.
+
+| Card | x | y | w | h | Spans |
+|---|---:|---:|---:|---:|---|
+| KPI cards x5 | 246 + 228 n | 88 | 212 | 86 | |
+| Waterfall | 246 | 190 | 668 | 314 | KPI cards 1 to 3 (right edge 914) |
+| Top drivers | 930 | 190 | 440 | 314 | KPI cards 4 and 5 |
+| Panel (map) | 246 | 520 | 1124 | 300 | KPI cards 1 to 5 (right edge 1370, bottom 820) |
+
+Items inside a layout container are tiled, not free-floating, so the panel is one floating container with the pieces nested in it.
 
 ```
-Panel: Office moves                  floating, x 252, y 530, w 1080, h 280, no background
-|-- Panel header                     vertical, w 1080, h 44
+Panel: Office moves                  floating, x 246, y 520, w 1124, h 300, background card, padding 16
+|-- Panel header                     vertical, w 1092, h 44
 |     |-- Office Moves Title         h 24
-|     `-- Office Moves Subtitle      h 20
-`-- Panel body                       horizontal, w 1080, h 236
-      |-- Office Moves Map           w 490, h 236
-      |-- Top Corridors              w 290, h 236
-      `-- Panel stats                vertical, w 300, h 236, outer padding left 20
-            |-- Stat Total           h 62
-            |-- Stat Within          h 62
-            `-- Stat Across          h 62
+|     `-- Office Moves SubTitle      h 20
+`-- Panel body                       horizontal, w 1092, h 224
+      |-- Office Moves Map           w 484, h 224
+      |-- Top Corridors              w 306, h 224
+      `-- Region Moves               w 270, h 224
 ```
+
+484 + 306 + 270 + 2 x 16 = 1092 = 1124 - 2 x 16. The map's width is set by the offices' shape (about 2.16 wide to 1 tall at this zoom); if it renders narrower or wider than its box, give the difference to Top Corridors.
 
 Build it:
 
-1. **Container.** From the dashboard Objects list, drag a **Vertical** container onto the dashboard with **Floating** selected. In the **Layout** pane set Position x 252, y 530, size 1080 x 280, Background None. Rename it `Panel: Office moves` (item menu, **Rename Dashboard Item**).
-2. **Header.** Drag a second **Vertical** container into it, drop it at the top, size 1080 x 44. Drag `Office Moves Title` (h 24) and `Office Moves Subtitle` (h 20) into it.
-3. **Body.** Drag a **Horizontal** container below the header, size 1080 x 236. Drag `Office Moves Map` into it and set its size to 490 x 236 (the offices' shape; a wider container only adds blank sides).
-4. **Top corridors.** Drag `Top Corridors` into the body to the right of the map (290 x 236).
-5. **Stats.** Drag a **Vertical** container to the right of that inside the body (300 x 236, outer padding left 20). Drag the three stat sheets into it, 62 high each.
-6. In the Layout pane, set every container's **Background** to **None** and **Border** to **None**.
-7. **Toggle.** Add it after the container as a floating item so it sits on top, at 1124, 524, 220 x 30. It stays outside the container, so it is still visible when the panel is hidden.
-
-Titles are 500 wide, so the container's empty top right stays free for the toggle. Positions are within a couple of pixels of the sketch.
+1. **Container.** Floating **Vertical** container, Layout pane position x 246, y 520, size 1124 x 300. Rename it `Panel: Office moves`. Background `#FBFBF8`, border 1 px `#E4E3DD`, inner padding 16 on all sides (this is the card, so no separate card object).
+2. **Header.** A **Vertical** container at the top, 1092 x 44, holding `Office Moves Title` (h 24) and `Office Moves SubTitle` (h 20).
+3. **Body.** A **Horizontal** container below it, 1092 x 224, holding `Office Moves Map` (484), `Top Corridors` (306) and `Region Moves` (270). Remove the old stats container. Set the body and header containers' background and border to **None**.
+4. **Toggle.** A floating item after the container, so it sits on top: x 1134, y 534, 220 x 30 (inside the card's top right; the title stays under 870 px wide).
+5. Remove the color legend Tableau adds to the dashboard, if it came back.
 
 ## 6. Check that it follows every filter
 
@@ -148,4 +175,4 @@ Titles are 500 wide, so the container's empty top right stays free for the toggl
 3. p_View Country, p_Group India: 136, 91, 45.
 4. p_View Function, p_Group Technology: 147.
 5. Pick a month-over-month pair: counts shrink to a handful of lines; no blank sheet and no error.
-6. A group with no moves in the period: the title shows the empty-state message, the stats show 0.
+6. A group with no moves in the period: the title shows the empty-state message, the subtitle shows 0 and the two bar charts are empty.

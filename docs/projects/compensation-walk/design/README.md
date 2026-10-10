@@ -13,17 +13,23 @@ SVG layers are named the way the Figma UI kit names them: **Background (export)*
 
 ## Layout (x, y, width, height in pixels)
 
+One spacing system: a **30 px frame** on the left (rail to cards), right and bottom, and **16 px** between every pair of cards, across and down. Every card edge sits on the KPI card grid, so the rows line up.
+
 | Object | Position | Notes |
 |---|---|---|
 | Filter rail (vertical) | 0, 0, 216 x 850 | Navy `#13233A`. Period, view, group, measures |
-| Title and navigation | 240, 18 | Tabs: Summary, Drivers, Diagnostics, Methodology |
-| KPI cards x5 | 240 + 223 n, 88, 212 x 86 | Radius 10. Follow the lens |
-| Waterfall card | 240, 186, 640 x 314 | Gantt-bar waterfall from Dashboard #1 |
-| Top drivers card | 892, 186, 452 x 314 | Four rows, dynamic text |
-| Swappable panel card | 240, 512, 1104 x 306 | Toggle at 1124, 524 (220 x 30) |
-| Footnote | 240, 828 | Fictional-company line |
+| Title and navigation | 246, 18 | Text starts at x 246, the card edge. Tabs: Summary, Drivers, Diagnostics, Methodology |
+| KPI cards x5 | 246 + 228 n, 88, 212 x 86 | n = 0..4, so x = 246, 474, 702, 930, 1158. Radius 10. Follow the lens |
+| Waterfall card | 246, 190, 668 x 314 | Spans KPI cards 1 to 3 (right edge 914) |
+| Top drivers card | 930, 190, 440 x 314 | Spans KPI cards 4 and 5 |
+| Swappable panel card | 246, 520, 1124 x 300 | Spans all five. Toggle at 1134, 534 (220 x 30) |
+| Footnote | in the rail, x 20, y 790 | Fictional-company line, white at 60%. Keeps the 30 px bottom frame clear |
 
-Right edge 1344, 12 px between cards. The panel body is 1104 x 254: map or chart at the left (700 wide), stats column at x 1000.
+Right edge of the cards 1370 (1400 - 30), bottom edge 820 (850 - 30). Rows: 88 + 86 = 174, +16 = 190, +314 = 504, +16 = 520, +300 = 820.
+
+Inside a card: 16 px padding on every side. Panel card: header 536 to 580 (title 24, subtitle 20), body 580 to 804 (224 high), bottom padding 16. Panel body, left to right: map 484, Top corridors 306, Region bars 270, 16 px apart (484 + 306 + 270 + 32 = 1092 = 1124 - 2 x 16).
+
+The KPI band is `docs/brand/arcadia_kpi_cards_bg_summary.png` (drawn by `docs/brand/build/make_kpi_cards_bg.py`). In Tableau set `kpi_GridLeft` 246, `kpi_CardW` 212, `kpi_GapX` 16.
 
 ## Rail controls
 
@@ -33,7 +39,7 @@ Right edge 1344, 12 px between cards. The panel body is 1104 x 254: map or chart
 | Quick picks | 20 and 110, y 182 and 212 (86 x 26) | FY26, FY25, last 4 quarters, monthly |
 | View by | 0, 288 (6 rows, 30 high) | `p_View`: Company, Function, Leader, Department, Office, Country |
 | Group search | 20, 508 (176 x 34) | one group in the chosen view |
-| Lens | 20, 616 (176 x 30) | `p_Lens`: Per FTE or Total |
+| Lens | 20, 616 (176 x 30) | `p_Lens`: values `FTE` and `Amount`, displayed as **Pay per FTE** and **Total payroll** |
 | Cost | 20, 652 | `p_Cost`: Loaded or Base |
 | Currency | 20, 688 | `p_Currency`: Constant or Nominal |
 | Reset | 20, 734 (176 x 26) | |
