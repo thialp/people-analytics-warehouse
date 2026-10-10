@@ -14,6 +14,9 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-09 (end 
 
 ## Open: polish on what exists
 
+0. **Map readability and background (2026-10-10, specified, not yet applied).** Thin lines with a three-class color (`Route Class`: one-person border crossings in pale coral), teal arrival dots sized by people received with labels on the top 5 offices, and a background that matches the card (Base layer off, sheet background None, every card filled `#FBFBF8`). See [map guide](tableau_office_moves_map_guide.md) section 3 and section 5. If still crowded, the data lever is the generator: international transfers pick a random country and office (`generate_data.py`, `transfer()`), so 87 of the 100 cross-border routes carry one person; steering them through hub offices would thin the arcs realistically but changes every number downstream.
+0. **Titles that answer a question (2026-10-10, specified, not yet applied).** Header, waterfall and panel headlines, chart labels, calculations and FY26 check text: [dashboard_titles.md](dashboard_titles.md). Replaces items 1, 2, 4 and 8 below.
+
 1. **Panel title.** The header shows the literal sheet name "Office Moves Title". Wire the `Moves Title` calculation (needs the `Top Route Movers` / `Top Route` calculations) or hide the sheet title.
 2. **Panel subtitle.** The three `Stat` sheets are still used across the top (345 / 118 / 227, wrapping onto two lines, across before within). Replace them with the single `Office Moves SubTitle` sheet (colored runs: violet within one country, coral across a border) and delete the three Stat sheets.
 3. **Region bars are not sorted by size** (they read alphabetically). Sort `to_region` descending by `SUM(Moved People)`.

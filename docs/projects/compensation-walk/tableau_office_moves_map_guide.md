@@ -51,12 +51,20 @@ ZN(SUM(IF [Move In Scope] AND [flow_scope] = "International" THEN [workers] END)
 { MAX(IF { FIXED [Corridor] : SUM(IF [Move In Scope] THEN [workers] END) } = [Top Route Movers]
       THEN [Corridor] END) }
 
-// Moves Title   (the panel headline: answers "where do people move?")
+// Moves Title   (the panel headline: answers "do people move inside or across borders, and where?")
 IF [Movers] = 0 THEN "No one in this selection changed office in this period"
 ELSEIF [Movers] = 1 THEN "One person changed office: " + [Top Route]
-ELSE [Top Route] + " is the busiest route: " + STR([Top Route Movers]) + " of "
-     + STR([Movers]) + " people who moved"
+ELSE STR(ROUND(100 * [Movers Within] / [Movers], 0)) + "% of moves stay inside one country; "
+     + [Top Route] + " is the busiest route (" + STR([Top Route Movers]) + " people)"
 END
+
+// Route Class   (aggregate; colors the lines: one-person border crossings are drawn lighter)
+IF ATTR([flow_scope]) = "Domestic" THEN "Within one country"
+ELSEIF [Movers] >= 2 THEN "Across a border"
+ELSE "Across a border, one person" END
+
+// Office Label   (layer 2; names the 5 offices that received the most people; compute using to_office)
+IF RANK_UNIQUE([Movers]) <= 5 THEN ATTR([to_office]) + " " + STR([Movers]) END
 
 // Moves Scope   (prefix for the subtitle; empty for the whole company)
 IF [p_View] = "Company" THEN "" ELSE [p_Group] + ": " END
@@ -75,10 +83,12 @@ IF [p_View] = "Company" THEN "" ELSE [p_Group] + ": " END
 
 1. Double-click **Move Line**. A map appears with lines (Tableau adds *Latitude (generated)* and *Longitude (generated)*).
 2. Drag **Move In Scope** to **Filters**, select **True**.
-3. Marks (layer 1, `Move Line`): mark type **Automatic** (not Line: the Line type joins the marks into one connecting path and the sheet zigzags; Automatic draws each corridor as its own arc, curved along the shortest route over the globe). **Corridor** to **Detail**. **SUM(workers)** to **Size**. **flow_scope_label** to **Color**: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`; opacity 60%. Size slider: small to medium, so Bengaluru to Hyderabad (28) is clearly thicker than a single move.
-4. Drag **Arrival Point** onto **Add a Marks Layer**. Layer 2: mark type **Circle**, **to_office** to **Detail**, **SUM(workers)** to **Size**, color navy `#13233A`, opacity 80%, size small (people arriving).
+3. Marks (layer 1, `Move Line`): mark type **Automatic** (not Line: the Line type joins the marks into one connecting path and the sheet zigzags; Automatic draws each corridor as its own arc, curved along the shortest route over the globe). **Corridor** to **Detail**. **SUM(workers)** to **Size**. **Route Class** to **Color**: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`, *Across a border, one person* `#F2A68C`. Color opacity 70%.
+   - **Why three colors:** in FY26, 99 of the 143 routes carry a single person, and 87 of those cross a border. Drawing them in the pale coral from the brand ramp turns the long tail into background texture and leaves the real corridors (28, 25, 19 people) to stand out, without hiding anyone.
+   - **Thin lines:** Size slider on the Marks card to the far left. If 28 people is not clearly thicker than 1, open the Size legend (**Analysis > Legends > Size**), **Edit Size**, and drag the upper handle until Bengaluru to Hyderabad is about 5 px.
+4. Drag **Arrival Point** onto **Add a Marks Layer**. Layer 2: mark type **Circle**, **to_office** to **Detail**, **SUM(workers)** to **Size** (people who arrived at the office), color teal `#00938D`, opacity 85%, **Border** white. Size legend, **Edit Size**: smallest dot about 5 px, Pune (39 arrivals) about 24 px, so the dots read as how many people an office received. **Office Label** to **Label** (compute using `to_office`), 9 pt bold navy, tick no overlap, so only the 5 busiest offices are named.
 5. Layer order on the Marks card: Arrival Point on top, Move Line below.
-6. **Map > Background Maps > Light**. **Map > Map Layers**: washout 40%, keep only Base and Coastline.
+6. **Background that matches the card.** The Light style paints the ocean pure white (`#FFFFFF`) and the land `#F4F4F4`; the page is `#F3F3EF` and a card is `#FBFBF8`, so a Light map shows as a white box on the card. Fix it on the sheet: **Map > Map Layers**, untick **Base** (leaves a flat background), tick **Coastline** and **Country/Region Borders**; **Format > Shading > Worksheet: None**, so the card's fill shows through. If the outline-only look is too faint, fall back to Light with white cards (`make_kpi_cards_bg.py --fill FFFFFF` and white container fills).
 7. **Map > Map Options**: untick *Show Map Search*, *Show View Toolbar*. Keep pan and zoom on so a reader can look closer.
 8. Hide the headers and the Latitude/Longitude axes. Fit is greyed out on a map sheet; the framing is the saved zoom instead. Zoom out with the **−** control and pan until Vancouver (west) and Sydney (east) sit just inside the left and right edges. The 35 offices span about 2.4 wide to 1 tall in Mercator, so at 236 high the map is about 490 wide; that is why the map container in section 5 is 490, not wider. Long arcs bow north and may touch the top edge; that is expected.
 9. Tooltip:
@@ -172,6 +182,8 @@ One spacing system: a **30 px frame** between the rail and the cards, between th
 | Waterfall | 246 | 190 | 668 | 314 | KPI cards 1 to 3 (right edge 914) |
 | Top drivers | 930 | 190 | 440 | 314 | KPI cards 4 and 5 |
 | Panel (map) | 246 | 520 | 1124 | 300 | KPI cards 1 to 5 (right edge 1370, bottom 820) |
+
+**One card color.** Every card is filled `#FBFBF8` with a 1 px `#E4E3DD` border, KPI cards included. Until 2026-10-10 the waterfall, Top drivers and panel containers had no fill (page color `#F3F3EF`), the KPI cards were `#FBFBF8` and the Light map was `#FFFFFF`: three different whites. Set each container's Background to `#FBFBF8` (Layout pane) and every sheet inside it to background None.
 
 Items inside a layout container are tiled, not free-floating, so the panel is one floating container with the pieces nested in it.
 
