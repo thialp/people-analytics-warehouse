@@ -103,10 +103,10 @@ RANK_UNIQUE([Movers]) <= 8 AND [Movers] > 0
 ```
 
 1. **Corridor** to **Rows**, **Movers** to **Columns**.
-2. Drag **Top Corridor** to **Filters**, select **True**. (A table-calculation filter runs last, so the eight are the top eight inside the current selection. A plain Top N filter would rank before **Move In Scope** applies.)
+2. Drag **Top Corridor** to **Filters**, select **True**. (A table-calculation filter runs last, so the eight are the top eight inside the current selection. A plain Top N filter would rank before **Move In Scope** applies.) Then right-click the pill, **Edit Table Calculation**, **Compute using: Specific Dimensions**, and tick **both** `Corridor` and `flow_scope_label`. With only `Corridor` ticked, Tableau ranks inside each color separately and shows the top 8 within-country and the top 8 across-border routes: 16 bars, not 8.
 3. Sort **Corridor** descending by **Movers**.
 4. **flow_scope_label** to **Color**, same colors as the map: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`. A corridor is either one or the other, so each bar has one color.
-5. Label the end of each bar with **Movers** (10 pt navy). Hide the Movers axis, gridlines, zero lines and borders; keep the Corridor labels (10 pt slate). Sheet background none.
+5. Label the end of each bar: **Movers** to **Label** on the Marks card, **Show mark labels** on, aligned at the bar end (10 pt navy). On the dashboard, remove the color legend Tableau adds when the sheet is dropped in (hover the legend, use the item menu, **Remove from Dashboard**): the stat numbers beside it already name the two colors. Hide the Movers axis, gridlines, zero lines and borders; keep the Corridor labels (10 pt slate). Sheet background none.
 6. Title shown, text "Biggest routes", 11 pt bold slate. **Fit: Entire View**.
 
 Expected Company FY26: Bengaluru to Hyderabad 28, Hyderabad to Bengaluru 25, Bengaluru to Pune 19 at the top. With p_View Office and p_Group Bengaluru, every bar starts or ends at Bengaluru.
