@@ -52,10 +52,11 @@ ZN(SUM(IF [Move In Scope] AND [flow_scope] = "International" THEN [workers] END)
       THEN [Corridor] END) }
 
 // Moves Title   (the panel headline: answers "do people move inside or across borders, and where?")
+// ATTR() turns the two fixed (LOD) values into aggregates, so they can sit beside Movers
 IF [Movers] = 0 THEN "No one in this selection changed office in this period"
-ELSEIF [Movers] = 1 THEN "One person changed office: " + [Top Route]
+ELSEIF [Movers] = 1 THEN "One person changed office: " + ATTR([Top Route])
 ELSE STR(ROUND(100 * [Movers Within] / [Movers], 0)) + "% of moves stay inside one country; "
-     + [Top Route] + " is the busiest route (" + STR([Top Route Movers]) + " people)"
+     + ATTR([Top Route]) + " is the busiest route (" + STR(ATTR([Top Route Movers])) + " people)"
 END
 
 // Route Class   (aggregate; colors the lines: one-person border crossings are drawn lighter)
