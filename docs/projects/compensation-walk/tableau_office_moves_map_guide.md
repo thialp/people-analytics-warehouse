@@ -64,12 +64,12 @@ END
 
 1. Double-click **Move Line**. A map appears with lines (Tableau adds *Latitude (generated)* and *Longitude (generated)*).
 2. Drag **Move In Scope** to **Filters**, select **True**.
-3. Marks (layer 1, `Move Line`): mark type **Line**. **Corridor** to **Detail**. **SUM(workers)** to **Size**. **flow_scope_label** to **Color**: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`; opacity 60%. Size slider: small to medium, so Bengaluru to Hyderabad (28) is clearly thicker than a single move.
+3. Marks (layer 1, `Move Line`): mark type **Automatic** (not Line: the Line type joins the marks into one connecting path and the sheet zigzags; Automatic draws each corridor as its own arc, curved along the shortest route over the globe). **Corridor** to **Detail**. **SUM(workers)** to **Size**. **flow_scope_label** to **Color**: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`; opacity 60%. Size slider: small to medium, so Bengaluru to Hyderabad (28) is clearly thicker than a single move.
 4. Drag **Arrival Point** onto **Add a Marks Layer**. Layer 2: mark type **Circle**, **to_office** to **Detail**, **SUM(workers)** to **Size**, color navy `#13233A`, opacity 80%, size small (people arriving).
 5. Layer order on the Marks card: Arrival Point on top, Move Line below.
 6. **Map > Background Maps > Light**. **Map > Map Layers**: washout 40%, keep only Base and Coastline.
 7. **Map > Map Options**: untick *Show Map Search*, *Show View Toolbar*. Keep pan and zoom on so a reader can look closer.
-8. **Fit: Entire View**. Hide the headers and the Latitude/Longitude axes.
+8. Hide the headers and the Latitude/Longitude axes. Fit is greyed out on a map sheet; the framing is the saved zoom instead. Zoom out with the **−** control and pan until Vancouver (west) and Sydney (east) sit just inside the left and right edges. The 35 offices span about 2.4 wide to 1 tall in Mercator, so at 236 high the map is about 490 wide; that is why the map container in section 5 is 490, not wider. Long arcs bow north and may touch the top edge; that is expected.
 9. Tooltip:
    ```
    <Corridor>
@@ -93,20 +93,53 @@ Expected, Company FY26: 143 lines; the thickest runs between Bengaluru and Hyder
 
 Hide the titles, set the sheet background to none, **Fit: Entire View**. Expected Company FY26: 345, 227, 118.
 
+### Sheet `Top Corridors`
+
+The map is only 490 wide, so the room beside it holds a ranked list of the biggest routes. Data source Office Moves.
+
+```
+// Top Corridor  (Boolean table calculation, computed along Corridor)
+RANK_UNIQUE([Movers]) <= 8 AND [Movers] > 0
+```
+
+1. **Corridor** to **Rows**, **Movers** to **Columns**.
+2. Drag **Top Corridor** to **Filters**, select **True**. (A table-calculation filter runs last, so the eight are the top eight inside the current selection. A plain Top N filter would rank before **Move In Scope** applies.) Then right-click the pill, **Edit Table Calculation**, **Compute using: Specific Dimensions**, and tick **both** `Corridor` and `flow_scope_label`. With only `Corridor` ticked, Tableau ranks inside each color separately and shows the top 8 within-country and the top 8 across-border routes: 16 bars, not 8.
+3. Sort **Corridor** descending by **Movers**.
+4. **flow_scope_label** to **Color**, same colors as the map: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`. A corridor is either one or the other, so each bar has one color.
+5. Label the end of each bar: **Movers** to **Label** on the Marks card, **Show mark labels** on, aligned at the bar end (10 pt navy). On the dashboard, remove the color legend Tableau adds when the sheet is dropped in (hover the legend, use the item menu, **Remove from Dashboard**): the stat numbers beside it already name the two colors. Hide the Movers axis, gridlines, zero lines and borders; keep the Corridor labels (10 pt slate). Sheet background none.
+6. Title shown, text "Biggest routes", 11 pt bold slate. **Fit: Entire View**.
+
+Expected Company FY26: Bengaluru to Hyderabad 28, Hyderabad to Bengaluru 25, Bengaluru to Pune 19 at the top. With p_View Office and p_Group Bengaluru, every bar starts or ends at Bengaluru.
+
 ## 5. Place on the dashboard (Summary, 1400 x 850)
 
-Floating, positions from the design sketch (Position and size in the layout pane):
+Items inside a layout container are tiled, not free-floating, so the panel is one floating container with the pieces nested in it. Sizes come from the design sketch (panel card 240, 512, 1104 x 306; the toggle floats at 1124, 524, 220 x 30).
 
-| Object | x, y | w x h |
-|---|---|---|
-| `Office Moves Title` | 258, 530 | 500 x 24 |
-| `Office Moves Subtitle` | 258, 554 | 500 x 20 |
-| `Office Moves Map` | 252, 578 | 728 x 232 |
-| `Stat Total` | 1000, 580 | 330 x 56 |
-| `Stat Within` | 1000, 642 | 330 x 56 |
-| `Stat Across` | 1000, 704 | 330 x 56 |
+```
+Panel: Office moves                  floating, x 252, y 530, w 1080, h 280, no background
+|-- Panel header                     vertical, w 1080, h 44
+|     |-- Office Moves Title         h 24
+|     `-- Office Moves Subtitle      h 20
+`-- Panel body                       horizontal, w 1080, h 236
+      |-- Office Moves Map           w 490, h 236
+      |-- Top Corridors              w 290, h 236
+      `-- Panel stats                vertical, w 300, h 236, outer padding left 20
+            |-- Stat Total           h 62
+            |-- Stat Within          h 62
+            `-- Stat Across          h 62
+```
 
-Put them in one container named `Panel: Office moves`, so the `p_Panel` toggle can show and hide the whole panel at once when the Career moves panel is built.
+Build it:
+
+1. **Container.** From the dashboard Objects list, drag a **Vertical** container onto the dashboard with **Floating** selected. In the **Layout** pane set Position x 252, y 530, size 1080 x 280, Background None. Rename it `Panel: Office moves` (item menu, **Rename Dashboard Item**).
+2. **Header.** Drag a second **Vertical** container into it, drop it at the top, size 1080 x 44. Drag `Office Moves Title` (h 24) and `Office Moves Subtitle` (h 20) into it.
+3. **Body.** Drag a **Horizontal** container below the header, size 1080 x 236. Drag `Office Moves Map` into it and set its size to 490 x 236 (the offices' shape; a wider container only adds blank sides).
+4. **Top corridors.** Drag `Top Corridors` into the body to the right of the map (290 x 236).
+5. **Stats.** Drag a **Vertical** container to the right of that inside the body (300 x 236, outer padding left 20). Drag the three stat sheets into it, 62 high each.
+6. In the Layout pane, set every container's **Background** to **None** and **Border** to **None**.
+7. **Toggle.** Add it after the container as a floating item so it sits on top, at 1124, 524, 220 x 30. It stays outside the container, so it is still visible when the panel is hidden.
+
+Titles are 500 wide, so the container's empty top right stays free for the toggle. Positions are within a couple of pixels of the sketch.
 
 ## 6. Check that it follows every filter
 
