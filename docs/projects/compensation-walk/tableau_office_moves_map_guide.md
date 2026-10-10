@@ -101,38 +101,66 @@ Expected, Company FY26: 143 lines; the thickest runs between Bengaluru and Hyder
 
 Hide the titles, set the sheet background to none, **Fit: Entire View**. Expected Company FY26 subtitle: "345 people changed office · 227 within one country · 118 across a border"; title: "Bengaluru to Hyderabad is the busiest route: 28 of 345 people who moved". The three `Stat` sheets are no longer used: delete them.
 
-### Sheet `Top Corridors`
+### Pattern: the name above each bar (used by `Top Corridors` and `Region Moves`)
 
-The map is only 490 wide, so the room beside it holds a ranked list of the biggest routes. Data source Office Moves.
+Tableau has no setting that puts a label above a bar, so the name is carried by a second, invisible mark in a row of its own. The recipe is the dual-axis `AVG(0)` trick ([Data School, Stanley Chan](https://thedataschool.co.uk/stanley-chan/add-a-label-above-every-horizontal-bar-in-tableau); same steps in [InterWorks](https://interworks.com/blog/2021/08/25/advance-with-assist-adding-field-names-above-bars-on-a-bar-chart/)). `<name>` is `Corridor` or `to_region`; `<value>` is the measure of that sheet.
+
+1. `<name>` to **Rows**, `<value>` to **Columns**. Mark type **Bar**.
+2. Double-click the empty space to the right of the `<value>` pill on Columns, type `AVG(0)` and press Enter. A second pill, `AGG(AVG(0))`, appears.
+3. Right-click `AGG(AVG(0))` on Columns, **Dual Axis**. Then right-click the top axis, **Synchronize Axis**. The Marks card now has three tabs: **All**, `<value>`, `AGG(AVG(0))`.
+4. On the **All** tab, **Measure Names** sits on Color. Drag it to **Rows**, to the right of `<name>`. (If it is not there, drag **Measure Names** from the bottom of the Dimensions list.) Each bar now has a second row.
+5. The dummy row must be **above** the bar. If it is below: right-click the **Measure Names** pill, **Sort**, **Manual**, and move `AGG(AVG(0))` above `<value>`.
+6. **`AGG(AVG(0))` tab:** mark type **Gantt Bar**, Size slider to the far left (zero), Color opacity 0%. Drag `<name>` from the Dimensions list in the data pane (not from Rows) onto **Label**. Click **Label**: Alignment horizontal **Left**, vertical **Middle**; font Tableau Book 10 pt slate `#5A6170`; **Options**: tick *Allow labels to overlap other marks*. If the text is centered on the zero line and half of it hangs off the left, Alignment is not set to Left.
+7. Hide the headers: right-click `<name>` and **Measure Names** on Rows, untick **Show Header**; right-click each axis, untick **Show Header**.
+8. **Format**, **Lines**: Row Divider, Grid Lines and Zero Lines all **None**. Sheet background none.
+9. **`<value>` tab:** Size slider to about 40%, so a bar is about 10 px thick in a row about 20 px high.
+
+With 5 names on a 224 px sheet, each name gets about 40 px: 20 for the name, 20 for the bar. Fit: **Entire View**.
+
+### Sheet `Top Corridors` (top 5, name above the bar)
+
+Five routes, one per region bar next door, so the two charts have the same number of rows. Data source Office Moves.
 
 ```
 // Top Corridor  (Boolean table calculation, computed along Corridor)
-RANK_UNIQUE([Movers]) <= 8 AND [Movers] > 0
+RANK_UNIQUE([Movers]) <= 5 AND [Movers] > 0
 ```
 
-1. **Corridor** to **Rows**, **Movers** to **Columns**.
-2. Drag **Top Corridor** to **Filters**, select **True**. (A table-calculation filter runs last, so the eight are the top eight inside the current selection. A plain Top N filter would rank before **Move In Scope** applies.) Then right-click the pill, **Edit Table Calculation**, **Compute using: Specific Dimensions**, and tick **both** `Corridor` and `flow_scope_label`. With only `Corridor` ticked, Tableau ranks inside each color separately and shows the top 8 within-country and the top 8 across-border routes: 16 bars, not 8.
-3. Sort **Corridor** descending by **Movers**.
-4. **flow_scope_label** to **Color**, same colors as the map: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`. A corridor is either one or the other, so each bar has one color.
-5. Label the end of each bar: **Movers** to **Label** on the Marks card, **Show mark labels** on, aligned at the bar end (10 pt navy). On the dashboard, remove the color legend Tableau adds when the sheet is dropped in (hover the legend, use the item menu, **Remove from Dashboard**): the stat numbers beside it already name the two colors. Hide the Movers axis, gridlines, zero lines and borders; keep the Corridor labels (10 pt slate). Sheet background none.
-6. Title shown, text "Biggest routes", 11 pt bold slate. **Fit: Entire View**.
+1. Build the pattern above with `<name>` = **Corridor** and `<value>` = **Movers**.
+2. Drag **Top Corridor** to **Filters**, select **True**. A table-calculation filter runs last, so the five are the top five inside the current selection (a plain Top N filter would rank before **Move In Scope** applies). Right-click the pill, **Edit Table Calculation**, **Compute using: Specific Dimensions**, tick `Corridor` and `flow_scope_label`; leave **Measure Names** unticked.
+3. **Movers** tab: **flow_scope_label** to **Color**, same colors as the map: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`. A corridor is either one or the other, so each bar has one color. **Movers** to **Label**, bar end, 10 pt bold navy.
+4. Sort **Corridor** descending by **Movers** (right-click the header before hiding it, **Sort**).
+5. Title shown, text "Busiest routes", 11 pt bold slate.
+6. Tooltip: `<Corridor>` then `<Movers> people · <flow_scope_label>`.
 
-Expected Company FY26: Bengaluru to Hyderabad 28, Hyderabad to Bengaluru 25, Bengaluru to Pune 19 at the top. With p_View Office and p_Group Bengaluru, every bar starts or ends at Bengaluru.
+Expected Company FY26: Bengaluru to Hyderabad 28, Hyderabad to Bengaluru 25, Bengaluru to Pune 19, Hyderabad to Pune 13, Warsaw to Krakow 12. With p_View Office and p_Group Bengaluru, every route starts or ends at Bengaluru.
 
-### Sheet `Region Moves`
+Option (not built): count each pair of offices once, in both directions, as the Figma prototype does (`IF [from_office] < [to_office] THEN [from_office] + " ↔ " + [to_office] ELSE [to_office] + " ↔ " + [from_office] END`). FY26 would read Bengaluru ↔ Hyderabad 53, Bengaluru ↔ Pune 22, Krakow ↔ Warsaw 17, Hyderabad ↔ Pune 16, Guadalajara ↔ Mexico City 16.
 
-Where people landed, by region. No new data: `to_region` is already a column, and the same `Movers` measure splits by `flow_scope_label`, so each bar shows how many arrivals came from inside one country and how many crossed a border.
+### Sheet `Region Moves` (where people landed)
 
-1. **to_region** to **Rows**, **Movers** to **Columns**.
-2. **flow_scope_label** to **Color** (violet and coral as above). The bars stack: within one country, across a border.
-3. Sort **to_region** descending by **Movers**.
-4. Total at the bar end: **Analytics** pane, **Reference Line**, scope **Per Cell**, value **Movers**, aggregation **Total**, label **Value**, line **None**. Segment labels stay off: a 4-person segment is too thin to hold a number.
-5. Hide the axis, gridlines, zero lines and borders. Region labels 10 pt slate, sheet background none, **Fit: Entire View**. Title shown: "Where they landed", 11 pt bold slate.
-6. Tooltip: `<to_region>` then `<Movers> people · <flow_scope_label>`.
+No new data: `to_region` is already a column, and the same moves split by `flow_scope_label`, so each bar shows how many arrivals came from inside one country and how many crossed a border. Data source Office Moves.
 
-Expected Company FY26 (within one country / across a border): Asia Pacific 121 (95 / 26), North America 120 (83 / 37), Europe 61 (25 / 36), Latin America 31 (16 / 15), Middle East & Africa 12 (8 / 4). The totals add to 345. With p_View Country and p_Group India: Asia Pacific 110 (91 / 19), North America 15, Europe 8, Latin America 3: 136 in all.
+One calculation first (data source Office Moves):
 
-Why not "net by region"? The net is nearly zero for every region (Asia Pacific -12, Europe +8, North America +2, Latin America +3, Middle East & Africa -1): moves mostly trade people between regions, so the bars would be invisible. Arrivals by region tell the story. Departures by region would need each move to appear twice (once per end); that is a data change for later, not for this chart.
+```
+// Moved People   (row level; a plain SUM, so the bar-total reference line can use "Total")
+IF [Move In Scope] THEN [workers] END
+```
+
+1. New worksheet, rename it `Region Moves`, data source **Office Moves**.
+2. Build the pattern above with `<name>` = **to_region** and `<value>` = **SUM(Moved People)** (drag `Moved People` to Columns; it shows as `SUM(Moved People)`).
+3. **SUM(Moved People)** tab: **flow_scope_label** to **Color**: *Within one country* `#5B4FB3`, *Across a border* `#E4572E`. The bars stack, violet then coral.
+4. Sort **to_region** descending by **SUM(Moved People)** (right-click the `to_region` header before hiding it, **Sort**, **Field**).
+5. Total at the end of each bar: **Analytics** pane, drag **Reference Line** onto **Cell** over the `SUM(Moved People)` pane. In the dialog: Scope **Per Cell**; Value **SUM(Moved People)**, aggregation **Total**; Label **Value**; Line **None**; Label font 10 pt bold navy. (The `AVG(0)` row gets no line: choose the `SUM(Moved People)` pane when dropping.) Segment labels stay off: a 4-person segment is too thin to hold a number.
+6. Title shown, text "Where they landed", 11 pt bold slate.
+7. Tooltip: `<to_region>` then `<SUM(Moved People)> people · <flow_scope_label>`.
+
+Expected Company FY26 (within one country / across a border): Asia Pacific 121 (95 / 26), North America 120 (83 / 37), Europe 61 (25 / 36), Latin America 31 (16 / 15), Middle East & Africa 12 (8 / 4); the totals add to 345. With p_View Country and p_Group India: Asia Pacific 110 (91 / 19), North America 15, Europe 8, Latin America 3: 136 in all.
+
+If a region shows no total, the reference line is on the wrong pane or the aggregation is not **Total**. If the bars come out as one color, **flow_scope_label** is on the **All** tab instead of the `SUM(Moved People)` tab.
+
+Why not "net by region"? The net is nearly zero for every region (Asia Pacific -12, Europe +8, North America +2, Latin America +3, Middle East & Africa -1): moves mostly trade people between regions, so the bars would be invisible. Arrivals by region tell the story. Departures by region would need each move to appear twice (once per end); that is a data change for later.
 
 ## 5. Place on the dashboard (Summary, 1400 x 850)
 
