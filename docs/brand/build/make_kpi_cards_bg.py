@@ -25,7 +25,12 @@ FILL = (0xFB, 0xFB, 0xF8, 255)    # card off-white
 BORDER = (0xE4, 0xE3, 0xDD, 255)  # hairline
 
 
-def build(sheet_w, sheet_h, left, top, card_w, card_h, gap, cards, radius, out):
+def rgba(hex_color):
+    h = hex_color.lstrip("#")
+    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), 255)
+
+
+def build(sheet_w, sheet_h, left, top, card_w, card_h, gap, cards, radius, out, fill=FILL, border=BORDER):
     k = SS * OUT_SCALE
     img = Image.new("RGBA", (sheet_w * k, sheet_h * k), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -35,8 +40,8 @@ def build(sheet_w, sheet_h, left, top, card_w, card_h, gap, cards, radius, out):
         x1 = x0 + card_w * k - 1
         y1 = y0 + card_h * k - 1
         # border first, then the fill inset by 1 px
-        d.rounded_rectangle([x0, y0, x1, y1], radius=radius * k, fill=BORDER)
-        d.rounded_rectangle([x0 + k, y0 + k, x1 - k, y1 - k], radius=(radius - 1) * k, fill=FILL)
+        d.rounded_rectangle([x0, y0, x1, y1], radius=radius * k, fill=border)
+        d.rounded_rectangle([x0 + k, y0 + k, x1 - k, y1 - k], radius=(radius - 1) * k, fill=fill)
     img = img.resize((sheet_w * OUT_SCALE, sheet_h * OUT_SCALE), Image.LANCZOS)
     img.save(out, optimize=True)
     return img.size
@@ -53,8 +58,11 @@ if __name__ == "__main__":
     ap.add_argument("--gap", type=int, default=16, help="space between cards (kpi_GapX)")
     ap.add_argument("--cards", type=int, default=5)
     ap.add_argument("--radius", type=int, default=10)
+    ap.add_argument("--fill", default="FBFBF8", help="card fill, hex (default the brand card color)")
+    ap.add_argument("--border", default="E4E3DD", help="card border, hex")
     ap.add_argument("--out", default="arcadia_kpi_cards_bg_summary.png")
     a = ap.parse_args()
-    size = build(a.sheet_w, a.sheet_h, a.left, a.top, a.card_w, a.card_h, a.gap, a.cards, a.radius, a.out)
+    size = build(a.sheet_w, a.sheet_h, a.left, a.top, a.card_w, a.card_h, a.gap, a.cards, a.radius, a.out,
+                 rgba(a.fill), rgba(a.border))
     right = a.left + a.cards * a.card_w + (a.cards - 1) * a.gap
     print(f"{a.out}: {size[0]} x {size[1]}, cards from x {a.left} to x {right}")
