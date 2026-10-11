@@ -22,7 +22,7 @@ def segment(label, on, path):
     im = Image.new("RGBA", (W*S, H*S), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     if on:
-        d.rounded_rectangle((8*S, 8*S, (W-8)*S, (H-8)*S), radius=((H-16)//2)*S, fill=WHITE)
+        d.rounded_rectangle((8*S, 8*S, (W-8)*S, (H-8)*S), radius=14*S, fill=WHITE)
     f = ImageFont.truetype(FONT, 40*S)
     d.text((W*S//2, H*S//2), label, font=f, fill=NAVY if on else MIST, anchor="mm")
     im.resize((W, H), Image.LANCZOS).save(path)
@@ -35,7 +35,7 @@ for key, lab in OPTIONS.items():
 pv = Image.new("RGB", (240*2, 3*70), (19, 35, 58))
 for r, (a, b) in enumerate((("lens_fte", "lens_amount"), ("cost_loaded", "cost_base"), ("currency_constant", "currency_nominal"))):
     cap = Image.new("RGBA", (352*2, 120), (0, 0, 0, 0)); d = ImageDraw.Draw(cap)
-    d.rounded_rectangle((0, 0, 703, 119), radius=60, fill=CAP)
+    d.rounded_rectangle((0, 0, 703, 119), radius=16, fill=CAP)
     for i, (k, on) in enumerate(((a, True), (b, False))):
         cap.alpha_composite(Image.open(f"{OUT}/seg_{k}_{'on' if on else 'off'}.png"), (i*352, 0))
     cap = cap.resize((240, 41), Image.LANCZOS)
