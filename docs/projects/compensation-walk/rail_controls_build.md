@@ -59,10 +59,10 @@ Dashboard item: 176 x 30, background Group Field blue, corner radius to match th
 
 | Action | Type | Source | Target | Field | Clearing |
 |---|---|---|---|---|---|
-| Set lens | Change Parameter | Lens Toggle | `p_Lens` | `Lens Value` (see note) | Keep current value |
+| Set lens | Change Parameter | Lens Toggle | `p_Lens` | `Lens Pick` (see note) | Keep current value |
 | Deselect Lens Toggle | Filter | Lens Toggle | Lens Toggle (worksheet) | `zzTrue` > `zzFalse` | Show all values |
 
-Note: the parameter wants `FTE` / `Amount`. Make the field the action passes `Lens Value` = `IF [step]="Opening" THEN "FTE" ELSEIF [step]="Closing" THEN "Amount" END` and put it on Detail. Use `Lens Value` as the field in the action; `Lens Option` stays for the shape.
+Note: the parameter wants `FTE` / `Amount`. Make the field the action passes `Lens Pick` = `IF [step]="Opening" THEN "FTE" ELSEIF [step]="Closing" THEN "Amount" END` and put it on Detail. Use `Lens Pick` as the field in the action; `Lens Option` stays for the shape. (Do not call it `Lens Value`: that name is already the measure on the cards.)
 
 ### 1.4 Remove the old `p_Lens` control from the top right of the dashboard. Heading text above the toggle: `SHOW PAY AS` (see Part 5).
 
@@ -81,10 +81,10 @@ Same as Part 1 with:
 
 | Sheet | Option calc | State calc compares to | Shape calc | Values passed to parameter |
 |---|---|---|---|---|
-| Cost Toggle | `Opening` > `loaded`, `Closing` > `base` | `LOWER([p_Cost])` | `"seg_cost_" + [Cost Option] + "_" + [Cost State]` | `Cost Value`: `Loaded` / `Base` |
-| Currency Toggle | `Opening` > `constant`, `Closing` > `nominal` | `LOWER([p_Currency])` | `"seg_currency_" + ...` | `Currency Value`: `Constant` / `Nominal` |
+| Cost Toggle | `Opening` > `loaded`, `Closing` > `base` | `LOWER([p_Cost])` | `"seg_cost_" + [Cost Option] + "_" + [Cost State]` | `Cost Pick`: `Loaded` / `Base` |
+| Currency Toggle | `Opening` > `constant`, `Closing` > `nominal` | `LOWER([p_Currency])` | `"seg_currency_" + ...` | `Currency Pick`: `Constant` / `Nominal` |
 
-Check the exact strings your `p_Cost` and `p_Currency` hold (Data pane > right-click parameter > Edit) and use those in `Cost Value` / `Currency Value`.
+Check the exact strings your `p_Cost` and `p_Currency` hold (Data pane > right-click parameter > Edit) and use those in `Cost Pick` / `Currency Pick`.
 
 ---
 
