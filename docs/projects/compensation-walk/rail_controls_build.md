@@ -10,6 +10,7 @@ Group/View pickers are in [rail_group_picker_build.md](rail_group_picker_build.m
 1. Run `python docs/brand/build/make_rail_toggle_shapes.py 1D3150` (replace `1D3150` with your Group Field hex; it only colours the preview).
 2. Copy the 12 new files `docs/brand/shapes/Arcadia/seg_lens_*`, `seg_cost_*`, `seg_currency_*` to `Documents/My Tableau Repository/Shapes/Arcadia`.
 3. Tableau: on any sheet, Shape card > Reload Shapes.
+4. Assign every shape by hand (Shape card > pick the value > click its file). Assign Palette does NOT match by name; it assigns in alphabetical order.
 
 | Option | On/off files |
 |---|---|
@@ -33,13 +34,13 @@ IF [step] = "Opening" THEN "fte"
 ELSEIF [step] = "Closing" THEN "amount" END
 
 // Lens State
-IF [Lens Option] = LOWER([p_Lens]) THEN "on" ELSE "off" END
+IF ([Lens Option] = "fte") = [Is FTE] THEN "on" ELSE "off" END
 
 // Lens Shape  (must equal the PNG file name without .png)
 "seg_lens_" + [Lens Option] + "_" + [Lens State]
 ```
 
-`p_Lens` values are `FTE` and `Amount`, hence `LOWER`.
+`p_Lens` stores `Per FTE` and `Total` (displayed Avg pay per FTE / Total payroll). Do not use `LOWER([p_Lens])`; use the existing `Is FTE` calc for the state.
 
 ### 1.2 Sheet `Lens Toggle`
 
@@ -62,7 +63,7 @@ Dashboard item: 176 x 30, background Group Field blue, corner radius to match th
 | Set lens | Change Parameter | Lens Toggle | `p_Lens` | `Lens Pick` (see note) | Keep current value |
 | Deselect Lens Toggle | Filter | Lens Toggle | Lens Toggle (worksheet) | `zzTrue` > `zzFalse` | Show all values |
 
-Note: the parameter wants `FTE` / `Amount`. Make the field the action passes `Lens Pick` = `IF [step]="Opening" THEN "FTE" ELSEIF [step]="Closing" THEN "Amount" END` and put it on Detail. Use `Lens Pick` as the field in the action; `Lens Option` stays for the shape. (Do not call it `Lens Value`: that name is already the measure on the cards.)
+Note: the parameter wants `Per FTE` / `Total`. Make the field the action passes `Lens Pick` = `IF [step]="Opening" THEN "Per FTE" ELSEIF [step]="Closing" THEN "Total" END` and put it on Detail. Use `Lens Pick` as the field in the action; `Lens Option` stays for the shape. (Do not call it `Lens Value`: that name is already the measure on the cards.)
 
 ### 1.4 Remove the old `p_Lens` control from the top right of the dashboard. Heading text above the toggle: `SHOW PAY AS` (see Part 5).
 
@@ -99,7 +100,7 @@ Marks Square, Text = a calc `Reset Text` = `"Reset"`, left aligned like the Rail
 | `Default To` | `DATE("2026-06-30")` |
 | `Default View` | `"Company"` |
 | `Default Group All` | `"Arcadia Systems"` |
-| `Default Lens` | `"FTE"` |
+| `Default Lens` | `"Per FTE"` |
 | `Default Cost` | `"Loaded"` |
 | `Default Currency` | `"Constant"` |
 | `Default Span` | `"Fiscal year"` |
