@@ -9,7 +9,7 @@ Group/View pickers are in [rail_group_picker_build.md](rail_group_picker_build.m
 
 1. Run `python docs/brand/build/make_rail_toggle_shapes.py 1D3150` (replace `1D3150` with your Group Field hex; it only colours the preview).
 2. Copy the 12 new files `docs/brand/shapes/Arcadia/seg_lens_*`, `seg_cost_*`, `seg_currency_*` to `Documents/My Tableau Repository/Shapes/Arcadia`.
-3. Tableau: Map > ... no: any sheet, Shape card > Reload Shapes.
+3. Tableau: on any sheet, Shape card > Reload Shapes.
 
 | Option | On/off files |
 |---|---|
@@ -59,7 +59,7 @@ Dashboard item: 176 x 30, background Group Field blue, corner radius to match th
 
 | Action | Type | Source | Target | Field | Clearing |
 |---|---|---|---|---|---|
-| Set lens | Change Parameter | Lens Toggle | `p_Lens` | `Lens Option` ... see note | Keep current value |
+| Set lens | Change Parameter | Lens Toggle | `p_Lens` | `Lens Value` (see note) | Keep current value |
 | Deselect Lens Toggle | Filter | Lens Toggle | Lens Toggle (worksheet) | `zzTrue` > `zzFalse` | Show all values |
 
 Note: the parameter wants `FTE` / `Amount`. Make the field the action passes `Lens Value` = `IF [step]="Opening" THEN "FTE" ELSEIF [step]="Closing" THEN "Amount" END` and put it on Detail. Use `Lens Value` as the field in the action; `Lens Option` stays for the shape.
@@ -99,7 +99,7 @@ Marks Square, Text = a calc `Reset Text` = `"Reset"`, left aligned like the Rail
 | `Default To` | `DATE("2026-06-30")` |
 | `Default View` | `"Company"` |
 | `Default Group All` | `"Arcadia Systems"` |
-| `Default Lens` | `"Amount"` |
+| `Default Lens` | `"FTE"` |
 | `Default Cost` | `"Loaded"` |
 | `Default Currency` | `"Constant"` |
 | `Default Span` | `"Fiscal year"` |
@@ -164,7 +164,7 @@ Fiscal year caveat: Year over Year rows whose from-month is not June are calenda
 | Sheet | Build |
 |---|---|
 | `Period Field` | Text mark, `Period Field Text`; Detail `Toggle Period Panel`, `zzTrue`, `zzFalse`; filter `Period Is Current` = True; same look as Group Field |
-| `Span List` | Square mark (like Rail View). Rows: `p_Span` options via the 4 values: calc `Span Option` = `IF [step]="Opening" THEN "Fiscal year" ...` is not enough for 4; instead use `Span Item` list: Rows `pair_type` filtered to the 4 types, Text = `Span Label` (`CASE [pair_type] WHEN "Year over Year" THEN "Fiscal year" WHEN "Fiscal Year to Date" THEN "Year to date" WHEN "Quarter over Quarter" THEN "Quarter" WHEN "Month over Month" THEN "Month" END`), Detail `Span Value` (same text). Action sets `p_Span` from `Span Value` |
+| `Span List` | Square mark (like Rail View). Rows `pair_type` (filter out Custom Range), Text = `Span Label` (`CASE [pair_type] WHEN "Year over Year" THEN "Fiscal year" WHEN "Fiscal Year to Date" THEN "Year to date" WHEN "Quarter over Quarter" THEN "Quarter" WHEN "Month over Month" THEN "Month" END`), Detail `Span Value` (same text). Action sets `p_Span` from `Span Value` |
 | `Period Panel` | Same as `Group Panel`: Columns `Pick Col`, Rows `Pick Row`, Text `Pair Label`, Detail `Period Key`, `from_month_end`, `to_month_end`, `Close Panel`, zz fields; filter `Period In Span` = True and `pair_type` not Custom; table calcs set to Specific Dimensions with `Period Key` first and every field ticked. Use `Pick Rows` = `INT((SIZE()+3)/4)` for 4 columns, or keep 3 |
 | `Period Close` | Copy of `Panel Close` |
 
@@ -240,5 +240,5 @@ Popover y: field y minus 6. Re-check the Group and Period popover x (214) and fr
 | 1 | Click each toggle option | Cards update, pill moves, no blue box |
 | 2 | Open Period, pick "Quarter", pick FY26 Q4 | Panel lists quarters newest first; picking closes it; field reads FY26 Q4 |
 | 3 | Open Period, then Group | Period closes |
-| 4 | Change several things, click Reset | Everything back to FY26, Company, Total payroll, Loaded, Constant |
+| 4 | Change several things, click Reset | Everything back to FY26, Company, Avg per FTE, Loaded, Constant |
 | 5 | Switch to Company | Group Field and Group Heading disappear, controls below stay aligned |
