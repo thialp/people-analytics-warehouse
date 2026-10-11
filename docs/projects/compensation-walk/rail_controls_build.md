@@ -49,7 +49,7 @@ IF ([Lens Option] = "fte") = [Is FTE] THEN "on" ELSE "off" END
 | 1 | Marks: **Shape** |
 | 2 | Columns: `Lens Option` (Discrete). Sort: Manual, `fte` first |
 | 3 | Filter `Lens Option`: exclude **Null** |
-| 4 | Shape: `Lens Shape`. Click the Shape card, pick the palette Arcadia, Assign Palette (names match automatically) |
+| 4 | Shape: `Lens Shape`. Click the Shape card, pick the palette Arcadia, assign each value by hand (Assign Palette does not match by name) |
 | 5 | Size: max. Fit: **Entire View**. Hide column header. Tooltip off |
 | 6 | Format > Shading: Worksheet and Pane = Group Field blue. Lines None |
 | 7 | Detail: `zzTrue`, `zzFalse` |
