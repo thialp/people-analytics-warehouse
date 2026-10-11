@@ -32,7 +32,7 @@ Dashboard > Actions > Add Action > **Filter**:
 | Name | `Deselect Rail View` |
 | Source sheets | Summary: **Rail View** only |
 | Run action on | Select |
-| Target sheets | Summary: **Rail View** only |
+| Target sheets | the **worksheet** `Rail View` itself, listed on its own in the Target Sheets box, NOT the `Summary (Rail View)` entry under the dashboard (InterWorks: "the sheet itself, not the dashboard instance") |
 | Clearing the selection will | **Show all values** |
 | Filter | Selected Fields: Source `zzTrue` → Target `zzFalse` |
 
@@ -158,11 +158,14 @@ Dashboard > Actions. All are on the Summary dashboard, and all are **Run action 
 | 3 | Close panel on pick | Change Parameter | Group Panel | `p_GroupOpen` | `Close Panel` | |
 | 4 | Close panel on ✕ | Change Parameter | Panel Close | `p_GroupOpen` | `Close Panel` | |
 | 5 | Close panel on view change | Change Parameter | Rail View | `p_GroupOpen` | `Close Panel` | |
+| 5b | Set group from view | Change Parameter | Rail View | `p_Group` | `Default Group` | Must exist: without it, changing the view keeps the old group (for example Atlanta under Department) and every card goes blank |
 | 6 | Deselect Group Field | Filter | Group Field | Group Field | `zzTrue` → `zzFalse` | Show all values |
 | 7 | Deselect Group Panel | Filter | Group Panel | Group Panel | `zzTrue` → `zzFalse` | Show all values |
 | 8 | Deselect Panel Close | Filter | Panel Close | Panel Close | `zzTrue` → `zzFalse` | Show all values |
 
-For actions 1, 3, 4 and 5: "When clearing the selection" = **Keep current value**.
+For actions 1, 3, 4, 5 and 5b: "When clearing the selection" = **Keep current value**.
+
+For the three Deselect filter actions (6 to 8, and `Deselect Rail View` from Part 1), the target is the **worksheet itself** (`Group Field`, `Group Panel`, `Panel Close`, `Rail View`), not the `Summary (...)` entry under the dashboard.
 
 ### 2.7 Dashboard layout
 
@@ -203,7 +206,7 @@ For actions 1, 3, 4 and 5: "When clearing the selection" = **Keep current value*
 | Size | 28 x 28 |
 | Control visibility using value | `p_GroupOpen` |
 
-6. Order: in the Item hierarchy, `Group Popover` and `Panel Close` must be **last** (on top of the cards). Drag them to the bottom of the list if they hide behind the waterfall.
+6. Order: the popover must sit in front of every card. Select `Group Popover`, open the item's dropdown, and choose **Floating Order > Bring to Front**. Do the same for `Panel Close`. In the Item hierarchy, the front-most items are listed first.
 
 Size check for Office: 12 rows x 22 px = 264. Adding the title (about 28) and padding (32) gives about 324, inside the 330 panel.
 
