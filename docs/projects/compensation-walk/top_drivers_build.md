@@ -74,33 +74,39 @@ IF ISNULL([TD Top Name]) THEN "No drivers in this selection"
 ELSE [TD Top Name] + " moved pay the most, " + [TD Top Text] END
 ```
 
-`TD Why` (one line, 80 characters at most so it fits at 9 pt in a 408 px card; counts come from `worker_count`):
+`TD People Label` (singular and plural, so a group of one reads "1 person"):
+
+```
+[TD People Text] + IF [TD People] = 1 THEN " person" ELSE " people" END
+```
+
+`TD Why` (one line, about 65 characters at most: the card's plot is about 390 px wide at 9 pt, and longer lines are clipped; counts come from `worker_count`, which counts people, not events):
 
 ```
 CASE [TD Key]
 WHEN "Hires" THEN
-    IF NOT [Is FTE] THEN [TD People Text] + " hires added pay to the payroll."
-    ELSEIF [TD Total] < 0 THEN [TD People Text] + " people joined below the opening average, which pulled it down."
-    ELSE [TD People Text] + " people joined above the opening average, which pushed it up." END
+    IF NOT [Is FTE] THEN "New hires (" + [TD People Label] + ") added pay to the payroll."
+    ELSEIF [TD Total] < 0 THEN [TD People Label] + " joined below the opening average, pulling it down."
+    ELSE [TD People Label] + " joined above the opening average, pushing it up." END
 WHEN "Exits" THEN
-    IF NOT [Is FTE] THEN [TD People Text] + " exits took pay off the payroll, offsetting hiring."
-    ELSEIF [TD Total] >= 0 THEN [TD People Text] + " people left. They earned less than average, so the average rose."
-    ELSE [TD People Text] + " people left. They earned more than average, so the average fell." END
-WHEN "Promotions & demotions" THEN [TD People Text] + " people changed grade. Promotions add pay, demotions take a little back."
-WHEN "Tenure raises" THEN [TD People Text] + " people stepped up on their hire anniversary."
-WHEN "Market adjustments" THEN "Targeted pay corrections to the market for " + [TD People Text] + " people."
-WHEN "Relocation" THEN "Pay reset to the destination office for " + [TD People Text] + " people who moved."
-WHEN "FTE changes" THEN [TD People Text] + " people changed hours, which moved the FTE the pay is spread over."
-WHEN "Fringe rates" THEN "Employer-cost rates changed for " + [TD People Text] + " people. Salaries did not move."
-WHEN "Transfers in" THEN [TD People Text] + " people moved into this group at their current pay."
-WHEN "Transfers out" THEN [TD People Text] + " people moved out of this group, taking their pay with them."
-WHEN "Currency translation" THEN "Exchange rates changed the dollar value of pay for " + [TD People Text] + " people."
+    IF NOT [Is FTE] THEN "Exits (" + [TD People Label] + ") took pay off the payroll."
+    ELSEIF [TD Total] >= 0 THEN [TD People Label] + " left, earning less than average, so the average rose."
+    ELSE [TD People Label] + " left, earning more than average, so the average fell." END
+WHEN "Promotions & demotions" THEN [TD People Label] + " changed grade: promotions add, demotions take back."
+WHEN "Tenure raises" THEN [TD People Label] + " stepped up on their hire anniversary."
+WHEN "Market adjustments" THEN "Targeted pay corrections to the market: " + [TD People Label] + "."
+WHEN "Relocation" THEN "Pay reset to the destination office. Moved: " + [TD People Label] + "."
+WHEN "FTE changes" THEN [TD People Label] + " changed hours, shifting the FTE the pay is spread over."
+WHEN "Fringe rates" THEN "Employer-cost rates changed for " + [TD People Label] + ", not salaries."
+WHEN "Transfers in" THEN [TD People Label] + " moved into this group at their current pay."
+WHEN "Transfers out" THEN [TD People Label] + " moved out of this group with their pay."
+WHEN "Currency translation" THEN "Exchange rates changed the dollar value of pay for " + [TD People Label] + "."
 END
 ```
 
 ## Sheet `Top Drivers`
 
-Built with the name-above-bar pattern ([map guide](tableau_office_moves_map_guide.md)). The name row carries two label lines: driver name plus signed amount (teal or coral), then the reason in 9 pt gray. Bars are the size (`MAX(TD Abs)`), always from zero, colored by `TD Direction`. No axis ever goes negative, so the name row cannot shift (the Region Bars issue).
+Built with the name-above-bar pattern ([map guide](tableau_office_moves_map_guide.md)). The name row carries two label lines: driver name plus signed amount (teal or coral), then the reason in 9 pt gray. Bars are the size (`MAX(TD Abs)`), always from zero, colored by `TD Direction`. No bar goes negative. The two axes are **not synchronized**: the `AVG(0)` axis is fixed 0 to 1 (names pinned to the left edge) and the bar axis is automatic from zero. Synchronized, the shared axis stretched to about minus the maximum (zero in the middle of the card, bars squeezed into half the width).
 
 ## Expected values (Company, FY26)
 
