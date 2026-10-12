@@ -11,18 +11,18 @@ A Top N filter ranks before the other dimension filters, and a rank table calcul
 ## Calculations (walk source `ArcadiaHR`)
 
 ```
-// TD Key   (row level; the eight walk drivers, plus the org-view and currency ones; Opening and Closing give Null)
+// TD Key   (row level; one row per individual step, never combined; names match the Expand axis aliases; Opening and Closing give Null)
 CASE [step]
   WHEN "Hires" THEN "Hires"
   WHEN "Exits" THEN "Exits"
   WHEN "Transfers In" THEN "Transfers in"
   WHEN "Transfers Out" THEN "Transfers out"
-  WHEN "Promotions" THEN "Promotions & demotions"
-  WHEN "Demotions" THEN "Promotions & demotions"
+  WHEN "Promotions" THEN "Promotions"
+  WHEN "Demotions" THEN "Demotions"
   WHEN "Tenure Increases" THEN "Tenure raises"
   WHEN "Market Adjustments" THEN "Market adjustments"
   WHEN "Relocation Adjustments" THEN "Relocation"
-  WHEN "International Transfer Adjustments" THEN "Relocation"
+  WHEN "International Transfer Adjustments" THEN "Cross-border move"
   WHEN "FTE Changes" THEN "FTE changes"
   WHEN "Fringe Rate Changes" THEN "Fringe rates"
   WHEN "FX Translation" THEN "Currency translation"
@@ -92,10 +92,12 @@ WHEN "Exits" THEN
     IF NOT [Is FTE] THEN "Exits (" + [TD People Label] + ") took pay off the payroll."
     ELSEIF [TD Total] >= 0 THEN [TD People Label] + " left, earning less than average, so the average rose."
     ELSE [TD People Label] + " left, earning more than average, so the average fell." END
-WHEN "Promotions & demotions" THEN [TD People Label] + " changed grade: promotions add, demotions take back."
+WHEN "Promotions" THEN "Pay stepped up with the new grade for " + [TD People Label] + "."
+WHEN "Demotions" THEN "Pay stepped down with the lower grade for " + [TD People Label] + "."
 WHEN "Tenure raises" THEN [TD People Label] + " stepped up on their hire anniversary."
 WHEN "Market adjustments" THEN "Targeted pay corrections to the market: " + [TD People Label] + "."
-WHEN "Relocation" THEN "Pay reset to the destination office. Moved: " + [TD People Label] + "."
+WHEN "Relocation" THEN "Pay reset to the new office inside a country: " + [TD People Label] + "."
+WHEN "Cross-border move" THEN "Pay reset to the new country and currency: " + [TD People Label] + "."
 WHEN "FTE changes" THEN [TD People Label] + " changed hours, shifting the FTE the pay is spread over."
 WHEN "Fringe rates" THEN "Employer-cost rates changed for " + [TD People Label] + ", not salaries."
 WHEN "Transfers in" THEN [TD People Label] + " moved into this group at their current pay."
@@ -140,3 +142,5 @@ END
 "Largest of the " + STR([TD Step Count]) + " steps behind the waterfall · teal adds, coral subtracts"
 ```
 3. **The waterfall admits it is a summary.** `Btn Expand` reads `"Expand · " + STR([TD Step Count]) + " steps"` (calc `Expand Label`), `Btn Collapse` reads "Collapse · 4 groups".
+
+**Individual drivers only (decided 2026-10-12).** The card never combines steps: Promotions and Demotions are two rows, Relocation and Cross-border move are two rows. `TD Key` is one name per `step`, so the count in the subtitle and on the Expand button (distinct `step`) is exactly the number of candidates. The eyebrow (`TD Group`) is the only place a group appears.
