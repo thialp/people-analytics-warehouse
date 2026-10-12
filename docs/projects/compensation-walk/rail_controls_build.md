@@ -255,6 +255,8 @@ Every control is a **section**: heading 16, gap 6, control. Sections are 24 apar
 | Footnote | 36 | |
 | Bottom Blank | 24 | 850 |
 
+**Dividers instead of some Blanks (decided 2026-10-12).** `docs/brand/arcadia_rail_divider.png` (400 x 48, made by `docs/brand/build/make_rail_divider.py`) is a transparent image with a 1 px line (white at 14%). Drop it onto the dashboard as an **Image** item (Fit image, no link, no border), 200 x 24, in place of the 24 px Blank. It has the same height as the Blank it replaces, so nothing else moves. Use it in three places: after Group Block (before SHOW PAY AS), before Reset, and optionally after the logo. Between the other sections keep the plain 24 Blank, so the rail reads as three blocks: what you look at (period, view, group), how pay is measured (pay as, cost, currency), and Reset. A container border is not an option: Tableau borders go on all four sides, so one section per container would box every control.
+
 Use a Blank of the exact height for every gap, text objects at 16 high (9 pt, bold, `#8FA0B8`), and a heading's 6 px gap as a Blank of 6 (or text inner padding bottom 6). Rail View can be 150 (6 rows of 25) if 172 looks loose.
 
 ### 5.5 Subtitle and titles follow Cost and Currency
