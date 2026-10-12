@@ -277,12 +277,13 @@ What the panel says (checked against the SQL, `compensation_walk.md` and `method
 - **Nominal** = each month at its own exchange rate, so the walk also has an "FX Translation" line.
 - **Avg per FTE** = pay divided by FTE; **Total payroll** = pay of all workers.
 
-Build (same pattern as Dashboard #1's info button):
-1. Parameter `p_InfoOpen`, Boolean, False. Calcs `Toggle Info` = `NOT [p_InfoOpen]`, `Close Info` = `FALSE`, `Info Shape` = `IF [p_InfoOpen] THEN "info_close" ELSE "info_open" END` (the PNGs are in the same shapes folder).
-2. Sheet `Info Button`: Shape mark, `Info Shape` on Shape (assign by hand), `Toggle Info`, `zzTrue`, `zzFalse` on Detail; any single-mark source (put `Lens Option` filter excluding Null? simpler: use a data source row filter `Lens Option` = fte). Sheet fit Standard; item about 20 x 20.
-3. Put `SHOW PAY AS` and `Info Button` in a horizontal container (height 16 to 20, width 200): heading left, button right.
-4. Floating text object `Info Panel`: 330 x about 210, navy `#13233A`, left corners 0, right radius 10, same x as the Group popover (214), y near the Lens toggle. Text in white / `#B8C0CC`, 10 pt, with the five lines above. Control visibility using value = `p_InfoOpen`. Bring to front.
-5. Actions: `Open info` (Change Parameter, source Info Button, target `p_InfoOpen`, field `Toggle Info`, keep current value); `Deselect Info Button` (filter, zzTrue to zzFalse, worksheet itself); close it from the other popovers if needed.
+Build:
+1. Copy `rail_info_open.png` and `rail_info_close.png` (`docs/brand/shapes/Arcadia/`, 64 px, `#B8C0CC`) into `Documents/My Tableau Repository/Shapes/Arcadia`, then Map > Reload Shapes (or restart).
+2. Parameter `p_InfoOpen`, Boolean, False. Calcs: `Toggle Info` = `NOT [p_InfoOpen]`; `Info Shape` = `IF [p_InfoOpen] THEN "rail_info_close" ELSE "rail_info_open" END` (values must match the file names). Reuse `Close Panel` (= FALSE) to close.
+3. Sheet `Info Button`: Shape mark; `Info Shape` on Shape (assign the two values by hand); `Toggle Info`, `Close Panel`, `zzTrue`, `zzFalse` on Detail; filter `step` = Opening so there is one mark. Fit Standard; dashboard item Entire View, 16 x 16.
+4. Layout: inside the `Show Pay As` container, a horizontal container 200 x 16: SHOW PAY AS text (flexible) on the left, `Info Button` (16 x 16) on the right.
+5. Floating vertical container `Info Popover`: navy `#13233A`, about 380 x 250, same x as the other popovers (about 215), top aligned with the SHOW PAY AS heading. Title "How pay is measured", then the five definitions above, 10 to 11 pt, terms bold white, text `#B8C0CC`. Control visibility using value = `p_InfoOpen`. Bring to front.
+6. Actions: `Open info` (Info Button, Select, Change Parameter, `p_InfoOpen` <- `Toggle Info`); `Deselect Info Button` (filter, zzTrue to zzFalse, the worksheet itself, Show all values); Info Button also sets `p_PeriodOpen` and `p_GroupOpen` <- `Close Panel`; Period Field and Group Field set `p_InfoOpen` <- `Close Panel` (add `Close Panel` to their Detail); Rail View and Reset also set `p_InfoOpen` <- `Close Panel`.
 
 ---
 
