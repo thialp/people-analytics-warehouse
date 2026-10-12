@@ -51,9 +51,9 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-10 (end 
 - Open the PR for `office-moves-map-layout`, Squash and merge, and edit the message so no Co-Authored-By trailers remain (the first five commits on the branch have them against the working agreement).
 
 ## Decided 2026-10-12 (evening): small details after the Top drivers card
-- **Expand / Collapse look like buttons**: a leading + / − glyph ("+  Expand · 11 steps", "−  Collapse · 4 groups"), a 1 px light-gray border, corner radius 6, bold 9 pt navy, centered.
+- **Expand / Collapse look like buttons**: the text label ("Expand · 11 steps", "Collapse · 4 groups") sits next to a small navy two-arrow icon sheet (`btn_expand_icon.png` / `btn_collapse_icon.png`). Each pair is a horizontal container (`Btn Expand ALL` / `Btn Collapse ALL`) with identical dimensions so nothing jumps when toggling. Both the text sheet and the icon sheet carry the parameter action.
 - **Waterfall subtitle** drops "axis not from zero" / "axis in $M, not from zero" (the axis labels already show it); it now fits on one line in every Cost and View.
 - **Top drivers subtitle** drops "teal adds, coral subtracts": "Largest of the N steps behind the waterfall".
 - **Alias on `step` (Expand waterfall)**: International Transfer Adjustments -> "Cross-border move" (fallback "Intl. transfer"). Calcs compare the underlying values, so aliases do not break them.
 - **Period popover note (until the SQL has `report_as_of_date`)**: second line under "Select a period", 9 pt `#8FA0B8`: "Fiscal year runs July to June · Data through Jun 30, 2026". Replace by the SQL date when the column exists (see the Report As Of Date item above).
-- **Growth by region color**: neutral slate `#5A6170`, no sign coding. Teal and coral already mean up and down in the waterfall and Top drivers, and coral also means "across a border" in the routes next door, so a signed color would be read wrong. Direction is already carried by the bar side and the +/- label.
+- **Growth by region color**: amber `#D98E04` (user's pick). The slate version made the dashboard look flat, and teal/coral already mean up/down in the waterfall and "across a border" in the routes, so amber stays neutral on direction. Direction is carried by the bar side and the +/- label.
