@@ -211,6 +211,8 @@ ELSE STR(INT(ATTR([Tot Open]))) END
 
 Sheet: the name-above-bar pattern with `<name>` = `group_parent` and `<value>` = `Growth %`. Name row label `<group_parent>   <SUM(Open HC)> | <SUM(Close HC)>` (name 9 pt navy, the two numbers 9 pt gray; the pills carry the `#,##0` format). Bar end label only the percent, format `+0.0%;−0.0%`. Bars teal `#00938D`, sorted descending by `Growth %`. Title "Growth by region" (11 pt bold navy), line 2 `<AGG(Region Subtitle)>` (9 pt gray). The bars come out nearly the same length (5.0% to 6.1% in FY26): that is the finding, growth was broad-based, and a zero-based bar shows it honestly.
 
+**Keep the name row pinned when a region shrinks** (found 2026-10-12, Amsterdam FY25 Q3: Latin America -0.7%). The names sit on the `AVG(0)` mark at zero of the shared axis, so when one bar is negative the axis grows to the left, zero moves right, and every name moves with it. Fix, on `Region Bars`: (1) right-click the `AVG(0)` pill on Columns, tick **Show Header** so its axis appears; (2) right-click that axis, untick **Synchronize Axis**; (3) right-click it again, **Edit Axis**, Range **Fixed**, Start **0**, End **1**, close; (4) untick **Show Header** on `AVG(0)` again. The names now always start at the left edge of the pane; the bars keep their own automatic axis, so a negative bar simply starts to the right of the left edge. Same idea for any name-above-bar sheet whose measure can go negative; `Top Corridors` (counts, always positive) does not need it.
+
 Tooltip (put `Open HC`, `Close HC`, `Net Change`, `Growth %`, `Share of Growth` on Detail):
 
 ```
