@@ -189,49 +189,79 @@ Delete the old From/To controls and quick picks.
 
 ---
 
-## Part 5. Headings, footnote, heights
+## Part 5. Look, spacing, wording, footnote
 
-Headings are Text objects (9 pt, bold, `#8FA0B8`, uppercase): PERIOD, VIEW BY, `Group Heading` (existing), SHOW PAY AS, COST, CURRENCY.
-
-Footnote: Text object "Arcadia Systems is fictional; all data is synthetic", 9 pt, white at about 60% (`#9AA5B5` on navy).
-
-Rail stack, container padding 20, every item 176 wide:
-
-| Item | Height |
+### 5.1 Colors (decided 2026-10-11)
+| Part | Value |
 |---|---|
-| Blank | 24 |
-| Logo | 40 |
-| Blank | 24 |
-| PERIOD | 18 |
-| Blank | 6 |
-| Period Field | 30 |
-| Blank | 22 |
-| VIEW BY | 18 |
-| Blank | 6 |
-| Rail View | 144 |
-| Blank | 22 |
-| Group Heading (DZV) | 18 |
-| Blank | 6 |
-| Group Field (DZV) | 30 |
-| Blank | 22 |
-| SHOW PAY AS | 18 |
-| Blank | 4 |
-| Lens | 30 |
-| Blank | 14 |
-| COST | 18 |
-| Blank | 4 |
-| Cost | 30 |
-| Blank | 14 |
-| CURRENCY | 18 |
-| Blank | 4 |
-| Currency | 30 |
-| Blank | 22 |
-| Reset | 30 |
-| Flexible blank | rest |
-| Footnote | 36 |
-| Blank | 24 |
+| Selected toggle option (pill in the PNGs) | wash `#E4E3DD` with navy text. Regenerate: `python3 docs/brand/build/make_rail_toggle_shapes.py 1D3150 E4E3DD`, copy the PNGs, Reload Shapes |
+| Group Field | background `#E4E3DD`, text navy `#13233A`, same radius as the toggles. On the `Group Field` sheet: font color navy, Shading = `#E4E3DD`; dashboard item background `#E4E3DD` |
+| Capsule behind the toggles | Group Field blue (`#1D3150`-ish) |
 
-Popover y: field y minus 6. Re-check the Group and Period popover x (214) and front order after moving things.
+### 5.2 Wording: headings read as actions (no dynamic text change except the Group heading)
+| Heading | Text |
+|---|---|
+| Period | SELECT PERIOD |
+| View | SELECT VIEW |
+| Group | `Panel Title` becomes `"Select " + CASE ... "a function" ...` (shown in capitals by `Group Heading`; the popover title uses it too) |
+| Pay | SHOW PAY AS |
+| Cost | SELECT COST |
+| Currency | SELECT CURRENCY |
+
+### 5.3 Group Block (stops the rail jumping when you choose All)
+Vertical container `Group Block` in the Rail: `Group Heading` (16) + Blank (6) + `Group Field` (30) = 52. Item menu > **Fix Height**, 52, background None, padding 0. The Has Groups visibility stays on the heading and the field, so the 52 px is kept even when both are hidden.
+
+### 5.4 Spacing system
+Every control is a **section**: heading 16, gap 6, control. Sections are 24 apart. Nothing else in the rail uses another gap.
+
+| Item | Height | Running y |
+|---|---|---|
+| Top Blank | 24 | 24 |
+| Logo | 40 | 64 |
+| Blank | 28 | 92 |
+| SELECT PERIOD (16) + 6 + Period Field (30) | 52 | 144 |
+| Blank | 24 | 168 |
+| SELECT VIEW (16) + 6 + Rail View (150) | 172 | 340 |
+| Blank | 24 | 364 |
+| Group Block | 52 | 416 |
+| Blank | 24 | 440 |
+| SHOW PAY AS (16) + 6 + Lens (30) | 52 | 492 |
+| Blank | 24 | 516 |
+| SELECT COST (16) + 6 + Cost (30) | 52 | 568 |
+| Blank | 24 | 592 |
+| SELECT CURRENCY (16) + 6 + Currency (30) | 52 | 644 |
+| Blank | 24 | 668 |
+| Reset | 30 | 698 |
+| Flexible Blank | rest | |
+| Footnote | 36 | |
+| Bottom Blank | 24 | 850 |
+
+Use a Blank of the exact height for every gap, text objects at 16 high (9 pt, bold, `#8FA0B8`), and a heading's 6 px gap as a Blank of 6 (or text inner padding bottom 6). Rail View can be 150 (6 rows of 25) if 172 looks loose.
+
+### 5.5 Subtitle and titles follow Cost and Currency
+```
+// Cost Text
+IF [p_Cost] = "Loaded" THEN "loaded cost" ELSE "base pay" END
+// Currency Text
+IF [p_Currency] = "Constant" THEN "constant currency" ELSE "nominal currency" END
+```
+- `Page Subtitle`: end with `+ " · " + [Cost Text] + ", " + [Currency Text]` instead of `" · loaded cost, constant currency"`.
+- `Waterfall Subtitle`: `"Pay per FTE = " + [Cost Text] + " ÷ FTE"` and `"Total payroll = " + [Cost Text] + " of all workers"`.
+
+### 5.6 Info button and explanation panel
+What the panel says (checked against the SQL, `compensation_walk.md` and `methodology.md`):
+- **Loaded** = base pay plus the employer fringe rate (benefits and employer taxes), so loaded = base x (1 + fringe rate). Bonus and tenure pay are not in the base column; tenure increases and market adjustments show up in the walk as changes to base pay.
+- **Base** = annualized base salary x FTE, with no fringe.
+- **Constant** = every month converted at one fixed rate (30 June 2026), so currency swings are removed and the walk shows pay changes only.
+- **Nominal** = each month at its own exchange rate, so the walk also has an "FX Translation" line.
+- **Avg per FTE** = pay divided by FTE; **Total payroll** = pay of all workers.
+
+Build (same pattern as Dashboard #1's info button):
+1. Parameter `p_InfoOpen`, Boolean, False. Calcs `Toggle Info` = `NOT [p_InfoOpen]`, `Close Info` = `FALSE`, `Info Shape` = `IF [p_InfoOpen] THEN "info_close" ELSE "info_open" END` (the PNGs are in the same shapes folder).
+2. Sheet `Info Button`: Shape mark, `Info Shape` on Shape (assign by hand), `Toggle Info`, `zzTrue`, `zzFalse` on Detail; any single-mark source (put `Lens Option` filter excluding Null? simpler: use a data source row filter `Lens Option` = fte). Sheet fit Standard; item about 20 x 20.
+3. Put `SHOW PAY AS` and `Info Button` in a horizontal container (height 16 to 20, width 200): heading left, button right.
+4. Floating text object `Info Panel`: 330 x about 210, navy `#13233A`, left corners 0, right radius 10, same x as the Group popover (214), y near the Lens toggle. Text in white / `#B8C0CC`, 10 pt, with the five lines above. Control visibility using value = `p_InfoOpen`. Bring to front.
+5. Actions: `Open info` (Change Parameter, source Info Button, target `p_InfoOpen`, field `Toggle Info`, keep current value); `Deselect Info Button` (filter, zzTrue to zzFalse, worksheet itself); close it from the other popovers if needed.
 
 ---
 

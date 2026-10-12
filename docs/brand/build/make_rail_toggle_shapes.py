@@ -1,5 +1,6 @@
 """Rail toggle shapes for the Compensation Walk (transparent PNGs, 4x of an 88x30 cell).
-Usage: python make_rail_toggle_shapes.py [capsule_hex]   (capsule colour only used for the preview)"""
+Usage: python3 make_rail_toggle_shapes.py [capsule_hex] [pill_hex]
+  capsule_hex: only used for the preview. pill_hex: fill of the selected option (default E4E3DD, the brand border/wash)"""
 from PIL import Image, ImageDraw, ImageFont
 import os, sys
 OUT = os.path.join(os.path.dirname(__file__), "..", "shapes", "Arcadia")
@@ -8,9 +9,11 @@ FONT = "/usr/share/fonts/opentype/inter/Inter-SemiBold.otf"
 if not os.path.exists(FONT):
     FONT = "/usr/share/fonts/opentype/inter/Inter-Bold.otf"
 S, W, H = 4, 352, 120
-NAVY, WHITE, MIST = (19, 35, 58, 255), (255, 255, 255, 255), (201, 209, 220, 255)
+NAVY, MIST = (19, 35, 58, 255), (201, 209, 220, 255)
 CAP = sys.argv[1].lstrip("#") if len(sys.argv) > 1 else "1D3150"
 CAP = tuple(int(CAP[i:i+2], 16) for i in (0, 2, 4)) + (255,)
+PILL = sys.argv[2].lstrip("#") if len(sys.argv) > 2 else "E4E3DD"
+WHITE = tuple(int(PILL[i:i+2], 16) for i in (0, 2, 4)) + (255,)
 
 OPTIONS = {
     "lens_fte": "Avg per FTE", "lens_amount": "Total payroll",
