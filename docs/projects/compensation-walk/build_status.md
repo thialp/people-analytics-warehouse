@@ -25,6 +25,7 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-10 (end 
 7. **Share of headcount in the map title** ("1.2% of headcount"): needs `open_headcount` in `custom_sql_office_moves.sql` (345 / 28,436 = 1.2%). Not built; the title has no percentage until then.
 8. **Delete the retired items:** the three `Stat` sheets, `Region Moves`, `Moved People`, `Top Region Movers`, `Top Region`, `Axis Step`, the opening-level reference line.
 9. **Routes in both directions** (chart option; the tooltip already shows both directions): Bengaluru ↔ Hyderabad 53, Bengaluru ↔ Pune 22, Krakow ↔ Warsaw 17, Hyderabad ↔ Pune 16, Guadalajara ↔ Mexico City 16.
+10. **Negative zero in the KPI band.** A tiny negative change shows "−0.0%" (and "−0%" in the waterfall title). Round the value in the calc before formatting so it reads 0.0%.
 
 ## Parked (back pocket, do later)
 

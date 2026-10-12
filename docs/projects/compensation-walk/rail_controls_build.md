@@ -222,7 +222,7 @@ Delete the old From/To controls and quick picks.
 |---|---|
 | Period | SELECT PERIOD |
 | View | SELECT VIEW |
-| Group | `Panel Title` becomes `"Select " + CASE ... "a function" ...` (shown in capitals by `Group Heading`; the popover title uses it too) |
+| Group | `Panel Title` becomes `"Select " + CASE ... "a function" ...` (shown in capitals by `Group Heading` in the rail). The Group popover title is a **duplicate sheet** (`Group Heading 2`) that reads the same `Panel Title`: one sheet cannot be placed twice with different styling, and the rail one has its own font and caps. The Period popover title is plain text: "Select a period" |
 | Pay | SHOW PAY AS |
 | Cost | SELECT COST |
 | Currency | SELECT CURRENCY |
