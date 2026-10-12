@@ -116,3 +116,27 @@ Built with the name-above-bar pattern ([map guide](tableau_office_moves_map_guid
 | Total payroll | Hires +$411.3M, Exits −$331.8M, Tenure raises +$97.7M, Promotions & demotions +$18.6M |
 
 These tie to the waterfall: raises +$3,378 = tenure +$3,325 and market +$53; hires and exits −$3,142 = hires −$3,270 and exits +$128 ([compensation_walk.md section 7](compensation_walk.md)).
+
+## Reading it next to the waterfall (decided 2026-10-12)
+
+The card ranks the individual steps, the compact waterfall shows four groups (`step_group`), so "Tenure raises +$3,325" sits beside a "Raises +$3,378" bar. Decision: keep the card's numbers (they match the Expand view) and make the relationship readable without a methodology note. No bars on the card (the thin bar added nothing the numbers do not say).
+
+1. **Eyebrow on every row**, small gray caps in the waterfall's own words:
+```
+// TD Group   (row level)
+CASE [step_group]
+  WHEN "Headcount" THEN "HIRES & EXITS"
+  WHEN "Career" THEN "PROMOTIONS"
+  WHEN "Pay Rate" THEN "RAISES"
+  ELSE "FRINGE & OTHER"
+END
+```
+   Label of the name row: line 1 `<TD Group>` (8 pt gray), line 2 `<TD Key>  <TD Up Text><TD Down Text>`, line 3 `<TD Why>`.
+2. **Subtitle says what the card is.** Expand shows 13 bars in the Company view (Opening, Closing and 11 steps), so the count is distinct `step`:
+```
+// TD Step Count
+{ FIXED : COUNTD(IF [In Pair] AND [step_group] <> "Balance" THEN [step] END) }
+// TD Subtitle
+"Largest of the " + STR([TD Step Count]) + " steps behind the waterfall · teal adds, coral subtracts"
+```
+3. **The waterfall admits it is a summary.** `Btn Expand` reads `"Expand · " + STR([TD Step Count]) + " steps"` (calc `Expand Label`), `Btn Collapse` reads "Collapse · 4 groups".
