@@ -278,7 +278,7 @@ What the panel says (checked against the SQL, `compensation_walk.md` and `method
 - **Avg per FTE** = pay divided by FTE; **Total payroll** = pay of all workers.
 
 Build:
-1. Copy `rail_info_open.png` and `rail_info_close.png` (`docs/brand/shapes/Arcadia/`, 64 px, `#B8C0CC`) into `Documents/My Tableau Repository/Shapes/Arcadia`, then Map > Reload Shapes (or restart).
+1. Copy `rail_info_open.png` and `rail_info_close.png` (`docs/brand/shapes/Arcadia/`, 64 px, `#B8C0CC`) into `Documents/My Tableau Repository/Shapes/Arcadia`, then open the Shape palette (Marks card > Shape) and click Reload Shapes at the bottom of the Edit Shape dialog.
 2. Parameter `p_InfoOpen`, Boolean, False. Calcs: `Toggle Info` = `NOT [p_InfoOpen]`; `Info Shape` = `IF [p_InfoOpen] THEN "rail_info_close" ELSE "rail_info_open" END` (values must match the file names). Reuse `Close Panel` (= FALSE) to close.
 3. Sheet `Info Button`: Shape mark; `Info Shape` on Shape (assign the two values by hand); `Toggle Info`, `Close Panel`, `zzTrue`, `zzFalse` on Detail; filter `step` = Opening so there is one mark. Fit Standard; dashboard item Entire View, 16 x 16.
 4. Layout: inside the `Show Pay As` container, a horizontal container 200 x 16: SHOW PAY AS text (flexible) on the left, `Info Button` (16 x 16) on the right.
