@@ -132,12 +132,13 @@ Plus a Deselect filter action for `Reset`.
 | `p_Span` | String list | Fiscal year, Year to date, Quarter, Month | Fiscal year |
 | `p_PeriodOpen` | Boolean | | False |
 
+`p_From` and `p_To` must be Date parameters with Allowable values **All**. A list of quarter-end dates silently rejects the Month pairs' non-quarter-end dates: the Change Parameter action then updated one end of the pair and kept the other (Apr '25 gave Mar 31 2025 to the old To, which is a "Custom range" pair).
+
 ### 4.2 Calcs
 ```
 // Pair Label
 CASE [pair_type]
- WHEN "Year over Year" THEN IF MONTH([from_month_end]) = 6 THEN LEFT([to_fiscal_period],4)
-   ELSE LEFT(DATENAME('month',[from_month_end]),3) + " " + RIGHT(STR(YEAR([from_month_end])),2) + " → " + LEFT(DATENAME('month',[to_month_end]),3) + " " + RIGHT(STR(YEAR([to_month_end])),2) END
+ WHEN "Year over Year" THEN LEFT(DATENAME('month',[from_month_end]),3) + " " + RIGHT(STR(YEAR([from_month_end])),2) + " → " + LEFT(DATENAME('month',[to_month_end]),3) + " " + RIGHT(STR(YEAR([to_month_end])),2)
  WHEN "Fiscal Year to Date" THEN LEFT([to_fiscal_period],4) + " first " + STR([months_between]) + " months"
  WHEN "Quarter over Quarter" THEN [to_fiscal_quarter]
  WHEN "Month over Month" THEN LEFT(DATENAME('month',[to_month_end]),3) + " '" + RIGHT(STR(YEAR([to_month_end])),2)
@@ -156,8 +157,11 @@ CASE [p_Span]
 [from_month_end] = [p_From] AND [to_month_end] = [p_To]
 // Period Key   (newest first)
 -DATEDIFF('day', #2000-01-01#, [to_month_end])
+// Pair Name   (Period Field and the Period Panel tooltip: adds the fiscal-year name to June to June pairs)
+IF [pair_type] = "Year over Year" AND MONTH([from_month_end]) = 6
+THEN LEFT([to_fiscal_period],4) + " · " + [Pair Label] ELSE [Pair Label] END
 // Period Field Text
-[Pair Label] + "  ▾"     (filter this sheet on Period Is Current = True)
+[Pair Name] + "  ▾"     (filter this sheet on Period Is Current = True)
 // Toggle Period Panel   NOT [p_PeriodOpen]
 
 // Grid position, 4 columns filled down (all three are table calcs, Specific Dimensions: Period Key, Pair Label)
@@ -166,7 +170,7 @@ CASE [p_Span]
 // Period Col    INT((INDEX() - 1) / [Period Rows])
 // Period Row    (INDEX() - 1) % [Period Rows]
 ```
-Year over Year holds 13 pairs: the fiscal years (June to June) plus the trailing 12 months ending at each quarter end. A label of just the calendar year made Dec 2025 and Sep 2025 both read "2025", which also merged them into one table-calc partition. Hence `Sep 24 → Sep 25` (opening to closing month-end) for the non-June pairs, so the start of each comparison is visible. The other three spans already have unique labels. Result with 13 pairs: 4 rows by 4 columns, one fiscal year per column (FY26, Mar 25 → Mar 26, Dec 24 → Dec 25, Sep 24 → Sep 25 down column 0).
+Year over Year holds 13 pairs: the fiscal years (June to June) plus the trailing 12 months ending at each quarter end. A label of just the calendar year made Dec 2025 and Sep 2025 both read "2025", which also merged them into one table-calc partition. Hence `Sep 24 → Sep 25` (opening to closing month-end) for every pair, June to June included, so the start of each comparison is visible (a bare `FY26` read like a column header, not a choice). The fiscal-year name stays in `Pair Name`: the rail field reads `FY26 · Jun 25 → Jun 26`. The other three spans already have unique labels. Result with 13 pairs: 4 rows by 4 columns, one fiscal year per column (FY26, Mar 25 → Mar 26, Dec 24 → Dec 25, Sep 24 → Sep 25 down column 0).
 
 The last column (FY23) holds only one option, and that is correct: the warehouse starts at the Jun 30, 2022 month-end, so a trailing 12 months ending Sep 22, Dec 22 or Mar 23 would need a start before the data. The earliest fiscal year is always partial in any history; backfilling would only move the gap to the new earliest year. The page subtitle states the data range.
 
