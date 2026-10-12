@@ -39,7 +39,7 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-10 (end 
 ## Open: the rest of the dashboard (agreed order for the next session)
 
 1. **Rail controls** (so the data can be explored): Period (`p_From`, `p_To`, valid pairs only) and quick picks (FY26, FY25, last 4 quarters, monthly); View by (six rows, `p_View`); Group list for `p_Group` (readers pick, they do not type); Lens (now with Display As names), Cost, Currency toggles; Reset. Parameter actions, not filter actions, across the two data sources. The `p_Lens` control moves from the top right into the rail with a readable title ("Show pay as"). Navigation tabs (Summary, Drivers, Diagnostics, Methodology) and the fictional-company footnote in the rail.
-2. **Top drivers card** (empty): four ranked rows with a reason each.
+2. **Top drivers card** (in progress 2026-10-12): four ranked rows with a reason each; build in [top_drivers_build.md](top_drivers_build.md).
 3. **Career moves panel** (promotions, demotions, Director and above) with the same group keys as the walk, and the `p_Panel` toggle that swaps it with the office-moves panel. Needs a Custom SQL like `tableau/custom_sql_office_moves.sql`.
 4. **Expand and collapse** for the other cards, using `step_group`.
 
