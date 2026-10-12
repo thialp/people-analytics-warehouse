@@ -136,10 +136,11 @@ Plus a Deselect filter action for `Reset`.
 ```
 // Pair Label
 CASE [pair_type]
- WHEN "Year over Year" THEN IF MONTH([from_month_end]) = 6 THEN LEFT([to_fiscal_period],4) ELSE "to " + LEFT(DATENAME('month',[to_month_end]),3) + " " + STR(YEAR([to_month_end])) END
+ WHEN "Year over Year" THEN IF MONTH([from_month_end]) = 6 THEN LEFT([to_fiscal_period],4)
+   ELSE LEFT(DATENAME('month',[from_month_end]),3) + " " + RIGHT(STR(YEAR([from_month_end])),2) + " → " + LEFT(DATENAME('month',[to_month_end]),3) + " " + RIGHT(STR(YEAR([to_month_end])),2) END
  WHEN "Fiscal Year to Date" THEN LEFT([to_fiscal_period],4) + " first " + STR([months_between]) + " months"
  WHEN "Quarter over Quarter" THEN [to_fiscal_quarter]
- WHEN "Month over Month" THEN LEFT(DATENAME('month',[to_month_end]),3) + " " + STR(YEAR([to_month_end]))
+ WHEN "Month over Month" THEN LEFT(DATENAME('month',[to_month_end]),3) + " '" + RIGHT(STR(YEAR([to_month_end])),2)
  ELSE "Custom range" END
 
 // Span Type  (pair_type for each p_Span value)
@@ -160,17 +161,26 @@ CASE [p_Span]
 // Toggle Period Panel   NOT [p_PeriodOpen]
 
 // Grid position, 4 columns filled down (all three are table calcs, Specific Dimensions: Period Key, Pair Label)
-// Period Rows   INT((SIZE() + 3) / 4)
+// Period Rows   IF [p_Span] = "Month" THEN INT((SIZE() + 7) / 8) ELSE INT((SIZE() + 3) / 4) END
+//               (Month: 48 pairs as 6 rows x 8 columns, ~57 px a column, so labels must stay short and must not wrap; the others keep 4 columns)
 // Period Col    INT((INDEX() - 1) / [Period Rows])
 // Period Row    (INDEX() - 1) % [Period Rows]
 ```
-Year over Year holds 13 pairs: the fiscal years (June to June) plus the trailing 12 months ending at each quarter end. A label of just the calendar year made Dec 2025 and Sep 2025 both read "2025", which also merged them into one table-calc partition. Hence `to Dec 2025` for the non-June pairs. The other three spans already have unique labels. Result with 13 pairs: 4 rows by 4 columns, one fiscal year per column (FY26, to Mar 2026, to Dec 2025, to Sep 2025 down column 0).
+Year over Year holds 13 pairs: the fiscal years (June to June) plus the trailing 12 months ending at each quarter end. A label of just the calendar year made Dec 2025 and Sep 2025 both read "2025", which also merged them into one table-calc partition. Hence `Sep 24 → Sep 25` (opening to closing month-end) for the non-June pairs, so the start of each comparison is visible. The other three spans already have unique labels. Result with 13 pairs: 4 rows by 4 columns, one fiscal year per column (FY26, Mar 25 → Mar 26, Dec 24 → Dec 25, Sep 24 → Sep 25 down column 0).
+
+The last column (FY23) holds only one option, and that is correct: the warehouse starts at the Jun 30, 2022 month-end, so a trailing 12 months ending Sep 22, Dec 22 or Mar 23 would need a start before the data. The earliest fiscal year is always partial in any history; backfilling would only move the gap to the new earliest year. The page subtitle states the data range.
+
+```
+// Span Display   (Label on Span List; the active span gets the same "›" marker as Rail View)
+IF [Span Value] = [p_Span] THEN "› " + [Span Label] ELSE [Span Label] END
+```
+`Span Label` shows "Year over year" for the first option (it also holds the trailing-12-month pairs); `Span Value` still returns `Fiscal year`, the value stored in `p_Span`.
 
 ### 4.3 Sheets
 | Sheet | Build |
 |---|---|
 | `Period Field` | Text mark, `Period Field Text`; Detail `Toggle Period Panel`, `zzTrue`, `zzFalse`; filter `Period Is Current` = True; same look as Group Field |
-| `Span List` | Square mark (like Rail View). Rows `pair_type` (filter out Custom Range), Text = `Span Label` (`CASE [pair_type] WHEN "Year over Year" THEN "Fiscal year" WHEN "Fiscal Year to Date" THEN "Year to date" WHEN "Quarter over Quarter" THEN "Quarter" WHEN "Month over Month" THEN "Month" END`), Detail `Span Value` (same text). Action sets `p_Span` from `Span Value` |
+| `Span List` | Square mark (like Rail View). Rows `pair_type` (filter out Custom Range), Text = `Span Display` (`Span Label` is `CASE [pair_type] WHEN "Year over Year" THEN "Year over year" WHEN "Fiscal Year to Date" THEN "Year to date" WHEN "Quarter over Quarter" THEN "Quarter" WHEN "Month over Month" THEN "Month" END`), Detail `Span Value` (the old text, `Fiscal year`, so `p_Span` keeps its values). Sort `pair_type` by `Span Order` (1 to 4), no Color pill. Action sets `p_Span` from `Span Value` |
 | `Period Panel` | Build from a new sheet (not a copy of `Group Panel`). Filter `Period In Span` = True. Detail `Period Key` first, then `Pair Label`; Text `Pair Label`; Columns `Period Col`, Rows `Period Row`; mark type Text. Every table calc (`Period Col`, `Period Row` and the nested `Period Rows`) is Specific Dimensions with `Period Key` and `Pair Label` ticked, Deepest. **Color uses `ATTR([Period Is Current])`, never the plain field**: a dimension on Color splits the table-calc partitions (the current pair lands in its own partition and sits on top of another cell). Then add `from_month_end`, `to_month_end`, `Close Panel`, `zzTrue`, `zzFalse` to Detail for the actions, ticking them in the table calcs as they arrive |
 | `Period Close` | Copy of `Panel Close` |
 
