@@ -16,6 +16,7 @@ SELECT
     change_reason,
     status,
     department_id,
+    cost_center_id,
     location_id,
     job_profile_id,
     CAST(job_level AS INTEGER)                               AS grade,

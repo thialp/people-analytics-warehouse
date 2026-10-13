@@ -30,6 +30,7 @@ SELECT
     DATE_DIFF('day', r.status_since, c.month_end_date) + 1 AS days_in_status,
     a.worker_id                                            AS incumbent_worker_id,
     r.department_id,
+    r.cost_center_id,
     r.location_id,
     l.country_code,
     r.job_profile_id,

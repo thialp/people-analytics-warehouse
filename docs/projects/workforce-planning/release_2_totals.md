@@ -4,16 +4,18 @@
 
 | FY | Opening HC | Hires | Voluntary | Involuntary | Moves in | Closing HC | Closing FTE | FY-end loaded $M (constant) |
 |---|---|---|---|---|---|---|---|---|
-| FY22 | 23,516 | 4,677 | 2,511 | 621 | 2,870 | 25,061 | 24,734.5 | 2,660.3 |
-| FY23 | 25,061 | 5,538 | 2,943 | 715 | 3,069 | 26,941 | 26,510.1 | 2,883.0 |
-| FY24 | 26,941 | 3,634 | 2,343 | 1,015 | 3,327 | 27,217 | 26,715.8 | 2,978.1 |
-| FY25 | 27,217 | 4,376 | 2,532 | 614 | 4,432 | 28,447 | 27,861.7 | 3,153.3 |
-| FY26 | 28,447 | 5,235 | 2,942 | 726 | 3,633 | 30,014 | 29,363.5 | 3,359.4 |
+| FY22 | 23,516 | 4,677 | 2,511 | 621 | 2,870 | 25,061 | 24,734.5 | 2,487.1 |
+| FY23 | 25,061 | 5,538 | 2,943 | 715 | 3,069 | 26,941 | 26,510.1 | 2,727.3 |
+| FY24 | 26,941 | 3,634 | 2,343 | 1,015 | 3,327 | 27,217 | 26,715.8 | 2,849.8 |
+| FY25 | 27,217 | 4,376 | 2,532 | 614 | 4,432 | 28,447 | 27,861.7 | 3,066.1 |
+| FY26 | 28,447 | 5,235 | 2,942 | 726 | 3,633 | 30,014 | 29,363.5 | 3,336.5 |
 
 ## Row counts: raw
 
 | Table | Rows |
 |---|---|
+| dim_candidate | 188,982 |
+| dim_cost_center | 630 |
 | dim_country | 22 |
 | dim_department | 32 |
 | dim_job_level | 12 |
@@ -23,11 +25,13 @@
 | dim_position | 101,297 |
 | dim_worker | 46,980 |
 | fact_bonus_payout | 154,151 |
-| fact_compensation_history | 182,149 |
+| fact_candidate_stage_event | 531,691 |
+| fact_compensation_history | 186,191 |
 | fact_job_history | 98,028 |
 | fact_performance_review | 154,151 |
 | fact_position_assignment | 54,094 |
 | fact_requisition | 31,323 |
+| fact_workforce_plan | 28,800 |
 | ref_fringe_rate | 132 |
 | ref_fringe_source | 215 |
 | ref_fx_rate_constant | 17 |
@@ -42,7 +46,7 @@
 
 | Table | Rows |
 |---|---|
-| mart_compensation_walk | 115,454 |
+| mart_compensation_walk | 115,544 |
 | mart_dim_country | 22 |
 | mart_dim_department | 32 |
 | mart_dim_grade | 12 |

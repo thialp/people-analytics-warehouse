@@ -225,6 +225,14 @@ JOB_LEVELS = {
     12: ("L12", "Chief Executive Officer",    "Executive",              650_000),
 }
 RANGE_MIN_PCT, RANGE_MAX_PCT = 0.85, 1.35
+
+# Salary structures move every July 1 (Arcadia pay policy, an assumption, not sourced data).
+# The level bases above, at LEVEL_BASE_FX_DATE rates, are the FY2023 range midpoints;
+# earlier years are divided back and later years multiplied forward by these increases.
+RANGE_ANCHOR_FY = 2023
+RANGE_STRUCTURE_INCREASE = {2022: 0.025, 2023: 0.040, 2024: 0.035, 2025: 0.030, 2026: 0.030}
+RANGE_STRUCTURE_COUNTRY_PP = {"IN": 0.040, "BR": 0.020, "ZA": 0.020, "PL": 0.020, "PH": 0.020,
+                              "MX": 0.015, "JP": -0.015, "CH": -0.015}
 LEVEL_BASE_FX_DATE = "2022-06-30"      # local level bases are set with this day's ECB rates
 
 # Base salary grows with tenure, not with performance: on each hire anniversary the
@@ -315,6 +323,29 @@ REQ_TIME_TO_FILL_MIN = 10
 REQ_MAX_OPEN_DAYS = 210                    # an approved requisition still open after this is cancelled
 REQ_CANCELLED_FREEZE_SHARE = 0.50          # a cancelled seat is frozen, otherwise eliminated
 TRANSFER_TAKES_OPEN_SEAT = 0.85            # an internal mover takes a ready open seat when one fits
+
+# --------------------------------------------------------------------------------------
+# Workforce plan: a budget before each fiscal year, then a reforecast after each of the
+# first three quarters (RF1-RF3), each covering the quarters still ahead. Versions are
+# never overwritten. The generator writes the plan around what happened, with an error
+# that shrinks with each reforecast: (log-mean, log-sd) of planned / actual.
+# --------------------------------------------------------------------------------------
+PLAN_VERSIONS = [  # name, (month, day) of the version date, first quarter covered
+    ("Budget", (5, 15), 1), ("RF1", (10, 15), 2), ("RF2", (1, 15), 3), ("RF3", (4, 15), 4)]
+PLAN_NET_NEW_ERROR = {"Budget": (0.15, 0.35), "RF1": (0.08, 0.25), "RF2": (0.04, 0.18), "RF3": (0.02, 0.12)}
+PLAN_BACKFILL_ERROR = {"Budget": (0.04, 0.20), "RF1": (0.02, 0.15), "RF2": (0.01, 0.10), "RF3": (0.00, 0.07)}
+PLAN_HEADCOUNT_ERROR = {"Budget": (0.012, 0.030), "RF1": (0.008, 0.020), "RF2": (0.004, 0.012), "RF3": (0.002, 0.007)}
+PLAN_COST_EXTRA_SD = 0.010                 # cost error on top of the headcount error
+PLAN_FY_BUDGET_SHIFT = {2024: (0.80, 0.035)}  # FY24 budget was set before the Feb 2024 restructuring
+
+# --------------------------------------------------------------------------------------
+# Candidates (applicant tracking): applicants per requisition with a real search,
+# and where the others drop out
+# --------------------------------------------------------------------------------------
+CANDIDATES_PER_REQ = {1: 7, 2: 7, 3: 6, 4: 5, 5: 5, 6: 4, 7: 4, 8: 3, 9: 3, 10: 3, 11: 3}
+CANDIDATE_EXIT_STAGE = {"Screen": 0.55, "Interview": 0.27, "Offer": 0.05, "Withdrawn": 0.13}
+OFFER_DECLINED_SHARE = 0.12                # a search where an earlier offer was declined
+CANDIDATE_SOURCES = {"Job board": 0.40, "Referral": 0.22, "Agency": 0.10, "Career site": 0.20, "Sourced": 0.08}
 
 FX_CONSTANT_RATE_SET = "Latest close (2026-06-30)"
 FX_CONSTANT_RATE_DATE = "2026-06-30"

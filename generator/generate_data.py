@@ -113,7 +113,7 @@ FIRST_ME, LAST_ME = MONTH_ENDS[0], MONTH_ENDS[-1]
 
 
 # ======================================================================================
-# 1. Pay structure: base salary per level and country (local currency, fixed)
+# 1. Pay structure: base salary per level and country (local currency), moving each July 1
 # ======================================================================================
 LEVEL_FX_DATE = dt.date.fromisoformat(ref.LEVEL_BASE_FX_DATE)
 LEVEL_BASE: dict[tuple[int, str], float] = {}
@@ -121,18 +121,41 @@ for lvl, (_, _, _, us_base) in ref.JOB_LEVELS.items():
     for cc, c in COUNTRY.items():
         LEVEL_BASE[(lvl, cc)] = round_salary(us_base * c["pay_index"] / fx_rates.usd_per_local(c["currency"], LEVEL_FX_DATE))
 
+RANGE_FISCAL_YEARS = list(range(fiscal_year(FIRST_ME), fiscal_year(LAST_ME) + 1))
 
-def level_base(level: int, loc: str) -> float:
+
+def structure_increase(fy: int, cc: str) -> float:
+    return ref.RANGE_STRUCTURE_INCREASE[fy] + ref.RANGE_STRUCTURE_COUNTRY_PP.get(cc, 0.0)
+
+
+def _range_factor(fy: int, cc: str) -> float:
+    """Range midpoint in fiscal year `fy` relative to the anchor year's level base."""
+    f = 1.0
+    for y in range(ref.RANGE_ANCHOR_FY + 1, fy + 1):
+        f *= 1 + structure_increase(y, cc)
+    for y in range(fy + 1, ref.RANGE_ANCHOR_FY + 1):
+        f /= 1 + structure_increase(y, cc)
+    return f
+
+
+RANGE_MID: dict[tuple[int, int, str], float] = {
+    (fy, lvl, cc): round_salary(base * _range_factor(fy, cc))
+    for fy in RANGE_FISCAL_YEARS for (lvl, cc), base in LEVEL_BASE.items()}
+
+
+def level_base(level: int, loc: str, on: dt.date) -> float:
+    """Range midpoint for the level at this office on `on` (country structure x office pay zone)."""
     o = OFFICE[loc]
-    return LEVEL_BASE[(level, o["country"])] * o["pay_zone"]
+    fy = min(max(fiscal_year(on), RANGE_FISCAL_YEARS[0]), RANGE_FISCAL_YEARS[-1])
+    return RANGE_MID[(fy, level, o["country"])] * o["pay_zone"]
 
 
-def range_max(level: int, loc: str) -> float:
-    return level_base(level, loc) * ref.RANGE_MAX_PCT
+def range_max(level: int, loc: str, on: dt.date) -> float:
+    return level_base(level, loc, on) * ref.RANGE_MAX_PCT
 
 
-def range_min(level: int, loc: str) -> float:
-    return level_base(level, loc) * ref.RANGE_MIN_PCT
+def range_min(level: int, loc: str, on: dt.date) -> float:
+    return level_base(level, loc, on) * ref.RANGE_MIN_PCT
 
 
 def tenure_raise(completed_years: int) -> float:
@@ -273,9 +296,14 @@ def seat_profile(s: dict) -> str:
     return f'{s["family"]}-L{s["level"]}'
 
 
+def cost_center_id(dept: str, loc: str) -> str:
+    """Cost center = department x country: the department's code plus the office's country."""
+    return f"CC-{dept[2:]}0-{OFFICE[loc]['country']}"
+
+
 def seat_fields(s: dict) -> dict:
-    return {"status": s["status"], "department_id": s["dept"], "location_id": s["loc"],
-            "job_profile_id": seat_profile(s), "job_level": s["level"], "fte": s["fte"]}
+    return {"status": s["status"], "department_id": s["dept"], "cost_center_id": cost_center_id(s["dept"], s["loc"]),
+            "location_id": s["loc"], "job_profile_id": seat_profile(s), "job_level": s["level"], "fte": s["fte"]}
 
 
 def seat_write(s: dict, on: dt.date, reason: str):
@@ -341,7 +369,8 @@ def new_requisition(s: dict, opened: dt.date, approved: dt.date, hiring_manager:
          "req_type": "Backfill" if s["filled_before"] else "Net-new",
          "opened_date": opened, "approved_date": approved, "target_start_date": approved + dt.timedelta(days=45),
          "filled_date": None, "cancelled_date": None, "status": "Open",
-         "department_id": s["dept"], "location_id": s["loc"], "job_profile_id": seat_profile(s), "job_level": s["level"],
+         "department_id": s["dept"], "cost_center_id": cost_center_id(s["dept"], s["loc"]), "location_id": s["loc"],
+         "job_profile_id": seat_profile(s), "job_level": s["level"],
          "hiring_manager_id": hiring_manager, "filled_by_worker_id": None, "fill_source": None}
     req_rows[r["requisition_id"]] = r
     s["req"] = r["requisition_id"]
@@ -659,8 +688,8 @@ def new_worker(hire_date: dt.date, dept_id: str, level: int, family: str, cc: st
     return w
 
 
-def hire_salary(level: int, loc: str) -> float:
-    return round_salary(level_base(level, loc) * offer_factor())
+def hire_salary(level: int, loc: str, on: dt.date) -> float:
+    return round_salary(level_base(level, loc, on) * offer_factor())
 
 
 # ======================================================================================
@@ -679,9 +708,9 @@ def opening_hire(level: int, cc: str, loc: str, min_years: float = 0.05, mean_ye
     tenure = min(20.0, max(min_years, rng.exponential(mean_years)))
     hire = FIRST_ME - dt.timedelta(days=int(tenure * 365.25))
     years_in_level = min(tenure, rng.exponential(2.5))
-    salary = level_base(level, loc) * offer_factor()
+    salary = level_base(level, loc, FIRST_ME) * offer_factor()
     for y in range(1, int(years_in_level) + 1):
-        salary = min(salary * (1 + tenure_raise(y)), range_max(level, loc))
+        salary = min(salary * (1 + tenure_raise(y)), range_max(level, loc, FIRST_ME))
     comp_start = max(hire, CONVERSION_DATE)
     return hire, round_salary(salary), comp_start
 
@@ -828,7 +857,7 @@ def promote(w: dict, on: dt.date, reason: str = "Promotion", increase: float | N
     w["level"] += 1
     w["level_since"] = on
     inc = increase if increase is not None else rng.uniform(*ref.PROMOTION_INCREASE)
-    w["salary"] = round_salary(max(w["salary"] * (1 + inc), range_min(w["level"], w["loc"])))
+    w["salary"] = round_salary(max(w["salary"] * (1 + inc), range_min(w["level"], w["loc"], on)))
     job_change(w, on, reason)
     comp_change(w, on, "Promotion")
     fix_manager(w, on)
@@ -873,7 +902,7 @@ def hire_into(dept_id: str, level: int, on: dt.date, cc: str | None = None, loc:
         family = pick_family(dept_id)
         cc = cc or pick_country(dept_id, on)
         loc = loc or pick_office(cc, on)
-    w = new_worker(on, dept_id, level, family, cc, loc, hire_salary(level, loc), 1.0 if leads else random_fte(),
+    w = new_worker(on, dept_id, level, family, cc, loc, hire_salary(level, loc, on), 1.0 if leads else random_fte(),
                    leads=leads, is_pm=is_pm)
     if seat is None:
         seat = net_new_seat(w, on, seat_reason, recruited=seat_reason == "Net-new")
@@ -1366,7 +1395,7 @@ for i in range(1, len(MONTH_ENDS)):
             terminate(w, on, "Involuntary", restructuring=True)
         elif kind == "tenure":
             years = on.year - w["hire_date"].year
-            cap = range_max(w["level"], w["loc"])
+            cap = range_max(w["level"], w["loc"], on)
             new_salary = round_salary(min(w["salary"] * (1 + tenure_raise(years)), cap))
             if years >= 1 and new_salary > w["salary"] and on > CONVERSION_DATE:
                 w["salary"] = new_salary
@@ -1379,7 +1408,7 @@ for i in range(1, len(MONTH_ENDS)):
                 promote(w, on)
                 fix_reports_of(w, on)
         elif kind == "market":
-            cap = range_max(w["level"], w["loc"])
+            cap = range_max(w["level"], w["loc"], on)
             new_salary = round_salary(min(w["salary"] * (1 + rng.uniform(0.03, 0.07)), cap))
             if new_salary > w["salary"] and w["comp"]["effective_start_date"] != on:   # one pay change per day
                 w["salary"] = new_salary
@@ -1426,6 +1455,147 @@ comp_rows.extend(corrections)
 
 
 # ======================================================================================
+# 6b. Cost centers, the workforce plan and candidates
+# ======================================================================================
+# Written after the simulation from what happened, so they never change it. The plan is
+# drawn around the actuals with an error that shrinks with each reforecast; candidates
+# are the applicant pipeline behind each requisition.
+QUARTER_ENDS = [me for me in MONTH_ENDS if me.month in (3, 6, 9, 12) and fiscal_year(me) > fiscal_year(FIRST_ME)]
+FRINGE_RATE = {(r["country_code"], r["year"]): r["fringe_rate"] for r in fringe_research.build()[0]}
+
+_wrong_ids = {id(c) for c in corrections}
+_job_df = pd.DataFrame(job_rows)[["worker_id", "effective_start_date", "effective_end_date", "department_id",
+                                  "location_id", "fte"]]
+_job_df["cost_center_id"] = [cost_center_id(d, l) for d, l in zip(_job_df["department_id"], _job_df["location_id"])]
+_comp_df = pd.DataFrame([r for r in comp_rows if id(r) not in _wrong_ids])[
+    ["worker_id", "effective_start_date", "effective_end_date", "currency_code", "base_salary_annual_local"]]
+
+
+def _as_of(df: pd.DataFrame, d: dt.date) -> pd.DataFrame:
+    return df[(df["effective_start_date"] <= d) & (df["effective_end_date"].isna() | (df["effective_end_date"] >= d))]
+
+
+# actuals at each quarter-end, by cost center: headcount, FTE, loaded run-rate by currency
+_actual = {}
+for qe in QUARTER_ENDS:
+    j = _as_of(_job_df, qe)
+    c = _as_of(_comp_df, qe)
+    x = j.merge(c[["worker_id", "currency_code", "base_salary_annual_local"]], on="worker_id")
+    x["loaded_local"] = x["base_salary_annual_local"] * x["fte"] * [
+        1 + FRINGE_RATE[(OFFICE[l]["country"], qe.year)] for l in x["location_id"]]
+    for cc, g in x.groupby("cost_center_id"):
+        _actual[(qe, cc)] = {"headcount": len(g), "fte": float(g["fte"].sum()),
+                             "loaded_local": g.groupby("currency_code")["loaded_local"].sum().to_dict()}
+
+# fills in each quarter, by cost center and requisition type
+_fill = defaultdict(lambda: {"Net-new": 0, "Backfill": 0})
+_start_cc = {(w, d): cc for w, d, cc in zip(_job_df["worker_id"], _job_df["effective_start_date"], _job_df["cost_center_id"])}
+for a in assign_rows:
+    if a["fill_type"] == "Initial" or a["start_date"] > LAST_ME or a["start_date"] <= FIRST_ME:
+        continue
+    qe = next(q for q in QUARTER_ENDS if q >= a["start_date"])
+    _fill[(qe, _start_cc[(a["worker_id"], a["start_date"])])][req_rows[a["requisition_id"]]["req_type"]] += 1
+
+plan_rows = []
+_cost_centers = sorted({cc for (_, cc) in _actual} | {cc for (_, cc) in _fill})
+for fy in sorted({fiscal_year(q) for q in QUARTER_ENDS}):
+    fy_quarters = [q for q in QUARTER_ENDS if fiscal_year(q) == fy]
+    active_ccs = [cc for cc in _cost_centers if any((q, cc) in _actual or (q, cc) in _fill for q in fy_quarters)]
+    for name, (vm, vd), first_q in ref.PLAN_VERSIONS:
+        version_date = dt.date(fy - 1 if vm >= 5 else fy, vm, vd)
+        mu_n, sd_n = ref.PLAN_NET_NEW_ERROR[name]
+        mu_b, sd_b = ref.PLAN_BACKFILL_ERROR[name]
+        mu_h, sd_h = ref.PLAN_HEADCOUNT_ERROR[name]
+        if name == "Budget" and fy in ref.PLAN_FY_BUDGET_SHIFT:
+            shift_n, shift_h = ref.PLAN_FY_BUDGET_SHIFT[fy]
+            mu_n, mu_h = mu_n + shift_n, mu_h + shift_h
+        for cc in active_ccs:
+            z_cc = plan_rng.normal()                   # a cost center's planning bias in this version
+            for q, qe in enumerate(fy_quarters, start=1):
+                if q < first_q:
+                    continue
+                horizon = q - first_q + 1
+                act = _actual.get((qe, cc), {"headcount": 0, "fte": 0.0, "loaded_local": {}})
+                fills = _fill.get((qe, cc), {"Net-new": 0, "Backfill": 0})
+                z_q = plan_rng.normal()
+                net_new = int(plan_rng.poisson((fills["Net-new"] + 0.05) * math.exp(mu_n + sd_n * (0.7 * z_cc + 0.7 * z_q))))
+                backfills = int(plan_rng.poisson((fills["Backfill"] + 0.05) * math.exp(mu_b + sd_b * (0.7 * z_cc + 0.7 * z_q))))
+                hc_factor = math.exp(mu_h + sd_h * math.sqrt(horizon) * (0.7 * z_cc + 0.7 * plan_rng.normal()))
+                hc = int(round(act["headcount"] * hc_factor))
+                fte_per_head = act["fte"] / act["headcount"] if act["headcount"] else 1.0
+                cost_usd = sum(v * fx_rates.usd_per_local(cur, version_date) for cur, v in act["loaded_local"].items())
+                cost_usd *= (hc / act["headcount"] if act["headcount"] else 0.0) * math.exp(plan_rng.normal(0, ref.PLAN_COST_EXTRA_SD))
+                plan_rows.append({
+                    "plan_version": f"FY{fy % 100:02d} {name}", "version_type": name, "version_date": version_date,
+                    "fiscal_year": fy, "fiscal_quarter": q, "quarter_end_date": qe, "cost_center_id": cc,
+                    "planned_ending_headcount": hc, "planned_ending_fte": round(hc * fte_per_head, 2),
+                    "planned_net_new": net_new, "planned_backfills": backfills,
+                    "planned_cost_usd": round(cost_usd, 2), "plan_fx_rate_date": version_date})
+
+# cost centers: every department x country that ever held a seat or a plan line
+_cc_ids = sorted({r["cost_center_id"] for r in pos_rows} | {r["cost_center_id"] for r in plan_rows})
+cost_center_rows = []
+for cc in _cc_ids:
+    _, code, country = cc.split("-")
+    dept_id = "D-" + code[:-1]
+    cost_center_rows.append({"cost_center_id": cc, "cost_center_name": f'{DEPT[dept_id]["name"]} · {COUNTRY[country]["name"]}',
+                             "department_id": dept_id, "department_cost_center": f"CC-{code}", "country_code": country,
+                             "function": DEPT[dept_id]["function"]})
+
+# candidates: the applicant pipeline behind each requisition
+STAGES = ["Applied", "Screen", "Interview", "Offer"]
+candidate_rows = []                        # dim_candidate: one row per applicant to one requisition
+candidate_event_rows = []                  # fact_candidate_stage_event: one row per stage reached
+
+
+def _stage_dates(start: dt.date, end: dt.date, k: int) -> list[dt.date]:
+    span = max(0, (end - start).days)
+    return [start + dt.timedelta(days=int(d)) for d in sorted(recruiting_rng.integers(0, span + 1, k))]
+
+
+def _candidate(req_id: str, stages: list[str], dates: list[dt.date], internal: bool, worker_id: str | None):
+    cid = next_id("candidate", "C")
+    source = "Internal" if internal else weighted_choice(ref.CANDIDATE_SOURCES, recruiting_rng)
+    final = stages[-1] if stages[-1] in ("Accepted", "Declined", "Rejected", "Withdrawn") else "In process"
+    candidate_rows.append({"candidate_id": cid, "requisition_id": req_id, "is_internal": internal,
+                           "candidate_source": source, "worker_id": worker_id, "final_status": final})
+    for order, (stage, day) in enumerate(zip(stages, dates), start=1):
+        candidate_event_rows.append({"candidate_id": cid, "stage": stage, "stage_order": order, "stage_date": day})
+
+
+_seq["candidate"] = 400000
+for r in req_rows.values():
+    start = r["approved_date"]
+    end = r["filled_date"] or r["cancelled_date"] or LAST_ME
+    if start > LAST_ME or start < FIRST_ME:        # approved before history starts: the search is not in the ATS
+        if r["status"] == "Filled":
+            _candidate(r["requisition_id"], ["Offer", "Accepted"], [r["filled_date"], r["filled_date"]],
+                       r["fill_source"] == "Internal", r["filled_by_worker_id"])
+        continue
+    search = (end - start).days >= 7
+    if r["status"] == "Filled":
+        if search:
+            _candidate(r["requisition_id"], STAGES + ["Accepted"], _stage_dates(start, end, 5),
+                       r["fill_source"] == "Internal", r["filled_by_worker_id"])
+        else:                                      # an immediate refill: succession or a team handed over
+            _candidate(r["requisition_id"], ["Offer", "Accepted"], [start, end],
+                       r["fill_source"] == "Internal", r["filled_by_worker_id"])
+    if not search:
+        continue
+    if r["status"] == "Filled" and recruiting_rng.random() < ref.OFFER_DECLINED_SHARE:
+        _candidate(r["requisition_id"], STAGES + ["Declined"], _stage_dates(start, end, 5), False, None)
+    for _ in range(int(recruiting_rng.poisson(ref.CANDIDATES_PER_REQ[min(r["job_level"], 11)]))):
+        exit_stage = weighted_choice(ref.CANDIDATE_EXIT_STAGE, recruiting_rng)
+        reached = {"Screen": 1, "Interview": 2, "Offer": 3, "Withdrawn": int(recruiting_rng.integers(1, 3))}[exit_stage]
+        outcome = "Withdrawn" if exit_stage == "Withdrawn" else "Rejected"
+        stages = STAGES[:reached] + [outcome]
+        dates = _stage_dates(start, end, len(stages))
+        if r["status"] == "Open" and recruiting_rng.random() < 0.5:   # still in process at the last month-end
+            stages, dates = stages[:-1], dates[:-1]
+        _candidate(r["requisition_id"], stages, dates, False, None)
+
+
+# ======================================================================================
 # 7. Write raw tables
 # ======================================================================================
 def write(df: pd.DataFrame, name: str):
@@ -1460,15 +1630,24 @@ write(job, "fact_job_history")
 pos = pd.DataFrame(pos_rows).sort_values(["position_id", "effective_start_date"]).reset_index(drop=True)
 pos.insert(0, "position_record_id", [f"PS{n:07d}" for n in range(1, len(pos) + 1)])
 write(pos[["position_record_id", "position_id", "effective_start_date", "effective_end_date", "change_reason", "status",
-           "department_id", "location_id", "job_profile_id", "job_level", "fte", "created_date", "created_reason"]],
+           "department_id", "cost_center_id", "location_id", "job_profile_id", "job_level", "fte", "created_date",
+           "created_reason"]],
       "dim_position")
 write(pd.DataFrame(assign_rows)[["assignment_id", "position_id", "worker_id", "start_date", "end_date", "fill_type",
                                  "requisition_id", "vacate_reason"]].sort_values("assignment_id"),
       "fact_position_assignment")
 write(pd.DataFrame(req_rows.values())[[
     "requisition_id", "position_id", "req_type", "opened_date", "approved_date", "target_start_date", "filled_date",
-    "cancelled_date", "status", "department_id", "location_id", "job_profile_id", "job_level", "hiring_manager_id",
+    "cancelled_date", "status", "department_id", "cost_center_id", "location_id", "job_profile_id", "job_level",
+    "hiring_manager_id",
     "filled_by_worker_id", "fill_source"]].sort_values("requisition_id"), "fact_requisition")
+write(pd.DataFrame(cost_center_rows), "dim_cost_center")
+write(pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"]),
+      "fact_workforce_plan")
+write(pd.DataFrame(candidate_rows).sort_values("candidate_id"), "dim_candidate")
+cand = pd.DataFrame(candidate_event_rows).sort_values(["candidate_id", "stage_order"]).reset_index(drop=True)
+cand.insert(0, "candidate_event_id", [f"CE{n:07d}" for n in range(1, len(cand) + 1)])
+write(cand, "fact_candidate_stage_event")
 
 comp = pd.DataFrame(comp_rows)
 comp["_order"] = (comp["transaction_type"] == "Correction").astype(int)
@@ -1575,12 +1754,12 @@ write(pd.DataFrame([{"tenure_year_from": lo, "tenure_year_to": hi, "increase_pct
 write(pd.DataFrame([{"rating": r, "bonus_pct": pct, "target_share": share}
                     for r, (pct, share) in ref.PERFORMANCE_RATINGS.items()]), "ref_performance_bonus")
 
-FISCAL_YEARS = list(range(fiscal_year(FIRST_ME), fiscal_year(LAST_ME) + 1))
 write(pd.DataFrame([{
     "fiscal_year": fy, "job_level": lvl, "country_code": cc, "currency_code": COUNTRY[cc]["currency"],
-    "range_min": round_salary(LEVEL_BASE[(lvl, cc)] * ref.RANGE_MIN_PCT), "range_mid": LEVEL_BASE[(lvl, cc)],
-    "range_max": round_salary(LEVEL_BASE[(lvl, cc)] * ref.RANGE_MAX_PCT),
-} for fy in FISCAL_YEARS for (lvl, cc) in sorted(LEVEL_BASE)]), "ref_salary_range")
+    "range_min": round_salary(RANGE_MID[(fy, lvl, cc)] * ref.RANGE_MIN_PCT), "range_mid": RANGE_MID[(fy, lvl, cc)],
+    "range_max": round_salary(RANGE_MID[(fy, lvl, cc)] * ref.RANGE_MAX_PCT),
+    "structure_increase_pct": round(structure_increase(fy, cc), 4) if fy > RANGE_FISCAL_YEARS[0] else None,
+} for fy in RANGE_FISCAL_YEARS for (lvl, cc) in sorted(LEVEL_BASE)]), "ref_salary_range")
 
 # FX: every ECB day, the month-end rates the snapshot uses, and the constant rate set
 write(pd.DataFrame(list(fx_rates.daily_rows())).sort_values(["currency_code", "rate_date"]), "ref_fx_rate_daily")
