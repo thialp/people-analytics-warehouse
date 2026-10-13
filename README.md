@@ -522,4 +522,4 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 - **GitHub:** [github.com/thialp](https://github.com/thialp)
 - **LinkedIn:** [linkedin.com/in/thiagoalpoin](https://www.linkedin.com/in/thiagoalpoin)
 
-**Skills:** SQL · Tableau (Certified Data Analyst) · Python · Figma · Claude Code · Workday · Alteryx · Data modeling · Agile delivery · PMP
+**Skills:** SQL · Tableau · Python · Figma · Claude Code · Workday · Alteryx · Data modeling · Agile delivery · PMP
