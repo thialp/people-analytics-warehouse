@@ -13,14 +13,14 @@
     + Hires + Exits + Transfers In + Transfers Out          (who is in the group)
     + Promotions + Demotions                                 (career)
     + Tenure Increases + Market Adjustments                  (pay rate)
-    + Relocation Adjustments + International Transfer Adj.   (location)
+    + Same-Country Transfer Adj. + International Transfer Adj. (location)
     + FTE Changes + Fringe Rate Changes + FX Translation     (hours, statutory, currency)
     = Closing
 
   for headcount, FTE and four dollar measures (base / loaded x nominal /
   constant FX), in total and as an average per FTE. Every combination is
   pre-computed: each date pair on the grid, for every group of six views
-  (Company, Function, Leader, Department, Office, Country). The workbook only
+  (Company, Function, Sub-function, Department, Office, Country). The workbook only
   filters and sums; it needs no LOD expression, table calculation or
   parameter-driven SQL.
 
@@ -79,6 +79,10 @@
 SELECT
     t.from_date                                                                  AS from_month_end,
     t.to_date                                                                    AS to_month_end,
+    /* the data window: the as-of date is the last month-end in the warehouse, the start
+       is the first month-end a pair can begin after the lead-in year */
+    (SELECT DATEADD(MONTH, 12, MIN(MonthEndDate)) FROM dw.MonthEndCalendar)          AS report_start_date,
+    (SELECT MAX(MonthEndDate) FROM dw.MonthEndCalendar)                              AS report_as_of_date,
     cf.FiscalPeriod                                                              AS from_fiscal_period,
     ct.FiscalPeriod                                                              AS to_fiscal_period,
     cf.FiscalQuarterLabel                                                        AS from_fiscal_quarter,
@@ -101,7 +105,7 @@ SELECT
     END                                                                          AS group_name,
     CASE t.view_name
         WHEN 'Function'   THEN 'Arcadia Systems'
-        WHEN 'Leader'     THEN ou.FunctionName
+        WHEN 'Sub-function' THEN ou.FunctionName
         WHEN 'Department' THEN ou.FunctionName
         WHEN 'Office'     THEN lo.CountryName
         WHEN 'Country'    THEN co.Region
@@ -318,7 +322,7 @@ FROM (
             CROSS APPLY (VALUES
                 (1, 'Company',    CAST('ORG-000' AS VARCHAR(15)),   CAST('ORG-000' AS VARCHAR(15)),   CAST(NULL AS VARCHAR(30))),
                 (2, 'Function',   CAST(od.FunctionID AS VARCHAR(15)),  CAST(cd.FunctionID AS VARCHAR(15)),  pg.org_move_reason),
-                (3, 'Leader',     CAST(od.LeaderOrgID AS VARCHAR(15)), CAST(cd.LeaderOrgID AS VARCHAR(15)), pg.org_move_reason),
+                (3, 'Sub-function', CAST(od.LeaderOrgID AS VARCHAR(15)), CAST(cd.LeaderOrgID AS VARCHAR(15)), pg.org_move_reason),
                 (4, 'Department', CAST(pg.o_dept AS VARCHAR(15)),      CAST(pg.c_dept AS VARCHAR(15)),      pg.org_move_reason),
                 (5, 'Office',     CAST(pg.o_loc AS VARCHAR(15)),       CAST(pg.c_loc AS VARCHAR(15)),       pg.location_move_reason),
                 (6, 'Country',    CAST(ol.CountryCode AS VARCHAR(15)), CAST(cl.CountryCode AS VARCHAR(15)), pg.location_move_reason)
@@ -353,7 +357,7 @@ FROM (
                 (9,  'Market Adjustments',                 'Pay Rate',       'close', CAST(NULL AS VARCHAR(30)),
                      CASE WHEN pg.market_people > 0 THEN 1 ELSE 0 END,
                      pg.market_people, 0, 0, pg.market_bn, pg.market_bc, pg.market_ln, pg.market_lc),
-                (10, 'Relocation Adjustments',             'Location',       'close', CAST(NULL AS VARCHAR(30)),
+                (10, 'Same-Country Transfer Adjustments',  'Location',       'close', CAST(NULL AS VARCHAR(30)),
                      CASE WHEN pg.reloc_people  > 0 THEN 1 ELSE 0 END,
                      pg.reloc_people,  0, 0, pg.reloc_bn,  pg.reloc_bc,  pg.reloc_ln,  pg.reloc_lc),
                 (11, 'International Transfer Adjustments', 'Location',       'close', CAST(NULL AS VARCHAR(30)),

@@ -105,6 +105,16 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 
 Expected: sections 1 and 2 all `PASS` (89,611 rows, 88 pairs; FY26 725 people changed office, 600 within one country, 125 across a border; FY23 560); sections 3 and 4 show `0`.
 
+```bash
+docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C \
+  -i /repo/sqlserver/09_validate_region_walk_and_career_moves.sql
+```
+
+Expected (added in phase 7): three "returned ... rows" lines (region walk 26,520, career moves 34,532, walk 115,544); section 1 all `PASS`; section 2 three rows with `0` failures, all `PASS`; section 3 all `PASS` (FY26: 1,850 promotions, 148 demotions, 16 into Director and above; North America 9,909 → 10,426).
+
+07 also has a new check, 4b (`open_headcount` equals the walk's Opening headcount): expected `0`.
+
 The seconds 06 and 07 print are roughly what a Tableau extract refresh of each data source will take; with 88 pairs instead of 184 they should be about half of what you saw before.
 
 ## Step 6. Send back

@@ -55,6 +55,8 @@ EXPORTS = [
     "mart_vacancy_pool",
     "mart_plan_vs_actual",
     "mart_seat_corridors",
+    "mart_region_walk",
+    "mart_career_moves",
 ]
 
 

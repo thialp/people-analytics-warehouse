@@ -87,7 +87,7 @@ ORDER BY step_order;
      7  Demotions                             148       0      -787908.61      -26.84
      8  Tenure Increases                    25189       0    105810275.68     3604.57
      9  Market Adjustments                    287       0      1522136.82       51.85
-    10  Relocation Adjustments                583       0       146961.74        5.01
+    10  Same-Country Transfer Adjustments     583       0       146961.74        5.01
     11  International Transfer Adjustments    125       0     -1159094.31      -39.49
     12  FTE Changes                           353       0     -9274040.16       -9.92
     13  Fringe Rate Changes                 11312       0      8304439.07      282.90

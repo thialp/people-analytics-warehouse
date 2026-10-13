@@ -7,7 +7,7 @@
 --
 --   Opening + Hires + Exits + Transfers In + Transfers Out
 --           + Promotions + Demotions + Tenure Increases + Market Adjustments
---           + Relocation Adjustments + International Transfer Adjustments
+--           + Same-Country Transfer Adjustments + International Transfer Adjustments
 --           + FTE Changes + Fringe Rate Changes + FX Translation  =  Closing
 --
 -- exactly, in headcount, FTE and all four dollar measures, for every row group.
@@ -160,7 +160,7 @@ view_row AS MATERIALIZED (
     LEFT JOIN dept_map AS cd ON cd.department_id = pg.c_dept
     LEFT JOIN staging.stg_location AS ol ON ol.location_id = pg.o_loc
     LEFT JOIN staging.stg_location AS cl ON cl.location_id = pg.c_loc
-    CROSS JOIN (VALUES (1, 'Company'), (2, 'Function'), (3, 'Leader'),
+    CROSS JOIN (VALUES (1, 'Company'), (2, 'Function'), (3, 'Sub-function'),
                        (4, 'Department'), (5, 'Office'), (6, 'Country')) AS v(view_order, view_name)
 ),
 
@@ -194,7 +194,7 @@ walk_line AS (
     SELECT from_date, to_date, view_order, view_name, close_key, 9, 'Market Adjustments', 'Pay Rate', NULL, market_people, 0, 0, market_bn, market_bc, market_ln, market_lc
     FROM view_row WHERE market_people > 0
     UNION ALL
-    SELECT from_date, to_date, view_order, view_name, close_key, 10, 'Relocation Adjustments', 'Location', NULL, reloc_people, 0, 0, reloc_bn, reloc_bc, reloc_ln, reloc_lc
+    SELECT from_date, to_date, view_order, view_name, close_key, 10, 'Same-Country Transfer Adjustments', 'Location', NULL, reloc_people, 0, 0, reloc_bn, reloc_bc, reloc_ln, reloc_lc
     FROM view_row WHERE reloc_people > 0
     UNION ALL
     SELECT from_date, to_date, view_order, view_name, close_key, 11, 'International Transfer Adjustments', 'Location', NULL, intl_people, 0, 0, intl_bn, intl_bc, intl_ln, intl_lc
@@ -245,6 +245,11 @@ with_totals AS (
 SELECT
     t.from_date                                                         AS from_month_end,
     t.to_date                                                           AS to_month_end,
+    -- the data window: the as-of date is the last month-end in the warehouse, the start is
+    -- the first month-end a pair can begin after the lead-in year (both move by themselves
+    -- when history grows)
+    (SELECT CAST(MIN(month_end_date) + INTERVAL 12 MONTH AS DATE) FROM intermediate.int_month_end_calendar) AS report_start_date,
+    (SELECT MAX(month_end_date) FROM intermediate.int_month_end_calendar)                                  AS report_as_of_date,
     cf.fiscal_period                                                    AS from_fiscal_period,
     ct.fiscal_period                                                    AS to_fiscal_period,
     cf.fiscal_quarter_label                                             AS from_fiscal_quarter,
@@ -268,7 +273,7 @@ SELECT
     CASE t.view_name
         WHEN 'Company'    THEN NULL
         WHEN 'Function'   THEN 'Arcadia Systems'
-        WHEN 'Leader'     THEN ou.function_name
+        WHEN 'Sub-function' THEN ou.function_name
         WHEN 'Department' THEN ou.function_name
         WHEN 'Office'     THEN lo.country_name
         WHEN 'Country'    THEN co.region

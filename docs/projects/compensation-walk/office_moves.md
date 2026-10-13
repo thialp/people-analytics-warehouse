@@ -16,7 +16,7 @@ The office-moves query is the companion of the compensation walk. It answers one
 1. **A mover** is a worker present at both month-ends whose office differs. Only the From and To snapshots are compared, as in the walk: A → B → C is one move A → C, and A → B → A is no move. That is why FY26 shows 345 movers here and 392 in the monthly flows (the monthly view counts every hop).
 2. **Executive officers** are excluded, as in the walk.
 3. **The same grid** as the walk (136 quarter-end pairs plus 48 month-over-month pairs, shown at the two `GRID` markers). Keep both files identical, or a date pair on the dashboard will have a walk and no map.
-4. **The same six views and group keys** as the walk: Company (`ORG-000`), Function, Leader, Department, Office (`LOC-nnn`) and Country (ISO code). `group_name` is built the same way, so `view_name = [p_View] AND group_name = [p_Group]` filters both queries.
+4. **The same six views and group keys** as the walk: Company (`ORG-000`), Function, Sub-function, Department, Office (`LOC-nnn`) and Country (ISO code). `group_name` is built the same way, so `view_name = [p_View] AND group_name = [p_Group]` filters both queries.
 
 ## Which group a move belongs to: `group_side`
 
@@ -24,19 +24,22 @@ A move belongs to the group the person is in at each end of the pair.
 
 | `group_side` | Meaning | Where it appears |
 |---|---|---|
-| `Both` | The group is the same at both ends: a move inside the group | Company (always); Function, Leader and Department when the mover stayed in the group; Country for moves inside one country |
+| `Both` | The group is the same at both ends: a move inside the group | Company (always); Function, Sub-function and Department when the mover stayed in the group; Country for moves inside one country |
 | `From` | The person was in this group at the From date and left it | Office (always); Country for moves across a border; org views when the mover also changed department |
 | `To` | The person joined this group by the To date | Same as `From`, on the receiving group |
 
 So for any one selected group, the people moving in that group are `SUM(workers)`; `group_side` splits inbound from outbound where that matters. A mover who changed office *and* department appears once in each group they were in, never twice in the same group.
 
-**Ties to the walk (test 39).** In the Office and Country views, `To` equals the walk's Transfers In headcount and `From` equals Transfers Out, for every group and date pair. The count of people moving across a border (118 in FY26) equals the walk's *International Transfer Adjustments* people, while relocations inside a country (227) are more than the walk's *Relocation Adjustments* people (216), because a relocation only produces a pay adjustment when the new office has a different pay zone.
+**Ties to the walk (test 39).** In the Office and Country views, `To` equals the walk's Transfers In headcount and `From` equals Transfers Out, for every group and date pair. The count of people moving across a border (125 in FY26) equals the walk's *International Transfer Adjustments* people, while moves inside a country (600) are more than the walk's *Same-Country Transfer Adjustments* people (583): a move only produces a pay adjustment when the new office has a different pay zone. Of the 600, 575 changed pay zone, 23 moved between offices in the same zone (Austin and Chicago, say) and 2 moved twice.
+
+**Ties to the walk (test 59).** `open_headcount` equals the walk's Opening headcount for the same pair, view and group.
 
 ## Columns
 
 | Column | Meaning |
 |---|---|
 | `from_month_end`, `to_month_end` | The date pair, as in the walk |
+| `report_start_date`, `report_as_of_date` | The data window, as in the walk |
 | `from_fiscal_period`, `to_fiscal_period`, `months_between` | Labels for the pair |
 | `view_order`, `view_name`, `group_id`, `group_name`, `group_parent` | The view and group, identical to the walk's columns of the same names |
 | `group_side` | `Both`, `From` or `To` (above) |
@@ -47,6 +50,7 @@ So for any one selected group, the people moving in that group are `SUM(workers)
 | `region_scope` | `Same region` or `Across regions` |
 | `move_reason` | `Relocation` (inside a country) or `International Transfer`, from the pay ledger; `Other` if the ledger has none |
 | `workers` | People who moved on this office pair under this group, side and reason |
+| `open_headcount` | The group's headcount at the From month-end, the same on every row of the group (repeated: use `MIN` or `ATTR`, never `SUM`). `SUM(workers) / MIN(open_headcount)` is the share of the group that changed office |
 
 Every office has coordinates (test 32), so a line is always `MAKELINE(MAKEPOINT(from_latitude, from_longitude), MAKEPOINT(to_latitude, to_longitude))`.
 
@@ -54,12 +58,14 @@ Every office has coordinates (test 32), so a line is always `MAKELINE(MAKEPOINT(
 
 | View | Side | People | Reads as |
 |---|---|---|---|
-| Company | Both | 345 | 345 people changed office: 227 within one country, 118 across a border |
-| Office | To | 345 | The same 345, counted at the office each joined |
-| Office | From | 345 | ... and at the office each left (Bengaluru 61, Hyderabad 50 and Austin HQ 42 lose the most) |
-| Country | Both | 227 | Moves inside one country |
-| Country | To | 118 | The cross-border moves, counted at the receiving country |
+| Company | Both | 725 | 725 people changed office (2.5% of the 28,438 at the start): 600 within one country, 125 across a border |
+| Office | To | 725 | The same 725, counted at the office each joined |
+| Office | From | 725 | ... and at the office each left (Austin HQ 104, Bengaluru 85 and Hyderabad 81 lose the most) |
+| Country | Both | 600 | Moves inside one country |
+| Country | To | 125 | The cross-border moves, counted at the receiving country |
+
+(Release 2 values: with seats, people who change department often change office too, so there are about twice as many moves as in release 1's 345.)
 
 ## Size and run time
 
-Movers are aggregated by date pair, departments, offices and reason before the six-view expansion, which keeps the result at 260,464 rows. Only people who changed office go through the six-view expansion (the walk expands everyone), so the query does less work than the walk. Run [`07_validate_office_moves.sql`](../../../sqlserver/07_validate_office_moves.sql) to print the actual SQL Server time on your machine.
+Movers are aggregated by date pair, departments, offices and reason before the six-view expansion, which keeps the result at 89,611 rows (88 date pairs). Only people who changed office go through the six-view expansion (the walk expands everyone), so the query does less work than the walk. Run [`07_validate_office_moves.sql`](../../../sqlserver/07_validate_office_moves.sql) to print the actual SQL Server time on your machine.

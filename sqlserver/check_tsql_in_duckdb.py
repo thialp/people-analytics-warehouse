@@ -11,8 +11,9 @@ What it runs
   1. 03_build_dw.sql, 03b_build_dw_workforce_planning.sql, 04_create_reporting_views.sql
      (index, constraint and ALTER COLUMN statements are skipped: DuckDB does not need them)
   2. every rpt view against its mart (numbers to the cent, flags as 0/1, the rest as text)
-  3. the Tableau Custom SQL: office moves in full, the compensation walk for the pairs that
-     end in FY26 (the full walk needs more memory than a laptop-sized DuckDB run allows)
+  3. the Tableau Custom SQL: office moves, region walk and career moves in full, the
+     compensation walk for the pairs that end in FY26 (the full walk needs more memory
+     than a laptop-sized DuckDB run allows)
   4. the PASS/FAIL tables of 05_validate.sql and 08_validate_workforce_planning.sql
   and, before all that, two SQL Server rules DuckDB does not enforce: primary-key columns
   must be made NOT NULL first, and text must fit its declared VARCHAR length.
@@ -217,6 +218,10 @@ def main() -> int:
         print("\n3. Tableau Custom SQL vs the pipeline marts")
         custom_sql(con, "custom_sql_office_moves.sql", "office_moves")
         ok &= compare(con, "mart_office_moves", "cs.office_moves")
+        custom_sql(con, "custom_sql_region_walk.sql", "region_walk")
+        ok &= compare(con, "mart_region_walk", "cs.region_walk")
+        custom_sql(con, "custom_sql_career_moves.sql", "career_moves")
+        ok &= compare(con, "mart_career_moves", "cs.career_moves")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
