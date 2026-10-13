@@ -1538,7 +1538,7 @@ cost_center_rows = []
 for cc in _cc_ids:
     _, code, country = cc.split("-")
     dept_id = "D-" + code[:-1]
-    cost_center_rows.append({"cost_center_id": cc, "cost_center_name": f'{DEPT[dept_id]["name"]} · {COUNTRY[country]["name"]}',
+    cost_center_rows.append({"cost_center_id": cc, "cost_center_name": f'{DEPT[dept_id]["name"]} - {COUNTRY[country]["name"]}',
                              "department_id": dept_id, "department_cost_center": f"CC-{code}", "country_code": country,
                              "function": DEPT[dept_id]["function"]})
 

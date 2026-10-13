@@ -38,4 +38,5 @@ JOIN staging.stg_location AS fl ON fl.location_id = f.prior_location_id
 JOIN staging.stg_location AS tl ON tl.location_id = f.new_location_id
 WHERE f.seat_type = 'Backfill'
   AND f.location_change <> 'Same office'
-GROUP BY ALL;
+GROUP BY ALL
+ORDER BY fiscal_year, fiscal_quarter_label, from_location_id, to_location_id, location_change;

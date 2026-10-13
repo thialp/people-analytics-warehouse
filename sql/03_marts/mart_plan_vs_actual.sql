@@ -22,8 +22,8 @@ people AS (   -- actuals at the quarter-end, by cost center and pay currency
            s.currency_code,
            COUNT(*)                                            AS headcount,
            SUM(s.fte)                                          AS fte,
-           SUM(s.base_salary_annual_local * s.fte * (1 + s.fringe_rate)) AS loaded_local,
-           SUM(s.loaded_usd_constant)                          AS loaded_usd_constant
+           SUM(CAST(s.base_salary_annual_local * s.fte * (1 + s.fringe_rate) AS DECIMAL(38, 10))) AS loaded_local,
+           SUM(CAST(s.loaded_usd_constant AS DECIMAL(38, 10))) AS loaded_usd_constant
     FROM intermediate.int_worker_month_end_snapshot AS s
     JOIN staging.stg_department AS d USING (department_id)
     WHERE s.month_end_date IN (SELECT quarter_end_date FROM quarters)
@@ -44,7 +44,7 @@ fills AS (    -- hires and internal moves into seats during the quarter, by the 
 ),
 cost_at_plan_fx AS (
     SELECT p.plan_version, p.cost_center_id, p.fiscal_quarter,
-           SUM(pe.loaded_local * fx.usd_per_local) AS actual_cost_usd_plan_fx
+           SUM(CAST(pe.loaded_local * fx.usd_per_local AS DECIMAL(38, 10))) AS actual_cost_usd_plan_fx
     FROM staging.stg_workforce_plan AS p
     JOIN people AS pe ON pe.quarter_end_date = p.quarter_end_date AND pe.cost_center_id = p.cost_center_id
     ASOF JOIN staging.stg_fx_rate_daily AS fx
@@ -88,8 +88,8 @@ SELECT
     COALESCE(f.external_hires, 0)                            AS actual_external_hires,
     COALESCE(f.internal_moves, 0)                            AS actual_internal_moves,
     p.planned_cost_usd,
-    COALESCE(x.actual_cost_usd_plan_fx, 0)                   AS actual_cost_usd_plan_fx,
-    COALESCE(a.loaded_usd_constant, 0)                       AS actual_cost_usd_constant,
+    CAST(ROUND(COALESCE(x.actual_cost_usd_plan_fx, 0), 2) AS DECIMAL(18, 2)) AS actual_cost_usd_plan_fx,
+    CAST(ROUND(COALESCE(a.loaded_usd_constant, 0), 2) AS DECIMAL(18, 2))     AS actual_cost_usd_constant,
     p.plan_fx_rate_date
 FROM staging.stg_workforce_plan AS p
 JOIN quarters AS q ON q.quarter_end_date = p.quarter_end_date
@@ -99,4 +99,5 @@ JOIN (SELECT DISTINCT country_code, country_name, region FROM staging.stg_locati
 LEFT JOIN people_cc AS a ON a.quarter_end_date = p.quarter_end_date AND a.cost_center_id = p.cost_center_id
 LEFT JOIN fills AS f ON f.quarter_end_date = p.quarter_end_date AND f.cost_center_id = p.cost_center_id
 LEFT JOIN cost_at_plan_fx AS x
-  ON x.plan_version = p.plan_version AND x.cost_center_id = p.cost_center_id AND x.fiscal_quarter = p.fiscal_quarter;
+  ON x.plan_version = p.plan_version AND x.cost_center_id = p.cost_center_id AND x.fiscal_quarter = p.fiscal_quarter
+ORDER BY p.fiscal_year, p.version_date, p.cost_center_id, p.fiscal_quarter;

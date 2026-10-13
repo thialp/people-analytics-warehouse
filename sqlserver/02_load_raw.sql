@@ -10,6 +10,38 @@ SET NOCOUNT ON;
 USE ArcadiaHR;
 GO
 
+DROP TABLE IF EXISTS raw.dim_candidate;
+CREATE TABLE raw.dim_candidate (
+    [candidate_id]     NVARCHAR(400) NULL,
+    [requisition_id]   NVARCHAR(400) NULL,
+    [is_internal]      NVARCHAR(400) NULL,
+    [candidate_source] NVARCHAR(400) NULL,
+    [worker_id]        NVARCHAR(400) NULL,
+    [final_status]     NVARCHAR(400) NULL
+);
+BULK INSERT raw.dim_candidate
+FROM '/repo/data/raw/dim_candidate.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_dim_candidate INT = (SELECT COUNT(*) FROM raw.dim_candidate);
+PRINT CONCAT('raw.dim_candidate', '                   ', @n_dim_candidate, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.dim_cost_center;
+CREATE TABLE raw.dim_cost_center (
+    [cost_center_id]         NVARCHAR(400) NULL,
+    [cost_center_name]       NVARCHAR(400) NULL,
+    [department_id]          NVARCHAR(400) NULL,
+    [department_cost_center] NVARCHAR(400) NULL,
+    [country_code]           NVARCHAR(400) NULL,
+    [function]               NVARCHAR(400) NULL
+);
+BULK INSERT raw.dim_cost_center
+FROM '/repo/data/raw/dim_cost_center.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_dim_cost_center INT = (SELECT COUNT(*) FROM raw.dim_cost_center);
+PRINT CONCAT('raw.dim_cost_center', '                 ', @n_dim_cost_center, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.dim_country;
 CREATE TABLE raw.dim_country (
     [country_code]  NVARCHAR(400) NULL,
@@ -120,6 +152,30 @@ DECLARE @n_dim_org_unit INT = (SELECT COUNT(*) FROM raw.dim_org_unit);
 PRINT CONCAT('raw.dim_org_unit', '                    ', @n_dim_org_unit, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.dim_position;
+CREATE TABLE raw.dim_position (
+    [position_record_id]   NVARCHAR(400) NULL,
+    [position_id]          NVARCHAR(400) NULL,
+    [effective_start_date] NVARCHAR(400) NULL,
+    [effective_end_date]   NVARCHAR(400) NULL,
+    [change_reason]        NVARCHAR(400) NULL,
+    [status]               NVARCHAR(400) NULL,
+    [department_id]        NVARCHAR(400) NULL,
+    [cost_center_id]       NVARCHAR(400) NULL,
+    [location_id]          NVARCHAR(400) NULL,
+    [job_profile_id]       NVARCHAR(400) NULL,
+    [job_level]            NVARCHAR(400) NULL,
+    [fte]                  NVARCHAR(400) NULL,
+    [created_date]         NVARCHAR(400) NULL,
+    [created_reason]       NVARCHAR(400) NULL
+);
+BULK INSERT raw.dim_position
+FROM '/repo/data/raw/dim_position.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_dim_position INT = (SELECT COUNT(*) FROM raw.dim_position);
+PRINT CONCAT('raw.dim_position', '                    ', @n_dim_position, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.dim_worker;
 CREATE TABLE raw.dim_worker (
     [worker_id]            NVARCHAR(400) NULL,
@@ -157,6 +213,21 @@ FROM '/repo/data/raw/fact_bonus_payout.csv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_fact_bonus_payout INT = (SELECT COUNT(*) FROM raw.fact_bonus_payout);
 PRINT CONCAT('raw.fact_bonus_payout', '               ', @n_fact_bonus_payout, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.fact_candidate_stage_event;
+CREATE TABLE raw.fact_candidate_stage_event (
+    [candidate_event_id] NVARCHAR(400) NULL,
+    [candidate_id]       NVARCHAR(400) NULL,
+    [stage]              NVARCHAR(400) NULL,
+    [stage_order]        NVARCHAR(400) NULL,
+    [stage_date]         NVARCHAR(400) NULL
+);
+BULK INSERT raw.fact_candidate_stage_event
+FROM '/repo/data/raw/fact_candidate_stage_event.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_fact_candidate_stage_event INT = (SELECT COUNT(*) FROM raw.fact_candidate_stage_event);
+PRINT CONCAT('raw.fact_candidate_stage_event', '      ', @n_fact_candidate_stage_event, ' rows');
 GO
 
 DROP TABLE IF EXISTS raw.fact_compensation_history;
@@ -215,6 +286,74 @@ FROM '/repo/data/raw/fact_performance_review.csv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_fact_performance_review INT = (SELECT COUNT(*) FROM raw.fact_performance_review);
 PRINT CONCAT('raw.fact_performance_review', '         ', @n_fact_performance_review, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.fact_position_assignment;
+CREATE TABLE raw.fact_position_assignment (
+    [assignment_id]  NVARCHAR(400) NULL,
+    [position_id]    NVARCHAR(400) NULL,
+    [worker_id]      NVARCHAR(400) NULL,
+    [start_date]     NVARCHAR(400) NULL,
+    [end_date]       NVARCHAR(400) NULL,
+    [fill_type]      NVARCHAR(400) NULL,
+    [requisition_id] NVARCHAR(400) NULL,
+    [vacate_reason]  NVARCHAR(400) NULL
+);
+BULK INSERT raw.fact_position_assignment
+FROM '/repo/data/raw/fact_position_assignment.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_fact_position_assignment INT = (SELECT COUNT(*) FROM raw.fact_position_assignment);
+PRINT CONCAT('raw.fact_position_assignment', '        ', @n_fact_position_assignment, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.fact_requisition;
+CREATE TABLE raw.fact_requisition (
+    [requisition_id]      NVARCHAR(400) NULL,
+    [position_id]         NVARCHAR(400) NULL,
+    [req_type]            NVARCHAR(400) NULL,
+    [opened_date]         NVARCHAR(400) NULL,
+    [approved_date]       NVARCHAR(400) NULL,
+    [target_start_date]   NVARCHAR(400) NULL,
+    [filled_date]         NVARCHAR(400) NULL,
+    [cancelled_date]      NVARCHAR(400) NULL,
+    [status]              NVARCHAR(400) NULL,
+    [department_id]       NVARCHAR(400) NULL,
+    [cost_center_id]      NVARCHAR(400) NULL,
+    [location_id]         NVARCHAR(400) NULL,
+    [job_profile_id]      NVARCHAR(400) NULL,
+    [job_level]           NVARCHAR(400) NULL,
+    [hiring_manager_id]   NVARCHAR(400) NULL,
+    [filled_by_worker_id] NVARCHAR(400) NULL,
+    [fill_source]         NVARCHAR(400) NULL
+);
+BULK INSERT raw.fact_requisition
+FROM '/repo/data/raw/fact_requisition.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_fact_requisition INT = (SELECT COUNT(*) FROM raw.fact_requisition);
+PRINT CONCAT('raw.fact_requisition', '                ', @n_fact_requisition, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.fact_workforce_plan;
+CREATE TABLE raw.fact_workforce_plan (
+    [plan_version]             NVARCHAR(400) NULL,
+    [version_type]             NVARCHAR(400) NULL,
+    [version_date]             NVARCHAR(400) NULL,
+    [fiscal_year]              NVARCHAR(400) NULL,
+    [fiscal_quarter]           NVARCHAR(400) NULL,
+    [quarter_end_date]         NVARCHAR(400) NULL,
+    [cost_center_id]           NVARCHAR(400) NULL,
+    [planned_ending_headcount] NVARCHAR(400) NULL,
+    [planned_ending_fte]       NVARCHAR(400) NULL,
+    [planned_net_new]          NVARCHAR(400) NULL,
+    [planned_backfills]        NVARCHAR(400) NULL,
+    [planned_cost_usd]         NVARCHAR(400) NULL,
+    [plan_fx_rate_date]        NVARCHAR(400) NULL
+);
+BULK INSERT raw.fact_workforce_plan
+FROM '/repo/data/raw/fact_workforce_plan.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_fact_workforce_plan INT = (SELECT COUNT(*) FROM raw.fact_workforce_plan);
+PRINT CONCAT('raw.fact_workforce_plan', '             ', @n_fact_workforce_plan, ' rows');
 GO
 
 DROP TABLE IF EXISTS raw.ref_fringe_rate;
@@ -327,13 +466,14 @@ GO
 
 DROP TABLE IF EXISTS raw.ref_salary_range;
 CREATE TABLE raw.ref_salary_range (
-    [fiscal_year]   NVARCHAR(400) NULL,
-    [job_level]     NVARCHAR(400) NULL,
-    [country_code]  NVARCHAR(400) NULL,
-    [currency_code] NVARCHAR(400) NULL,
-    [range_min]     NVARCHAR(400) NULL,
-    [range_mid]     NVARCHAR(400) NULL,
-    [range_max]     NVARCHAR(400) NULL
+    [fiscal_year]            NVARCHAR(400) NULL,
+    [job_level]              NVARCHAR(400) NULL,
+    [country_code]           NVARCHAR(400) NULL,
+    [currency_code]          NVARCHAR(400) NULL,
+    [range_min]              NVARCHAR(400) NULL,
+    [range_mid]              NVARCHAR(400) NULL,
+    [range_max]              NVARCHAR(400) NULL,
+    [structure_increase_pct] NVARCHAR(400) NULL
 );
 BULK INSERT raw.ref_salary_range
 FROM '/repo/data/raw/ref_salary_range.csv'

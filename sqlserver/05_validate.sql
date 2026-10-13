@@ -11,16 +11,16 @@ PRINT '1. Row counts';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'dw.DimWorker rows'                   AS check_name, (SELECT COUNT(*) FROM dw.DimWorker)               AS actual, 43569   AS expected
-    UNION ALL SELECT 'dw.FactJobHistory rows',                            (SELECT COUNT(*) FROM dw.FactJobHistory),                    89240
-    UNION ALL SELECT 'dw.FactCompensationHistory rows',                   (SELECT COUNT(*) FROM dw.FactCompensationHistory),           152939
-    UNION ALL SELECT 'corrected pay records resolved',                    (SELECT COUNT(*) FROM dw.FactCompensationHistory WHERE WasCorrected = 1), 891
-    UNION ALL SELECT 'dw.FactPerformanceReview rows',                     (SELECT COUNT(*) FROM dw.FactPerformanceReview),             131639
-    UNION ALL SELECT 'dw.FactBonusPayout rows',                           (SELECT COUNT(*) FROM dw.FactBonusPayout),                   131639
-    UNION ALL SELECT 'dw.MonthEndCalendar rows',                          (SELECT COUNT(*) FROM dw.MonthEndCalendar),                  49
-    UNION ALL SELECT 'dw.WorkerMonthEndSnapshot rows',                    (SELECT COUNT(*) FROM dw.WorkerMonthEndSnapshot),            1347949
-    UNION ALL SELECT 'dw.WorkerPayLedger rows',                           (SELECT COUNT(*) FROM dw.WorkerPayLedger),                   1347949
-    UNION ALL SELECT 'dw.WorkerReportingChain rows',                      (SELECT COUNT(*) FROM dw.WorkerReportingChain),              918806
+              SELECT 'dw.DimWorker rows'                   AS check_name, (SELECT COUNT(*) FROM dw.DimWorker)               AS actual, 46980   AS expected
+    UNION ALL SELECT 'dw.FactJobHistory rows',                            (SELECT COUNT(*) FROM dw.FactJobHistory),                    98028
+    UNION ALL SELECT 'dw.FactCompensationHistory rows',                   (SELECT COUNT(*) FROM dw.FactCompensationHistory),           185063
+    UNION ALL SELECT 'corrected pay records resolved',                    (SELECT COUNT(*) FROM dw.FactCompensationHistory WHERE WasCorrected = 1), 1128
+    UNION ALL SELECT 'dw.FactPerformanceReview rows',                     (SELECT COUNT(*) FROM dw.FactPerformanceReview),             154151
+    UNION ALL SELECT 'dw.FactBonusPayout rows',                           (SELECT COUNT(*) FROM dw.FactBonusPayout),                   154151
+    UNION ALL SELECT 'dw.MonthEndCalendar rows',                          (SELECT COUNT(*) FROM dw.MonthEndCalendar),                  61
+    UNION ALL SELECT 'dw.WorkerMonthEndSnapshot rows',                    (SELECT COUNT(*) FROM dw.WorkerMonthEndSnapshot),            1639687
+    UNION ALL SELECT 'dw.WorkerPayLedger rows',                           (SELECT COUNT(*) FROM dw.WorkerPayLedger),                   1639687
+    UNION ALL SELECT 'dw.WorkerReportingChain rows',                      (SELECT COUNT(*) FROM dw.WorkerReportingChain),              1048170
     UNION ALL SELECT 'org leaders at 2026-06-30',                         (SELECT COUNT(*) FROM rpt.vw_org_leader_summary WHERE month_end_date = '2026-06-30'), 44
 ) AS c;
 GO
@@ -53,8 +53,8 @@ GROUP BY month_end_date
 ORDER BY month_end_date;
 /*
   Expected:
-    2022-06-30   25005   24733.20   2577787184.81   2613645368.50
-    2026-06-30   30015   29395.70   3195503264.83   3195503264.83
+    2022-06-30   25052   24725.50   2450138920.49   2487093187.74
+    2026-06-30   30005   29354.50   3336539181.84   3336539181.84
   (Nominal equals constant on 2026-06-30: the constant rate set is that day's rates.)
 */
 GO

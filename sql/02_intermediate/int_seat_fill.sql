@@ -16,7 +16,9 @@
 --   market effect    mid(new grade, new office,   fill FY) - mid(new grade,   new office,   exit FY)
 --   positioning      (new pay - mid(new grade, new office, fill FY)) - (prior pay - mid(prior grade, prior office, exit FY))
 -- Pay is the annual base salary rate (not x FTE), so a part-time incumbent compares
--- like for like. The order is level, then location, then market.
+-- like for like. The order is level, then location, then market. Pays and the level,
+-- location and market effects are rounded to the cent; positioning is what remains, so
+-- the walk adds up exactly to the cent and the published CSV is the same on every run.
 --
 -- For a net-new seat, reuse_candidate says whether a seat it could have reused was
 -- vacant when it was approved: same department, job family and country, a grade within
@@ -140,7 +142,9 @@ reuse AS (   -- net-new seats approved while a seat they could have reused was v
     GROUP BY m.fill_id
 )
 SELECT
-    m.* EXCLUDE (prior_currency_code, new_currency_code),
+    m.* EXCLUDE (prior_currency_code, new_currency_code, prior_pay_usd_constant, new_pay_usd_constant,
+                 mid_prior_grade_prior_office_exit, mid_new_grade_prior_office_exit,
+                 mid_new_grade_new_office_exit, mid_new_grade_new_office_fill),
     CASE WHEN m.seat_type = 'Net-new' THEN NULL
          WHEN m.new_grade > m.prior_grade THEN 'Up'
          WHEN m.new_grade < m.prior_grade THEN 'Down'
@@ -157,16 +161,29 @@ SELECT
               AND m.requisition_opened_date = m.requisition_approved_date THEN 'Immediate refill'
          WHEN m.first_change_after_vacate = 'Vacated'                  THEN 'Backfill as is'
          ELSE 'Immediate refill' END                                     AS seat_decision,
-    -- pay walk (backfills only), constant USD
-    m.new_pay_usd_constant - m.prior_pay_usd_constant                    AS pay_change_usd_constant,
-    m.mid_new_grade_prior_office_exit - m.mid_prior_grade_prior_office_exit AS level_effect_usd_constant,
-    m.mid_new_grade_new_office_exit - m.mid_new_grade_prior_office_exit  AS location_effect_usd_constant,
-    m.mid_new_grade_new_office_fill - m.mid_new_grade_new_office_exit    AS market_effect_usd_constant,
-    (m.new_pay_usd_constant - m.mid_new_grade_new_office_fill)
-      - (m.prior_pay_usd_constant - m.mid_prior_grade_prior_office_exit) AS positioning_effect_usd_constant,
+    -- pay walk (backfills only), constant USD, exact to the cent
+    w.prior_pay_usd_constant,
+    w.new_pay_usd_constant,
+    w.new_pay_usd_constant - w.prior_pay_usd_constant                    AS pay_change_usd_constant,
+    w.level_effect_usd_constant,
+    w.location_effect_usd_constant,
+    w.market_effect_usd_constant,
+    (w.new_pay_usd_constant - w.prior_pay_usd_constant) - w.level_effect_usd_constant
+      - w.location_effect_usd_constant - w.market_effect_usd_constant    AS positioning_effect_usd_constant,
     COALESCE(u.reuse_candidate_seats, 0) > 0                             AS reuse_candidate,
     COALESCE(u.reuse_candidate_seats, 0)                                 AS reuse_candidate_seats,
     u.reuse_candidate_position_id,
     u.reuse_candidate_vacant_since
 FROM mids AS m
+CROSS JOIN LATERAL (
+    SELECT
+        CAST(ROUND(CAST(m.prior_pay_usd_constant AS DECIMAL(38, 10)), 2) AS DECIMAL(18, 2)) AS prior_pay_usd_constant,
+        CAST(ROUND(CAST(m.new_pay_usd_constant   AS DECIMAL(38, 10)), 2) AS DECIMAL(18, 2)) AS new_pay_usd_constant,
+        CAST(ROUND(CAST(m.mid_new_grade_prior_office_exit AS DECIMAL(38, 10))
+                 - CAST(m.mid_prior_grade_prior_office_exit AS DECIMAL(38, 10)), 2) AS DECIMAL(18, 2)) AS level_effect_usd_constant,
+        CAST(ROUND(CAST(m.mid_new_grade_new_office_exit AS DECIMAL(38, 10))
+                 - CAST(m.mid_new_grade_prior_office_exit AS DECIMAL(38, 10)), 2) AS DECIMAL(18, 2)) AS location_effect_usd_constant,
+        CAST(ROUND(CAST(m.mid_new_grade_new_office_fill AS DECIMAL(38, 10))
+                 - CAST(m.mid_new_grade_new_office_exit AS DECIMAL(38, 10)), 2) AS DECIMAL(18, 2)) AS market_effect_usd_constant
+) AS w
 LEFT JOIN reuse AS u USING (fill_id);

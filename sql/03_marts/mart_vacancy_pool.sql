@@ -59,4 +59,5 @@ LEFT JOIN staging.stg_requisition AS q ON q.requisition_id = s.open_requisition_
 JOIN staging.stg_department  AS d  ON d.department_id   = s.department_id
 JOIN staging.stg_location    AS l  ON l.location_id     = s.location_id
 JOIN staging.stg_job_profile AS jp ON jp.job_profile_id = s.job_profile_id
-WHERE s.status IN ('Open', 'Frozen');
+WHERE s.status IN ('Open', 'Frozen')
+ORDER BY s.month_end_date, s.position_id;

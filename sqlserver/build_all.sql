@@ -11,5 +11,7 @@
 :r /repo/sqlserver/01_create_database.sql
 :r /repo/sqlserver/02_load_raw.sql
 :r /repo/sqlserver/03_build_dw.sql
+:r /repo/sqlserver/03b_build_dw_workforce_planning.sql
 :r /repo/sqlserver/04_create_reporting_views.sql
 :r /repo/sqlserver/05_validate.sql
+:r /repo/sqlserver/08_validate_workforce_planning.sql

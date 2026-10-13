@@ -97,4 +97,5 @@ JOIN staging.stg_department   AS nd ON nd.department_id  = f.new_department_id
 JOIN staging.stg_location     AS nl ON nl.location_id    = f.new_location_id
 JOIN staging.stg_job_profile  AS nj ON nj.job_profile_id = f.new_job_profile_id
 LEFT JOIN staging.stg_location    AS pl ON pl.location_id    = f.prior_location_id
-LEFT JOIN staging.stg_job_profile AS pj ON pj.job_profile_id = f.prior_job_profile_id;
+LEFT JOIN staging.stg_job_profile AS pj ON pj.job_profile_id = f.prior_job_profile_id
+ORDER BY f.fill_id;
