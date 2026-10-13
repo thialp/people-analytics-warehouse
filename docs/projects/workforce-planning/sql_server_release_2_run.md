@@ -9,7 +9,7 @@ What was already checked before this run: the same T-SQL, translated to DuckDB w
 Open Terminal and go to the folder you cloned in Step 2 of the [setup guide](../../setup/sql_server_local_setup.md) (the one SQL Server sees as `/repo`):
 
 ```bash
-cd ~/people-analytics-warehouse
+cd ~/Documents/GitHub/people-analytics-warehouse
 git fetch origin
 git checkout warehouse-release-2
 git pull

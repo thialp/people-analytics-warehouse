@@ -14,6 +14,8 @@ What it runs
   3. the Tableau Custom SQL: office moves in full, the compensation walk for the pairs that
      end in FY26 (the full walk needs more memory than a laptop-sized DuckDB run allows)
   4. the PASS/FAIL tables of 05_validate.sql and 08_validate_workforce_planning.sql
+  and, before all that, two SQL Server rules DuckDB does not enforce: primary-key columns
+  must be made NOT NULL first, and text must fit its declared VARCHAR length.
 
 Translation rules that make DuckDB behave like SQL Server: integers divide as integers,
 FLOAT is an 8-byte double, BIT is a 0/1 flag, OUTER/CROSS APPLY become LATERAL joins.
@@ -23,6 +25,7 @@ This is evidence that the T-SQL logic matches the pipeline; the run on SQL Serve
 
 from __future__ import annotations
 
+import csv
 import re
 import sys
 import tempfile
@@ -162,13 +165,51 @@ def validation(con: duckdb.DuckDBPyConnection, name: str) -> bool:
     return ok
 
 
+def static_checks() -> bool:
+    """SQL Server rules the translated run cannot see, because DuckDB ignores them:
+    a primary key needs every column made NOT NULL first (SELECT ... INTO keeps the source's
+    nullability), and text cast from a raw column must fit its declared length (SQL Server
+    would cut it silently)."""
+    ok = True
+    for name in BUILD:
+        text = re.sub(r"/\*.*?\*/", "", (ROOT / "sqlserver" / name).read_text(), flags=re.S)
+        not_null = {(t.lower(), c.lower()) for t, c in
+                    re.findall(r"ALTER TABLE\s+([\w.]+)\s+ALTER COLUMN\s+(\w+)\s+[^;]*NOT NULL", text, flags=re.I)}
+        for table, cols in re.findall(r"ALTER TABLE\s+([\w.]+)\s+ADD CONSTRAINT\s+\w+\s+PRIMARY KEY[^(]*\(([^)]*)\)", text, flags=re.I):
+            for col in (c.strip() for c in cols.split(",")):
+                if (table.lower(), col.lower()) not in not_null:
+                    ok = False
+                    print(f"   FAIL  {name}: {table}.{col} is in the primary key but never made NOT NULL")
+        for stmt in re.split(r"(?=DROP TABLE IF EXISTS)", text):
+            src = re.search(r"FROM\s+raw\.(\w+)", stmt, flags=re.I)
+            if not src:
+                continue
+            csv_path = ROOT / "data" / "raw" / f"{src.group(1)}.csv"
+            with csv_path.open(newline="") as f:
+                rows = list(csv.reader(f))
+            header = rows[0]
+            for raw_col, n in re.findall(r"CAST\(\s*(?:NULLIF\(\s*)?\[?(\w+)\]?(?:\s*,\s*''\s*\))?\s+AS\s+N?VARCHAR\((\d+)\)\)",
+                                         stmt, flags=re.I):
+                if raw_col not in header:
+                    continue
+                k = header.index(raw_col)
+                longest = max((len(r[k]) for r in rows[1:] if len(r) > k), default=0)
+                if longest > int(n):
+                    ok = False
+                    print(f"   FAIL  {name}: raw.{src.group(1)}.{raw_col} holds values of {longest} characters, cast to VARCHAR({n})")
+    print("   primary keys and text lengths: " + ("all fit SQL Server's rules" if ok else "see above"))
+    return ok
+
+
 def main() -> int:
     if not PIPELINE_DB.exists():
         print("Run python pipeline/run_pipeline.py first: the marts are what the T-SQL is compared with.")
         return 1
     with tempfile.TemporaryDirectory() as tmp:
         con = connect(Path(tmp) / "sqlserver.duckdb")
-        print("1. Building the SQL Server warehouse (T-SQL translated to DuckDB)")
+        print("0. SQL Server rules DuckDB does not enforce")
+        static = static_checks()
+        print("\n1. Building the SQL Server warehouse (T-SQL translated to DuckDB)")
         build(con)
         con.execute(f"ATTACH '{PIPELINE_DB}' AS p (READ_ONLY)")
         print("\n2. Reporting views vs the pipeline marts")
@@ -182,6 +223,7 @@ def main() -> int:
         ok &= validation(con, "05_validate.sql")
         ok &= validation(con, "08_validate_workforce_planning.sql")
         con.close()
+    ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")
     return 0 if ok else 1
 

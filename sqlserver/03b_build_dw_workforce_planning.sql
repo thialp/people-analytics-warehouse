@@ -230,6 +230,7 @@ LEFT JOIN dw.FactRequisition AS q
  AND c.MonthEndDate >= q.OpenedDate
  AND c.MonthEndDate < COALESCE(q.FilledDate, q.CancelledDate, CONVERT(DATE, '9999-12-31'));
 ALTER TABLE dw.PositionMonthEndSnapshot ALTER COLUMN PositionID VARCHAR(12) NOT NULL;
+ALTER TABLE dw.PositionMonthEndSnapshot ALTER COLUMN MonthEndDate DATE NOT NULL;
 ALTER TABLE dw.PositionMonthEndSnapshot
     ADD CONSTRAINT PK_PositionMonthEndSnapshot PRIMARY KEY CLUSTERED (MonthEndDate, PositionID);
 GO
