@@ -51,6 +51,10 @@ EXPORTS = [
     "mart_org_leader_summary",
     "mart_reporting_line",
     "mart_fringe_rate",
+    "mart_position_fill",
+    "mart_vacancy_pool",
+    "mart_plan_vs_actual",
+    "mart_seat_corridors",
 ]
 
 

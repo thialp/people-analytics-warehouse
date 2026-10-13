@@ -19,7 +19,8 @@ Every number on Dashboards #1 and #2 will change, because the history is extende
 | 2. History from Jun 2021 | Done 2026-10-12 | Start month-end Jun 30, 2021; 23,500 opening people with FY22 growth of 6.5% (25,044 at Jun 2022, old start 25,014); pay history from the Mar 2021 conversion; ECB extract from Jan 2021; 2021 fringe rates reuse each country's 2022 inputs, flagged `is_estimate`; 40 tests pass; totals in [release_2_totals.md](release_2_totals.md). Two part A items moved here from phase 7 because the walk CSV passed GitHub's 100 MB file limit: the grid keeps only the four offered period types (no Custom Range pairs) and the first year is lead-in (pairs end after Jun 30, 2022, computed from the calendar). 88 pairs; walk 114,977 rows (was 271,219), office moves 53,826 (was 260,464); build 46 s (was 80 s) |
 | 3. Positions, requisitions, seat decisions | Done 2026-10-12 | Raw `dim_position` (101,297 records), `fact_position_assignment` (54,094), `fact_requisition` (31,323); staging models and `int_position_snapshot` (seat × month-end, 1.7M rows); tests 41–48 pass, and each was checked against a deliberately broken copy of the data. Fills FY22–FY26: about 24% of backfills are internal moves; external hires are 60–85% backfills (FY24, the restructuring year, 86%). Closing headcount within 21 of phase 2 every year. Cost: FY26 $3,359.4M vs $3,215.9M in phase 2 (+4.5%), because backfills hire at the leaver's level (average grade 3.62 → 3.71 over five years); see section 11 |
 | 4. Range increases, cost centers, plan versions, candidates | Done 2026-10-12 | **Salary ranges move every July 1** (decided 2026-10-12): Arcadia pay policy, 2.5% to 4.0% a year plus a country adjustment (India +4 pp; Brazil, South Africa, Poland, Philippines +2; Mexico +1.5; Japan, Switzerland −1.5), anchored on the FY23 level bases; hire pay, the promotion floor and the tenure and market caps use the range in force. People and seats are identical to phase 3 (ranges change amounts, not decisions); cost FY22 $2,487.1M to FY26 $3,336.5M. **Cost centers**: `dim_cost_center`, department × country (`CC-1010-US`), 630; on every seat record and requisition. **Plan**: `fact_workforce_plan`, 28,800 rows, Budget plus RF1–RF3 per fiscal year (FY22–FY26), each reforecast covering the quarters still ahead; written around the actuals with an error that shrinks per version; budgets plan about 1.3× the net-new hires that happen (FY24 3.1×: set before the restructuring), backfills about 1.1×. **Candidates**: `dim_candidate` (188,982 applicants) and `fact_candidate_stage_event` (531,691 stages), split so source and internal flag are not repeated on every stage; about 7 applicants per real search; 16% accepted, 71% rejected, 11% withdrawn, 2% declined an offer. Tests 49–52 pass and catch deliberate breaks |
-| 5. Marts for Dashboard #3 | Next | |
+| 5. Marts for Dashboard #3 | Done 2026-10-12 | Intermediate `int_position_history` (seat records with status runs, country, pay zone, family), `int_seat_fill` (30,575 fills: prior incumbent, seat decision, level and location change, pay walk, reuse check), `int_seat_vacancy_chain`. Marts `mart_position_fill` (30,575), `mart_vacancy_pool` (62,055 seat-months), `mart_plan_vs_actual` (28,800), `mart_seat_corridors` (821), exported as CSVs. Pay walk adds up on every backfill (largest residual 3×10⁻¹¹ USD). **Reuse threshold set to 90 days** (at 30 days half of net-new seats matched a seat still being recruited for; at 90 days 25%, four in five of them frozen seats). Tests 53–56 pass and catch deliberate breaks. FY26 values in [headline_values.md](headline_values.md) |
+| 6. SQL Server twin | Next | |
 
 ---
 
@@ -80,9 +81,10 @@ Every number on Dashboards #1 and #2 will change, because the history is extende
 
 | Table | Grain | Purpose |
 |---|---|---|
+| `int_position_history` | seat record | Seat SCD2 with status run start (`status_since`), country, currency, pay zone, job family, manager seat flag. Built in phase 5; the snapshot and fills read it. |
 | `int_position_snapshot` | position × month-end | Status, incumbent, level, office, cost center at each month-end. Feeds the vacancy pool and the plan-vs-actual comparison. |
-| `int_position_fill` | one row per fill (external or internal) | The core of Dashboard #3 (section 6). |
-| `int_vacancy_chain` | fill × chain | `chain_id`, `chain_depth`, `chain_root_event` (the exit or net-new seat that started it). |
+| `int_seat_fill` | one row per fill (external or internal) | The core of Dashboard #3 (section 6). Named `int_seat_*` so it builds after `int_position_history` (models run in file-name order). |
+| `int_seat_vacancy_chain` | fill | `parent_fill_id`, `chain_id`, `chain_depth`, `chain_length`, `chain_trigger` (Voluntary exit, Involuntary exit, Net-new seat). |
 
 ### Marts
 
@@ -123,7 +125,7 @@ Net-new seats are created from the plan's `planned_net_new`. Some are deliberate
 | `vacancy_days` | `prior_end_date` → `fill_date` |
 | `time_to_fill_days` | `opened_date` → `filled_date` |
 | `chain_id`, `chain_depth` | From `int_vacancy_chain` |
-| `reuse_candidate` | Net-new only: when approved, a seat matching rule D5 had been open or frozen for 30 days or more (default, tunable) |
+| `reuse_candidate` | Net-new only: when approved, a seat matching rule D5 had been open or frozen for 90 days or more (decided in phase 5; the threshold is one line in `int_seat_fill.sql` and test 54) |
 | `reuse_candidate_position_id` | The matching seat (the oldest vacancy wins) |
 | Pay fields | `prior_exit_pay`, `new_start_pay`, the pay walk below, all annualized base in constant USD |
 
@@ -152,7 +154,7 @@ Plan rows stay at quarter grain. Tableau relates them to the actuals, so yearly 
 
 ## 8. Tests (added to the 40 existing)
 
-Built in phase 3: test 41 (plan item 1), 42 (3), 43 (every job record sits in its seat, new), 44 (seat status matches its incumbent), 45 (12), 46 (5), 47 (6, extended to every seat exit), 48 (8). Built in phase 4: test 49 (plan item 9, plus reforecasts dated after the quarter they follow), 50 (candidates tie to requisitions), 51 (cost center = department × country), 52 (ranges move by the structure increase). Still to build: plan items 7, 10, 11, 13; item 4 is true by construction of the snapshot and is replaced by 44.
+Built in phase 3: test 41 (plan item 1), 42 (3), 43 (every job record sits in its seat, new), 44 (seat status matches its incumbent), 45 (12), 46 (5), 47 (6, extended to every seat exit), 48 (8). Built in phase 4: test 49 (plan item 9, plus reforecasts dated after the quarter they follow), 50 (candidates tie to requisitions), 51 (cost center = department × country), 52 (ranges move by the structure increase). Built in phase 5: test 53 (plan item 10, plus no level effect at the same grade and no location effect in the same office), 54 (11), 55 (7, plus chain links), 56 (plan vs actual ties to headcount and fills). Still to build: plan item 13 (phase 7); item 4 is true by construction of the snapshot and is replaced by 44.
 
 1. Position SCD2: no gaps or overlaps per position; `effective_to` is exclusive.
 2. Every active worker holds exactly one position on every day (overlaps only on seats where `overlap_flag` = 1, at most 30 days).
@@ -200,7 +202,7 @@ Built in phase 3: test 41 (plan item 1), 42 (3), 43 (every job record sits in it
 ## 11. Still open
 
 - **Sub-function fallback:** list only the real sub-functions, or keep the function names and say so in the tooltip.
-- **Reuse threshold:** 30 days vacant by default; confirm when the first numbers exist.
+- **Reuse threshold:** 90 days (phase 5). Change it in `int_seat_fill.sql` and test 54 together.
 - **Pay zones:** settled. Offices already carry a pay-zone factor (`dim_location.pay_zone_factor`), so no new reference table is needed.
 - **Market effect in the seat pay walk:** settled in phase 4: ranges move every July 1, so the market step is real.
 - **The plan is written around the actuals (simulation shortcut):** the generator draws each version from what happened, with an error that shrinks per reforecast, instead of letting the plan drive hiring. Honest to say so in the case study; the version mechanics, variance and attainment are what the dashboard shows.

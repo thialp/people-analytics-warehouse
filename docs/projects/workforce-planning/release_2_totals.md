@@ -60,6 +60,10 @@
 | mart_mobility_flows | 2,101 |
 | mart_office_moves | 89,611 |
 | mart_org_leader_summary | 260 |
+| mart_plan_vs_actual | 28,800 |
+| mart_position_fill | 30,575 |
 | mart_reporting_line | 161,196 |
+| mart_seat_corridors | 821 |
+| mart_vacancy_pool | 62,055 |
 | mart_workforce_cost_bridge | 17,022 |
 | mart_workforce_cost_snapshot | 233,866 |
