@@ -31,8 +31,10 @@ Expected: a version followed by `linux/x86_64` (Intel) or `linux/aarch64` (Apple
 
 ## 2. Get the repo
 
+Keep the repo in `~/GitHub`, not under Documents or Desktop. If iCloud's **Desktop & Documents Folders** sync is on, iCloud and Git both write to the same files, which leaves duplicate `file 2.sql` copies behind and can corrupt the `.git` folder. Compose shares the repo folder with SQL Server (`./:/repo`), so the folder you run `docker compose up -d` from is the one the database reads.
+
 ```bash
-mkdir -p ~/Documents/GitHub && cd ~/Documents/GitHub
+mkdir -p ~/GitHub && cd ~/GitHub
 git clone https://github.com/thialp/people-analytics-warehouse.git
 cd people-analytics-warehouse
 ```
@@ -40,7 +42,7 @@ cd people-analytics-warehouse
 Already cloned? Update it instead:
 
 ```bash
-cd ~/Documents/GitHub/people-analytics-warehouse && git pull
+cd ~/GitHub/people-analytics-warehouse && git pull
 ```
 
 Expected: `compose.yaml` and `.env.example` are now in the folder (`ls -a`).
@@ -85,12 +87,14 @@ Expected (the first run downloads about 1.5 GB):
 docker compose logs -f build
 ```
 
-Press `Ctrl+C` once you see the validation section. It should show ten **PASS** rows, `0` missing rows, `0` workers without a valid manager, and:
+Wait for the line `arcadia-build exited with code 0`, then press `Ctrl+C`. Every row with a `result` column should say **PASS**, every "expected 0" check should show `0`, and the control totals should read:
 
 ```
-2022-06-30   25005   24733.20   2577787184.81   2613645368.50
-2026-06-30   30015   29395.70   3195503264.83   3195503264.83
+2022-06-30   25052   24725.50   2450138920.49   2487093187.74
+2026-06-30   30005   29354.50   3336539181.84   3336539181.84
 ```
+
+SQL Server may show a cent different in the last column (each group is rounded to the cent before the total is added up). The expected values live in [`sqlserver/05_validate.sql`](../../sqlserver/05_validate.sql); if the data is ever regenerated, that script is the source of truth.
 
 Then confirm the build job finished cleanly:
 

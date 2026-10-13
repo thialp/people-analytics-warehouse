@@ -37,11 +37,11 @@ Docker version 29.x.x, build xxxxxxx
 
 ## Step 2. Get the repo onto your Mac
 
-If you already cloned it with GitHub Desktop, skip this step. Otherwise:
+If you already cloned it with GitHub Desktop, skip this step. Otherwise (keep it in `~/GitHub`, outside the folders iCloud syncs; see the note in [`docker_compose_guide.md`](docker_compose_guide.md#2-get-the-repo)):
 
 ```bash
-mkdir -p ~/Documents/GitHub
-cd ~/Documents/GitHub
+mkdir -p ~/GitHub
+cd ~/GitHub
 git clone https://github.com/thialp/people-analytics-warehouse.git
 ls people-analytics-warehouse
 ```
@@ -67,7 +67,7 @@ docker run -d --name arcadia-sql \
   -e "MSSQL_PID=Developer" \
   -e "MSSQL_SA_PASSWORD=$MSSQL_SA_PASSWORD" \
   -p 1433:1433 \
-  -v ~/Documents/GitHub/people-analytics-warehouse:/repo:ro \
+  -v ~/GitHub/people-analytics-warehouse:/repo:ro \
   mcr.microsoft.com/mssql/server:2022-latest
 ```
 
