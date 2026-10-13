@@ -1,6 +1,12 @@
 # Compensation Walk dashboard: build status and next steps
 
-Where the Tableau build stands, and what is still open. Updated 2026-10-10 (end of day). The company is fictional and all data is synthetic.
+Where the Tableau build stands, and what is still open. Updated 2026-10-12 (night): **Dashboard #2 is published** (see the Published section). The company is fictional and all data is synthetic.
+
+## Published (2026-10-12)
+
+- **Live:** https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary (profile: https://public.tableau.com/app/profile/thialp). Extracts of both data sources (271,219 and 260,464 rows). Steps, description text and decisions: [publish_tableau_public.md](publish_tableau_public.md).
+- **Done in this stretch:** the rail (period, view, group, lens, cost, currency, reset, info panel and footnote), the Top drivers card (individual steps only), the Expand/Collapse buttons (text plus icon sheets in one container), amber Growth by Region, page subtitle with "Data as of".
+- **Still to do on the published page:** the interaction checks listed in the publishing notes (rail, popovers, Expand/Collapse, Reset, hover). Anything that differs from Desktop goes below.
 
 ## Done
 
@@ -38,8 +44,8 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-10 (end 
 
 ## Open: the rest of the dashboard (agreed order for the next session)
 
-1. **Rail controls** (so the data can be explored): Period (`p_From`, `p_To`, valid pairs only) and quick picks (FY26, FY25, last 4 quarters, monthly); View by (six rows, `p_View`); Group list for `p_Group` (readers pick, they do not type); Lens (now with Display As names), Cost, Currency toggles; Reset. Parameter actions, not filter actions, across the two data sources. The `p_Lens` control moves from the top right into the rail with a readable title ("Show pay as"). Navigation tabs (Summary, Drivers, Diagnostics, Methodology) and the fictional-company footnote in the rail.
-2. **Top drivers card** (in progress 2026-10-12): four ranked rows with a reason each; build in [top_drivers_build.md](top_drivers_build.md).
+1. **Rail controls** (done 2026-10-12; build in [rail_controls_build.md](rail_controls_build.md)): Period (`p_From`, `p_To`, valid pairs only) and quick picks (FY26, FY25, last 4 quarters, monthly); View by (six rows, `p_View`); Group list for `p_Group` (readers pick, they do not type); Lens (now with Display As names), Cost, Currency toggles; Reset. Parameter actions, not filter actions, across the two data sources. The `p_Lens` control moves from the top right into the rail with a readable title ("Show pay as"). Navigation tabs (Summary, Drivers, Diagnostics, Methodology) and the fictional-company footnote in the rail.
+2. **Top drivers card** (done 2026-10-12): four ranked rows with a reason each; build in [top_drivers_build.md](top_drivers_build.md). The calcs `TD Top Name`, `TD Top Text` and `TD Direction` may now be unused; delete them in the cleanup if so.
 3. **Career moves panel** (promotions, demotions, Director and above) with the same group keys as the walk, and the `p_Panel` toggle that swaps it with the office-moves panel. Needs a Custom SQL like `tableau/custom_sql_office_moves.sql`.
 4. **Expand and collapse** for the other cards, using `step_group`.
 
@@ -47,7 +53,7 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-10 (end 
 
 - The sketch SVG and PNG files in `design/` still show the first layout (big stat numbers, 12 px gaps, 1104 wide panel). Regenerate with `build_sketch_svg.py` once the page is final.
 - The Figma push is blocked by the plan's tool-call quota; the SVGs are the import path until it resets.
-- Dashboard #1 still needs republishing on Tableau Public with the refreshed data.
+- Dashboard #1 still needs republishing on Tableau Public with the refreshed data. (Dashboard #2 is published.)
 - Open the PR for `office-moves-map-layout`, Squash and merge, and edit the message so no Co-Authored-By trailers remain (the first five commits on the branch have them against the working agreement).
 
 ## Decided 2026-10-12 (evening): small details after the Top drivers card

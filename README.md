@@ -10,8 +10,8 @@ An HR data warehouse for a fictional global company, built to answer the questio
 |---|---|---|
 | **1. [Workforce Cost Bridge](#1-business-problem)** | *Why did our workforce cost change?* A monthly walk of annualized pay run-rate that splits every dollar of change into hires, terminations, transfers, promotions, demotions, tenure raises, mobility, FTE, fringe and currency, in **nominal** and **constant** currency, reconciled to the cent. | Tableau Public: *coming soon* |
 | **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* Opening + hires − leavers ± internal moves = closing, in headcount and FTE, reconciled for any department, country, job family or grade, plus a benchmark of three ways to store workforce history. | **[Executive Summary on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)** |
-| **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, where are we growing, and how do people move between offices?* An office-level walk and an origin-to-destination relocation table, drawn as a four-layer Tableau map with `MAKEPOINT`, `MAKELINE` and `BUFFER`. | Tableau Public: *coming soon* |
-| **4. [Compensation Walk](#case-study-4-compensation-walk)** | *Between any two month-ends, why did pay in this group move, in total and on average?* Hires, exits and transfers, then promotions, demotions, tenure and market raises, relocation and international pay resets, FTE, fringe and FX, for six views of the organization and 184 date pairs, pre-computed in one Tableau Custom SQL so the workbook only filters and sums. | Tableau Public: *coming soon* |
+| **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, where are we growing, and how do people move between offices?* An office-level walk and an origin-to-destination relocation table, drawn as a four-layer Tableau map with `MAKEPOINT`, `MAKELINE` and `BUFFER`. | Tableau Public: *coming soon*. The office-moves map also runs as a panel of the **[Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary)** |
+| **4. [Compensation Walk](#case-study-4-compensation-walk)** | *Between any two month-ends, why did pay in this group move, in total and on average?* Hires, exits and transfers, then promotions, demotions, tenure and market raises, relocation and international pay resets, FTE, fringe and FX, for six views of the organization and 184 date pairs, pre-computed in one Tableau Custom SQL so the workbook only filters and sums. | **[Compensation Walk on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary)** |
 
 All four case studies run on the same simulated company, the same effective-dated history and the same month-end snapshot, and share one look ([`docs/brand/`](docs/brand/README.md)).
 
@@ -375,7 +375,7 @@ How it was built, with every worksheet, calculated field, color, position, toolt
 
 ![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
 
-*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive dashboard is on Tableau Public (coming soon).*
+*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary).*
 
 ### Business problem
 
@@ -409,6 +409,8 @@ Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_gu
 
 ## Case study 4: Compensation Walk
 
+**Published:** [Compensation Walk on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary) (interactive; every control drives every card).
+
 ### Business problem
 
 "Average pay went up 1.1% but cost went up 6.5%. Why?" Answering it means pricing every change in pay between two dates and attributing it to a cause (who joined, who left, who moved, who was promoted, who got an anniversary raise, what the fringe rates and exchange rates did), for any group and any pair of dates, in totals **and** averages. In Tableau that becomes a tangle of LOD expressions that has to stay right under every filter. Here it is pre-computed once, in the data source, and tested.
@@ -439,6 +441,20 @@ Three rules make the walk close in every group, under any filter: each line is p
 Hiring is the cost story (+$79M), while tenure raises are the average-pay story. Because new hires join below the average, hires and exits together pull it down by $3,142 per FTE, which offsets most of what anniversary raises add.
 
 Seven tests (34 to 40) prove the ledger explains every worker's change, that every one of the 19,321 group walks closes, ties to the snapshot, nets its transfers to zero and agrees across views, and that the office moves tie to the walk's transfers in every office and country. Month-over-month department walks also match the cost bridge of case study 1 within 2 cents.
+
+### Tableau
+
+One dashboard, **1400 x 850**, built on two Custom SQL data sources (the walk and the office moves), published as extracts to **[Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary)**:
+
+| Card | What it does |
+|---|---|
+| Rail | Period (valid From/To pairs only), View by (six views), group picker, pay lens (average per FTE or total payroll), cost (loaded or base), currency (constant or nominal), reset; all parameter actions, so one click drives both data sources |
+| KPI band | Opening, closing, change in dollars and percent, and people, all following the lens |
+| Waterfall | Compact (hires and exits, promotions, raises, fringe and other) with an Expand button that opens all 13 steps; a trimmed value axis that stays a true running total |
+| Top drivers | The four largest individual steps, ranked, each with a one-line reason; the headline names the biggest mover |
+| Office moves | A map of who changed office (teal dots where people arrived, coral for across a border), the five busiest routes, and headcount growth by region |
+
+Build guides: [`docs/projects/compensation-walk/`](docs/projects/compensation-walk/) (the build status, rail controls, Top drivers card, map guide and publishing notes). The walk's numbers are computed in SQL and tested; the Top drivers card is the one place a LOD chain ranks values live.
 
 ---
 
