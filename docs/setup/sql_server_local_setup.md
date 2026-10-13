@@ -215,6 +215,18 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 
 Expected: section 1 and 2 rows say `PASS` (89,611 rows; FY26 has 725 people who changed office, 600 within one country and 125 across a border), and sections 3 and 4 show `0`.
 
+### Optional: validate the region walk and career moves
+
+Two more Custom SQL queries for the same dashboard ([field reference](../projects/compensation-walk/region_walk_and_career_moves.md)). This script runs both with the walk and checks that they tie to it:
+
+```bash
+docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C \
+  -i /repo/sqlserver/09_validate_region_walk_and_career_moves.sql
+```
+
+Expected: every row with a `result` column says `PASS` (26,520 and 34,532 rows; FY26 1,850 promotions, 16 into Director and above).
+
 ## Step 5. Install the SQL Server driver for Tableau
 
 Tableau on a Mac needs Microsoft's ODBC driver to talk to SQL Server. The simplest install is with [Homebrew](https://brew.sh), the standard Mac package manager.

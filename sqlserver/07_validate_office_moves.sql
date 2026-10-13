@@ -99,6 +99,17 @@ WHERE ISNULL(m.moves_in, 0)  <> ISNULL(w.walk_in, 0)
    OR ISNULL(m.moves_out, 0) <> ISNULL(w.walk_out, 0);
 GO
 
+PRINT '4b. open_headcount differs from the walk''s Opening headcount for the group (expected 0)';
+SELECT COUNT(*) AS groups_with_a_different_open_headcount
+FROM (SELECT DISTINCT from_month_end, to_month_end, view_name, group_id, open_headcount FROM #moves) AS m
+LEFT JOIN #walk AS w
+  ON w.from_month_end = m.from_month_end AND w.to_month_end = m.to_month_end
+ AND w.view_name = m.view_name AND w.group_id = m.group_id AND w.step = 'Opening'
+/* a group that did not exist at the From date (a new office or department) has no Opening
+   line in the walk and a NULL open_headcount: that is a match */
+WHERE ISNULL(w.headcount, -1) <> ISNULL(m.open_headcount, -1);
+GO
+
 PRINT '4. Dates, groups and names match the walk, so one set of dashboard filters drives both (expected 0)';
 SELECT COUNT(*) AS move_groups_missing_from_walk
 FROM (SELECT DISTINCT from_month_end, to_month_end, view_name, group_id, group_name FROM #moves) AS m

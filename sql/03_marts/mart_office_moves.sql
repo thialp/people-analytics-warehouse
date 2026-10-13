@@ -20,6 +20,9 @@
 -- 'To' rows equal the walk's Transfers In and 'From' rows equal Transfers Out. In the Country
 -- view the same holds for moves across a border; moves inside one country are 'Both'.
 --
+-- open_headcount is the group's headcount at the From month-end (executive officers
+-- excluded, as in the walk's Opening), so a title can say what share of the group moved.
+--
 -- Field reference: docs/projects/compensation-walk/office_moves.md
 CREATE OR REPLACE TABLE marts.mart_office_moves AS
 WITH grid AS (
@@ -78,7 +81,7 @@ view_row AS (
     LEFT JOIN dept_map AS cd ON cd.department_id = mg.c_dept
     LEFT JOIN staging.stg_location AS ol ON ol.location_id = mg.o_loc
     LEFT JOIN staging.stg_location AS cl ON cl.location_id = mg.c_loc
-    CROSS JOIN (VALUES (1, 'Company'), (2, 'Function'), (3, 'Leader'),
+    CROSS JOIN (VALUES (1, 'Company'), (2, 'Function'), (3, 'Sub-function'),
                        (4, 'Department'), (5, 'Office'), (6, 'Country')) AS v(view_order, view_name)
 ),
 
@@ -100,11 +103,35 @@ move_total AS (
            SUM(n) AS workers
     FROM move_line
     GROUP BY ALL
+),
+
+-- 5. each group's headcount at the From month-end, keyed like the moves
+group_open AS (
+    SELECT o.from_date, v.view_name,
+           CASE v.view_order WHEN 1 THEN 'ORG-000' WHEN 2 THEN dm.function_id WHEN 3 THEN dm.leader_org_id
+                             WHEN 4 THEN o.department_id WHEN 5 THEN o.location_id WHEN 6 THEN o.country_code END AS group_id,
+           SUM(o.n) AS open_headcount
+    FROM (
+        SELECT s.month_end_date AS from_date, s.department_id, s.location_id, s.country_code, COUNT(*) AS n
+        FROM intermediate.int_worker_month_end_snapshot AS s
+        WHERE NOT s.is_executive_officer
+          AND s.month_end_date IN (SELECT DISTINCT from_date FROM grid)
+        GROUP BY ALL
+    ) AS o
+    LEFT JOIN dept_map AS dm ON dm.department_id = o.department_id
+    CROSS JOIN (VALUES (1, 'Company'), (2, 'Function'), (3, 'Sub-function'),
+                       (4, 'Department'), (5, 'Office'), (6, 'Country')) AS v(view_order, view_name)
+    GROUP BY ALL
 )
 
 SELECT
     t.from_date                                                         AS from_month_end,
     t.to_date                                                           AS to_month_end,
+    -- the data window: the as-of date is the last month-end in the warehouse, the start is
+    -- the first month-end a pair can begin after the lead-in year (both move by themselves
+    -- when history grows)
+    (SELECT CAST(MIN(month_end_date) + INTERVAL 12 MONTH AS DATE) FROM intermediate.int_month_end_calendar) AS report_start_date,
+    (SELECT MAX(month_end_date) FROM intermediate.int_month_end_calendar)                                  AS report_as_of_date,
     cf.fiscal_period                                                    AS from_fiscal_period,
     ct.fiscal_period                                                    AS to_fiscal_period,
     date_diff('month', t.from_date, t.to_date)                          AS months_between,
@@ -119,7 +146,7 @@ SELECT
     CASE t.view_name
         WHEN 'Company'    THEN NULL
         WHEN 'Function'   THEN 'Arcadia Systems'
-        WHEN 'Leader'     THEN ou.function_name
+        WHEN 'Sub-function' THEN ou.function_name
         WHEN 'Department' THEN ou.function_name
         WHEN 'Office'     THEN lo.country_name
         WHEN 'Country'    THEN co.region
@@ -143,7 +170,8 @@ SELECT
     CASE WHEN fl.country_code = tl.country_code THEN 'Within one country' ELSE 'Across a border' END AS flow_scope_label,
     CASE WHEN fl.region = tl.region THEN 'Same region' ELSE 'Across regions' END           AS region_scope,
     t.move_reason,
-    CAST(t.workers AS INTEGER)                                          AS workers
+    CAST(t.workers AS INTEGER)                                          AS workers,
+    CAST(go.open_headcount AS INTEGER)                                  AS open_headcount
 FROM move_total AS t
 JOIN intermediate.int_month_end_calendar AS cf ON cf.month_end_date = t.from_date
 JOIN intermediate.int_month_end_calendar AS ct ON ct.month_end_date = t.to_date
@@ -152,4 +180,5 @@ JOIN marts.mart_dim_location AS tl ON tl.location_id = t.c_loc
 LEFT JOIN staging.stg_org_unit AS ou ON ou.org_unit_id = t.group_id
 LEFT JOIN staging.stg_location AS lo ON t.view_name = 'Office'  AND lo.location_id  = t.group_id
 LEFT JOIN staging.stg_country  AS co ON t.view_name = 'Country' AND co.country_code = t.group_id
+LEFT JOIN group_open AS go ON go.from_date = t.from_date AND go.view_name = t.view_name AND go.group_id = t.group_id
 ORDER BY t.from_date, t.to_date, t.view_order, t.group_id, t.group_side, t.o_loc, t.c_loc, t.move_reason;

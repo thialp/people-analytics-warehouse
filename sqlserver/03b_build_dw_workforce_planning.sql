@@ -110,6 +110,8 @@ SELECT
 INTO dw.FactRequisition
 FROM raw.fact_requisition;
 ALTER TABLE dw.FactRequisition ALTER COLUMN RequisitionID VARCHAR(12) NOT NULL;
+GO
+
 ALTER TABLE dw.FactRequisition ADD CONSTRAINT PK_FactRequisition PRIMARY KEY (RequisitionID);
 CREATE INDEX IX_FactRequisition_Position ON dw.FactRequisition (PositionID, OpenedDate);
 GO
@@ -230,6 +232,9 @@ LEFT JOIN dw.FactRequisition AS q
  AND c.MonthEndDate >= q.OpenedDate
  AND c.MonthEndDate < COALESCE(q.FilledDate, q.CancelledDate, CONVERT(DATE, '9999-12-31'));
 ALTER TABLE dw.PositionMonthEndSnapshot ALTER COLUMN PositionID VARCHAR(12) NOT NULL;
+ALTER TABLE dw.PositionMonthEndSnapshot ALTER COLUMN MonthEndDate DATE NOT NULL;
+GO
+
 ALTER TABLE dw.PositionMonthEndSnapshot
     ADD CONSTRAINT PK_PositionMonthEndSnapshot PRIMARY KEY CLUSTERED (MonthEndDate, PositionID);
 GO
@@ -419,6 +424,8 @@ CROSS APPLY (
 ) AS w
 LEFT JOIN #Reuse AS u ON u.FillID = m.FillID;
 ALTER TABLE dw.SeatFill ALTER COLUMN FillID VARCHAR(12) NOT NULL;
+GO
+
 ALTER TABLE dw.SeatFill ADD CONSTRAINT PK_SeatFill PRIMARY KEY CLUSTERED (FillID);
 CREATE INDEX IX_SeatFill_Worker ON dw.SeatFill (WorkerID, FillDate);
 DROP TABLE IF EXISTS #Fills;

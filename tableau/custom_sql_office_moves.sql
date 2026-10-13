@@ -10,7 +10,7 @@
   For a pair of month-ends (From, To) and a group of people, which people
   changed office between the two dates, and from which office to which. It is
   built to sit beside the compensation walk on one dashboard: the date pair,
-  the six views (Company, Function, Leader, Department, Office, Country) and the
+  the six views (Company, Function, Sub-function, Department, Office, Country) and the
   group names are the walk's, so the same parameters filter both queries and a
   map of office moves follows the dashboard filters like every other sheet.
 
@@ -29,11 +29,15 @@
   'From' row at the office it left and a 'To' row at the office it joined, so
   'To' = the walk's Transfers In and 'From' = Transfers Out. Country view: a
   move inside one country is 'Both'; a move across a border is 'From' for the
-  old country and 'To' for the new one. Function / Leader / Department: a mover
+  old country and 'To' for the new one. Function / Sub-function / Department: a mover
   who also changed department appears once in each group they were in.
   The number of people moving inside a selected group is therefore
   SUM(workers) for that view and group, whatever the side; add the filter
   group_side to separate inbound from outbound.
+
+  open_headcount is the group's headcount at the From month-end (executive
+  officers excluded, as in the walk's Opening), so a title can say what share
+  of the group moved.
 
   TABLEAU CUSTOM SQL RULES (Tableau wraps this query in a subquery)
     - one SELECT statement: no CTEs (WITH), temp tables or variables
@@ -57,6 +61,10 @@
 SELECT
     t.from_date                                                                  AS from_month_end,
     t.to_date                                                                    AS to_month_end,
+    /* the data window: the as-of date is the last month-end in the warehouse, the start
+       is the first month-end a pair can begin after the lead-in year */
+    (SELECT DATEADD(MONTH, 12, MIN(MonthEndDate)) FROM dw.MonthEndCalendar)          AS report_start_date,
+    (SELECT MAX(MonthEndDate) FROM dw.MonthEndCalendar)                              AS report_as_of_date,
     cf.FiscalPeriod                                                              AS from_fiscal_period,
     ct.FiscalPeriod                                                              AS to_fiscal_period,
     DATEDIFF(MONTH, t.from_date, t.to_date)                                      AS months_between,
@@ -70,7 +78,7 @@ SELECT
     END                                                                          AS group_name,
     CASE t.view_name
         WHEN 'Function'   THEN 'Arcadia Systems'
-        WHEN 'Leader'     THEN ou.FunctionName
+        WHEN 'Sub-function' THEN ou.FunctionName
         WHEN 'Department' THEN ou.FunctionName
         WHEN 'Office'     THEN lo.CountryName
         WHEN 'Country'    THEN co.Region
@@ -94,7 +102,8 @@ SELECT
     CASE WHEN fl.CountryCode = tl.CountryCode THEN 'Within one country' ELSE 'Across a border' END AS flow_scope_label,
     CASE WHEN fl.Region = tl.Region THEN 'Same region' ELSE 'Across regions' END                 AS region_scope,
     t.move_reason,
-    CAST(t.workers AS INT)                                                       AS workers
+    CAST(t.workers AS INT)                                                       AS workers,
+    CAST(go.open_headcount AS INT)                                               AS open_headcount
 FROM (
     /* 4. aggregate to date pair x view x group x side x office pair x reason */
     SELECT
@@ -156,7 +165,7 @@ FROM (
         CROSS APPLY (VALUES
             (1, 'Company',    CAST('ORG-000' AS VARCHAR(15)),      CAST('ORG-000' AS VARCHAR(15))),
             (2, 'Function',   CAST(od.FunctionID AS VARCHAR(15)),  CAST(cd.FunctionID AS VARCHAR(15))),
-            (3, 'Leader',     CAST(od.LeaderOrgID AS VARCHAR(15)), CAST(cd.LeaderOrgID AS VARCHAR(15))),
+            (3, 'Sub-function', CAST(od.LeaderOrgID AS VARCHAR(15)), CAST(cd.LeaderOrgID AS VARCHAR(15))),
             (4, 'Department', CAST(pg.o_dept AS VARCHAR(15)),      CAST(pg.c_dept AS VARCHAR(15))),
             (5, 'Office',     CAST(pg.o_loc AS VARCHAR(15)),       CAST(pg.c_loc AS VARCHAR(15))),
             (6, 'Country',    CAST(ol.CountryCode AS VARCHAR(15)), CAST(cl.CountryCode AS VARCHAR(15)))
@@ -180,3 +189,29 @@ JOIN dw.DimLocation      AS tl ON tl.LocationID   = t.c_loc
 LEFT JOIN dw.DimOrgUnit  AS ou ON ou.OrgUnitID    = t.group_id
 LEFT JOIN dw.DimLocation AS lo ON t.view_name = 'Office'  AND lo.LocationID  = t.group_id
 LEFT JOIN dw.DimCountry  AS co ON t.view_name = 'Country' AND co.CountryCode = t.group_id
+LEFT JOIN (
+    /* 5. each group's headcount at the From month-end, keyed like the moves */
+    SELECT o.from_date, v.view_name, v.group_id, SUM(o.n) AS open_headcount
+    FROM (
+        SELECT s.MonthEndDate AS from_date, s.DepartmentID, s.LocationID, s.CountryCode, COUNT(*) AS n
+        FROM dw.WorkerMonthEndSnapshot AS s
+        WHERE s.IsExecutiveOfficer = 0
+        GROUP BY s.MonthEndDate, s.DepartmentID, s.LocationID, s.CountryCode
+    ) AS o
+    LEFT JOIN (
+            SELECT d.DepartmentID,
+                   CASE WHEN p.OrgUnitType = 'Sub-function' THEN p.ParentOrgUnitID ELSE p.OrgUnitID END AS FunctionID,
+                   d.ParentOrgUnitID AS LeaderOrgID
+            FROM dw.DimDepartment AS d
+            JOIN dw.DimOrgUnit AS p ON p.OrgUnitID = d.ParentOrgUnitID
+        ) AS dm ON dm.DepartmentID = o.DepartmentID
+    CROSS APPLY (VALUES
+        (1, 'Company',      CAST('ORG-000' AS VARCHAR(15))),
+        (2, 'Function',     CAST(dm.FunctionID AS VARCHAR(15))),
+        (3, 'Sub-function', CAST(dm.LeaderOrgID AS VARCHAR(15))),
+        (4, 'Department',   CAST(o.DepartmentID AS VARCHAR(15))),
+        (5, 'Office',       CAST(o.LocationID AS VARCHAR(15))),
+        (6, 'Country',      CAST(o.CountryCode AS VARCHAR(15)))
+    ) AS v (view_order, view_name, group_id)
+    GROUP BY o.from_date, v.view_name, v.group_id
+) AS go ON go.from_date = t.from_date AND go.view_name = t.view_name AND go.group_id = t.group_id

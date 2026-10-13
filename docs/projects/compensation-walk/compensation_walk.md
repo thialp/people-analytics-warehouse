@@ -8,7 +8,7 @@
 | Same result as a CSV (Tableau Public) | [`data/marts/mart_compensation_walk.csv`](../../../data/marts/mart_compensation_walk.csv), built by [`sql/03_marts/mart_compensation_walk.sql`](../../../sql/03_marts/mart_compensation_walk.sql) |
 | Warehouse support table | `dw.WorkerPayLedger` / [`int_worker_pay_ledger`](../../../sql/02_intermediate/int_worker_pay_ledger.sql) |
 | Grain | date pair × view × group × walk step × movement reason |
-| Size (default grid) | 114,977 rows, 88 date pairs, 6 views, 107 groups (release 2, phase 2; final numbers after phase 3) |
+| Size (default grid) | 115,544 rows, 88 date pairs, 6 views, 107 groups |
 
 The walk takes a group's compensation at the **From** month-end, explains every dollar of change, and lands on the **To** month-end exactly:
 
@@ -17,7 +17,7 @@ The walk takes a group's compensation at the **From** month-end, explains every 
 + Hires + Exits + Transfers In + Transfers Out                 who is in the group
 + Promotions + Demotions                                       career
 + Tenure Increases + Market Adjustments                        pay rate
-+ Relocation Adjustments + International Transfer Adjustments  location
++ Same-Country Transfer Adjustments + International Transfer Adjustments  location
 + FTE Changes + Fringe Rate Changes + FX Translation           hours, statutory cost, currency
 = Closing
 ```
@@ -101,7 +101,7 @@ At constant FX the same formulas use the fixed rate, so FX Translation is zero b
 | Demotions | Demotion |
 | Tenure Increases | Tenure Increase (anniversary raise) |
 | Market Adjustments | Market Adjustment (off-cycle raise to keep pay competitive) |
-| Relocation Adjustments | Relocation Adjustment (move to an office with a different pay zone) |
+| Same-Country Transfer Adjustments | Relocation Adjustment: a move to another office in the same country with a different pay zone (named Relocation Adjustments before release 2). A move between two offices in the same pay zone changes no pay, so it is not on this line: in FY26, 600 people changed office within a country and 583 had a pay adjustment (23 moved inside one pay zone; a few moved twice) |
 | International Transfer Adjustments | International Transfer (pay reset on a move to another country and currency) |
 
 Test 34 checks the identity for every worker and every month-end: the ledger's drivers add up to the change in value on all four measures. The largest gap across 27 million worker × date-pair combinations is $2 × 10⁻¹⁰.
@@ -112,7 +112,7 @@ Test 34 checks the identity for every worker and every month-end: the ledger's d
 |---|---|---|---|---|---|---|
 | 1 | Company | `ORG-000` | Arcadia Systems | (none) | CEO | 1 |
 | 2 | Function | function org unit (`ORG-TEC` …) | Technology … | Arcadia Systems | function head | 8 |
-| 3 | Leader | the department's parent org unit: a sub-function (`ORG-TEC-ENG` …) or, where there is none, the function | Engineering, Sales, Product … | function | SVP or function head | 10 |
+| 3 | Sub-function | the department's parent org unit: a sub-function (`ORG-TEC-ENG` …) or, where there is none, the function (so the view still contains the whole company; six of the ten groups are functions with no sub-function) | Engineering, Sales, Product … | function | SVP or function head | 10 |
 | 4 | Department | department (`D-101` …) | Core Platform Engineering … | function | head of department | 31 |
 | 5 | Office | office (`LOC-001` …) | Austin HQ … | country | (none) | 35 |
 | 6 | Country | ISO country code | United States … | region | (none) | 22 |
@@ -146,6 +146,7 @@ Every month-end to every later one would be 1,830 pairs (61 month-ends): replace
 |---|---|---|
 | `from_month_end` | date | Opening month-end of the pair |
 | `to_month_end` | date | Closing month-end of the pair |
+| `report_start_date`, `report_as_of_date` | date | The data window, the same on every row: the first month-end a pair can start after the lead-in year (30 Jun 2022) and the last month-end in the warehouse (30 Jun 2026). For the "Data covers ..." note and the default period; both move by themselves when history grows |
 | `from_fiscal_period`, `to_fiscal_period` | text | e.g. `FY26 P12` (fiscal year starts 1 July) |
 | `from_fiscal_quarter`, `to_fiscal_quarter` | text | e.g. `FY26 Q4` |
 | `months_between` | integer | Months from From to To |
@@ -162,7 +163,7 @@ Every measure is a signed sum: aggregate with `SUM()` only. In the walk, Exits a
 
 | Field | Meaning |
 |---|---|
-| `worker_count` | People behind the line, unsigned. Opening and Closing: people in the group. Flows: people moving. Pay drivers: people with at least one event of that kind (e.g. 1,899 people promoted). Divide a pay driver's dollars by it for the average raise per person affected. Not additive across steps. |
+| `worker_count` | People behind the line, unsigned. Opening and Closing: people in the group. Flows: people moving. Pay drivers: people with at least one event of that kind (e.g. 1,824 people promoted in FY26). Divide a pay driver's dollars by it for the average raise per person affected. Not additive across steps. |
 | `headcount` | Signed headcount. Opening + Hires + Exits + Transfers = Closing. Zero on pay drivers. |
 | `fte` | Signed FTE. As headcount, plus FTE Changes carries the change in hours of people who stayed. |
 | `base_usd_nominal` | Annualized base pay (annual base × FTE) at each month-end's actual FX rate |
@@ -198,21 +199,23 @@ So each step's contribution to the change in average is `(Dₖ − nₖ × Ā₀
 
 | Step | People | Total $ | Avg per FTE |
 |---|---:|---:|---:|
-| Opening | 28,436 | 3,000,123,794 | **107,553.68** |
-| Hires | 4,766 | +411,260,584 | −3,269.63 |
-| Exits | 3,187 | −331,824,383 | +127.33 |
-| Promotions | 1,899 | +19,146,842 | +651.35 |
-| Demotions | 95 | −580,262 | −19.74 |
-| Tenure Increases | 24,218 | +97,731,983 | +3,324.70 |
-| Market Adjustments | 307 | +1,568,127 | +53.35 |
-| Relocation Adjustments | 216 | −87,552 | −2.98 |
-| International Transfer Adjustments | 118 | +602,450 | +20.49 |
-| FTE Changes | 377 | −10,639,038 | −11.04 |
-| Fringe Rate Changes | 10,892 | +8,200,720 | +278.98 |
-| FX Translation | 17,211 | 0 (constant FX) | 0 |
-| Closing | 30,015 | 3,195,503,265 | **108,706.49** |
+| Opening | 28,438 | 3,066,147,621 | **110,084.39** |
+| Hires | 4,790 | +485,725,626 | −1,223.30 |
+| Exits | 3,223 | −341,052,810 | +213.75 |
+| Promotions | 1,824 | +21,155,975 | +720.71 |
+| Demotions | 148 | −787,909 | −26.84 |
+| Tenure Increases | 25,189 | +105,810,276 | +3,604.57 |
+| Market Adjustments | 287 | +1,522,137 | +51.85 |
+| Same-Country Transfer Adjustments | 583 | +146,962 | +5.01 |
+| International Transfer Adjustments | 125 | −1,159,094 | −39.49 |
+| FTE Changes | 353 | −9,274,040 | −9.92 |
+| Fringe Rate Changes | 11,312 | +8,304,439 | +282.90 |
+| FX Translation | 17,038 | 0 (constant FX) | 0 |
+| Closing | 30,005 | 3,336,539,182 | **113,663.64** |
 
-Total loaded cost grew 6.5%, mostly because of headcount: hires minus exits added $79M. The **average** grew only $1,153 (1.1%). Tenure increases added $3,325 per FTE, promotions $651 and statutory fringe increases $279. New hires, paid well below the average, took $3,270 back.
+Total loaded cost grew 8.8%, mostly because of headcount: hires minus exits added $145M. The **average** grew $3,579 (3.3%). Tenure increases added $3,605 per FTE, promotions $721 and statutory fringe increases $283. New hires, paid below the average, took $1,223 back; less than before release 2, because salary ranges now move every July 1, so a new hire starts on this year's range while the people already here climbed last year's.
+
+(Release 2 values. Release 1 opened FY26 at 28,436 people and an average of 107,553.68.)
 
 ## 8. Reconciling to the other dashboards
 
@@ -250,7 +253,7 @@ Total loaded cost grew 6.5%, mostly because of headcount: hires minus exits adde
 | 1. Worker pairs | 4.4 million |
 | 2. Pre-aggregated rows | about 0.5 million (aggregate early, about 9 workers per row) |
 | 3. Expanded walk lines (six views × applicable steps) | about 12 million |
-| 4–5. Published rows | 114,977 (release 2, phase 2) |
+| 4–5. Published rows | 115,544 |
 
 * DuckDB builds the mart in about 30 seconds on a laptop-class machine. The SQL Server timing is printed by `06_validate_compensation_walk.sql`.
 * **Aggregate early, expand late.** Workers are collapsed to (date pair, departments, offices, reasons) *before* being multiplied into views and steps, which cuts the expansion about 9×.

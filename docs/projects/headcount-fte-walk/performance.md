@@ -1,6 +1,6 @@
 # Performance: choosing the grain of workforce history
 
-A headcount walk looks like a reporting problem, but its cost is decided by a modelling choice: **at what grain is workforce history stored?** This page compares three common answers on the Arcadia data, at its real size and at 10 times its size (435,690 workers).
+A headcount walk looks like a reporting problem, but its cost is decided by a modelling choice: **at what grain is workforce history stored?** This page compares three common answers on the Arcadia data, at its real size and at 10 times its size (469,800 workers; five years of history, measured on warehouse release 2).
 
 Run it yourself:
 
@@ -26,21 +26,21 @@ From [`performance_results.md`](performance_results.md) (DuckDB 1.5.6 in a small
 
 | Workers | Design | Rows stored | Fits Tableau Public (15M rows)? | Seconds |
 |---|---|---|---|---|
-| 43,569 | 1. Daily scaffold | 40,939,132 | no | 3.01 |
-| 43,569 | 2. As-of join, twice | none | n/a | 0.62 |
-| 43,569 | 3. Snapshot, then join | 1,347,949 | yes | 0.52 (0.35 build + 0.18 walk) |
-| 435,690 | 1. Daily scaffold | 409,391,320 | no | 21.82 |
-| 435,690 | 2. As-of join, twice | none | n/a | 5.66 |
-| 435,690 | 3. Snapshot, then join | 13,479,490 | yes | 4.03 (2.15 build + 1.88 walk) |
+| 46,980 | 1. Daily scaffold | 49,789,268 | no | 10.33 |
+| 46,980 | 2. As-of join, twice | none | n/a | 1.04 |
+| 46,980 | 3. Snapshot, then join | 1,639,687 | yes | 0.47 (0.31 build + 0.15 walk) |
+| 469,800 | 1. Daily scaffold | 497,892,680 | no | 46.35 |
+| 469,800 | 2. As-of join, twice | none | n/a | 4.57 |
+| 469,800 | 3. Snapshot, then join | 16,396,870 | no (the walk mart is) | 3.75 (1.93 build + 1.83 walk) |
 
 Designs 2 and 3 return identical hires, leavers and department moves at every scale.
 
 ## What the numbers say
 
-- **The daily scaffold is the expensive mistake.** It stores 30 times more rows than a month-end snapshot (40.9M vs 1.35M) to answer month-end questions. At Arcadia's real size it is already almost three times Tableau Public's 15-million-row limit, and at 10x it reaches 409 million rows. Most of those rows say "nothing changed today".
-- **The snapshot is paid for once.** Building it takes 2.15 seconds at 10x; after that a walk takes 1.88 seconds, three times faster than recomputing the date-range joins (5.66 seconds). At 10x the snapshot is still under Tableau Public's limit (13.5M rows). The same snapshot feeds four downstream models here (the cost bridge, the cost snapshot, the movement model and the headcount walk), so design 2 would repeat its joins for each of them where design 3 builds once.
+- **The daily scaffold is the expensive mistake.** It stores 30 times more rows than a month-end snapshot (49.8M vs 1.64M) to answer month-end questions. At Arcadia's real size it is already more than three times Tableau Public's 15-million-row limit, and at 10x it reaches 498 million rows and is the slowest design by a factor of 12. Most of those rows say "nothing changed today".
+- **The snapshot is paid for once.** Building it takes 1.93 seconds at 10x; after that a walk takes 1.83 seconds, 2.5 times faster than recomputing the date-range joins (4.57 seconds). At 10x and five years of history the snapshot itself passes Tableau Public's limit (16.4M rows), which is why it stays in the warehouse and Tableau gets the aggregated walk mart. The same snapshot feeds four downstream models here (the cost bridge, the cost snapshot, the movement model and the headcount walk), so design 2 would repeat its joins for each of them where design 3 builds once.
 - **Equality joins are simpler to test.** Joining on `worker_id + month_end_date` makes "one row per worker per month" a one-line test (test 05). A date-range join can silently fan out when two records overlap; tests 02 and 03 exist to stop that before it reaches the snapshot.
-- **The mart is smaller again.** The walk mart aggregates 1,336,479 worker-month comparisons into 436,501 slice-level lines, and ships its names in five small dimension files. The export is 24 MB instead of 73 MB.
+- **The mart is smaller again.** The walk mart aggregates 1,633,133 worker-month comparisons into 521,029 slice-level lines, and ships its names in five small dimension files. The export is 28 MB instead of 98 MB with the names on every line.
 
 ## The general lesson
 

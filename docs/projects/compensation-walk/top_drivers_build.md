@@ -112,6 +112,8 @@ Built with the name-above-bar pattern ([map guide](tableau_office_moves_map_guid
 
 ## Expected values (Company, FY26)
 
+Release 2 values (current data) are in the generated [expected_values.md](expected_values.md): Tenure raises +$3,605, Hires −$1,223, Promotions +$721, Fringe rates +$283 (Pay per FTE). The table below is the release 1 build check, kept for the record.
+
 | View | Rows, in order |
 |---|---|
 | Avg per FTE, Loaded, Constant | Tenure raises +$3,325, Hires −$3,270, Promotions & demotions +$632, Fringe rates +$279 |

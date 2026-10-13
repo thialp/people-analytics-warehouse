@@ -169,7 +169,7 @@ def build(lens, panel, name):
         G('Period', T(20, 86, 'PERIOD', 10, 600, RAIL_MUTED, ls='1.2'), T(32, 120, 'FROM', 10, 400, RAIL_MUTED), T(66, 120, 'Jun 30, 2025', 12, 400, '#FFFFFF'), T(180, 120, '▾', 11, 400, '#FFFFFF', 'end'),
           T(32, 160, 'TO', 10, 400, RAIL_MUTED), T(66, 160, 'Jun 30, 2026', 12, 400, '#FFFFFF'), T(180, 160, '▾', 11, 400, '#FFFFFF', 'end'),
           *[G(f'Quick pick {t}', T(x + 43, y + 17, t, 11, 600 if on else 400, NAVY if on else '#C9D2E2', 'middle')) for x, y, t, on in chips]),
-        G('View by', T(20, 276, 'VIEW BY', 10, 600, RAIL_MUTED, ls='1.2'), *[T(27, 307 + i * 30, v, 12.5, 600 if i == 0 else 400, '#FFFFFF' if i == 0 else '#C9D2E2') for i, v in enumerate(['Company', 'Function', 'Leader', 'Department', 'Office', 'Country'])]),
+        G('View by', T(20, 276, 'VIEW BY', 10, 600, RAIL_MUTED, ls='1.2'), *[T(27, 307 + i * 30, v, 12.5, 600 if i == 0 else 400, '#FFFFFF' if i == 0 else '#C9D2E2') for i, v in enumerate(['Company', 'Function', 'Sub-function', 'Department', 'Office', 'Country'])]),
         G('Group', T(20, 496, 'GROUP', 10, 600, RAIL_MUTED, ls='1.2'), T(32, 529, 'Search groups', 12, 400, RAIL_MUTED), T(20, 568, 'All of Arcadia', 12, 600, '#FFFFFF'), T(104, 568, '· 30,015', 12, 400, RAIL_MUTED)),
         G('Measures', T(20, 604, 'MEASURES', 10, 600, RAIL_MUTED, ls='1.2'), s1, s2, s3, T(108, 751, 'Reset filters', 11, 400, '#C9D2E2', 'middle')),
         T(20, 800, 'Data as of Jun 30, 2026.', 10, 400, RAIL_MUTED), T(20, 813, 'Fictional company; data generated', 10, 400, RAIL_MUTED), T(20, 826, 'by Claude Code.', 10, 400, RAIL_MUTED))
