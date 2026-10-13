@@ -43,6 +43,22 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "data" / "raw"
 rng = np.random.default_rng(SEED)
 name_rng = np.random.default_rng(SEED + 1)   # names draw from their own stream, so they never shift the simulation
+
+
+def domain_stream(domain: str) -> np.random.Generator:
+    """A random stream of its own for one domain of the simulation.
+
+    Each domain (positions, recruiting, plan, ...) draws from a stream seeded by SEED and
+    the domain's name, so adding draws in one domain never shifts the draws of another.
+    The worker simulation keeps `rng` and the names keep `name_rng`, unchanged.
+    """
+    key = int.from_bytes(domain.encode("utf-8"), "big") % (2**63)
+    return np.random.default_rng(np.random.SeedSequence([SEED, key]))
+
+
+position_rng = domain_stream("positions")      # vacancy decisions, re-levelling, seat relocation
+recruiting_rng = domain_stream("recruiting")   # requisitions, candidates, time to fill
+plan_rng = domain_stream("plan")               # budget and reforecast versions
 ONE_DAY = dt.timedelta(days=1)
 
 
