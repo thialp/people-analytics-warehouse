@@ -35,7 +35,7 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-12 (nigh
 
 ## Parked data items: done in warehouse release 2 (workbook steps still to do)
 
-All the parked data changes were made in the SQL on branch `warehouse-release-2` (phases 2 and 7 of [the release plan](../workforce-planning/release_2_plan.md)). The workbook still has the old Custom SQL text and names; the steps below are for the release 2 workbook session (phase 8).
+All the parked data changes were made in the SQL on branch `warehouse-release-2` (phases 2 and 7 of [the release plan](../workforce-planning/release_2_plan.md)). The workbook still has the old Custom SQL text and names. Click-by-click steps for the release 2 workbook session (phase 8), with the check table for every number: [release_2_republish.md](../workforce-planning/release_2_republish.md) and [expected_values.md](expected_values.md).
 
 | Item | Data (done) | Workbook (to do) |
 |---|---|---|
