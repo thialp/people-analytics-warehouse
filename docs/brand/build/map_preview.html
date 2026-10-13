@@ -1,0 +1,151 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Inter; font-weight: 400; src: url(node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; src: url(node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 700; src: url(node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2); }
+:root {
+  --navy: #13233A; --teal: #00938D; --coral: #E4572E; --violet: #5B4FB3; --amber: #D98E04;
+  --ink: #13233A; --ink-2: #5A6170; --muted: #8C8A84; --grid: #E4E3DD; --surface: #FBFBF8; --page: #F3F3EF;
+}
+* { box-sizing: border-box; }
+body { margin: 0; width: 1400px; height: 846px; background: var(--page); font-family: Inter, sans-serif; color: var(--ink); }
+header { height: 76px; background: var(--navy); display: flex; align-items: center; padding: 0 28px; gap: 22px; }
+header img { height: 44px; }
+header .t { color: #fff; font-size: 21px; font-weight: 700; }
+header .s { color: #B9C2CF; font-size: 13px; margin-top: 3px; }
+header .pills { margin-left: auto; display: flex; gap: 8px; }
+.pill { border: 1px solid #3A4A63; color: #DCE3EC; font-size: 12px; padding: 7px 12px; border-radius: 999px; }
+.pill b { color: #fff; font-weight: 600; }
+.pill.on { background: #fff; color: var(--navy); border-color: #fff; }
+.kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 14px 28px 0; }
+.kpi { background: var(--surface); border: 1px solid var(--grid); border-radius: 10px; padding: 11px 14px; }
+.kpi .l { font-size: 12px; color: var(--ink-2); }
+.kpi .v { font-size: 26px; font-weight: 700; margin-top: 2px; }
+.kpi .n { font-size: 11.5px; color: var(--ink-2); margin-top: 1px; }
+.kpi .up { color: #006B66; font-weight: 600; }
+main { display: grid; grid-template-columns: 1fr 360px; gap: 12px; padding: 12px 28px 0; }
+.card { background: var(--surface); border: 1px solid var(--grid); border-radius: 10px; padding: 12px 14px; position: relative; }
+.card h3 { margin: 0 0 2px; font-size: 14px; font-weight: 700; }
+.card .sub { font-size: 11.5px; color: var(--ink-2); }
+#map { display: block; }
+.legend { position: absolute; left: 14px; bottom: 10px; display: flex; gap: 16px; font-size: 11px; color: var(--ink-2); align-items: center; }
+.ramp { width: 90px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #CDEDEA, #00938D, #00524F); }
+.layers { position: absolute; right: 12px; top: 12px; background: #fff; border: 1px solid var(--grid); border-radius: 8px; padding: 8px 10px; font-size: 11px; color: var(--ink-2); line-height: 1.6; }
+.layers b { color: var(--ink); font-weight: 600; }
+.right { display: grid; grid-template-rows: auto auto; gap: 12px; }
+footer { padding: 8px 28px; font-size: 11px; color: var(--muted); }
+</style></head>
+<body>
+<header>
+  <img src="../arcadia_logo_horizontal_reverse.svg">
+  <div><div class="t">Global Workforce Footprint</div>
+  <div class="s">Where Arcadia's people are, where it is growing, and how people move between offices</div></div>
+  <div class="pills"><span class="pill">Fiscal year <b>FY26</b></span><span class="pill on">Headcount</span><span class="pill">FTE</span><span class="pill">Selected office <b>London</b> · radius <b>1,000 km</b></span></div>
+</header>
+<div class="kpis" id="kpis"></div>
+<main>
+  <div class="card" style="height:600px">
+    <h3>Offices sized by headcount, colored by FY26 growth · lines are relocations between offices</h3>
+    <div class="sub" id="mapsub"></div>
+    <svg id="map" width="940" height="540"></svg>
+    <div class="legend">
+      <span>FY26 growth</span><span>1%</span><span class="ramp"></span><span>11%</span>
+      <span style="margin-left:10px"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#5B4FB3" stroke-width="3" stroke-opacity=".6"/></svg> relocation corridor, 3+ people (width = people)</span>
+      <span><svg width="18" height="12"><circle cx="9" cy="6" r="5" fill="#13233A" fill-opacity=".06" stroke="#13233A"/></svg> 1,000 km of selected office</span>
+    </div>
+    <div class="layers"><b>Map layers, top to bottom</b><br>Offices · MAKEPOINT<br>Radius · BUFFER<br>Relocations · MAKELINE<br>Countries with offices</div>
+  </div>
+  <div class="right">
+    <div class="card"><h3>Growth by region, FY26</h3><div class="sub">Closing vs opening headcount</div><svg id="reg" width="330" height="210"></svg></div>
+    <div class="card"><h3>Busiest relocation corridors, FY26</h3><div class="sub">People moving between two offices, both directions</div><svg id="cor" width="330" height="250"></svg></div>
+  </div>
+</main>
+<footer>Arcadia Systems is a fictional company; all data is synthetic. Static preview of the Tableau Public dashboard · source: thialp/people-analytics-warehouse · mart_location_headcount, mart_mobility_flows, mart_dim_location</footer>
+
+<script src="node_modules/d3/dist/d3.min.js"></script>
+<script src="node_modules/topojson-client/dist/topojson-client.min.js"></script>
+<script>
+const fmt = d3.format(","), pct = d3.format("+.1%");
+Promise.all([d3.json("data.json"), d3.json("node_modules/world-atlas/countries-110m.json")]).then(([D, world]) => {
+  const offices = D.offices, mapped = offices.filter(o => o.lat !== null);
+  const total = d3.sum(offices, o => o.closing), open = d3.sum(offices, o => o.opening);
+  const remote = offices.find(o => o.lat === null);
+  const india = d3.sum(offices.filter(o => o.country_name === "India"), o => o.closing);
+  const reg = D.region.map(r => ({...r, g: (r.fy26 - r.fy25) / r.fy25})).sort((a, b) => b.g - a.g);
+
+  // KPI band
+  const kpis = [
+    ["Closing headcount", fmt(total), `<span class="up">${pct((total - open) / open)}</span> vs FY26 opening`],
+    ["Offices", mapped.length, `in ${new Set(mapped.map(o => o.country_name)).size} countries, plus ${fmt(remote.closing)} remote in the US`],
+    ["Fastest-growing region", reg[0].region, `<span class="up">${pct(reg[0].g)}</span> in FY26`],
+    ["India engineering centers", d3.format(".0%")(india / total), `${fmt(india)} people in Bangalore and Hyderabad`],
+    ["Relocations", fmt(D.tot.rel), `${D.tot.intl} international, the rest within a country`],
+  ];
+  d3.select("#kpis").selectAll("div").data(kpis).join("div").attr("class", "kpi")
+    .html(d => `<div class="l">${d[0]}</div><div class="v">${d[1]}</div><div class="n">${d[2]}</div>`);
+
+  // Map
+  const svg = d3.select("#map");
+  const land = topojson.feature(world, world.objects.countries);
+  land.features = land.features.filter(f => f.properties.name !== "Antarctica");
+  const proj = d3.geoEqualEarth().fitExtent([[0, 10], [940, 530]], land);
+  const path = d3.geoPath(proj);
+  const present = new Set(mapped.map(o => o.country_name).concat(["United States of America"]));
+  // layer 1: countries
+  svg.append("g").selectAll("path").data(land.features).join("path").attr("d", path)
+    .attr("fill", d => present.has(d.properties.name) ? "#DCEDEA" : "#ECEBE6").attr("stroke", "#FBFBF8").attr("stroke-width", 0.6);
+  // layer 2: relocation paths, geodesic like MAKELINE; one line per corridor (both directions),
+  // only corridors with at least MIN people, the same rule as the "Minimum people on a path" parameter
+  const MIN = 3;
+  const corridors = d3.rollups(D.flows, v => ({workers: d3.sum(v, f => f.workers), a: v[0]}),
+      f => [f.from_city, f.to_city].sort().join("|")).map(d => d[1]).filter(d => d.workers >= MIN);
+  const w = d3.scaleSqrt().domain([MIN, d3.max(corridors, c => c.workers)]).range([1.2, 7]);
+  svg.append("g").selectAll("path").data(corridors.sort((a, b) => a.workers - b.workers)).join("path")
+    .attr("d", c => path({type: "LineString", coordinates: [[c.a.flon, c.a.flat], [c.a.tlon, c.a.tlat]]}))
+    .attr("fill", "none").attr("stroke", "#5B4FB3").attr("stroke-opacity", 0.55).attr("stroke-width", c => w(c.workers)).attr("stroke-linecap", "round");
+  // layer 4 (drawn under the dots so they stay readable): BUFFER around the selected office
+  const sel = mapped.find(o => o.city === "London");
+  const ring = d3.geoCircle().center([sel.lon, sel.lat]).radius(1000 / 111.2)();
+  svg.append("path").attr("d", path(ring)).attr("fill", "#13233A").attr("fill-opacity", 0.05)
+    .attr("stroke", "#13233A").attr("stroke-width", 1.2);
+  // layer 3: offices, MAKEPOINT
+  const r = d3.scaleSqrt().domain([0, d3.max(mapped, o => o.closing)]).range([0, 19]);
+  const color = d3.scaleLinear().domain([0.01, 0.06, 0.11]).range(["#CDEDEA", "#00938D", "#00524F"]).clamp(true);
+  svg.append("g").selectAll("circle").data([...mapped].sort((a, b) => b.closing - a.closing)).join("circle")
+    .attr("cx", o => proj([o.lon, o.lat])[0]).attr("cy", o => proj([o.lon, o.lat])[1]).attr("r", o => r(o.closing))
+    .attr("fill", o => color(o.growth)).attr("stroke", "#fff").attr("stroke-width", 1.5);
+  // selective labels: the largest offices and the selected one
+  const labelled = {"Austin": [8, 22], "Hyderabad": [14, -10], "Bangalore": [14, 14], "London": [-12, -20], "Sao Paulo": [14, 4], "Singapore": [14, 4], "Sydney": [14, 4], "New York": [14, -6]};
+  svg.append("g").selectAll("text").data(mapped.filter(o => labelled[o.city])).join("text")
+    .attr("x", o => proj([o.lon, o.lat])[0] + labelled[o.city][0]).attr("y", o => proj([o.lon, o.lat])[1] + labelled[o.city][1])
+    .attr("text-anchor", o => labelled[o.city][0] < 0 ? "end" : "start")
+    .attr("font-size", 11).attr("font-weight", 600).attr("fill", "#13233A")
+    .attr("paint-order", "stroke").attr("stroke", "#FBFBF8").attr("stroke-width", 3)
+    .text(o => `${o.city} ${fmt(o.closing)}`);
+  // what the BUFFER answers
+  const hav = (a, b) => { const R = 6371, t = Math.PI / 180, dl = (b.lat - a.lat) * t, dn = (b.lon - a.lon) * t;
+    const h = Math.sin(dl / 2) ** 2 + Math.cos(a.lat * t) * Math.cos(b.lat * t) * Math.sin(dn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
+  const near = mapped.filter(o => o !== sel && hav(sel, o) <= 1000);
+  d3.select("#mapsub").text(`Within 1,000 km of London: ${near.map(o => o.city).join(", ")} · ${fmt(d3.sum(near, o => o.closing) + sel.closing)} people across ${near.length + 1} offices`);
+
+  // Region growth bars
+  const rs = d3.select("#reg"), x = d3.scaleLinear().domain([0, d3.max(reg, d => d.g) * 1.25]).range([0, 160]);
+  const g = rs.selectAll("g").data(reg).join("g").attr("transform", (d, i) => `translate(0,${18 + i * 38})`);
+  g.append("text").attr("y", 0).attr("font-size", 12).attr("fill", "#13233A").text(d => d.region);
+  g.append("text").attr("x", 330).attr("y", 0).attr("text-anchor", "end").attr("font-size", 11).attr("fill", "#5A6170").text(d => `${fmt(d.fy25)} → ${fmt(d.fy26)}`);
+  g.append("rect").attr("y", 7).attr("height", 12).attr("rx", 3).attr("width", d => x(d.g)).attr("fill", (d, i) => i === 0 ? "#00938D" : "#9FCFCB");
+  g.append("text").attr("x", d => x(d.g) + 6).attr("y", 17).attr("font-size", 11.5).attr("font-weight", 600).attr("fill", "#13233A").text(d => pct(d.g));
+
+  // Corridors, both directions combined
+  const key = f => [f.from_city, f.to_city].sort().join(" ↔ ");
+  const cor = d3.rollups(D.flows, v => d3.sum(v, f => f.workers), key).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const cs = d3.select("#cor"), cx = d3.scaleLinear().domain([0, cor[0][1]]).range([0, 190]);
+  const cg = cs.selectAll("g").data(cor).join("g").attr("transform", (d, i) => `translate(0,${18 + i * 38})`);
+  cg.append("text").attr("font-size", 12).attr("fill", "#13233A").text(d => d[0]);
+  cg.append("rect").attr("y", 7).attr("height", 12).attr("rx", 3).attr("width", d => cx(d[1])).attr("fill", "#5B4FB3");
+  cg.append("text").attr("x", d => cx(d[1]) + 6).attr("y", 17).attr("font-size", 11.5).attr("font-weight", 600).attr("fill", "#13233A").text(d => fmt(d[1]));
+  document.body.dataset.ready = "1";
+});
+</script>
+</body></html>
