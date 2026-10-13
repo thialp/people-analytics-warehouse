@@ -4,11 +4,11 @@
 
 | FY | Opening HC | Hires | Voluntary | Involuntary | Moves in | Closing HC | Closing FTE | FY-end loaded $M (constant) |
 |---|---|---|---|---|---|---|---|---|
-| FY22 | 23,516 | 4,694 | 2,553 | 613 | 2,895 | 25,044 | 24,716.7 | 2,643.0 |
-| FY23 | 25,044 | 5,561 | 2,928 | 750 | 3,093 | 26,927 | 26,505.6 | 2,835.9 |
-| FY24 | 26,927 | 3,607 | 2,326 | 1,010 | 3,308 | 27,198 | 26,704.0 | 2,912.8 |
-| FY25 | 27,198 | 4,347 | 2,486 | 617 | 4,709 | 28,442 | 27,875.0 | 3,017.9 |
-| FY26 | 28,442 | 5,244 | 2,887 | 764 | 3,618 | 30,035 | 29,390.3 | 3,215.9 |
+| FY22 | 23,516 | 4,677 | 2,511 | 621 | 2,870 | 25,061 | 24,734.5 | 2,660.3 |
+| FY23 | 25,061 | 5,538 | 2,943 | 715 | 3,069 | 26,941 | 26,510.1 | 2,883.0 |
+| FY24 | 26,941 | 3,634 | 2,343 | 1,015 | 3,327 | 27,217 | 26,715.8 | 2,978.1 |
+| FY25 | 27,217 | 4,376 | 2,532 | 614 | 4,432 | 28,447 | 27,861.7 | 3,153.3 |
+| FY26 | 28,447 | 5,235 | 2,942 | 726 | 3,633 | 30,014 | 29,363.5 | 3,359.4 |
 
 ## Row counts: raw
 
@@ -20,11 +20,14 @@
 | dim_job_profile | 165 |
 | dim_location | 35 |
 | dim_org_unit | 44 |
-| dim_worker | 46,982 |
-| fact_bonus_payout | 154,118 |
-| fact_compensation_history | 180,829 |
-| fact_job_history | 98,597 |
-| fact_performance_review | 154,118 |
+| dim_position | 101,297 |
+| dim_worker | 46,980 |
+| fact_bonus_payout | 154,151 |
+| fact_compensation_history | 182,149 |
+| fact_job_history | 98,028 |
+| fact_performance_review | 154,151 |
+| fact_position_assignment | 54,094 |
+| fact_requisition | 31,323 |
 | ref_fringe_rate | 132 |
 | ref_fringe_source | 215 |
 | ref_fx_rate_constant | 17 |
@@ -39,7 +42,7 @@
 
 | Table | Rows |
 |---|---|
-| mart_compensation_walk | 114,977 |
+| mart_compensation_walk | 115,454 |
 | mart_dim_country | 22 |
 | mart_dim_department | 32 |
 | mart_dim_grade | 12 |
@@ -48,11 +51,11 @@
 | mart_dim_month | 60 |
 | mart_dim_org_unit | 44 |
 | mart_fringe_rate | 132 |
-| mart_headcount_fte_walk | 539,088 |
+| mart_headcount_fte_walk | 521,029 |
 | mart_location_headcount | 1,929 |
-| mart_mobility_flows | 1,454 |
-| mart_office_moves | 53,826 |
+| mart_mobility_flows | 2,101 |
+| mart_office_moves | 89,611 |
 | mart_org_leader_summary | 260 |
-| mart_reporting_line | 161,162 |
-| mart_workforce_cost_bridge | 17,119 |
-| mart_workforce_cost_snapshot | 242,966 |
+| mart_reporting_line | 161,196 |
+| mart_workforce_cost_bridge | 17,022 |
+| mart_workforce_cost_snapshot | 233,866 |

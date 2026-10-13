@@ -78,10 +78,10 @@ def random_day_in_month(year: int, month: int, first_day: int = 1) -> dt.date:
     return dt.date(year, month, int(rng.integers(first_day, last + 1)))
 
 
-def weighted_choice(options: dict):
+def weighted_choice(options: dict, stream: np.random.Generator | None = None):
     keys = list(options.keys())
     weights = np.array([options[k] for k in keys], dtype=float)
-    return keys[rng.choice(len(keys), p=weights / weights.sum())]
+    return keys[(stream or rng).choice(len(keys), p=weights / weights.sum())]
 
 
 def round_salary(amount: float) -> float:
@@ -163,7 +163,7 @@ sub_head: dict[str, str] = {}
 func_head: dict[str, str] = {}
 ceo_id: str | None = None
 pending: dict[dt.date, list] = defaultdict(list)    # day -> [("reassign", worker_id) | ("succession", org)]
-_seq = {"worker": 100000, "position": 200000}
+_seq = {"worker": 100000, "position": 200000, "requisition": 300000, "assignment": 0}
 
 JOB_REASON_RANK = {r: i for i, r in enumerate([
     "Hire", "Reorganization", "Transfer", "Succession", "Promotion", "Demotion", "Location Change",
@@ -213,11 +213,13 @@ def job_change(w: dict, on: dt.date, reason: str):
             cur.update(job_fields(w))
             if JOB_REASON_RANK[reason] < JOB_REASON_RANK[cur["action_reason"]]:
                 cur["action_reason"] = reason
+            seat_follow(w, on, reason)
             return
         cur["effective_end_date"] = on - ONE_DAY
     w["job"] = {"worker_id": w["worker_id"], "effective_start_date": on, "effective_end_date": None,
                 "action_reason": reason, **job_fields(w)}
     job_rows.append(w["job"])
+    seat_follow(w, on, reason)
 
 
 def comp_change(w: dict, on: dt.date, reason: str):
@@ -236,6 +238,268 @@ def comp_change(w: dict, on: dt.date, reason: str):
                  "action_reason": reason, "currency_code": COUNTRY[w["country"]]["currency"],
                  "base_salary_annual_local": w["salary"]}
     comp_rows.append(w["comp"])
+
+
+# --------------------------------------------------------------------------------------
+# Seats: positions, requisitions and seat assignments
+# --------------------------------------------------------------------------------------
+# A position is a seat that outlives the people in it. Every worker holds exactly one
+# seat; while it is filled the seat follows its incumbent (a promotion re-levels the seat
+# in place). When the incumbent leaves or moves to another seat, the seat is decided:
+# backfilled as is, re-levelled, relocated within the country, frozen or eliminated.
+# Hires and internal moves fill ready open seats first and create net-new seats only
+# when none fits. Leader seats are refilled through succession.
+pos_rows: list[dict] = []                  # dim_position, SCD2
+assign_rows: list[dict] = []               # fact_position_assignment
+req_rows: dict[str, dict] = {}             # fact_requisition, by id
+seats: dict[str, dict] = {}
+open_seats: dict[str, None] = {}           # status Open with an open requisition, waiting for a fill
+frozen_seats: dict[str, None] = {}
+org_seat: dict[str, str] = {}              # org unit -> the seat its leader holds
+
+SEAT_REASON_FROM_JOB = {
+    "Promotion": "Re-levelled with incumbent", "Demotion": "Re-levelled with incumbent",
+    "Succession": "Re-levelled with incumbent", "Location Change": "Relocated with incumbent",
+    "FTE Change": "FTE change with incumbent", "Became People Manager": "Job change with incumbent",
+    "Returned to Individual Contributor": "Job change with incumbent", "Reorganization": "Reorganization",
+}
+
+
+def seat_profile(s: dict) -> str:
+    if s["exec_profile"]:
+        return s["exec_profile"]
+    if s["is_pm"] and s["level"] in (5, 6):
+        return f'{s["family"]}-M{s["level"]}'
+    return f'{s["family"]}-L{s["level"]}'
+
+
+def seat_fields(s: dict) -> dict:
+    return {"status": s["status"], "department_id": s["dept"], "location_id": s["loc"],
+            "job_profile_id": seat_profile(s), "job_level": s["level"], "fte": s["fte"]}
+
+
+def seat_write(s: dict, on: dt.date, reason: str):
+    """Write the seat's state from `on` (SCD2): close the current row, or merge into it on the same day."""
+    fields = seat_fields(s)
+    cur = s["row"]
+    if cur is not None:
+        if on < cur["effective_start_date"]:
+            raise RuntimeError(f"Out-of-order seat change for {s['id']} on {on}")
+        if all(cur[k] == v for k, v in fields.items()):
+            return
+        if on == cur["effective_start_date"]:
+            if cur["status"] != fields["status"]:
+                cur["change_reason"] = reason
+            cur.update(fields)
+            return
+        cur["effective_end_date"] = on - ONE_DAY
+    s["row"] = {"position_id": s["id"], "effective_start_date": on, "effective_end_date": None,
+                "change_reason": reason, **fields, "created_date": s["created"], "created_reason": s["created_reason"]}
+    pos_rows.append(s["row"])
+
+
+def new_seat(on: dt.date, reason: str, dept: str, family: str, level: int, loc: str, is_pm: bool, fte: float,
+             status: str = "Open", exec_profile: str | None = None) -> dict:
+    s = {"id": next_id("position", "P"), "created": on, "created_reason": reason, "row": None, "status": status,
+         "dept": dept, "family": family, "level": level, "loc": loc, "is_pm": is_pm, "fte": fte,
+         "exec_profile": exec_profile, "incumbent": None, "filled_before": False, "req": None,
+         "ready_on": None, "deadline": None, "resolve": None, "vacated_on": None, "reserved": False}
+    seats[s["id"]] = s
+    seat_write(s, on, reason)
+    return s
+
+
+def seat_from_worker(s: dict, w: dict):
+    s.update(dept=w["dept"], family=w["family"], level=w["level"], loc=w["loc"], is_pm=w["is_pm"], fte=w["fte"],
+             exec_profile=w["exec_profile"] if w["is_exec"] else None)
+
+
+def seat_follow(w: dict, on: dt.date, reason: str):
+    """A filled seat follows its incumbent's job changes."""
+    s = seats.get(w["position_id"])
+    if s is None or s["incumbent"] != w["worker_id"]:
+        return
+    seat_from_worker(s, w)
+    seat_write(s, on, SEAT_REASON_FROM_JOB.get(reason, "Job change with incumbent"))
+
+
+def time_to_fill(level: int) -> int:
+    med = ref.REQ_TIME_TO_FILL_MEDIAN[min(level, 11)]
+    days = recruiting_rng.lognormal(math.log(med), ref.REQ_TIME_TO_FILL_SIGMA)
+    return int(np.clip(round(days), ref.REQ_TIME_TO_FILL_MIN, 240))
+
+
+def approval_lag() -> int:
+    share, (lo, hi) = ref.REQ_LATE_APPROVAL
+    if recruiting_rng.random() < share:
+        return int(recruiting_rng.integers(lo, hi + 1))
+    return int(recruiting_rng.integers(ref.REQ_APPROVAL_DAYS[0], ref.REQ_APPROVAL_DAYS[1] + 1))
+
+
+def new_requisition(s: dict, opened: dt.date, approved: dt.date, hiring_manager: str | None) -> dict:
+    r = {"requisition_id": next_id("requisition", "R"), "position_id": s["id"],
+         "req_type": "Backfill" if s["filled_before"] else "Net-new",
+         "opened_date": opened, "approved_date": approved, "target_start_date": approved + dt.timedelta(days=45),
+         "filled_date": None, "cancelled_date": None, "status": "Open",
+         "department_id": s["dept"], "location_id": s["loc"], "job_profile_id": seat_profile(s), "job_level": s["level"],
+         "hiring_manager_id": hiring_manager, "filled_by_worker_id": None, "fill_source": None}
+    req_rows[r["requisition_id"]] = r
+    s["req"] = r["requisition_id"]
+    return r
+
+
+def open_for_hiring(s: dict, day: dt.date, reason: str, hiring_manager: str | None):
+    """Seat goes to Open with an approved requisition; it can be filled once recruiting had time."""
+    s["status"] = "Open"
+    seat_write(s, day, reason)
+    approved = day + dt.timedelta(days=approval_lag())
+    new_requisition(s, day, approved, hiring_manager)
+    s["ready_on"] = approved + dt.timedelta(days=time_to_fill(s["level"]))
+    s["deadline"] = approved + dt.timedelta(days=ref.REQ_MAX_OPEN_DAYS)
+    s["reserved"] = False
+    frozen_seats.pop(s["id"], None)
+    open_seats[s["id"]] = None
+
+
+def is_ready(s: dict, on: dt.date) -> bool:
+    return not s["reserved"] and s["ready_on"] is not None and s["ready_on"] <= on < s["deadline"]
+
+
+def assign(w: dict, s: dict, on: dt.date, fill_type: str):
+    """`w` starts in seat `s` on `on`. The seat takes the worker's job as it stands."""
+    if s["incumbent"] is not None:
+        raise RuntimeError(f"Seat {s['id']} already has {s['incumbent']}")
+    if fill_type != "Initial" and s["req"] is None:   # an immediate refill (succession, team backfill)
+        opened = s["vacated_on"] or on
+        new_requisition(s, opened, opened, None)
+    req_id = s["req"]
+    if req_id:
+        r = req_rows[req_id]
+        r.update(filled_date=on, status="Filled", filled_by_worker_id=w["worker_id"],
+                 fill_source="Internal" if fill_type == "Internal Move" else "External")
+    w["position_id"] = s["id"]
+    s.update(incumbent=w["worker_id"], status="Filled", filled_before=True, req=None, ready_on=None,
+             deadline=None, resolve=None, reserved=False)
+    open_seats.pop(s["id"], None)
+    frozen_seats.pop(s["id"], None)
+    seat_from_worker(s, w)
+    seat_write(s, on, "Initial" if fill_type == "Initial" else "Filled")
+    _seq["assignment"] += 1
+    w["assignment"] = {"assignment_id": f"PA{_seq['assignment']:07d}", "position_id": s["id"],
+                       "worker_id": w["worker_id"], "start_date": on, "end_date": None, "fill_type": fill_type,
+                       "requisition_id": req_id, "vacate_reason": None}
+    assign_rows.append(w["assignment"])
+
+
+def vacate(w: dict, last_day: dt.date, reason: str) -> dict:
+    """`w` leaves their seat after `last_day`. Returns the seat, not yet decided."""
+    s = seats[w["position_id"]]
+    w["assignment"].update(end_date=last_day, vacate_reason=reason)
+    s["incumbent"] = None
+    s["vacated_on"] = last_day + ONE_DAY
+    s["last_manager"] = w["mgr"]
+    return s
+
+
+def reserve(s: dict, day: dt.date):
+    """A leader or team-backfill seat: open, refilled by the succession routine, not by recruiting."""
+    s["status"], s["reserved"] = "Open", True
+    seat_write(s, day, "Vacated")
+
+
+def relocation_office(s: dict, on: dt.date) -> str | None:
+    cc = OFFICE[s["loc"]]["country"]
+    opts = {o["id"]: o["weight"] * o["pay_zone"] ** -ref.RELOCATE_ZONE_POWER
+            for o in OFFICE.values() if o["country"] == cc and o["opened"] <= on and o["id"] != s["loc"]}
+    return weighted_choice(opts, position_rng) if opts else None
+
+
+def decide_seat(s: dict, day: dt.date, restructuring: bool = False):
+    """What happens to a vacated seat, effective `day` (the first day it is empty)."""
+    options = ref.SEAT_DECISION_RESTRUCTURING if restructuring else ref.SEAT_DECISION
+    outcome = weighted_choice(options, position_rng)
+    hm = s.get("last_manager")
+    if outcome == "Backfill re-levelled":
+        if s["level"] >= 7 or s["exec_profile"]:
+            outcome = "Backfill as is"
+        else:
+            down = position_rng.random() < ref.RELEVEL_DOWN_SHARE
+            if s["is_pm"]:                           # a manager seat is refilled as an IC seat one level down
+                s["is_pm"], s["level"] = False, s["level"] - 1
+            elif (down and s["level"] > 1) or s["level"] == 6:
+                s["level"] -= 1
+            else:
+                s["level"] += 1
+            open_for_hiring(s, day, "Re-levelled for backfill", hm)
+            return
+    if outcome == "Backfill relocated":
+        new_loc = relocation_office(s, day)
+        if new_loc is None:
+            outcome = "Backfill as is"
+        else:
+            s["loc"] = new_loc
+            open_for_hiring(s, day, "Relocated for backfill", hm)
+            return
+    if outcome == "Backfill as is":
+        open_for_hiring(s, day, "Vacated", hm)
+    elif outcome == "Freeze":
+        freeze(s, day, "Frozen")
+    else:
+        eliminate(s, day)
+
+
+def freeze(s: dict, day: dt.date, reason: str):
+    s["status"], s["reserved"] = "Frozen", False
+    seat_write(s, day, reason)
+    open_seats.pop(s["id"], None)
+    frozen_seats[s["id"]] = None
+    lo, hi = ref.FROZEN_SEAT_DAYS
+    s["resolve"] = (day + dt.timedelta(days=int(position_rng.integers(lo, hi + 1))),
+                    "Unfreeze" if position_rng.random() < ref.FROZEN_SEAT_UNFREEZE_SHARE else "Eliminate")
+
+
+def eliminate(s: dict, day: dt.date):
+    s["status"], s["reserved"] = "Eliminated", False
+    seat_write(s, day, "Eliminated")
+    open_seats.pop(s["id"], None)
+    frozen_seats.pop(s["id"], None)
+
+
+def seat_housekeeping(me: dt.date):
+    """Month-end: cancel requisitions open too long, resolve frozen seats that are due."""
+    for sid in list(open_seats):
+        s = seats[sid]
+        if s["deadline"] <= me:
+            r = req_rows[s["req"]]
+            r.update(cancelled_date=s["deadline"], status="Cancelled")
+            s["req"] = None
+            if position_rng.random() < ref.REQ_CANCELLED_FREEZE_SHARE:
+                freeze(s, s["deadline"], "Requisition cancelled")
+            else:
+                eliminate(s, s["deadline"])
+    for sid in list(frozen_seats):
+        s = seats[sid]
+        due, outcome = s["resolve"]
+        if due <= me:
+            if outcome == "Unfreeze":
+                open_for_hiring(s, due, "Unfrozen", s.get("last_manager"))
+            else:
+                eliminate(s, due)
+
+
+def take_ready_seat(on: dt.date, fits=None, internal: bool = False) -> dict | None:
+    """The ready open seat waiting longest (optionally among those `fits` accepts). An internal
+    candidate can take a seat as soon as its requisition is approved: no external search needed."""
+    best = None
+    for sid in open_seats:
+        s = seats[sid]
+        if internal:
+            ok = (not s["reserved"] and req_rows[s["req"]]["approved_date"] <= on < s["deadline"])
+        else:
+            ok = is_ready(s, on)
+        if ok and (fits is None or fits(s)) and (best is None or s["ready_on"] < best["ready_on"]):
+            best = s
+    return best
 
 
 # --------------------------------------------------------------------------------------
@@ -383,7 +647,7 @@ def new_worker(hire_date: dt.date, dept_id: str, level: int, family: str, cc: st
     first, last = random_name(cc)
     w = {"worker_id": next_id("worker", "W"), "first_name": first, "last_name": last,
          "hire_date": hire_date, "termination_date": None, "termination_type": None,
-         "is_exec": is_exec, "exec_profile": exec_profile, "position_id": next_id("position", "P"),
+         "is_exec": is_exec, "exec_profile": exec_profile, "position_id": None, "assignment": None,
          "dept": dept_id, "family": family, "level": level, "country": cc, "loc": loc, "fte": fte,
          "salary": salary, "mgr": None, "is_pm": False, "leads": leads, "level_since": hire_date,
          "last_rating": None, "job": None, "comp": None}
@@ -423,6 +687,12 @@ def opening_hire(level: int, cc: str, loc: str, min_years: float = 0.05, mean_ye
 
 
 def open_records(w: dict, comp_start: dt.date):
+    """An opening worker: a seat of their own since their hire date, then the job and pay records."""
+    s = new_seat(w["hire_date"], "Initial", w["dept"], w["family"], w["level"], w["loc"], w["is_pm"], w["fte"],
+                 exec_profile=w["exec_profile"] if w["is_exec"] else None)
+    assign(w, s, w["hire_date"], "Initial")
+    if w["leads"]:
+        org_seat[w["leads"]] = s["id"]
     job_change(w, w["hire_date"], "Hire")
     comp_change(w, comp_start, "Hire" if comp_start == w["hire_date"] else "Conversion")
 
@@ -523,8 +793,9 @@ print(f"Opening organization: {len(active):,} people, "
 # ======================================================================================
 # 4. Events
 # ======================================================================================
-def leave_structures(w: dict, eff: dt.date):
-    """Take a worker out of the org on `eff - 1` (their last day): queue their team."""
+def leave_structures(w: dict, eff: dt.date) -> bool:
+    """Take a worker out of the org on `eff - 1` (their last day): queue their team.
+    Returns True when their seat is refilled by succession or a team backfill."""
     wid = w["worker_id"]
     dept_members[w["dept"]].pop(wid, None)
     dept_pms[w["dept"]].pop(wid, None)
@@ -534,16 +805,23 @@ def leave_structures(w: dict, eff: dt.date):
         pending[eff].append(("reassign", rid))
     if w["leads"]:
         pending[eff].insert(0, ("succession", w["leads"]))
+        return True
     elif w["is_pm"] and reports[wid] and rng.random() < MANAGER_BACKFILL_RATE:
         pending[eff].insert(0, ("backfill", wid))
+        return True
+    return False
 
 
-def terminate(w: dict, on: dt.date, kind: str):
+def terminate(w: dict, on: dt.date, kind: str, restructuring: bool = False):
     w["termination_date"], w["termination_type"] = on, kind
     w["job"]["effective_end_date"] = on
     w["comp"]["effective_end_date"] = on
     del active[w["worker_id"]]
-    leave_structures(w, on + ONE_DAY)
+    s = vacate(w, on, kind)
+    if leave_structures(w, on + ONE_DAY):
+        reserve(s, on + ONE_DAY)
+    else:
+        decide_seat(s, on + ONE_DAY, restructuring)
 
 
 def promote(w: dict, on: dt.date, reason: str = "Promotion", increase: float | None = None):
@@ -565,16 +843,55 @@ def demote(w: dict, on: dt.date):
     fix_manager(w, on)
 
 
+def net_new_seat(w: dict, on: dt.date, reason: str, recruited: bool) -> dict:
+    """A seat created for `w`. A recruited seat was approved earlier, as long before the hire as
+    recruiting takes; a seat created by an internal decision (team split, internal move) opens that day."""
+    approved = opened = on
+    if recruited:
+        approved = on - dt.timedelta(days=time_to_fill(w["level"]))
+        earliest = max(OFFICE[w["loc"]]["opened"], REORG_DATE if w["dept"] == "D-108" else approved)
+        approved = max(approved, earliest)
+        opened = approved - dt.timedelta(days=approval_lag())
+    s = new_seat(approved, reason, w["dept"], w["family"], w["level"], w["loc"], w["is_pm"], w["fte"])
+    new_requisition(s, opened, approved, None)
+    return s
+
+
 def hire_into(dept_id: str, level: int, on: dt.date, cc: str | None = None, loc: str | None = None,
-              is_pm: bool = False, leads: str | None = None) -> dict:
-    cc = cc or pick_country(dept_id, on)
-    loc = loc or pick_office(cc, on)
-    w = new_worker(on, dept_id, level, pick_family(dept_id), cc, loc, hire_salary(level, loc), 1.0 if leads else random_fte(),
+              is_pm: bool = False, leads: str | None = None, seat: dict | None = None,
+              seat_reason: str = "Net-new") -> dict:
+    """An external hire, into `seat` when given (a backfill or a leader seat), otherwise into a net-new seat."""
+    if seat is not None:
+        dept_id, level, family = seat["dept"], seat["level"], seat["family"]
+        is_pm = is_pm or seat["is_pm"]
+        if cc is None:
+            loc = seat["loc"]
+            cc = OFFICE[loc]["country"]
+        else:
+            loc = loc or pick_office(cc, on)
+    else:
+        family = pick_family(dept_id)
+        cc = cc or pick_country(dept_id, on)
+        loc = loc or pick_office(cc, on)
+    w = new_worker(on, dept_id, level, family, cc, loc, hire_salary(level, loc), 1.0 if leads else random_fte(),
                    leads=leads, is_pm=is_pm)
+    if seat is None:
+        seat = net_new_seat(w, on, seat_reason, recruited=seat_reason == "Net-new")
+    assign(w, seat, on, "External Hire")
     job_change(w, on, "Hire")
     comp_change(w, on, "Hire")
     place(w, on, "Hire")
+    r = req_rows.get(w["assignment"]["requisition_id"])
+    if r is not None and r["hiring_manager_id"] is None:
+        r["hiring_manager_id"] = w["mgr"]
     return w
+
+
+def move_seat(w: dict, seat: dict, on: dt.date):
+    """`w` leaves their seat the day before `on` and starts in `seat`; their old seat is decided."""
+    old = vacate(w, on - ONE_DAY, "Internal Move Out")
+    assign(w, seat, on, "Internal Move")
+    decide_seat(old, on)
 
 
 def succession(org: str, on: dt.date):
@@ -584,13 +901,15 @@ def succession(org: str, on: dt.date):
             return
         others = [active[x]["level"] for x in dept_members[org] if x in active and not active[x]["leads"]]
         need = max(HEAD_LEVEL[org], (max(others) + 1) if others else 0)
-        cands = [active[m] for m in dept_pms[org] if m in active and active[m]["level"] >= need - 1]
+        cands = [active[m] for m in dept_pms[org] if m in active and active[m]["level"] >= need - 1
+                 and active[m]["assignment"]["start_date"] < on]
         cands.sort(key=lambda w: (-w["level"], w["hire_date"], w["worker_id"]))
         if cands and rng.random() >= ref.EXTERNAL_SUCCESSOR_SHARE:
             s = cands[0]
             dept_pms[org].pop(s["worker_id"], None)
             s["leads"] = org
             dept_head[org] = s["worker_id"]
+            move_seat(s, seats[org_seat[org]], on)
             if s["level"] < need:
                 promote(s, on, "Succession")
             else:
@@ -599,7 +918,7 @@ def succession(org: str, on: dt.date):
             dept_pms[org][s["worker_id"]] = None
         else:
             cc = "US" if rng.random() < 0.5 else pick_country(org, on)
-            s = hire_into(org, need, on, cc=cc, leads=org, is_pm=True)
+            s = hire_into(org, need, on, cc=cc, leads=org, is_pm=True, seat=seats[org_seat[org]])
             dept_head[org] = s["worker_id"]
             set_manager(s, leader_manager(s), on, "Hire")
         return
@@ -609,7 +928,8 @@ def succession(org: str, on: dt.date):
         return
     _, fn, _, need, home = ref.SUB_FUNCTIONS[sf]
     heads = [active[dept_head[d]] for d, x in DEPT.items()
-             if x["sub_function"] == sf and dept_head.get(d) in active]
+             if x["sub_function"] == sf and dept_head.get(d) in active
+             and active[dept_head[d]]["assignment"]["start_date"] < on]
     heads.sort(key=lambda w: (-w["level"], w["hire_date"], w["worker_id"]))
     if heads and rng.random() >= ref.EXTERNAL_SUCCESSOR_SHARE:
         s = heads[0]
@@ -621,7 +941,10 @@ def succession(org: str, on: dt.date):
         s["leads"] = org
         sub_head[sf] = s["worker_id"]
         dept_head.pop(old_dept, None)
-        s["dept"], s["position_id"] = home, next_id("position", "P")
+        own = vacate(s, on - ONE_DAY, "Internal Move Out")
+        reserve(own, on)                               # their department head seat goes to succession
+        s["dept"] = home
+        assign(s, seats[org_seat[org]], on, "Internal Move")
         dept_members[home][s["worker_id"]] = None
         while s["level"] < need:
             promote(s, on, "Succession")
@@ -629,7 +952,7 @@ def succession(org: str, on: dt.date):
         set_manager(s, leader_manager(s), on)
         pending[on].insert(0, ("succession", old_dept))
     else:
-        s = hire_into(home, need, on, cc="US", leads=org, is_pm=True)
+        s = hire_into(home, need, on, cc="US", leads=org, is_pm=True, seat=seats[org_seat[org]])
         dept_pms[home].pop(s["worker_id"], None)
         sub_head[sf] = s["worker_id"]
         set_manager(s, leader_manager(s), on, "Hire")
@@ -647,29 +970,35 @@ MANAGER_BACKFILL_RATE = 0.75
 def backfill(departed_id: str, on: dt.date):
     """Replace a departed manager with one person who inherits the whole team."""
     gone = workers[departed_id]
+    seat = seats[gone["position_id"]]
     team = [active[r] for r in reports[departed_id] if r in active and active[r]["dept"] == gone["dept"]
             and active[r]["mgr"] == departed_id]
     if not team:
+        decide_seat(seat, on)
         return
     if gone["level"] >= 7:      # a director: their most senior manager steps up
-        pool = [r for r in team if r["is_pm"] and r["level"] == gone["level"] - 1]
+        pool = [r for r in team if r["is_pm"] and r["level"] == gone["level"] - 1
+                and r["assignment"]["start_date"] < on]
         if pool and rng.random() < 0.7:
             s = max(pool, key=lambda r: (r["level"], -r["hire_date"].toordinal(), r["worker_id"]))
+            move_seat(s, seat, on)
             promote(s, on)
         else:
-            s = hire_into(gone["dept"], gone["level"], on, cc=gone["country"], loc=gone["loc"], is_pm=True)
+            s = hire_into(gone["dept"], gone["level"], on, cc=gone["country"], loc=gone["loc"], is_pm=True, seat=seat)
     else:                       # a first-line manager: a senior IC steps up, or an external hire
-        pool = [r for r in team if not r["is_pm"] and 4 <= r["level"] <= gone["level"]]
+        pool = [r for r in team if not r["is_pm"] and 4 <= r["level"] <= gone["level"]
+                and r["assignment"]["start_date"] < on]
         if pool and rng.random() < 0.6:
             s = max(pool, key=lambda r: (r["level"], -r["hire_date"].toordinal(), r["worker_id"]))
             make_pm(s, True)
+            move_seat(s, seat, on)
             if s["level"] == 4:
                 promote(s, on)
             else:
                 job_change(s, on, "Became People Manager")
                 fix_manager(s, on)
         else:
-            s = hire_into(gone["dept"], gone["level"], on, cc=gone["country"], loc=gone["loc"], is_pm=True)
+            s = hire_into(gone["dept"], gone["level"], on, cc=gone["country"], loc=gone["loc"], is_pm=True, seat=seat)
     for r in team:
         if r is not s and r["worker_id"] in active and can_manage(s, r):
             set_manager(r, s["worker_id"], on)
@@ -693,29 +1022,46 @@ def run_pending(day: dt.date):
 
 
 def transfer(w: dict, on: dt.date):
-    """Individual contributor changes department (10% also change country)."""
+    """Individual contributor changes department (10% also change country). They take a ready
+    open seat that fits when there is one (an internal fill), otherwise a net-new seat."""
+    if w["assignment"]["start_date"] >= on:
+        return
     same_function = rng.random() < 0.7
     avail = [d for d in DEPT if d != "D-901" and (d != "D-108" or on >= REORG_DATE) and d != w["dept"]]
     options = [d for d in avail if not same_function or DEPT[d]["function"] == DEPT[w["dept"]]["function"]] or avail
-    new_dept = options[rng.integers(len(options))]
+    international = rng.random() < ref.INTERNATIONAL_SHARE_OF_TRANSFERS
+    target = None
+    if recruiting_rng.random() < ref.TRANSFER_TAKES_OPEN_SEAT:
+        allowed = set(options)
+        target = take_ready_seat(on, lambda s: s["dept"] in allowed and s["level"] == w["level"] and not s["is_pm"]
+                                 and (OFFICE[s["loc"]]["country"] != w["country"]) == international, internal=True)
+    if target is not None:
+        new_dept, new_family, new_loc = target["dept"], target["family"], target["loc"]
+    else:
+        new_dept = options[rng.integers(len(options))]
+        new_family = w["family"] if w["family"] in DEPT[new_dept]["families"] else pick_family(new_dept)
+        new_loc = pick_office(pick_country(new_dept, on, exclude=w["country"]), on) if international else w["loc"]
+    new_cc = OFFICE[new_loc]["country"]
+    old_cc, old_loc = w["country"], w["loc"]
     dept_members[w["dept"]].pop(w["worker_id"], None)
-    if w["family"] not in DEPT[new_dept]["families"]:
-        w["family"] = pick_family(new_dept)
-    w["dept"], w["position_id"] = new_dept, next_id("position", "P")
+    w["dept"], w["family"] = new_dept, new_family
     dept_members[new_dept][w["worker_id"]] = None
-    if rng.random() < ref.INTERNATIONAL_SHARE_OF_TRANSFERS:
-        old_usd = w["salary"] * fx_rates.usd_per_local(COUNTRY[w["country"]]["currency"], on)
-        old_index = COUNTRY[w["country"]]["pay_index"] * OFFICE[w["loc"]]["pay_zone"]
-        new_cc = pick_country(new_dept, on, exclude=w["country"])
-        new_loc = pick_office(new_cc, on)
+    pay_reason = None
+    if new_cc != old_cc:
+        old_usd = w["salary"] * fx_rates.usd_per_local(COUNTRY[old_cc]["currency"], on)
+        old_index = COUNTRY[old_cc]["pay_index"] * OFFICE[old_loc]["pay_zone"]
         new_index = COUNTRY[new_cc]["pay_index"] * OFFICE[new_loc]["pay_zone"]
-        w["country"], w["loc"] = new_cc, new_loc
         new_usd = old_usd * new_index / old_index * rng.uniform(0.98, 1.05)
         w["salary"] = round_salary(new_usd / fx_rates.usd_per_local(COUNTRY[new_cc]["currency"], on))
-        job_change(w, on, "Transfer")
-        comp_change(w, on, "International Transfer")
-    else:
-        job_change(w, on, "Transfer")
+        pay_reason = "International Transfer"
+    elif OFFICE[new_loc]["pay_zone"] != OFFICE[old_loc]["pay_zone"]:
+        w["salary"] = round_salary(w["salary"] * OFFICE[new_loc]["pay_zone"] / OFFICE[old_loc]["pay_zone"])
+        pay_reason = "Relocation Adjustment"
+    w["country"], w["loc"] = new_cc, new_loc
+    move_seat(w, target or net_new_seat(w, on, "Net-new", recruited=False), on)
+    job_change(w, on, "Transfer")
+    if pay_reason:
+        comp_change(w, on, pay_reason)
     place(w, on, "Transfer")
 
 
@@ -799,7 +1145,7 @@ def split_team(m: dict, on: dt.date) -> bool:
             lvl = max(5, min(m["level"] - 1, 6)) if m["level"] > 5 else 5
             if lvl > m["level"] or (lvl == m["level"]):
                 return False
-            cand = hire_into(m["dept"], lvl, on, cc=m["country"], loc=m["loc"], is_pm=True)
+            cand = hire_into(m["dept"], lvl, on, cc=m["country"], loc=m["loc"], is_pm=True, seat_reason="Team split")
         movers = [r for r in ics if r is not cand and can_manage(cand, r)]
         movers.sort(key=lambda r: (r["country"] != cand["country"], r["worker_id"]))
         movers = movers[: len(ics) // 2]
@@ -881,12 +1227,13 @@ def reorganization(on: dt.date):
                 orphans.append(rid)
     head = max(movers, key=lambda w: (w["level"], -w["hire_date"].toordinal()))
     for w in movers:
-        w["dept"], w["position_id"] = target, next_id("position", "P")
+        w["dept"] = target                      # the seat moves with its incumbent (job change below)
         dept_members[target][w["worker_id"]] = None
         if w["is_pm"]:
             dept_pms[target][w["worker_id"]] = None
     head["leads"] = target
     dept_head[target] = head["worker_id"]
+    org_seat[target] = head["position_id"]
     if not head["is_pm"]:
         make_pm(head, True)
     top_other = max((w["level"] for w in movers if w is not head), default=0)
@@ -996,8 +1343,12 @@ for i in range(1, len(MONTH_ENDS)):
             dept_hc = {d: len(dept_members[d]) for d in DEPT}
             weights = {d: (dept_hc[d] + 15) * DEPT[d]["growth_weight"] for d in DEPT
                        if d != "D-901" and (d != "D-108" or on >= REORG_DATE)}
-            dept_id = weighted_choice(weights)
-            hire_into(dept_id, weighted_choice(ref.HIRE_LEVEL_MIX), on)
+            seat = take_ready_seat(on)
+            if seat is not None:                 # a backfill or a reopened seat
+                hire_into(seat["dept"], seat["level"], on, seat=seat)
+            else:                                # nothing ready: a net-new seat
+                dept_id = weighted_choice(weights)
+                hire_into(dept_id, weighted_choice(ref.HIRE_LEVEL_MIX), on)
             continue
         if kind == "reorg":
             reorganization(on)
@@ -1012,7 +1363,7 @@ for i in range(1, len(MONTH_ENDS)):
         if kind == "terminate":
             terminate(w, on, tt)
         elif kind == "restructure":
-            terminate(w, on, "Involuntary")
+            terminate(w, on, "Involuntary", restructuring=True)
         elif kind == "tenure":
             years = on.year - w["hire_date"].year
             cap = range_max(w["level"], w["loc"])
@@ -1042,6 +1393,7 @@ for i in range(1, len(MONTH_ENDS)):
                 relocate(w, on)
 
     run_pending(me)
+    seat_housekeeping(me)
     if m == 6:
         annual_review(me)
     if m == 8:
@@ -1103,6 +1455,20 @@ job = job[["job_record_id", "worker_id", "effective_start_date", "effective_end_
            "department_id", "location_id", "job_profile_id", "job_level", "fte", "manager_worker_id",
            "is_people_manager", "leads_org_unit_id"]]
 write(job, "fact_job_history")
+
+# seats
+pos = pd.DataFrame(pos_rows).sort_values(["position_id", "effective_start_date"]).reset_index(drop=True)
+pos.insert(0, "position_record_id", [f"PS{n:07d}" for n in range(1, len(pos) + 1)])
+write(pos[["position_record_id", "position_id", "effective_start_date", "effective_end_date", "change_reason", "status",
+           "department_id", "location_id", "job_profile_id", "job_level", "fte", "created_date", "created_reason"]],
+      "dim_position")
+write(pd.DataFrame(assign_rows)[["assignment_id", "position_id", "worker_id", "start_date", "end_date", "fill_type",
+                                 "requisition_id", "vacate_reason"]].sort_values("assignment_id"),
+      "fact_position_assignment")
+write(pd.DataFrame(req_rows.values())[[
+    "requisition_id", "position_id", "req_type", "opened_date", "approved_date", "target_start_date", "filled_date",
+    "cancelled_date", "status", "department_id", "location_id", "job_profile_id", "job_level", "hiring_manager_id",
+    "filled_by_worker_id", "fill_source"]].sort_values("requisition_id"), "fact_requisition")
 
 comp = pd.DataFrame(comp_rows)
 comp["_order"] = (comp["transaction_type"] == "Correction").astype(int)

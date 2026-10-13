@@ -289,6 +289,33 @@ REORGANIZATION = {"date": "2024-11-01", "target_department": "D-108",
 
 COMP_CORRECTION_RATE = 0.006
 
+# --------------------------------------------------------------------------------------
+# Seats (positions) and requisitions
+# --------------------------------------------------------------------------------------
+# What happens to a seat when its incumbent leaves or moves to another seat. Leader seats
+# (department, sub-function and function heads) and manager seats whose team is handed to
+# a successor are always refilled and skip this decision.
+SEAT_DECISION = {
+    "Backfill as is": 0.60,
+    "Backfill re-levelled": 0.15,          # usually one level down; a manager seat becomes an IC seat
+    "Backfill relocated": 0.10,            # another office in the same country, leaning to lower pay zones
+    "Freeze": 0.10,
+    "Eliminate": 0.05,
+}
+SEAT_DECISION_RESTRUCTURING = {"Eliminate": 0.75, "Freeze": 0.25}
+RELEVEL_DOWN_SHARE = 0.80
+RELOCATE_ZONE_POWER = 6                    # office weight x pay_zone ** -6: San Francisco seats drift to Austin
+FROZEN_SEAT_DAYS = (60, 300)               # a frozen seat is resolved after this many days ...
+FROZEN_SEAT_UNFREEZE_SHARE = 0.50          # ... reopened for hiring, otherwise eliminated
+REQ_APPROVAL_DAYS = (0, 14)                # requisition opened -> approved
+REQ_LATE_APPROVAL = (0.08, (30, 75))       # share of requisitions approved late, and how late
+REQ_TIME_TO_FILL_MEDIAN = {1: 35, 2: 35, 3: 40, 4: 48, 5: 55, 6: 62, 7: 80, 8: 90, 9: 100, 10: 100, 11: 100}
+REQ_TIME_TO_FILL_SIGMA = 0.45
+REQ_TIME_TO_FILL_MIN = 10
+REQ_MAX_OPEN_DAYS = 210                    # an approved requisition still open after this is cancelled
+REQ_CANCELLED_FREEZE_SHARE = 0.50          # a cancelled seat is frozen, otherwise eliminated
+TRANSFER_TAKES_OPEN_SEAT = 0.85            # an internal mover takes a ready open seat when one fits
+
 FX_CONSTANT_RATE_SET = "Latest close (2026-06-30)"
 FX_CONSTANT_RATE_DATE = "2026-06-30"
 AED_PER_USD_PEG = 3.6725               # Central Bank of the UAE peg, in place since 1997

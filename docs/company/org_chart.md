@@ -1,6 +1,6 @@
 # Arcadia Systems: leadership org chart
 
-As of **2026-06-30** (end of FY26): **30,035 people**, every one of them in a single
+As of **2026-06-30** (end of FY26): **30,014 people**, every one of them in a single
 reporting line that ends at the CEO. Each box shows the leader, their level and two counts:
 **direct** reports and **total** people in their organization (direct plus everyone below them).
 
@@ -9,50 +9,50 @@ reporting line that ends at the CEO. Each box shows the leader, their level and 
 
 ```mermaid
 flowchart LR
-    ORG_000["<b>Grace Ramsey</b><br/>Chief Executive Officer<br/>8 direct · 30,034 total"]
-    ORG_TEC["<b>Technology</b><br/>Marcus Carter, Chief Technology Officer<br/>2 direct · 12,515 total"]
-    ORG_COM["<b>Commercial</b><br/>Isaac Porter, Chief Revenue Officer<br/>2 direct · 6,908 total"]
-    ORG_OPS["<b>Operations</b><br/>Tyler Mercer, Chief Operating Officer<br/>3 direct · 4,491 total"]
-    ORG_PRD["<b>Product</b><br/>Ava Carter, Chief Product Officer<br/>2 direct · 1,825 total"]
-    ORG_FIN["<b>Finance</b><br/>Jordan Reed, Chief Financial Officer<br/>3 direct · 1,286 total"]
-    ORG_PPL["<b>People</b><br/>Grace Ellis, Chief People Officer<br/>4 direct · 1,158 total"]
-    ORG_MKT["<b>Marketing</b><br/>Isaac Barnes, Chief Marketing Officer<br/>2 direct · 989 total"]
-    ORG_LGL["<b>Legal & Compliance</b><br/>Grace Warren, General Counsel<br/>2 direct · 854 total"]
-    ORG_TEC_ENG["<b>Engineering</b><br/>Isaac Holland, SVP<br/>5 direct · 8,822 total"]
-    ORG_COM_SAL["<b>Sales</b><br/>Hannah Dalton, SVP<br/>5 direct · 4,420 total"]
-    ORG_TEC_INF["<b>Infrastructure</b><br/>Brandon Porter, SVP<br/>3 direct · 3,691 total"]
-    ORG_COM_CLS["<b>Client Services</b><br/>Noah Bennett, SVP<br/>2 direct · 2,486 total"]
-    D_101["<b>Core Platform Engineering</b><br/>Hannah Caldwell, L9<br/>9 direct · 2,760 total"]
-    D_801["<b>Customer Operations</b><br/>Isabela Valdez, L9<br/>9 direct · 2,295 total"]
-    D_102["<b>Product Engineering</b><br/>Nathan Quinlan, L9<br/>9 direct · 2,288 total"]
-    D_103["<b>Mobile & Web Engineering</b><br/>Daniela Guerra, L9<br/>9 direct · 1,832 total"]
-    D_802["<b>Trust & Safety Operations</b><br/>Vivek Reyes, L9<br/>7 direct · 1,572 total"]
-    D_108["<b>Data & AI Platform</b><br/>Owen Harmon, L8<br/>12 direct · 1,478 total"]
-    D_106["<b>Information Security</b><br/>Tyler Reed, L8<br/>8 direct · 1,436 total"]
-    D_305["<b>Client Success</b><br/>Wesley Hughes, L9<br/>5 direct · 1,395 total"]
-    D_301["<b>Enterprise Sales - Americas</b><br/>Kayla Quinlan, L9<br/>3 direct · 1,392 total"]
-    D_105["<b>Site Reliability</b><br/>Chloe Hughes, L8<br/>9 direct · 1,213 total"]
-    D_201["<b>Product Management</b><br/>Leah Shelton, L8<br/>8 direct · 1,091 total"]
-    D_306["<b>Technical Support</b><br/>Amelie Gallagher, L9<br/>4 direct · 1,089 total"]
-    D_302["<b>Enterprise Sales - EMEA</b><br/>Ursula Rossi, L8<br/>9 direct · 1,066 total"]
-    D_107["<b>Enterprise IT</b><br/>Jonas Lefevre, L8<br/>9 direct · 1,039 total"]
-    D_303["<b>Enterprise Sales - APAC</b><br/>Seo-yeon Agarwal, L8<br/>9 direct · 896 total"]
-    D_202["<b>Design & Research</b><br/>Owen Foster, L8<br/>9 direct · 732 total"]
-    D_803["<b>Workplace & Procurement</b><br/>Kayla Lowell, L8<br/>8 direct · 621 total"]
-    D_402["<b>Growth Marketing</b><br/>Leah Osborne, L8<br/>8 direct · 557 total"]
-    D_502["<b>Accounting & Controllership</b><br/>Elena Coleman, L8<br/>7 direct · 539 total"]
-    D_304["<b>Sales Operations</b><br/>Leah Foster, L8<br/>9 direct · 539 total"]
-    D_307["<b>Partnerships</b><br/>Lakshmi Yamamoto, L8<br/>9 direct · 522 total"]
-    D_702["<b>Compliance & Risk</b><br/>Divya Kobayashi, L8<br/>9 direct · 490 total"]
-    D_104["<b>Analytics Engineering</b><br/>Chen Kobayashi, L8<br/>9 direct · 459 total"]
-    D_501["<b>FP&A</b><br/>Hannah Quinlan, L8<br/>9 direct · 457 total"]
-    D_401["<b>Brand & Communications</b><br/>Riley Sullivan, L8<br/>9 direct · 430 total"]
-    D_602["<b>Talent Acquisition</b><br/>Brandon Ramsey, L7<br/>21 direct · 366 total"]
-    D_701["<b>Legal</b><br/>Ava Baxter, L7<br/>19 direct · 362 total"]
-    D_601["<b>HR Business Partners</b><br/>Zoe Carter, L7<br/>19 direct · 324 total"]
-    D_503["<b>Treasury & Tax</b><br/>Avery Yates, L7<br/>17 direct · 287 total"]
-    D_603["<b>Total Rewards</b><br/>Trevor Norris, L7<br/>16 direct · 250 total"]
-    D_604["<b>People Analytics</b><br/>James Parker, L7<br/>11 direct · 214 total"]
+    ORG_000["<b>Grace Ramsey</b><br/>Chief Executive Officer<br/>8 direct · 30,013 total"]
+    ORG_TEC["<b>Technology</b><br/>Marcus Carter, Chief Technology Officer<br/>2 direct · 11,497 total"]
+    ORG_COM["<b>Commercial</b><br/>Isaac Porter, Chief Revenue Officer<br/>2 direct · 7,795 total"]
+    ORG_OPS["<b>Operations</b><br/>Tyler Mercer, Chief Operating Officer<br/>3 direct · 4,319 total"]
+    ORG_PRD["<b>Product</b><br/>Ava Carter, Chief Product Officer<br/>2 direct · 1,982 total"]
+    ORG_FIN["<b>Finance</b><br/>Jordan Reed, Chief Financial Officer<br/>3 direct · 1,271 total"]
+    ORG_PPL["<b>People</b><br/>Grace Ellis, Chief People Officer<br/>4 direct · 1,178 total"]
+    ORG_MKT["<b>Marketing</b><br/>Isaac Barnes, Chief Marketing Officer<br/>2 direct · 1,096 total"]
+    ORG_LGL["<b>Legal & Compliance</b><br/>Grace Warren, General Counsel<br/>2 direct · 867 total"]
+    ORG_TEC_ENG["<b>Engineering</b><br/>Isaac Holland, SVP<br/>5 direct · 8,099 total"]
+    ORG_COM_SAL["<b>Sales</b><br/>James Jennings, SVP<br/>8 direct · 4,752 total"]
+    ORG_TEC_INF["<b>Infrastructure</b><br/>Maria Barnes, SVP<br/>3 direct · 3,396 total"]
+    ORG_COM_CLS["<b>Client Services</b><br/>Noah Bennett, SVP<br/>2 direct · 3,041 total"]
+    D_101["<b>Core Platform Engineering</b><br/>Hannah Caldwell, L9<br/>9 direct · 2,564 total"]
+    D_801["<b>Customer Operations</b><br/>Tyler Garrett, L9<br/>9 direct · 2,374 total"]
+    D_102["<b>Product Engineering</b><br/>Nathan Quinlan, L9<br/>9 direct · 2,134 total"]
+    D_103["<b>Mobile & Web Engineering</b><br/>Daniela Guerra, L9<br/>9 direct · 1,855 total"]
+    D_305["<b>Client Success</b><br/>Wesley Hughes, L9<br/>5 direct · 1,662 total"]
+    D_802["<b>Trust & Safety Operations</b><br/>Tatiana Guerra, L9<br/>9 direct · 1,404 total"]
+    D_306["<b>Technical Support</b><br/>Amelie Gallagher, L9<br/>4 direct · 1,377 total"]
+    D_105["<b>Site Reliability</b><br/>Chloe Hughes, L8<br/>9 direct · 1,239 total"]
+    D_201["<b>Product Management</b><br/>Leah Shelton, L8<br/>9 direct · 1,231 total"]
+    D_108["<b>Data & AI Platform</b><br/>Liam Emerson, L8<br/>12 direct · 1,204 total"]
+    D_302["<b>Enterprise Sales - EMEA</b><br/>Ursula Rossi, L8<br/>7 direct · 1,181 total"]
+    D_106["<b>Information Security</b><br/>Diego Pacheco, L8<br/>10 direct · 1,164 total"]
+    D_107["<b>Enterprise IT</b><br/>Brandon Porter, L8<br/>8 direct · 990 total"]
+    D_303["<b>Enterprise Sales - APAC</b><br/>Seo-yeon Agarwal, L8<br/>8 direct · 905 total"]
+    D_202["<b>Design & Research</b><br/>Owen Foster, L8<br/>10 direct · 749 total"]
+    D_402["<b>Growth Marketing</b><br/>Leah Osborne, L8<br/>9 direct · 605 total"]
+    D_304["<b>Sales Operations</b><br/>Leah Foster, L8<br/>10 direct · 587 total"]
+    D_301["<b>Enterprise Sales - Americas</b><br/>Eduardo Vidal, L9<br/>1 direct · 570 total"]
+    D_502["<b>Accounting & Controllership</b><br/>Isaac Norris, L8<br/>8 direct · 559 total"]
+    D_803["<b>Workplace & Procurement</b><br/>Isha Ng, L8<br/>9 direct · 538 total"]
+    D_307["<b>Partnerships</b><br/>Divya Lim, L8<br/>9 direct · 499 total"]
+    D_702["<b>Compliance & Risk</b><br/>Zoe Parker, L8<br/>9 direct · 497 total"]
+    D_401["<b>Brand & Communications</b><br/>Riley Sullivan, L8<br/>8 direct · 489 total"]
+    D_501["<b>FP&A</b><br/>Hannah Quinlan, L8<br/>8 direct · 430 total"]
+    D_601["<b>HR Business Partners</b><br/>Zoe Carter, L7<br/>25 direct · 388 total"]
+    D_602["<b>Talent Acquisition</b><br/>Brandon Ramsey, L7<br/>22 direct · 387 total"]
+    D_701["<b>Legal</b><br/>Zoe Lowell, L7<br/>21 direct · 368 total"]
+    D_104["<b>Analytics Engineering</b><br/>Chen Kobayashi, L8<br/>8 direct · 337 total"]
+    D_503["<b>Treasury & Tax</b><br/>Avery Yates, L7<br/>13 direct · 279 total"]
+    D_603["<b>Total Rewards</b><br/>Trevor Norris, L7<br/>14 direct · 220 total"]
+    D_604["<b>People Analytics</b><br/>Chloe Osborne, L7<br/>9 direct · 179 total"]
     ORG_000 --> ORG_TEC
     ORG_000 --> ORG_COM
     ORG_000 --> ORG_OPS
@@ -69,30 +69,30 @@ flowchart LR
     ORG_OPS --> D_801
     ORG_TEC_ENG --> D_102
     ORG_TEC_ENG --> D_103
-    ORG_OPS --> D_802
-    ORG_TEC_ENG --> D_108
-    ORG_TEC_INF --> D_106
     ORG_COM_CLS --> D_305
-    ORG_COM_SAL --> D_301
+    ORG_OPS --> D_802
+    ORG_COM_CLS --> D_306
     ORG_TEC_INF --> D_105
     ORG_PRD --> D_201
-    ORG_COM_CLS --> D_306
+    ORG_TEC_ENG --> D_108
     ORG_COM_SAL --> D_302
+    ORG_TEC_INF --> D_106
     ORG_TEC_INF --> D_107
     ORG_COM_SAL --> D_303
     ORG_PRD --> D_202
-    ORG_OPS --> D_803
     ORG_MKT --> D_402
-    ORG_FIN --> D_502
     ORG_COM_SAL --> D_304
+    ORG_COM_SAL --> D_301
+    ORG_FIN --> D_502
+    ORG_OPS --> D_803
     ORG_COM_SAL --> D_307
     ORG_LGL --> D_702
-    ORG_TEC_ENG --> D_104
-    ORG_FIN --> D_501
     ORG_MKT --> D_401
+    ORG_FIN --> D_501
+    ORG_PPL --> D_601
     ORG_PPL --> D_602
     ORG_LGL --> D_701
-    ORG_PPL --> D_601
+    ORG_TEC_ENG --> D_104
     ORG_FIN --> D_503
     ORG_PPL --> D_603
     ORG_PPL --> D_604
@@ -103,57 +103,57 @@ flowchart LR
     class ORG_000 company
     class ORG_TEC,ORG_COM,ORG_OPS,ORG_PRD,ORG_FIN,ORG_PPL,ORG_MKT,ORG_LGL function
     class ORG_TEC_ENG,ORG_COM_SAL,ORG_TEC_INF,ORG_COM_CLS sub
-    class D_101,D_801,D_102,D_103,D_802,D_108,D_106,D_305,D_301,D_105,D_201,D_306,D_302,D_107,D_303,D_202,D_803,D_402,D_502,D_304,D_307,D_702,D_104,D_501,D_401,D_602,D_701,D_601,D_503,D_603,D_604 dept
+    class D_101,D_801,D_102,D_103,D_305,D_802,D_306,D_105,D_201,D_108,D_302,D_106,D_107,D_303,D_202,D_402,D_304,D_301,D_502,D_803,D_307,D_702,D_401,D_501,D_601,D_602,D_701,D_104,D_503,D_603,D_604 dept
 ```
 
 ## Leaders
 
 | Unit | Type | Leader | Role | Level | Office | Direct | Total |
 |---|---|---|---|---:|---|---:|---:|
-| Arcadia Systems | Company | Grace Ramsey | Chief Executive Officer | L12 | Austin HQ | 8 | 30,034 |
-| Technology | Function | Marcus Carter | Chief Technology Officer | L11 | Austin HQ | 2 | 12,515 |
-| Commercial | Function | Isaac Porter | Chief Revenue Officer | L11 | Austin HQ | 2 | 6,908 |
-| Operations | Function | Tyler Mercer | Chief Operating Officer | L11 | Austin HQ | 3 | 4,491 |
-| Product | Function | Ava Carter | Chief Product Officer | L11 | Austin HQ | 2 | 1,825 |
-| Finance | Function | Jordan Reed | Chief Financial Officer | L11 | Austin HQ | 3 | 1,286 |
-| People | Function | Grace Ellis | Chief People Officer | L10 | Austin HQ | 4 | 1,158 |
-| Marketing | Function | Isaac Barnes | Chief Marketing Officer | L10 | Austin HQ | 2 | 989 |
-| Legal & Compliance | Function | Grace Warren | General Counsel | L10 | Austin HQ | 2 | 854 |
-| Engineering | Sub-function | Isaac Holland | Senior Vice President, Engineering | L10 | Austin HQ | 5 | 8,822 |
-| Sales | Sub-function | Hannah Dalton | Senior Vice President, Sales | L10 | Austin HQ | 5 | 4,420 |
-| Infrastructure | Sub-function | Brandon Porter | Senior Vice President, Infrastructure | L10 | Seattle | 3 | 3,691 |
-| Client Services | Sub-function | Noah Bennett | Senior Vice President, Client Services | L10 | Austin HQ | 2 | 2,486 |
-| Core Platform Engineering | Department | Hannah Caldwell | Head of Core Platform Engineering | L9 | San Francisco | 9 | 2,760 |
-| Customer Operations | Department | Isabela Valdez | Head of Customer Operations | L9 | Mexico City | 9 | 2,295 |
-| Product Engineering | Department | Nathan Quinlan | Head of Product Engineering | L9 | Austin HQ | 9 | 2,288 |
-| Mobile & Web Engineering | Department | Daniela Guerra | Head of Mobile & Web Engineering | L9 | Sao Paulo | 9 | 1,832 |
-| Trust & Safety Operations | Department | Vivek Reyes | Head of Trust & Safety Operations | L9 | Hyderabad | 7 | 1,572 |
-| Data & AI Platform | Department | Owen Harmon | Head of Data & AI Platform | L8 | Chicago | 12 | 1,478 |
-| Information Security | Department | Tyler Reed | Head of Information Security | L8 | Atlanta | 8 | 1,436 |
-| Client Success | Department | Wesley Hughes | Head of Client Success | L9 | New York | 5 | 1,395 |
-| Enterprise Sales - Americas | Department | Kayla Quinlan | Head of Enterprise Sales - Americas | L9 | Chicago | 3 | 1,392 |
-| Site Reliability | Department | Chloe Hughes | Head of Site Reliability | L8 | Austin HQ | 9 | 1,213 |
-| Product Management | Department | Leah Shelton | Head of Product Management | L8 | New York | 8 | 1,091 |
-| Technical Support | Department | Amelie Gallagher | Head of Technical Support | L9 | Krakow | 4 | 1,089 |
-| Enterprise Sales - EMEA | Department | Ursula Rossi | Head of Enterprise Sales - EMEA | L8 | Krakow | 9 | 1,066 |
-| Enterprise IT | Department | Jonas Lefevre | Head of Enterprise IT | L8 | Warsaw | 9 | 1,039 |
-| Enterprise Sales - APAC | Department | Seo-yeon Agarwal | Head of Enterprise Sales - APAC | L8 | Singapore | 9 | 896 |
-| Design & Research | Department | Owen Foster | Head of Design & Research | L8 | Austin HQ | 9 | 732 |
-| Workplace & Procurement | Department | Kayla Lowell | Head of Workplace & Procurement | L8 | Seattle | 8 | 621 |
-| Growth Marketing | Department | Leah Osborne | Head of Growth Marketing | L8 | Atlanta | 8 | 557 |
-| Accounting & Controllership | Department | Elena Coleman | Head of Accounting & Controllership | L8 | New York | 7 | 539 |
-| Sales Operations | Department | Leah Foster | Head of Sales Operations | L8 | New York | 9 | 539 |
-| Partnerships | Department | Lakshmi Yamamoto | Head of Partnerships | L8 | Singapore | 9 | 522 |
-| Compliance & Risk | Department | Divya Kobayashi | Head of Compliance & Risk | L8 | Hyderabad | 9 | 490 |
-| Analytics Engineering | Department | Chen Kobayashi | Head of Analytics Engineering | L8 | Hyderabad | 9 | 459 |
-| FP&A | Department | Hannah Quinlan | Head of FP&A | L8 | Seattle | 9 | 457 |
-| Brand & Communications | Department | Riley Sullivan | Head of Brand & Communications | L8 | Austin HQ | 9 | 430 |
-| Talent Acquisition | Department | Brandon Ramsey | Head of Talent Acquisition | L7 | Austin HQ | 21 | 366 |
-| Legal | Department | Ava Baxter | Head of Legal | L7 | New York | 19 | 362 |
-| HR Business Partners | Department | Zoe Carter | Head of HR Business Partners | L7 | New York | 19 | 324 |
-| Treasury & Tax | Department | Avery Yates | Head of Treasury & Tax | L7 | Austin HQ | 17 | 287 |
-| Total Rewards | Department | Trevor Norris | Head of Total Rewards | L7 | Austin HQ | 16 | 250 |
-| People Analytics | Department | James Parker | Head of People Analytics | L7 | Atlanta | 11 | 214 |
+| Arcadia Systems | Company | Grace Ramsey | Chief Executive Officer | L12 | Austin HQ | 8 | 30,013 |
+| Technology | Function | Marcus Carter | Chief Technology Officer | L11 | Austin HQ | 2 | 11,497 |
+| Commercial | Function | Isaac Porter | Chief Revenue Officer | L11 | Austin HQ | 2 | 7,795 |
+| Operations | Function | Tyler Mercer | Chief Operating Officer | L11 | Austin HQ | 3 | 4,319 |
+| Product | Function | Ava Carter | Chief Product Officer | L11 | Austin HQ | 2 | 1,982 |
+| Finance | Function | Jordan Reed | Chief Financial Officer | L11 | Austin HQ | 3 | 1,271 |
+| People | Function | Grace Ellis | Chief People Officer | L10 | Austin HQ | 4 | 1,178 |
+| Marketing | Function | Isaac Barnes | Chief Marketing Officer | L10 | Austin HQ | 2 | 1,096 |
+| Legal & Compliance | Function | Grace Warren | General Counsel | L10 | Austin HQ | 2 | 867 |
+| Engineering | Sub-function | Isaac Holland | Senior Vice President, Engineering | L10 | Austin HQ | 5 | 8,099 |
+| Sales | Sub-function | James Jennings | Senior Vice President, Sales | L10 | Austin HQ | 8 | 4,752 |
+| Infrastructure | Sub-function | Maria Barnes | Senior Vice President, Infrastructure | L10 | Austin HQ | 3 | 3,396 |
+| Client Services | Sub-function | Noah Bennett | Senior Vice President, Client Services | L10 | Austin HQ | 2 | 3,041 |
+| Core Platform Engineering | Department | Hannah Caldwell | Head of Core Platform Engineering | L9 | San Francisco | 9 | 2,564 |
+| Customer Operations | Department | Tyler Garrett | Head of Customer Operations | L9 | Austin HQ | 9 | 2,374 |
+| Product Engineering | Department | Nathan Quinlan | Head of Product Engineering | L9 | Austin HQ | 9 | 2,134 |
+| Mobile & Web Engineering | Department | Daniela Guerra | Head of Mobile & Web Engineering | L9 | Sao Paulo | 9 | 1,855 |
+| Client Success | Department | Wesley Hughes | Head of Client Success | L9 | New York | 5 | 1,662 |
+| Trust & Safety Operations | Department | Tatiana Guerra | Head of Trust & Safety Operations | L9 | Sao Paulo | 9 | 1,404 |
+| Technical Support | Department | Amelie Gallagher | Head of Technical Support | L9 | Krakow | 4 | 1,377 |
+| Site Reliability | Department | Chloe Hughes | Head of Site Reliability | L8 | Austin HQ | 9 | 1,239 |
+| Product Management | Department | Leah Shelton | Head of Product Management | L8 | New York | 9 | 1,231 |
+| Data & AI Platform | Department | Liam Emerson | Head of Data & AI Platform | L8 | Toronto | 12 | 1,204 |
+| Enterprise Sales - EMEA | Department | Ursula Rossi | Head of Enterprise Sales - EMEA | L8 | Krakow | 7 | 1,181 |
+| Information Security | Department | Diego Pacheco | Head of Information Security | L8 | Guadalajara | 10 | 1,164 |
+| Enterprise IT | Department | Brandon Porter | Head of Enterprise IT | L8 | Seattle | 8 | 990 |
+| Enterprise Sales - APAC | Department | Seo-yeon Agarwal | Head of Enterprise Sales - APAC | L8 | Singapore | 8 | 905 |
+| Design & Research | Department | Owen Foster | Head of Design & Research | L8 | Austin HQ | 10 | 749 |
+| Growth Marketing | Department | Leah Osborne | Head of Growth Marketing | L8 | Atlanta | 9 | 605 |
+| Sales Operations | Department | Leah Foster | Head of Sales Operations | L8 | New York | 10 | 587 |
+| Enterprise Sales - Americas | Department | Eduardo Vidal | Head of Enterprise Sales - Americas | L9 | Mexico City | 1 | 570 |
+| Accounting & Controllership | Department | Isaac Norris | Head of Accounting & Controllership | L8 | Atlanta | 8 | 559 |
+| Workplace & Procurement | Department | Isha Ng | Head of Workplace & Procurement | L8 | Bengaluru | 9 | 538 |
+| Partnerships | Department | Divya Lim | Head of Partnerships | L8 | Tokyo | 9 | 499 |
+| Compliance & Risk | Department | Zoe Parker | Head of Compliance & Risk | L8 | Austin HQ | 9 | 497 |
+| Brand & Communications | Department | Riley Sullivan | Head of Brand & Communications | L8 | Austin HQ | 8 | 489 |
+| FP&A | Department | Hannah Quinlan | Head of FP&A | L8 | Seattle | 8 | 430 |
+| HR Business Partners | Department | Zoe Carter | Head of HR Business Partners | L7 | New York | 25 | 388 |
+| Talent Acquisition | Department | Brandon Ramsey | Head of Talent Acquisition | L7 | Austin HQ | 22 | 387 |
+| Legal | Department | Zoe Lowell | Head of Legal | L7 | San Francisco | 21 | 368 |
+| Analytics Engineering | Department | Chen Kobayashi | Head of Analytics Engineering | L8 | Hyderabad | 8 | 337 |
+| Treasury & Tax | Department | Avery Yates | Head of Treasury & Tax | L7 | Austin HQ | 13 | 279 |
+| Total Rewards | Department | Trevor Norris | Head of Total Rewards | L7 | Austin HQ | 14 | 220 |
+| People Analytics | Department | Chloe Osborne | Head of People Analytics | L7 | Atlanta | 9 | 179 |
 
 Direct reports of a department head include their directors and managers and, in smaller departments,
 individual contributors. A total counts everyone below a leader, so a function head's total equals the

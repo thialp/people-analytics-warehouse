@@ -17,7 +17,8 @@ Every number on Dashboards #1 and #2 will change, because the history is extende
 | 0. Branch and baseline | Done 2026-10-12 | Branch `warehouse-release-2` from `main`; regenerated raw files and marts match the committed ones; 40 tests pass; totals in [baseline_release_1.md](baseline_release_1.md) (`python pipeline/control_totals.py`) |
 | 1. Per-domain random streams | Done 2026-10-12 | `domain_stream()` in `generator/generate_data.py` (positions, recruiting, plan); zero raw files changed after regenerating |
 | 2. History from Jun 2021 | Done 2026-10-12 | Start month-end Jun 30, 2021; 23,500 opening people with FY22 growth of 6.5% (25,044 at Jun 2022, old start 25,014); pay history from the Mar 2021 conversion; ECB extract from Jan 2021; 2021 fringe rates reuse each country's 2022 inputs, flagged `is_estimate`; 40 tests pass; totals in [release_2_totals.md](release_2_totals.md). Two part A items moved here from phase 7 because the walk CSV passed GitHub's 100 MB file limit: the grid keeps only the four offered period types (no Custom Range pairs) and the first year is lead-in (pairs end after Jun 30, 2022, computed from the calendar). 88 pairs; walk 114,977 rows (was 271,219), office moves 53,826 (was 260,464); build 46 s (was 80 s) |
-| 3. Positions, requisitions, vacancy chains | Next | |
+| 3. Positions, requisitions, seat decisions | Done 2026-10-12 | Raw `dim_position` (101,297 records), `fact_position_assignment` (54,094), `fact_requisition` (31,323); staging models and `int_position_snapshot` (seat × month-end, 1.7M rows); tests 41–48 pass, and each was checked against a deliberately broken copy of the data. Fills FY22–FY26: about 24% of backfills are internal moves; external hires are 60–85% backfills (FY24, the restructuring year, 86%). Closing headcount within 21 of phase 2 every year. Cost: FY26 $3,359.4M vs $3,215.9M in phase 2 (+4.5%), because backfills hire at the leaver's level (average grade 3.62 → 3.71 over five years); see section 11 |
+| 4. Plan versions, cost centers, candidates, range increases | Next | |
 
 ---
 
@@ -65,9 +66,9 @@ Every number on Dashboards #1 and #2 will change, because the history is extende
 | Table | Grain | History | Key columns |
 |---|---|---|---|
 | `dim_cost_center` | department × country | Type 1 | `cost_center_id`, `department_id`, `country_code`, `function_id` |
-| `dim_position` | position × effective-dated version | SCD2 | `position_id`, `effective_from`, `effective_to` (exclusive, open = 9999-12-31), `status` (filled / open / frozen / eliminated), `job_profile_id`, `job_level`, `job_family`, `department_id`, `cost_center_id`, `location_id`, `pay_zone`, `fte`, `created_date`, `created_reason` (initial / net-new / split / reorg), `change_reason` (fill, vacate, re-level, relocate, freeze, unfreeze, eliminate, reclass on promotion) |
-| `fact_position_assignment` | position × worker × effective dates | effective-dated | `position_id`, `worker_id`, `start_date`, `end_date`, `fill_type` (external hire / rehire / internal move / initial), `requisition_id`, `vacate_reason` (voluntary / involuntary / retirement / internal move out / still in seat), `overlap_flag` |
-| `fact_requisition` | requisition | accumulating snapshot | `requisition_id`, `position_id`, `req_type` (backfill / net-new), `opened_date`, `approved_date`, `target_start_date`, `filled_date`, `cancelled_date`, `status`, `hiring_manager_id`, `filled_by_worker_id`, `fill_source` (external / internal) |
+| `dim_position` | position × effective-dated version | SCD2 | `position_record_id`, `position_id`, `effective_start_date`, `effective_end_date` (inclusive, NULL = current, as in job history), `status` (filled / open / frozen / eliminated), `job_profile_id`, `job_level`, `job_family`, `department_id`, `cost_center_id`, `location_id`, `pay_zone`, `fte`, `created_date`, `created_reason` (initial / net-new / split / reorg), `change_reason` (fill, vacate, re-level, relocate, freeze, unfreeze, eliminate, reclass on promotion) |
+| `fact_position_assignment` | position × worker × effective dates | effective-dated | `assignment_id`, `position_id`, `worker_id`, `start_date`, `end_date` (inclusive), `fill_type` (Initial / External Hire / Internal Move), `requisition_id`, `vacate_reason` (Voluntary / Involuntary / Internal Move Out / NULL while in the seat) |
+| `fact_requisition` | requisition | accumulating snapshot | `requisition_id`, `position_id`, `req_type` (Backfill / Net-new), `opened_date`, `approved_date`, `target_start_date`, `filled_date`, `cancelled_date`, `status`, the seat's `department_id`, `location_id`, `job_profile_id`, `job_level` when opened, `hiring_manager_id`, `filled_by_worker_id`, `fill_source` (External / Internal) |
 | `fact_candidate_stage_event` | candidate × requisition × stage | transaction | `candidate_id`, `requisition_id`, `stage` (applied → screen → interview → offer → accepted / declined / rejected / withdrawn), `stage_date`, `is_internal`, `worker_id` when internal |
 | `fact_workforce_plan` | cost center × fiscal quarter × plan version | versioned, never overwritten | `plan_version` (FYnn Budget, RF1, RF2, RF3), `version_date`, `planned_ending_headcount`, `planned_ending_fte`, `planned_net_new`, `planned_backfills`, `planned_cost_usd` |
 | `ref_pay_zone` (only if needed) | country × pay zone × fiscal year | dated | `zone_factor` applied to the level base salary and the salary range |
@@ -148,6 +149,8 @@ Plan rows stay at quarter grain. Tableau relates them to the actuals, so yearly 
 
 ## 8. Tests (added to the 40 existing)
 
+Built in phase 3: test 41 (plan item 1), 42 (3), 43 (every job record sits in its seat, new), 44 (seat status matches its incumbent), 45 (12), 46 (5), 47 (6, extended to every seat exit), 48 (8). Still to build: plan items 7, 9, 10, 11, 13; item 4 is true by construction of the snapshot and is replaced by 44.
+
 1. Position SCD2: no gaps or overlaps per position; `effective_to` is exclusive.
 2. Every active worker holds exactly one position on every day (overlaps only on seats where `overlap_flag` = 1, at most 30 days).
 3. No position has two incumbents outside a flagged overlap.
@@ -197,5 +200,8 @@ Plan rows stay at quarter grain. Tableau relates them to the actuals, so yearly 
 - **Reuse threshold:** 30 days vacant by default; confirm when the first numbers exist.
 - **Pay zones:** settled. Offices already carry a pay-zone factor (`dim_location.pay_zone_factor`), so no new reference table is needed.
 - **Market effect in the seat pay walk:** salary ranges are the same in every fiscal year today, so the market step would always be zero. Decide in phase 4 whether ranges get an annual structure increase (this also moves the range cap on tenure raises).
+- **Grade creep from backfills (phase 3):** a backfill hires at the leaver's level, while net-new hires follow the junior-leaning hire mix, so the average grade drifts from 3.62 to 3.71 over five years and FY26 loaded cost is 4.5% above phase 2. Kept as is: it is a real effect and feeds case study 5 ("hiring shifted toward higher grades"). Lever if it should be smaller: `SEAT_DECISION` re-level share and `RELEVEL_DOWN_SHARE` in `generator/reference_data.py`.
+- **Not built in phase 3:** short overlaps (two incumbents for up to 30 days, flagged) and rehires. Seats never overlap today (test 42).
+- **Hires on Jul 1, 2026:** team splits at the last month-end hire a few managers the day after history ends (existing behaviour, 3 in this build); they are outside every snapshot.
 - **2021 fringe rates:** carried back from 2022 and flagged. A researched 2021 set (OECD Taxing Wages 2022 edition, BLS ECEC March 2021) can replace them later.
 - **Data size:** candidate volume per requisition is kept moderate so the repo and the Tableau Public extracts stay small. Expected rows are measured in phase 4.
