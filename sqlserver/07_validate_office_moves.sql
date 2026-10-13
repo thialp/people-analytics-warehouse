@@ -9,7 +9,7 @@
 
   Every "expected" value comes from the DuckDB pipeline (marts.mart_office_moves and
   data/marts/mart_compensation_walk.csv). The row count depends on the GRID markers in
-  the Custom SQL: 260,464 rows for the default grid (184 date pairs).
+  the Custom SQL: 89,611 rows for the default grid (88 date pairs).
 */
 SET NOCOUNT ON;
 USE ArcadiaHR;
@@ -43,8 +43,8 @@ PRINT '1. Shape';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #moves) AS actual, 260464 AS expected
-    UNION ALL SELECT 'date pairs', (SELECT COUNT(*) FROM (SELECT DISTINCT from_month_end, to_month_end FROM #moves) AS p), 184
+              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #moves) AS actual, 89611 AS expected
+    UNION ALL SELECT 'date pairs', (SELECT COUNT(*) FROM (SELECT DISTINCT from_month_end, to_month_end FROM #moves) AS p), 88
     UNION ALL SELECT 'views',      (SELECT COUNT(DISTINCT view_name) FROM #moves), 6
     UNION ALL SELECT 'rows without a group name', (SELECT COUNT(*) FROM #moves WHERE group_name IS NULL), 0
     UNION ALL SELECT 'flows from an office to itself', (SELECT COUNT(*) FROM #moves WHERE from_location_id = to_location_id), 0
@@ -56,21 +56,21 @@ SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
               SELECT 'Company, all moves' AS check_name,
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30') AS actual, 345 AS expected
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30') AS actual, 725 AS expected
     UNION ALL SELECT 'Company, within one country',
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND flow_scope = 'Domestic' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 227
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND flow_scope = 'Domestic' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 600
     UNION ALL SELECT 'Company, across a border',
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND flow_scope = 'International' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 118
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND flow_scope = 'International' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 125
     UNION ALL SELECT 'Office view, joined an office (To)',
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Office' AND group_side = 'To' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 345
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Office' AND group_side = 'To' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 725
     UNION ALL SELECT 'Office view, left an office (From)',
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Office' AND group_side = 'From' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 345
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Office' AND group_side = 'From' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 725
     UNION ALL SELECT 'Country view, inside one country (Both)',
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Country' AND group_side = 'Both' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 227
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Country' AND group_side = 'Both' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 600
     UNION ALL SELECT 'Country view, across a border (To)',
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Country' AND group_side = 'To' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 118
-    UNION ALL SELECT 'Company, 30 Jun 2022 to 30 Jun 2026',
-                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND from_month_end = '2022-06-30' AND to_month_end = '2026-06-30'), 789
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Country' AND group_side = 'To' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'), 125
+    UNION ALL SELECT 'Company, FY23 (30 Jun 2022 to 30 Jun 2023)',
+                     (SELECT SUM(workers) FROM #moves WHERE view_name = 'Company' AND from_month_end = '2022-06-30' AND to_month_end = '2023-06-30'), 560
 ) AS c;
 GO
 

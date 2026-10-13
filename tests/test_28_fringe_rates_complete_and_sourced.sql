@@ -1,10 +1,10 @@
--- Every country has a fringe rate for every year 2022-2026, its components add up to
+-- Every country has a fringe rate for every year 2021-2026, its components add up to
 -- the total, the total is a plausible share of salary, and every non-zero component
 -- cites at least one source.
 WITH expected AS (
     SELECT c.country_code, y.fringe_year
     FROM staging.stg_country AS c
-    CROSS JOIN (SELECT UNNEST(RANGE(2022, 2027)) AS fringe_year) AS y
+    CROSS JOIN (SELECT UNNEST(RANGE(2021, 2027)) AS fringe_year) AS y
 ),
 components AS (
     SELECT country_code, fringe_year, component, rate

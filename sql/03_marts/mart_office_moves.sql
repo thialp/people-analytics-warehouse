@@ -23,13 +23,16 @@
 -- Field reference: docs/projects/compensation-walk/office_moves.md
 CREATE OR REPLACE TABLE marts.mart_office_moves AS
 WITH grid AS (
-    -- === GRID === same rule as mart_compensation_walk: every quarter-end to every later
-    -- quarter-end (136 pairs) plus every month-end to the next one (48)
+    -- === GRID === same rule as mart_compensation_walk: the four offered period types,
+    -- ending more than 12 months after the first month-end (88 pairs)
     SELECT f.month_end_date AS from_date, t.month_end_date AS to_date
     FROM intermediate.int_month_end_calendar AS f
     JOIN intermediate.int_month_end_calendar AS t ON t.month_end_date > f.month_end_date
-    WHERE (MONTH(f.month_end_date) IN (3, 6, 9, 12) AND MONTH(t.month_end_date) IN (3, 6, 9, 12))
-       OR t.prior_month_end_date = f.month_end_date
+    WHERE t.month_end_date > (SELECT MIN(month_end_date) FROM intermediate.int_month_end_calendar) + INTERVAL 12 MONTH
+      AND (   t.prior_month_end_date = f.month_end_date
+           OR (    MONTH(f.month_end_date) IN (3, 6, 9, 12) AND MONTH(t.month_end_date) IN (3, 6, 9, 12)
+               AND (   date_diff('month', f.month_end_date, t.month_end_date) IN (3, 12)
+                    OR (MONTH(f.month_end_date) = 6 AND date_diff('month', f.month_end_date, t.month_end_date) < 12))))
 ),
 
 -- 1. one row per mover per date pair

@@ -14,14 +14,20 @@
 -- Field reference and worked examples: docs/projects/compensation-walk/compensation_walk.md
 CREATE OR REPLACE TABLE marts.mart_compensation_walk AS
 WITH grid AS (
-    -- === GRID === every quarter-end to every later quarter-end (136 pairs) plus every
-    -- month-end to the next one (48). Remove both conditions for every month-end to every
-    -- later month-end (1,176 pairs, about 8x the rows and run time).
+    -- === GRID === only the four period types the dashboard offers: month over month,
+    -- quarter over quarter, year over year (quarter-end to quarter-end 12 months later) and
+    -- fiscal year to date (Jun 30 to a later quarter-end in the same fiscal year). The first
+    -- year of history is lead-in: a pair must end more than 12 months after the first
+    -- month-end, so every fiscal year offered has all its year-over-year options.
+    -- 88 pairs with history from Jun 2021.
     SELECT f.month_end_date AS from_date, t.month_end_date AS to_date
     FROM intermediate.int_month_end_calendar AS f
     JOIN intermediate.int_month_end_calendar AS t ON t.month_end_date > f.month_end_date
-    WHERE (MONTH(f.month_end_date) IN (3, 6, 9, 12) AND MONTH(t.month_end_date) IN (3, 6, 9, 12))
-       OR t.prior_month_end_date = f.month_end_date
+    WHERE t.month_end_date > (SELECT MIN(month_end_date) FROM intermediate.int_month_end_calendar) + INTERVAL 12 MONTH
+      AND (   t.prior_month_end_date = f.month_end_date
+           OR (    MONTH(f.month_end_date) IN (3, 6, 9, 12) AND MONTH(t.month_end_date) IN (3, 6, 9, 12)
+               AND (   date_diff('month', f.month_end_date, t.month_end_date) IN (3, 12)
+                    OR (MONTH(f.month_end_date) = 6 AND date_diff('month', f.month_end_date, t.month_end_date) < 12))))
 ),
 
 snap AS (

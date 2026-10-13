@@ -7,8 +7,9 @@
     sqlcmd -S localhost -U sa -P "<password>" -C -i /repo/sqlserver/06_validate_compensation_walk.sql
 
   Every "expected" value comes from the DuckDB pipeline (data/marts/mart_compensation_walk.csv).
-  The row count depends on the GRID markers in the Custom SQL: 271,219 rows for the
-  default grid (quarter-end pairs plus month over month, 184 pairs).
+  The row count depends on the GRID markers in the Custom SQL: 115,544 rows for the
+  default grid (the four offered period types, ending after the first year of history:
+  88 pairs).
 */
 SET NOCOUNT ON;
 USE ArcadiaHR;
@@ -30,8 +31,8 @@ PRINT '1. Shape';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #walk) AS actual, 271219 AS expected
-    UNION ALL SELECT 'date pairs', (SELECT COUNT(*) FROM (SELECT DISTINCT from_month_end, to_month_end FROM #walk) AS p), 184
+              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #walk) AS actual, 115544 AS expected
+    UNION ALL SELECT 'date pairs', (SELECT COUNT(*) FROM (SELECT DISTINCT from_month_end, to_month_end FROM #walk) AS p), 88
     UNION ALL SELECT 'views',      (SELECT COUNT(DISTINCT view_name) FROM #walk), 6
 ) AS c;
 GO
@@ -56,15 +57,15 @@ WHERE d_hc <> 0 OR d_fte <> 0
    OR ABS(d_avg) > 0.0001 * lines;
 GO
 
-PRINT '3. Company, 30 Jun 2022 to 30 Jun 2026';
+PRINT '3. Company, FY23 (30 Jun 2022 to 30 Jun 2023)';
 SELECT step, headcount, loaded_usd_nominal, loaded_usd_constant
 FROM #walk
-WHERE view_name = 'Company' AND from_month_end = '2022-06-30' AND to_month_end = '2026-06-30'
+WHERE view_name = 'Company' AND from_month_end = '2022-06-30' AND to_month_end = '2023-06-30'
   AND step IN ('Opening', 'Closing');
 /*
   Expected:
-    Opening   25005   2577787184.61   2613645368.19
-    Closing   30015   3195503264.60   3195503264.60
+    Opening   25052   2450138920.28   2487093187.28
+    Closing   26932   2718192220.16   2727327688.63
   (The cost snapshot control totals in 05 read .81 / .50 / .83: they add up values
    already rounded to the cent per group. The walk sums people first, then rounds.)
 */
@@ -79,19 +80,19 @@ GROUP BY step_order, step
 ORDER BY step_order;
 /*
   Expected:
-     1  Opening                             28436   28436   3000123793.56   107553.68
-     2  Hires                                4766    4766    411260583.95    -3269.63
-     3  Exits                                3187   -3187   -331824382.85      127.33
-     6  Promotions                           1899       0     19146841.89      651.35
-     7  Demotions                              95       0      -580262.30      -19.74
-     8  Tenure Increases                    24218       0     97731983.15     3324.70
-     9  Market Adjustments                    307       0      1568126.87       53.35
-    10  Relocation Adjustments                216       0       -87552.47       -2.98
-    11  International Transfer Adjustments    118       0       602450.19       20.49
-    12  FTE Changes                           377       0    -10639037.56      -11.04
-    13  Fringe Rate Changes                 10892       0      8200720.18      278.98
-    14  FX Translation                      17211       0            0.00        0.00
-    15  Closing                             30015   30015   3195503264.60   108706.49
+     1  Opening                             28438   28438   3066147620.92   110084.39
+     2  Hires                                4790    4790    485725625.83    -1223.30
+     3  Exits                                3223   -3223   -341052810.18      213.75
+     6  Promotions                           1824       0     21155974.87      720.71
+     7  Demotions                             148       0      -787908.61      -26.84
+     8  Tenure Increases                    25189       0    105810275.68     3604.57
+     9  Market Adjustments                    287       0      1522136.82       51.85
+    10  Relocation Adjustments                583       0       146961.74        5.01
+    11  International Transfer Adjustments    125       0     -1159094.31      -39.49
+    12  FTE Changes                           353       0     -9274040.16       -9.92
+    13  Fringe Rate Changes                 11312       0      8304439.07      282.90
+    14  FX Translation                      17038       0            0.00        0.00
+    15  Closing                             30005   30005   3336539181.68   113663.64
 */
 GO
 

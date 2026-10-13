@@ -1,5 +1,5 @@
 """
-Fringe rates by country and calendar year, 2022-2026, built from public sources.
+Fringe rates by country and calendar year, 2021-2026, built from public sources.
 
 Fringe = what an employer pays on top of base salary, as a share of base salary.
 Arcadia's definition has four components, each sourced separately:
@@ -23,6 +23,9 @@ Method by country
   published as a share of labour costs and converted to a share of gross wages:
   rate = L / (100 - L). Each year comes from the edition that first reported it
   (2023 edition for 2022 ... 2026 edition for 2025).
+* 2021 (all countries): the history was extended one year after the research was done.
+  Each country's 2022 inputs are applied to 2021 and the row is flagged is_estimate,
+  so the fringe rate does not change on 1 January 2022.
 * 2026 for OECD members: the 2027 edition is not out yet, so 2025 is carried forward
   and flagged is_estimate, except where a 2026 statutory change was confirmed
   (Germany, Spain, Ireland, Korea), which is added to the 2025 rate.
@@ -46,7 +49,8 @@ import datetime as dt
 import fx_rates
 import reference_data as ref
 
-YEARS = [2022, 2023, 2024, 2025, 2026]
+YEARS = [2021, 2022, 2023, 2024, 2025, 2026]
+FIRST_RESEARCHED_YEAR = 2022
 
 # --------------------------------------------------------------------------------------
 # Sources
@@ -203,12 +207,16 @@ def build() -> tuple[list[dict], list[dict]]:
         for year in YEARS:
             social = retire = stat_pay = benefits = 0.0
             estimate, notes = False, []
+            src = max(year, FIRST_RESEARCHED_YEAR)   # 2021 reuses the 2022 inputs
+            if year < FIRST_RESEARCHED_YEAR:
+                estimate = True
+                notes.append("2022 inputs applied to 2021 (history extension, not researched separately)")
 
             # 1. employer social security (OECD members except the US)
             if cc in OECD_EMPLOYER_SSC and cc != "US":
                 if year <= 2025:
-                    social = _gross(OECD_EMPLOYER_SSC[cc][year - 2022])
-                    cite(cc, year, "social_contribution_rate", OECD_SOURCE_BY_YEAR[year])
+                    social = _gross(OECD_EMPLOYER_SSC[cc][src - 2022])
+                    cite(cc, year, "social_contribution_rate", OECD_SOURCE_BY_YEAR[src])
                 else:
                     social = _gross(OECD_EMPLOYER_SSC[cc][3])
                     cite(cc, year, "social_contribution_rate", "OECD-TW26")
@@ -222,10 +230,10 @@ def build() -> tuple[list[dict], list[dict]]:
                         notes.append("2025 OECD rate carried forward (2026 data not yet published)")
 
             if cc == "US":
-                w, pl, ins, ret, lr = BLS_ECEC[year]
+                w, pl, ins, ret, lr = BLS_ECEC[src]
                 social, benefits = lr / (w + pl), (ins + ret) / (w + pl)
-                cite(cc, year, "social_contribution_rate", f"BLS-{year}")
-                cite(cc, year, "employer_benefits_rate", f"BLS-{year}")
+                cite(cc, year, "social_contribution_rate", f"BLS-{src}")
+                cite(cc, year, "employer_benefits_rate", f"BLS-{src}")
                 notes.append("BLS ECEC: legally required + (insurance + retirement), over wages + paid leave")
 
             elif cc == "BR":
@@ -239,7 +247,7 @@ def build() -> tuple[list[dict], list[dict]]:
                 notes.append("Standard payroll regime (not Simples Nacional or CPRB); charges also due on 13th and vacation bonus")
 
             elif cc == "MX":
-                vacation_days = 6 if year == 2022 else 12
+                vacation_days = 6 if year <= 2022 else 12
                 stat_pay = 15 / 365 + 0.25 * vacation_days / 365
                 cite(cc, year, "statutory_pay_rate", "MX-LFT")
                 cite(cc, year, "statutory_pay_rate", "MX-VAC")
@@ -257,7 +265,7 @@ def build() -> tuple[list[dict], list[dict]]:
                 notes.append("Auto-enrolment employer 1.5% from 1 Jan 2026 (applied to full base)")
 
             elif cc == "CH":
-                deduction, upper = CH_BVG[year]
+                deduction, upper = CH_BVG[src]
                 coordinated = max(0.0, min(ref_salary, upper) - deduction)
                 retire = CH_BVG_EMPLOYER_SHARE_OF_COORDINATED * coordinated / ref_salary
                 cite(cc, year, "retirement_severance_rate", "CH-BVG-22" if year <= 2024 else "CH-BVG-25")
@@ -268,7 +276,7 @@ def build() -> tuple[list[dict], list[dict]]:
                 cite(cc, year, "retirement_severance_rate", "KR-SEV")
 
             elif cc == "AU":
-                retire = AU_SUPER_GUARANTEE_CALENDAR[year]
+                retire = AU_SUPER_GUARANTEE_CALENDAR[src]
                 cite(cc, year, "retirement_severance_rate", "AU-SG")
 
             elif cc == "AE":
@@ -288,14 +296,14 @@ def build() -> tuple[list[dict], list[dict]]:
                 notes.append("PF 12% and gratuity 4.81% on basic = 50% of base (meets the labour codes' 50% wage rule)")
 
             elif cc == "SG":
-                retire = 0.17 * SG_CPF_MONTHLY_CEILING[year] * 12 / ref_salary
+                retire = 0.17 * SG_CPF_MONTHLY_CEILING[src] * 12 / ref_salary
                 social = min(0.0025 * ref_salary / 12, 11.25) * 12 / ref_salary
                 cite(cc, year, "retirement_severance_rate", "SG-CPF")
                 cite(cc, year, "social_contribution_rate", "SG-SDL")
                 notes.append("CPF on ordinary wages up to the monthly ceiling; citizens and PRs")
 
             elif cc == "PH":
-                social = PH_MONTHLY_EMPLOYER[year] * 12 / ref_salary
+                social = PH_MONTHLY_EMPLOYER[src] * 12 / ref_salary
                 stat_pay = 1 / 12
                 cite(cc, year, "social_contribution_rate", "PH-SSS23" if year <= 2023 else "PH-PWC")
                 cite(cc, year, "statutory_pay_rate", "PH-13M")

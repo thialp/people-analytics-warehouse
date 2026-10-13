@@ -61,11 +61,14 @@
                       every line, for the average walk and the percent walk
 
   THE GRID (the runtime lever)
-  Pairs are taken from dw.MonthEndCalendar where both month-ends are quarter
-  ends (136 pairs), or the two month-ends are consecutive (48 month-over-month
-  pairs). The rule appears twice, at the two GRID markers; keep them identical.
-  Deleting both conditions gives every month-end to every later month-end:
-  1,176 pairs, about 8x the rows and run time.
+  Pairs are taken from dw.MonthEndCalendar for the four period types the
+  dashboard offers: month over month, quarter over quarter, year over year
+  (quarter-end to quarter-end 12 months later) and fiscal year to date (Jun 30
+  to a later quarter-end of the same fiscal year). The first year of history
+  is lead-in: a pair must end more than 12 months after the first month-end,
+  so every fiscal year offered has all its year-over-year options. 88 pairs
+  with history from Jun 2021. The rule is at the GRID markers; keep it
+  identical to the office-moves query.
 
   SCOPE
   Executive officers (the CEO and the function heads) are excluded, as in the
@@ -271,8 +274,11 @@ FROM (
                         SELECT f.MonthEndDate AS from_date, t2.MonthEndDate AS to_date
                         FROM dw.MonthEndCalendar AS f
                         JOIN dw.MonthEndCalendar AS t2 ON t2.MonthEndDate > f.MonthEndDate
-                        WHERE (MONTH(f.MonthEndDate) IN (3, 6, 9, 12) AND MONTH(t2.MonthEndDate) IN (3, 6, 9, 12))  /* === GRID === */
-                           OR t2.PriorMonthEndDate = f.MonthEndDate                                                     /* === GRID === */
+                        WHERE t2.MonthEndDate > DATEADD(MONTH, 12, (SELECT MIN(MonthEndDate) FROM dw.MonthEndCalendar))   /* === GRID === first year is lead-in */
+                          AND (   t2.PriorMonthEndDate = f.MonthEndDate                                                      /* === GRID === month */
+                               OR (    MONTH(f.MonthEndDate) IN (3, 6, 9, 12) AND MONTH(t2.MonthEndDate) IN (3, 6, 9, 12)    /* === GRID === quarter-ends */
+                                   AND (   DATEDIFF(MONTH, f.MonthEndDate, t2.MonthEndDate) IN (3, 12)                         /* === GRID === quarter, year */
+                                        OR (MONTH(f.MonthEndDate) = 6 AND DATEDIFF(MONTH, f.MonthEndDate, t2.MonthEndDate) < 12))))  /* === GRID === year to date */
                     ) AS g
                     /* everyone employed at some point between the two dates; the WHERE
                        below keeps those present at the From or the To month-end */

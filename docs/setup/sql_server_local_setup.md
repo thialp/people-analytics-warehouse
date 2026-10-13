@@ -97,53 +97,81 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
   -i /repo/sqlserver/build_all.sql
 ```
 
-`-C` tells `sqlcmd` to trust the container's self-signed certificate. `build_all.sql` runs scripts 01 to 05 in order:
+`-C` tells `sqlcmd` to trust the container's self-signed certificate. `build_all.sql` runs these scripts in order:
 
 | Script | What it does |
 |---|---|
 | `01_create_database.sql` | Creates the `ArcadiaHR` database and the `raw`, `dw` and `rpt` schemas |
 | `02_load_raw.sql` | Lands each CSV as text with `BULK INSERT` |
 | `03_build_dw.sql` | Types and cleans the data, resolves pay corrections, values pay at its posting-date FX rate, builds the fiscal calendar, the indexed worker month-end snapshot, the pay ledger behind the compensation walk and the reporting chain |
-| `04_create_reporting_views.sql` | Creates `rpt.vw_workforce_cost_snapshot`, `rpt.vw_org_leader_summary` and `rpt.vw_fringe_rate` |
+| `03b_build_dw_workforce_planning.sql` | The seat layer: cost centers, positions (SCD2), seat assignments, requisitions, the workforce plan, candidates, the seat month-end snapshot, seat fills with the pay walk, vacancy chains, plan vs actual |
+| `04_create_reporting_views.sql` | Creates `rpt.vw_workforce_cost_snapshot`, `rpt.vw_org_leader_summary`, `rpt.vw_fringe_rate`, and for Workforce Planning `rpt.vw_position_fill`, `rpt.vw_vacancy_pool`, `rpt.vw_plan_vs_actual`, `rpt.vw_seat_corridors` |
 | `05_validate.sql` | Checks row counts, reporting lines, control totals and that the pay ledger explains every worker's change in cost |
+| `08_validate_workforce_planning.sql` | Checks the seat layer: row counts, one incumbent per seat, filled seats = headcount, the seat pay walk, FY26 fills, the vacancy pool and plan vs actual |
 
-Expected output, abbreviated (2–5 minutes under emulation):
+Expected output, abbreviated (5–10 minutes under emulation):
 
 ```
 Created database ArcadiaHR
 Schemas ready: raw, dw, rpt
-raw.dim_worker                      43569 rows
-raw.fact_job_history                89240 rows
-raw.fact_compensation_history       153830 rows
+raw.dim_candidate                   188982 rows
+raw.dim_cost_center                 630 rows
+...
+raw.dim_worker                      46980 rows
+raw.fact_job_history                98028 rows
+raw.fact_compensation_history       186191 rows
 ...
 TableName                       RowsLoaded
-dw.DimWorker                         43569
-dw.FactJobHistory                    89240
-dw.FactCompensationHistory          152939
-dw.FactPerformanceReview            131639
-dw.FactBonusPayout                  131639
-dw.MonthEndCalendar                     49
-dw.WorkerMonthEndSnapshot          1347949
-dw.WorkerPayLedger                 1347949
-dw.WorkerReportingChain             918806
-Created views rpt.vw_workforce_cost_snapshot, rpt.vw_org_leader_summary, rpt.vw_fringe_rate
+dw.DimWorker                         46980
+dw.FactJobHistory                    98028
+dw.FactCompensationHistory          185063
+dw.FactPerformanceReview            154151
+dw.FactBonusPayout                  154151
+dw.MonthEndCalendar                     61
+dw.WorkerMonthEndSnapshot          1639687
+dw.WorkerPayLedger                 1639687
+dw.WorkerReportingChain            1048170
+TableName                       RowsLoaded
+dw.DimCostCenter                       630
+dw.DimPosition                      101297
+dw.FactPositionAssignment            54094
+dw.FactRequisition                   31323
+dw.FactWorkforcePlan                 28800
+dw.DimCandidate                     188982
+dw.FactCandidateStageEvent          531691
+dw.PositionMonthEndSnapshot        1701742
+dw.SeatFill                          30575
+dw.SeatVacancyChain                  30575
+dw.PlanVsActual                      28800
+Created views rpt.vw_workforce_cost_snapshot, rpt.vw_org_leader_summary, rpt.vw_fringe_rate,
+              rpt.vw_position_fill, rpt.vw_vacancy_pool, rpt.vw_plan_vs_actual, rpt.vw_seat_corridors
 1. Row counts
 check_name                          actual   expected  result
-dw.DimWorker rows                    43569      43569  PASS
+dw.DimWorker rows                    46980      46980  PASS
 ...
 3. Everyone except the CEO reports to an employed manager (expected 0)
 workers_without_a_valid_manager
 0
 4. Control totals (executive officers excluded)
 month_end_date  headcount  fte       loaded_usd_nominal  loaded_usd_constant
-2022-06-30      25005      24733.20  2577787184.81       2613645368.50
-2026-06-30      30015      29395.70  3195503264.83       3195503264.83
+2022-06-30      25052      24725.50  2450138920.49       2487093187.74
+2026-06-30      30005      29354.50  3336539181.84       3336539181.84
 5. The pay ledger explains every change in every worker's cost (expected 0)
 worker_months_not_explained
 0
+1. Row counts                 (08: twelve rows, all PASS)
+2. Seat integrity (every check expects 0)
+seats with two incumbents at once                               0  PASS
+month-ends where filled seats differ from headcount             0  PASS
+...
+3. FY26 seat fills (fiscal_year = 2026)        (twelve rows, all PASS)
+4. Vacancy pool at 30 Jun 2026                 (four rows, all PASS)
+5. FY26 plan vs actual, company                (compare with the expected values in the script)
 ```
 
-Every row in section 1 should say `PASS`, sections 2, 3 and 5 should show `0`, and the control totals should match (SQL Server may show `.80` where DuckDB shows `.81`: each group is rounded to the cent before the total is added up).
+Every row with a `result` column should say `PASS`, the single-number checks in 05 should show `0`, and the control totals should match (SQL Server may show a cent different from DuckDB: each group is rounded to the cent before the total is added up).
+
+**No SQL Server at hand?** `python sqlserver/check_tsql_in_duckdb.py` translates the same T-SQL to DuckDB with sqlglot, runs it on the same CSVs and compares every view and Custom SQL with the pipeline's marts, row for row (about a minute). It is how release 2 was checked before it ran on SQL Server.
 
 ### Optional: validate the compensation walk
 
@@ -158,16 +186,16 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 Expected, abbreviated:
 
 ```
-Custom SQL returned 271219 rows in <n> seconds
+Custom SQL returned 115544 rows in <n> seconds
 1. Shape
-rows          271219   271219  PASS
-date pairs       184      184  PASS
+rows          115544   115544  PASS
+date pairs        88       88  PASS
 views              6        6  PASS
 2. Groups whose walk does not close: Opening + steps <> Closing (expected 0)
 0
-3. Company, 30 Jun 2022 to 30 Jun 2026
-Opening   25005   2577787184.61   2613645368.19
-Closing   30015   3195503264.60   3195503264.60
+3. Company, FY23 (30 Jun 2022 to 30 Jun 2023)
+Opening   25052   2450138920.28   2487093187.28
+Closing   26932   2718192220.16   2727327688.63
 4. FY26 company walk, loaded cost at constant FX ...
 ```
 
@@ -185,7 +213,7 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
   -i /repo/sqlserver/07_validate_office_moves.sql
 ```
 
-Expected: section 1 and 2 rows say `PASS` (260,464 rows; FY26 has 345 people who changed office, 227 within one country and 118 across a border), and sections 3 and 4 show `0`.
+Expected: section 1 and 2 rows say `PASS` (89,611 rows; FY26 has 725 people who changed office, 600 within one country and 125 across a border), and sections 3 and 4 show `0`.
 
 ## Step 5. Install the SQL Server driver for Tableau
 

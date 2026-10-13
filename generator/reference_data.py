@@ -225,6 +225,14 @@ JOB_LEVELS = {
     12: ("L12", "Chief Executive Officer",    "Executive",              650_000),
 }
 RANGE_MIN_PCT, RANGE_MAX_PCT = 0.85, 1.35
+
+# Salary structures move every July 1 (Arcadia pay policy, an assumption, not sourced data).
+# The level bases above, at LEVEL_BASE_FX_DATE rates, are the FY2023 range midpoints;
+# earlier years are divided back and later years multiplied forward by these increases.
+RANGE_ANCHOR_FY = 2023
+RANGE_STRUCTURE_INCREASE = {2022: 0.025, 2023: 0.040, 2024: 0.035, 2025: 0.030, 2026: 0.030}
+RANGE_STRUCTURE_COUNTRY_PP = {"IN": 0.040, "BR": 0.020, "ZA": 0.020, "PL": 0.020, "PH": 0.020,
+                              "MX": 0.015, "JP": -0.015, "CH": -0.015}
 LEVEL_BASE_FX_DATE = "2022-06-30"      # local level bases are set with this day's ECB rates
 
 # Base salary grows with tenure, not with performance: on each hire anniversary the
@@ -267,12 +275,12 @@ SPAN_OF_CONTROL_MAX = 9        # above this a team is split at month-end
 # Business calendar and workforce assumptions
 # --------------------------------------------------------------------------------------
 FISCAL_YEAR_START_MONTH = 7            # FY2026 = 2025-07-01 .. 2026-06-30
-FIRST_SNAPSHOT = "2022-06-30"
+FIRST_SNAPSHOT = "2021-06-30"
 LAST_SNAPSHOT = "2026-06-30"
-START_HEADCOUNT = 25_000               # non-executive population at the first month-end
-COMP_CONVERSION_DATE = "2022-03-01"    # pay history starts at the HR system conversion
+START_HEADCOUNT = 23_500               # non-executive population at the first month-end (about 25,000 by Jun 2022)
+COMP_CONVERSION_DATE = "2021-03-01"    # pay history starts at the HR system conversion
 
-FY_NET_GROWTH = {2023: 0.075, 2024: 0.010, 2025: 0.045, 2026: 0.055}
+FY_NET_GROWTH = {2022: 0.065, 2023: 0.075, 2024: 0.010, 2025: 0.045, 2026: 0.055}
 
 MONTHLY_ATTRITION = 0.0095
 MONTHLY_TRANSFER = 0.0045
@@ -288,6 +296,56 @@ REORGANIZATION = {"date": "2024-11-01", "target_department": "D-108",
                   "source_departments": ["D-101", "D-102", "D-104"], "families": ["DAT"]}
 
 COMP_CORRECTION_RATE = 0.006
+
+# --------------------------------------------------------------------------------------
+# Seats (positions) and requisitions
+# --------------------------------------------------------------------------------------
+# What happens to a seat when its incumbent leaves or moves to another seat. Leader seats
+# (department, sub-function and function heads) and manager seats whose team is handed to
+# a successor are always refilled and skip this decision.
+SEAT_DECISION = {
+    "Backfill as is": 0.60,
+    "Backfill re-levelled": 0.15,          # usually one level down; a manager seat becomes an IC seat
+    "Backfill relocated": 0.10,            # another office in the same country, leaning to lower pay zones
+    "Freeze": 0.10,
+    "Eliminate": 0.05,
+}
+SEAT_DECISION_RESTRUCTURING = {"Eliminate": 0.75, "Freeze": 0.25}
+RELEVEL_DOWN_SHARE = 0.80
+RELOCATE_ZONE_POWER = 6                    # office weight x pay_zone ** -6: San Francisco seats drift to Austin
+FROZEN_SEAT_DAYS = (60, 300)               # a frozen seat is resolved after this many days ...
+FROZEN_SEAT_UNFREEZE_SHARE = 0.50          # ... reopened for hiring, otherwise eliminated
+REQ_APPROVAL_DAYS = (0, 14)                # requisition opened -> approved
+REQ_LATE_APPROVAL = (0.08, (30, 75))       # share of requisitions approved late, and how late
+REQ_TIME_TO_FILL_MEDIAN = {1: 35, 2: 35, 3: 40, 4: 48, 5: 55, 6: 62, 7: 80, 8: 90, 9: 100, 10: 100, 11: 100}
+REQ_TIME_TO_FILL_SIGMA = 0.45
+REQ_TIME_TO_FILL_MIN = 10
+REQ_MAX_OPEN_DAYS = 210                    # an approved requisition still open after this is cancelled
+REQ_CANCELLED_FREEZE_SHARE = 0.50          # a cancelled seat is frozen, otherwise eliminated
+TRANSFER_TAKES_OPEN_SEAT = 0.85            # an internal mover takes a ready open seat when one fits
+
+# --------------------------------------------------------------------------------------
+# Workforce plan: a budget before each fiscal year, then a reforecast after each of the
+# first three quarters (RF1-RF3), each covering the quarters still ahead. Versions are
+# never overwritten. The generator writes the plan around what happened, with an error
+# that shrinks with each reforecast: (log-mean, log-sd) of planned / actual.
+# --------------------------------------------------------------------------------------
+PLAN_VERSIONS = [  # name, (month, day) of the version date, first quarter covered
+    ("Budget", (5, 15), 1), ("RF1", (10, 15), 2), ("RF2", (1, 15), 3), ("RF3", (4, 15), 4)]
+PLAN_NET_NEW_ERROR = {"Budget": (0.15, 0.35), "RF1": (0.08, 0.25), "RF2": (0.04, 0.18), "RF3": (0.02, 0.12)}
+PLAN_BACKFILL_ERROR = {"Budget": (0.04, 0.20), "RF1": (0.02, 0.15), "RF2": (0.01, 0.10), "RF3": (0.00, 0.07)}
+PLAN_HEADCOUNT_ERROR = {"Budget": (0.012, 0.030), "RF1": (0.008, 0.020), "RF2": (0.004, 0.012), "RF3": (0.002, 0.007)}
+PLAN_COST_EXTRA_SD = 0.010                 # cost error on top of the headcount error
+PLAN_FY_BUDGET_SHIFT = {2024: (0.80, 0.035)}  # FY24 budget was set before the Feb 2024 restructuring
+
+# --------------------------------------------------------------------------------------
+# Candidates (applicant tracking): applicants per requisition with a real search,
+# and where the others drop out
+# --------------------------------------------------------------------------------------
+CANDIDATES_PER_REQ = {1: 7, 2: 7, 3: 6, 4: 5, 5: 5, 6: 4, 7: 4, 8: 3, 9: 3, 10: 3, 11: 3}
+CANDIDATE_EXIT_STAGE = {"Screen": 0.55, "Interview": 0.27, "Offer": 0.05, "Withdrawn": 0.13}
+OFFER_DECLINED_SHARE = 0.12                # a search where an earlier offer was declined
+CANDIDATE_SOURCES = {"Job board": 0.40, "Referral": 0.22, "Agency": 0.10, "Career site": 0.20, "Sourced": 0.08}
 
 FX_CONSTANT_RATE_SET = "Latest close (2026-06-30)"
 FX_CONSTANT_RATE_DATE = "2026-06-30"

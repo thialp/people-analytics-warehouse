@@ -1,5 +1,5 @@
 -- mart_fringe_rate
--- Grain: one row per country per calendar year (2022-2026).
+-- Grain: one row per country per calendar year (2021-2026).
 --
 -- The researched fringe rate and its four components, with the number of sources
 -- behind it and whether the year is an estimate (2026 carried forward where the
