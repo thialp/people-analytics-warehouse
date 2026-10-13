@@ -1,0 +1,23 @@
+country_code,country_name,region,currency_code,pay_index
+AE,United Arab Emirates,Middle East & Africa,AED,0.78
+AU,Australia,Asia Pacific,AUD,0.84
+BR,Brazil,Latin America,BRL,0.36
+CA,Canada,North America,CAD,0.78
+CH,Switzerland,Europe,CHF,1.12
+DE,Germany,Europe,EUR,0.86
+ES,Spain,Europe,EUR,0.6
+FR,France,Europe,EUR,0.78
+GB,United Kingdom,Europe,GBP,0.84
+IE,Ireland,Europe,EUR,0.82
+IN,India,Asia Pacific,INR,0.27
+JP,Japan,Asia Pacific,JPY,0.66
+KR,South Korea,Asia Pacific,KRW,0.62
+MX,Mexico,Latin America,MXN,0.34
+NL,Netherlands,Europe,EUR,0.84
+PH,Philippines,Asia Pacific,PHP,0.26
+PL,Poland,Europe,PLN,0.46
+PT,Portugal,Europe,EUR,0.5
+SE,Sweden,Europe,SEK,0.76
+SG,Singapore,Asia Pacific,SGD,0.86
+US,United States,North America,USD,1.0
+ZA,South Africa,Middle East & Africa,ZAR,0.36

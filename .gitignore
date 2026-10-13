@@ -1,0 +1,21 @@
+# Local DuckDB warehouse (rebuilt by pipeline/run_pipeline.py)
+warehouse/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Tableau local files
+*.twbr
+*.tmp
+
+# Local secrets (copy .env.example to .env)
+.env

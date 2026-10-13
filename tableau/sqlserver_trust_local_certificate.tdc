@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!--
+  Only needed if Tableau shows an SSL / certificate error when connecting to the
+  local SQL Server container. The container uses a self-signed certificate, and
+  Microsoft ODBC Driver 18 rejects self-signed certificates by default.
+
+  Copy this file to:  ~/Documents/My Tableau Repository/Datasources/
+  then quit and reopen Tableau. Use it for the local container only.
+-->
+<connection-customization class='sqlserver' enabled='true' version='10.0'>
+  <vendor name='sqlserver' />
+  <driver name='sqlserver' />
+  <customizations>
+    <customization name='odbc-connect-string-extras' value='TrustServerCertificate=yes' />
+  </customizations>
+</connection-customization>

@@ -1,0 +1,16 @@
+-- Every job record names the seat the worker holds: exactly one of the worker's
+-- assignments covers the record's start date, and it is on the same position.
+SELECT
+    j.job_record_id,
+    j.worker_id,
+    j.effective_start_date,
+    j.position_id,
+    COUNT(a.assignment_id)                                     AS covering_assignments,
+    STRING_AGG(a.position_id, ', ')                            AS assigned_positions
+FROM staging.stg_job_history AS j
+LEFT JOIN staging.stg_position_assignment AS a
+  ON a.worker_id = j.worker_id
+ AND j.effective_start_date BETWEEN a.start_date AND a.end_date_filled
+GROUP BY ALL
+HAVING COUNT(a.assignment_id) <> 1
+    OR MAX(a.position_id) <> j.position_id
