@@ -21,7 +21,8 @@ INTO #regions
 FROM (
 :r /repo/tableau/custom_sql_region_walk.sql
 ) AS r;
-PRINT CONCAT('Region walk Custom SQL returned ', (SELECT COUNT(*) FROM #regions), ' rows in ',
+DECLARE @n INT = (SELECT COUNT(*) FROM #regions);
+PRINT CONCAT('Region walk Custom SQL returned ', @n, ' rows in ',
              DATEDIFF(SECOND, @started, SYSDATETIME()), ' seconds');
 GO
 
@@ -32,7 +33,8 @@ INTO #career
 FROM (
 :r /repo/tableau/custom_sql_career_moves.sql
 ) AS c;
-PRINT CONCAT('Career moves Custom SQL returned ', (SELECT COUNT(*) FROM #career), ' rows in ',
+DECLARE @n INT = (SELECT COUNT(*) FROM #career);
+PRINT CONCAT('Career moves Custom SQL returned ', @n, ' rows in ',
              DATEDIFF(SECOND, @started, SYSDATETIME()), ' seconds');
 GO
 
@@ -43,7 +45,8 @@ INTO #walk
 FROM (
 :r /repo/tableau/custom_sql_compensation_walk.sql
 ) AS w;
-PRINT CONCAT('Compensation walk Custom SQL returned ', (SELECT COUNT(*) FROM #walk), ' rows in ',
+DECLARE @n INT = (SELECT COUNT(*) FROM #walk);
+PRINT CONCAT('Compensation walk Custom SQL returned ', @n, ' rows in ',
              DATEDIFF(SECOND, @started, SYSDATETIME()), ' seconds');
 GO
 

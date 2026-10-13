@@ -105,7 +105,9 @@ FROM (SELECT DISTINCT from_month_end, to_month_end, view_name, group_id, open_he
 LEFT JOIN #walk AS w
   ON w.from_month_end = m.from_month_end AND w.to_month_end = m.to_month_end
  AND w.view_name = m.view_name AND w.group_id = m.group_id AND w.step = 'Opening'
-WHERE w.headcount IS NULL OR w.headcount <> m.open_headcount;
+/* a group that did not exist at the From date (a new office or department) has no Opening
+   line in the walk and a NULL open_headcount: that is a match */
+WHERE ISNULL(w.headcount, -1) <> ISNULL(m.open_headcount, -1);
 GO
 
 PRINT '4. Dates, groups and names match the walk, so one set of dashboard filters drives both (expected 0)';

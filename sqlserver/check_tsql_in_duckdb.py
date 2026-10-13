@@ -181,6 +181,16 @@ def static_checks() -> bool:
                 if (table.lower(), col.lower()) not in not_null:
                     ok = False
                     print(f"   FAIL  {name}: {table}.{col} is in the primary key but never made NOT NULL")
+        for batch in re.split(r"^\s*GO\s*$", text, flags=re.M):
+            # SQL Server checks the key against the columns as they were when the batch compiled:
+            # if a nullable copy of the table is left from an earlier run, an ALTER COLUMN in the
+            # same batch does not count. The key goes in the batch after the ALTER COLUMN.
+            altered = {(t.lower(), c.lower()) for t, c in
+                       re.findall(r"ALTER TABLE\s+([\w.]+)\s+ALTER COLUMN\s+(\w+)\s+[^;]*NOT NULL", batch, flags=re.I)}
+            for table, cols in re.findall(r"ALTER TABLE\s+([\w.]+)\s+ADD CONSTRAINT\s+\w+\s+PRIMARY KEY[^(]*\(([^)]*)\)", batch, flags=re.I):
+                if any((table.lower(), c.strip().lower()) in altered for c in cols.split(",")):
+                    ok = False
+                    print(f"   FAIL  {name}: {table} gets its primary key in the same batch as its ALTER COLUMN")
         for stmt in re.split(r"(?=DROP TABLE IF EXISTS)", text):
             src = re.search(r"FROM\s+raw\.(\w+)", stmt, flags=re.I)
             if not src:
@@ -198,7 +208,12 @@ def static_checks() -> bool:
                 if longest > int(n):
                     ok = False
                     print(f"   FAIL  {name}: raw.{src.group(1)}.{raw_col} holds values of {longest} characters, cast to VARCHAR({n})")
-    print("   primary keys and text lengths: " + ("all fit SQL Server's rules" if ok else "see above"))
+    for path in sorted((ROOT / "sqlserver").glob("*.sql")):   # PRINT takes no subquery (Msg 1046)
+        text = re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
+        for line in re.findall(r"^\s*PRINT\b[^;]*\(\s*SELECT\b", text, flags=re.I | re.M):
+            ok = False
+            print(f"   FAIL  {path.name}: PRINT holds a subquery: {line.strip()[:60]}")
+    print("   primary keys, text lengths and PRINT: " + ("all fit SQL Server's rules" if ok else "see above"))
     return ok
 
 

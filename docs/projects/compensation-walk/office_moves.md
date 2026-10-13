@@ -50,7 +50,7 @@ So for any one selected group, the people moving in that group are `SUM(workers)
 | `region_scope` | `Same region` or `Across regions` |
 | `move_reason` | `Relocation` (inside a country) or `International Transfer`, from the pay ledger; `Other` if the ledger has none |
 | `workers` | People who moved on this office pair under this group, side and reason |
-| `open_headcount` | The group's headcount at the From month-end, the same on every row of the group (repeated: use `MIN` or `ATTR`, never `SUM`). `SUM(workers) / MIN(open_headcount)` is the share of the group that changed office |
+| `open_headcount` | The group's headcount at the From month-end, the same on every row of the group (repeated: use `MIN` or `ATTR`, never `SUM`). `SUM(workers) / MIN(open_headcount)` is the share of the group that changed office. NULL for a group that did not exist at the From date (a new office or department), as the walk then has no Opening line |
 
 Every office has coordinates (test 32), so a line is always `MAKELINE(MAKEPOINT(from_latitude, from_longitude), MAKEPOINT(to_latitude, to_longitude))`.
 

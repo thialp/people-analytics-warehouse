@@ -37,6 +37,8 @@ SELECT
 INTO dw.DimWorker
 FROM raw.dim_worker;
 ALTER TABLE dw.DimWorker ALTER COLUMN WorkerID VARCHAR(12) NOT NULL;
+GO
+
 ALTER TABLE dw.DimWorker ADD CONSTRAINT PK_DimWorker PRIMARY KEY (WorkerID);
 GO
 
@@ -424,6 +426,8 @@ LEFT JOIN dw.RefSalaryRange AS rng
 
 ALTER TABLE dw.WorkerMonthEndSnapshot ALTER COLUMN WorkerID VARCHAR(12) NOT NULL;
 ALTER TABLE dw.WorkerMonthEndSnapshot ALTER COLUMN MonthEndDate DATE NOT NULL;
+GO
+
 ALTER TABLE dw.WorkerMonthEndSnapshot
     ADD CONSTRAINT PK_WorkerMonthEndSnapshot PRIMARY KEY CLUSTERED (MonthEndDate, WorkerID);
 GO
@@ -599,6 +603,8 @@ OUTER APPLY (
 
 ALTER TABLE dw.WorkerPayLedger ALTER COLUMN WorkerID VARCHAR(12) NOT NULL;
 ALTER TABLE dw.WorkerPayLedger ALTER COLUMN MonthEndDate DATE NOT NULL;
+GO
+
 ALTER TABLE dw.WorkerPayLedger
     ADD CONSTRAINT PK_WorkerPayLedger PRIMARY KEY CLUSTERED (MonthEndDate, WorkerID);
 DROP TABLE IF EXISTS #JobMove;
