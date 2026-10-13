@@ -24,7 +24,7 @@ All five run on the same simulated company, the same effective-dated history and
 |---|---|
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 46,980 workers ever employed (23,516 → 30,014) · 5 fiscal years (FY22–FY26) · 61 month-ends · 33,359 seats · 31,323 requisitions · 188,982 applicants · 35 offices · 22 countries · 17 currencies · 1,639,687 worker-month snapshots |
-| **Output** | Fifteen Tableau-ready marts and seven dimension files in [`data/marts/`](data/marts/), plus six Tableau Custom SQL queries for SQL Server |
+| **Output** | Fifteen Tableau-ready marts and seven dimension files in [`data/marts/`](data/marts/), plus ten Tableau Custom SQL queries for SQL Server |
 | **Controls** | 59 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
 
 ---
@@ -319,7 +319,7 @@ Sixteen tests (41 to 56) guard the seat layer, and [`08_validate_workforce_plann
 
 ### Tableau
 
-Dashboard #3 is in design. The marts, the SQL Server views (`rpt.vw_position_fill`, `rpt.vw_vacancy_pool`, `rpt.vw_plan_vs_actual`, `rpt.vw_seat_corridors`) and the check values ([headline values](docs/projects/workforce-planning/headline_values.md)) are ready.
+Dashboard #3 is in design. Four Tableau Custom SQL data sources are ready, one per grain (fills, vacancy pool, plan vs actual, seat corridors: `tableau/custom_sql_position_fill.sql` and the three beside it), each matching its mart row for row, with a [step-by-step guide from the connection to the first check sheets](docs/projects/workforce-planning/tableau_first_sheets_guide.md) and the [headline values](docs/projects/workforce-planning/headline_values.md).
 
 ---
 
