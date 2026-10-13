@@ -261,6 +261,9 @@ def main() -> int:
         ok &= compare(con, "tmp_headcount_fte_walk_csvs", "cs.headcount_fte_walk")
         con.execute("CREATE OR REPLACE TABLE tmp_hc AS SELECT * FROM cs.headcount_fte_walk")
         con.execute("CREATE OR REPLACE VIEW hc AS SELECT * FROM tmp_hc")
+        for name in ("position_fill", "vacancy_pool", "plan_vs_actual", "seat_corridors"):   # Dashboard #3
+            custom_sql(con, f"custom_sql_{name}.sql", name)
+            ok &= compare(con, f"mart_{name}", f"cs.{name}")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
