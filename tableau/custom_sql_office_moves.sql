@@ -49,10 +49,10 @@
     4. aggregate      to date pair x view x group x side x office pair x reason
 
   THE GRID
-  Same rule as the compensation walk, shown twice at the GRID markers: both
-  month-ends are quarter ends (136 pairs), or the two are consecutive (48
-  month-over-month pairs). Keep it identical to the walk's, or a pair on the
-  dashboard will have a walk and no map.
+  Same rule as the compensation walk, at the GRID markers: the four offered
+  period types, ending more than 12 months after the first month-end (88
+  pairs). Keep it identical to the walk's, or a pair on the dashboard will
+  have a walk and no map.
 */
 SELECT
     t.from_date                                                                  AS from_month_end,
@@ -121,8 +121,11 @@ FROM (
                     SELECT f.MonthEndDate AS from_date, t2.MonthEndDate AS to_date
                     FROM dw.MonthEndCalendar AS f
                     JOIN dw.MonthEndCalendar AS t2 ON t2.MonthEndDate > f.MonthEndDate
-                    WHERE (MONTH(f.MonthEndDate) IN (3, 6, 9, 12) AND MONTH(t2.MonthEndDate) IN (3, 6, 9, 12))  /* === GRID === */
-                       OR t2.PriorMonthEndDate = f.MonthEndDate                                                     /* === GRID === */
+                    WHERE t2.MonthEndDate > DATEADD(MONTH, 12, (SELECT MIN(MonthEndDate) FROM dw.MonthEndCalendar))   /* === GRID === first year is lead-in */
+                      AND (   t2.PriorMonthEndDate = f.MonthEndDate                                                      /* === GRID === month */
+                           OR (    MONTH(f.MonthEndDate) IN (3, 6, 9, 12) AND MONTH(t2.MonthEndDate) IN (3, 6, 9, 12)    /* === GRID === quarter-ends */
+                               AND (   DATEDIFF(MONTH, f.MonthEndDate, t2.MonthEndDate) IN (3, 12)                         /* === GRID === quarter, year */
+                                    OR (MONTH(f.MonthEndDate) = 6 AND DATEDIFF(MONTH, f.MonthEndDate, t2.MonthEndDate) < 12))))  /* === GRID === year to date */
                 ) AS g
                 JOIN dw.WorkerMonthEndSnapshot AS o  ON o.MonthEndDate  = g.from_date AND o.IsExecutiveOfficer = 0
                 JOIN dw.WorkerMonthEndSnapshot AS c  ON c.MonthEndDate  = g.to_date   AND c.WorkerID  = o.WorkerID

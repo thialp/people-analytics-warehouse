@@ -8,7 +8,7 @@
 | Same result as a CSV (Tableau Public) | [`data/marts/mart_compensation_walk.csv`](../../../data/marts/mart_compensation_walk.csv), built by [`sql/03_marts/mart_compensation_walk.sql`](../../../sql/03_marts/mart_compensation_walk.sql) |
 | Warehouse support table | `dw.WorkerPayLedger` / [`int_worker_pay_ledger`](../../../sql/02_intermediate/int_worker_pay_ledger.sql) |
 | Grain | date pair × view × group × walk step × movement reason |
-| Size (default grid) | 271,219 rows, 184 date pairs, 6 views, 107 groups |
+| Size (default grid) | 114,977 rows, 88 date pairs, 6 views, 107 groups (release 2, phase 2; final numbers after phase 3) |
 
 The walk takes a group's compensation at the **From** month-end, explains every dollar of change, and lands on the **To** month-end exactly:
 
@@ -30,7 +30,7 @@ It does this for headcount, FTE and four dollar measures (base or loaded cost, e
 
 A compensation walk sounds like a chart, but it is mostly a combinatorics problem:
 
-* **Any two dates.** 49 month-ends give 1,176 possible From/To pairs. The walk for one pair cannot be built by adding up others, because someone hired in March and gone by May is in neither snapshot of a February-to-June walk.
+* **Any two dates.** 61 month-ends give 1,830 possible From/To pairs. The walk for one pair cannot be built by adding up others, because someone hired in March and gone by May is in neither snapshot of a February-to-June walk.
 * **Any group.** A transfer depends on the view. Moving office inside the same department is a transfer in the Office view and nothing at all in the Department view.
 * **Averages don't add up.** The average-pay walk needs the group's opening average and closing FTE next to every line. In Tableau that means LOD expressions that have to agree with every filter on the sheet.
 * **The driver of each dollar.** A promotion and an anniversary raise in the same month (817 worker-months in this data) are two different stories, and need to stay two numbers.
@@ -76,7 +76,7 @@ A common alternative prices *Transfers In* at the closing value. The walk still 
 driver amount (From → To)  =  cum_driver(To) − cum_driver(From)
 ```
 
-That is two equality joins on the clustered key `(MonthEndDate, WorkerID)`, instead of a range scan of the pay history for each of the 184 pairs. This is the classic prefix-sum technique, and it is what makes an "any date to any date" grid affordable.
+That is two equality joins on the clustered key `(MonthEndDate, WorkerID)`, instead of a range scan of the pay history for each of the 88 pairs. This is the classic prefix-sum technique, and it is what makes an "any date to any date" grid affordable.
 
 ### Rule 3: transfers are decided per view
 
@@ -122,22 +122,21 @@ Test 34 checks the identity for every worker and every month-end: the ledger's d
 
 ## 5. The date-pair grid
 
-| Pairs | Rule | Count |
-|---|---|---|
-| Quarter-end to any later quarter-end | both month-ends in Mar, Jun, Sep or Dec | 136 |
-| Month over month | consecutive month-ends | 48 |
-| **Default grid** | either rule | **184** |
-| Every month-end to every later one | delete both `=== GRID ===` conditions | 1,176 (about 8× rows and run time) |
+The grid holds only the four period types the dashboard offers (release 2; it used to also hold 99 quarter-end to quarter-end "Custom Range" pairs that no control offered).
+
+**Lead-in rule:** a pair must end more than 12 months after the first month-end in the warehouse. History starts at Jun 30, 2021, so every pair ends in FY23 or later, and FY23 has all four year-over-year options (the trailing 12 months ending Sep 22, Dec 22 and Mar 23 start in FY22). The rule is computed from the calendar, so it moves by itself if history is extended again.
 
 `pair_type` labels each pair. It is evaluated in this order, and the first match wins:
 
 | `pair_type` | Rule | Pairs |
 |---|---|---|
-| Month over Month | 1 month apart | 48 |
-| Quarter over Quarter | 3 months apart | 16 |
-| Year over Year | 12 months apart | 13 |
-| Fiscal Year to Date | From is a fiscal year-end (30 June) and To is within the next 12 months | 8 |
-| Custom Range | anything else | 99 |
+| Month over Month | consecutive month-ends | 48 |
+| Quarter over Quarter | quarter-ends 3 months apart | 16 |
+| Year over Year | quarter-ends 12 months apart (fiscal years and trailing 12 months) | 16 |
+| Fiscal Year to Date | From is a fiscal year-end (30 June), To a later quarter-end in the same fiscal year (Dec or Mar; Sep is already Quarter over Quarter) | 8 |
+| **Grid** | | **88** |
+
+Every month-end to every later one would be 1,830 pairs (61 month-ends): replace the conditions at the `=== GRID ===` markers to build it, at about 20× the rows and run time.
 
 ## 6. Field reference
 
@@ -251,7 +250,7 @@ Total loaded cost grew 6.5%, mostly because of headcount: hires minus exits adde
 | 1. Worker pairs | 4.4 million |
 | 2. Pre-aggregated rows | about 0.5 million (aggregate early, about 9 workers per row) |
 | 3. Expanded walk lines (six views × applicable steps) | about 12 million |
-| 4–5. Published rows | 271,219 |
+| 4–5. Published rows | 114,977 (release 2, phase 2) |
 
 * DuckDB builds the mart in about 30 seconds on a laptop-class machine. The SQL Server timing is printed by `06_validate_compensation_walk.sql`.
 * **Aggregate early, expand late.** Workers are collapsed to (date pair, departments, offices, reasons) *before* being multiplied into views and steps, which cuts the expansion about 9×.

@@ -28,7 +28,7 @@ import currency_converter
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reference" / "ecb_fx_reference_rates.csv"
 
-START = "2022-01-01"   # covers the comp-history conversion date (2022-03-01) with room to spare
+START = "2021-01-01"   # covers the comp-history conversion date (2021-03-01) with room to spare
 CURRENCIES = ["USD", "CAD", "BRL", "MXN", "GBP", "PLN", "CHF", "SEK", "ZAR",
               "INR", "SGD", "JPY", "AUD", "KRW", "PHP"]
 

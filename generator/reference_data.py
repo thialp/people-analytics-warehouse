@@ -267,12 +267,12 @@ SPAN_OF_CONTROL_MAX = 9        # above this a team is split at month-end
 # Business calendar and workforce assumptions
 # --------------------------------------------------------------------------------------
 FISCAL_YEAR_START_MONTH = 7            # FY2026 = 2025-07-01 .. 2026-06-30
-FIRST_SNAPSHOT = "2022-06-30"
+FIRST_SNAPSHOT = "2021-06-30"
 LAST_SNAPSHOT = "2026-06-30"
-START_HEADCOUNT = 25_000               # non-executive population at the first month-end
-COMP_CONVERSION_DATE = "2022-03-01"    # pay history starts at the HR system conversion
+START_HEADCOUNT = 23_500               # non-executive population at the first month-end (about 25,000 by Jun 2022)
+COMP_CONVERSION_DATE = "2021-03-01"    # pay history starts at the HR system conversion
 
-FY_NET_GROWTH = {2023: 0.075, 2024: 0.010, 2025: 0.045, 2026: 0.055}
+FY_NET_GROWTH = {2022: 0.065, 2023: 0.075, 2024: 0.010, 2025: 0.045, 2026: 0.055}
 
 MONTHLY_ATTRITION = 0.0095
 MONTHLY_TRANSFER = 0.0045

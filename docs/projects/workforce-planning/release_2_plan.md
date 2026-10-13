@@ -16,7 +16,8 @@ Every number on Dashboards #1 and #2 will change, because the history is extende
 |---|---|---|
 | 0. Branch and baseline | Done 2026-10-12 | Branch `warehouse-release-2` from `main`; regenerated raw files and marts match the committed ones; 40 tests pass; totals in [baseline_release_1.md](baseline_release_1.md) (`python pipeline/control_totals.py`) |
 | 1. Per-domain random streams | Done 2026-10-12 | `domain_stream()` in `generator/generate_data.py` (positions, recruiting, plan); zero raw files changed after regenerating |
-| 2. History from Jun 2021 | Next | |
+| 2. History from Jun 2021 | Done 2026-10-12 | Start month-end Jun 30, 2021; 23,500 opening people with FY22 growth of 6.5% (25,044 at Jun 2022, old start 25,014); pay history from the Mar 2021 conversion; ECB extract from Jan 2021; 2021 fringe rates reuse each country's 2022 inputs, flagged `is_estimate`; 40 tests pass; totals in [release_2_totals.md](release_2_totals.md). Two part A items moved here from phase 7 because the walk CSV passed GitHub's 100 MB file limit: the grid keeps only the four offered period types (no Custom Range pairs) and the first year is lead-in (pairs end after Jun 30, 2022, computed from the calendar). 88 pairs; walk 114,977 rows (was 271,219), office moves 53,826 (was 260,464); build 46 s (was 80 s) |
+| 3. Positions, requisitions, vacancy chains | Next | |
 
 ---
 
@@ -166,8 +167,8 @@ Plan rows stay at quarter grain. Tableau relates them to the actuals, so yearly 
 | Item | Where | Check |
 |---|---|---|
 | `report_as_of_date`, `report_start_date` | walk and office-moves Custom SQL, marts | Popover note, page subtitle, Default From/To |
-| Display window from Jul 2022 (`to_month_end` after 2022-06-30) | pair grid in both queries | FY23 offers all four period options |
-| Drop the 99 Custom Range pairs | pair grid | Row count and run time roughly halved |
+| ~~Display window from Jul 2022~~ | done in phase 2 (lead-in rule in the grid of all four queries) | FY23 offers all four period options |
+| ~~Drop the Custom Range pairs~~ | done in phase 2 | 88 pairs |
 | `Leader` → `Sub-function` | both Custom SQLs, both marts, `build_sketch_svg.py`, picker docs; workbook parameter and calcs | Decide: list only real sub-functions, or keep the function-name fallback |
 | Region per group | walk SQL | Growth by Region follows the group |
 | `open_headcount` | office-moves SQL | "1.2% of headcount" in the map title |
@@ -194,5 +195,7 @@ Plan rows stay at quarter grain. Tableau relates them to the actuals, so yearly 
 
 - **Sub-function fallback:** list only the real sub-functions, or keep the function names and say so in the tooltip.
 - **Reuse threshold:** 30 days vacant by default; confirm when the first numbers exist.
-- **Pay zones:** confirm whether the warehouse already has office-level zones (phase 3, before building).
+- **Pay zones:** settled. Offices already carry a pay-zone factor (`dim_location.pay_zone_factor`), so no new reference table is needed.
+- **Market effect in the seat pay walk:** salary ranges are the same in every fiscal year today, so the market step would always be zero. Decide in phase 4 whether ranges get an annual structure increase (this also moves the range cap on tenure raises).
+- **2021 fringe rates:** carried back from 2022 and flagged. A researched 2021 set (OECD Taxing Wages 2022 edition, BLS ECEC March 2021) can replace them later.
 - **Data size:** candidate volume per requisition is kept moderate so the repo and the Tableau Public extracts stay small. Expected rows are measured in phase 4.

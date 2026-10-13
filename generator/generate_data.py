@@ -1,7 +1,7 @@
 """
 Synthetic HR data warehouse generator for Arcadia Systems (fictional).
 
-Simulates the company day by day from the opening month-end (2022-06-30) to the end
+Simulates the company day by day from the opening month-end (2021-06-30) to the end
 of FY2026 (2026-06-30) and writes raw warehouse tables (CSV) to data/raw/.
 
 What it simulates
