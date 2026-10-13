@@ -64,7 +64,7 @@ Your plan works: **Save As** the Compensation Walk, swap the data source, delete
 Copy the two SQL files into the repo first (`tableau/custom_sql_workforce_footprint.sql`, `sqlserver/11_validate_workforce_footprint.sql`), then:
 
 ```bash
-cd ~/Documents/GitHub/people-analytics-warehouse
+cd ~/GitHub/people-analytics-warehouse
 export MSSQL_SA_PASSWORD="$(docker exec arcadia-sql printenv MSSQL_SA_PASSWORD)"
 docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -i /repo/sqlserver/11_validate_workforce_footprint.sql
 ```

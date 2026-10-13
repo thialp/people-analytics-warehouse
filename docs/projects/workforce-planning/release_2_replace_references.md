@@ -16,7 +16,7 @@ The new Dashboard #1 query was compared with the six CSVs joined together: **521
 ## 0. Before Tableau (Mac)
 
 ```bash
-cd ~/Documents/GitHub/people-analytics-warehouse
+cd ~/GitHub/people-analytics-warehouse
 git pull
 export MSSQL_SA_PASSWORD="$(docker exec arcadia-sql printenv MSSQL_SA_PASSWORD)"
 docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C \
