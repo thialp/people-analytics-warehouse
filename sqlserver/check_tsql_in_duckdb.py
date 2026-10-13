@@ -11,7 +11,8 @@ What it runs
   1. 03_build_dw.sql, 03b_build_dw_workforce_planning.sql, 04_create_reporting_views.sql
      (index, constraint and ALTER COLUMN statements are skipped: DuckDB does not need them)
   2. every rpt view against its mart (numbers to the cent, flags as 0/1, the rest as text)
-  3. the Tableau Custom SQL: office moves, region walk and career moves in full, the
+  3. the Tableau Custom SQL: the headcount & FTE walk (against its six CSVs), office moves,
+     region walk and career moves in full, the
      compensation walk for the pairs that end in FY26 (the full walk needs more memory
      than a laptop-sized DuckDB run allows)
   4. the PASS/FAIL tables of 05_validate.sql and 08_validate_workforce_planning.sql
@@ -121,8 +122,11 @@ def build(con: duckdb.DuckDBPyConnection):
 
 
 def compare(con: duckdb.DuckDBPyConnection, mart: str, other: str, where: str = "") -> bool:
-    cols = con.execute(f"SELECT column_name, data_type FROM information_schema.columns WHERE table_catalog = 'p' "
-                       f"AND table_schema = 'marts' AND table_name = '{mart}' ORDER BY ordinal_position").fetchall()
+    if mart.startswith("tmp_"):                        # an expected table built in this database
+        cols = [(r[0], r[1]) for r in con.execute(f"DESCRIBE {mart}").fetchall()]
+    else:
+        cols = con.execute(f"SELECT column_name, data_type FROM information_schema.columns WHERE table_catalog = 'p' "
+                           f"AND table_schema = 'marts' AND table_name = '{mart}' ORDER BY ordinal_position").fetchall()
 
     def norm(c, d):
         q = f'"{c}"'
@@ -133,7 +137,8 @@ def compare(con: duckdb.DuckDBPyConnection, mart: str, other: str, where: str = 
         return f"CAST({q} AS {'DATE' if d == 'DATE' else 'VARCHAR'})"
 
     sel = ", ".join(f"{norm(c, d)} AS \"{c}\"" for c, d in cols)
-    a, b = f"SELECT {sel} FROM p.marts.{mart} {where}", f"SELECT {sel} FROM {other}"
+    src = mart if mart.startswith("tmp_") else f"p.marts.{mart}"
+    a, b = f"SELECT {sel} FROM {src} {where}", f"SELECT {sel} FROM {other}"
     n_a, n_b = (con.execute(f"SELECT COUNT(*) FROM ({x})").fetchone()[0] for x in (a, b))
     only_a, only_b = (con.execute(f"SELECT COUNT(*) FROM ({x} EXCEPT ALL {y})").fetchone()[0] for x, y in ((a, b), (b, a)))
     ok = n_a == n_b and only_a == only_b == 0
@@ -155,6 +160,8 @@ def validation(con: duckdb.DuckDBPyConnection, name: str) -> bool:
     """Run the PASS/FAIL tables of a validation script; return False if any row fails."""
     ok = True
     for batch in batches(ROOT / "sqlserver" / name):
+        if "INTO #" in batch:                  # the batch that runs a Custom SQL file with :r
+            continue
         for stmt in sqlglot.parse(batch, read="tsql"):
             if not isinstance(stmt, exp.Select):
                 continue
@@ -237,11 +244,29 @@ def main() -> int:
         ok &= compare(con, "mart_region_walk", "cs.region_walk")
         custom_sql(con, "custom_sql_career_moves.sql", "career_moves")
         ok &= compare(con, "mart_career_moves", "cs.career_moves")
+        # Dashboard #1: the walk CSV with its five dimension CSVs, joined, is what the Custom SQL replaces
+        con.execute("""CREATE OR REPLACE TABLE tmp_headcount_fte_walk_csvs AS
+            SELECT w.*, m.prior_month_end_date, CAST(m.fiscal_year AS VARCHAR) AS fiscal_year, m.fiscal_year_label,
+                   m.fiscal_quarter_label, m.fiscal_period, m.fiscal_month, m.is_fiscal_year_end,
+                   d.department_name, d.sub_function, d.function_name, d.parent_org_unit_id, d.cost_center, d.head_grade,
+                   c.country_name, c.region, c.currency_code, c.pay_index, j.job_family,
+                   g.level_code, g.grade_level, g.career_track, g.us_base_salary_usd
+            FROM p.marts.mart_headcount_fte_walk AS w
+            JOIN p.marts.mart_dim_month      AS m USING (month_end_date)
+            JOIN p.marts.mart_dim_department AS d USING (department_id)
+            JOIN p.marts.mart_dim_country    AS c USING (country_code)
+            JOIN p.marts.mart_dim_job_family AS j USING (job_family_code)
+            JOIN p.marts.mart_dim_grade      AS g USING (grade)""")
+        custom_sql(con, "custom_sql_headcount_fte_walk.sql", "headcount_fte_walk")
+        ok &= compare(con, "tmp_headcount_fte_walk_csvs", "cs.headcount_fte_walk")
+        con.execute("CREATE OR REPLACE TABLE tmp_hc AS SELECT * FROM cs.headcount_fte_walk")
+        con.execute("CREATE OR REPLACE VIEW hc AS SELECT * FROM tmp_hc")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
         ok &= validation(con, "05_validate.sql")
         ok &= validation(con, "08_validate_workforce_planning.sql")
+        ok &= validation(con, "10_validate_headcount_fte_walk.sql")
         con.close()
     ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")

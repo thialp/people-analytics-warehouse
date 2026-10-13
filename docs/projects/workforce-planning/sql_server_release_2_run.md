@@ -124,3 +124,14 @@ A screenshot of each output, or just any line that is not `PASS` or `0`. If ever
 ## What this does not change yet
 
 The published dashboards and your workbooks still hold the old data. Their Custom SQL text lives inside each workbook, so Dashboard #2 picks up the new pair grid only when the new `tableau/custom_sql_compensation_walk.sql` and `custom_sql_office_moves.sql` are pasted in. That, the new expected values and the republish of Dashboards #1 and #2 are phase 8. Until then, do not refresh the extracts of the published workbooks.
+
+## Dashboard #1 on SQL Server (added 2026-10-13)
+
+Dashboard #1 moves from the CSVs to [`tableau/custom_sql_headcount_fte_walk.sql`](../../../tableau/custom_sql_headcount_fte_walk.sql). Check it after `build_all`:
+
+```bash
+docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C \
+  -i /repo/sqlserver/10_validate_headcount_fte_walk.sql
+```
+
+Expected: 521,029 rows; every check PASS (shape, every slice closes, FY26 opening 28,447, hires 5,235, closing 30,014). Tableau steps: [Replace References guide](release_2_replace_references.md).
