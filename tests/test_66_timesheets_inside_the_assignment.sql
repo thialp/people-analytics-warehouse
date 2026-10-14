@@ -1,6 +1,9 @@
 -- Billed time sits inside the assignment as Bridgeway holds it on the extract date, is
 -- priced at a rate the order actually carried, and adds up: amount = units x rate to the
 -- cent, and no month bills more hours than its weekdays x 8.
+-- The one exception is time billed after the last day, which release 3 seeds on purpose
+-- (discrepancy CW11): such a timesheet passes only if the answer key lists it, so nothing
+-- outside the assignment can appear without being a known, flagged case.
 WITH cur AS (
     SELECT service_order_id, assignment_start_date, assignment_end_date
     FROM staging.stg_bw_service_order_revision WHERE is_current
@@ -11,7 +14,9 @@ rates AS (
 SELECT t.timesheet_id, 'outside the assignment' AS problem
 FROM staging.stg_bw_timesheet_month AS t JOIN cur USING (service_order_id)
 WHERE t.month_end_date < cur.assignment_start_date
-   OR DATE_TRUNC('month', t.month_end_date) > cur.assignment_end_date
+   OR (DATE_TRUNC('month', t.month_end_date) > cur.assignment_end_date
+       AND t.timesheet_id NOT IN (SELECT timesheet_id FROM staging.stg_gen_cw_discrepancy_truth
+                                  WHERE discrepancy_code = 'CW11'))
 UNION ALL
 SELECT t.timesheet_id, 'rate the order never carried'
 FROM staging.stg_bw_timesheet_month AS t LEFT JOIN rates AS r USING (service_order_id, bill_rate)

@@ -4,7 +4,7 @@ Arcadia Systems, Bridgeway VMS and every supplier and person here are fictional;
 
 Release 3, phase 3. [`generator/contingent_workforce.py`](../../../generator/contingent_workforce.py) simulates Arcadia's contingent workforce program month by month and writes the six Bridgeway VMS tables the warehouse loads. Every parameter is in [`generator/reference_data.py`](../../../generator/reference_data.py) under *Contingent workforce*. The simulation draws from its own random stream, after the employee simulation, so no employee number moves.
 
-This is the **clean** program: what Bridgeway knows is true. The disagreements between Bridgeway and Keystone HR, the system managers use, are added on top of it in phase 4.
+This is the **clean** program: what Bridgeway knows is true. Phase 4 adds the disagreements between Bridgeway and Keystone HR, the system managers use, and three hygiene problems inside Bridgeway: orders closed late or never, time billed after the last day, and renewals submitted as a new worker. The counts below are the clean program's; the extract differs slightly (62 more workers, 112 fewer revisions, 139 more timesheets). See [Keystone and the feed](keystone_feed.md).
 
 ## The life of an engagement
 
@@ -79,6 +79,6 @@ These were sanity-checked against aggregate public market ranges; countries with
 | 63 | Opened ≤ submitted ≤ approved; a new engagement starts after approval; no assignment ends before it starts |
 | 64 | No Contractor or Consultant engagement runs more than 6 months past the 48-month cap |
 | 65 | The rate changes only on a *Rate change* revision; currency and rate type never change inside an order |
-| 66 | Billed time sits inside the assignment, at a rate the order carried, never more hours than the month's weekdays × 8, and the amount is units × rate to the cent |
+| 66 | Billed time sits inside the assignment, at a rate the order carried, never more hours than the month's weekdays × 8, and the amount is units × rate to the cent. Since phase 4, time billed after the last day passes only if the answer key lists it (CW11) |
 
 Each test was run against a deliberately broken copy of the data and caught the break. Writing test 66 found two real bugs on the way: Python's `round()` goes half to even (2,594.625 became 2,594.62) and binary floats land 0.3 × 1,670.75 on 501.22499…, so amounts are now multiplied in decimals and rounded half up, as invoices are; and staging had cut BPO's fractional months to two decimals.

@@ -52,7 +52,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain"]
         MART["marts<br/>walks · fills · plan vs actual · org"]
-        TEST{{"66 data tests"}}
+        TEST{{"69 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -234,7 +234,10 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 63 | Service order dates happen in order; a new engagement starts after approval | A worker counted before anyone approved them |
 | 64 | No Contractor or Consultant engagement runs more than six months past the 48-month cap | An extension rule that lets contracts run forever |
 | 65 | A bill rate changes only on a rate change revision | A raise slipping into a contract that has no raises |
-| 66 | Billed time sits inside the assignment and adds up to the cent | Spend for days nobody was working, or amounts that don't foot |
+| 66 | Billed time sits inside the assignment and adds up to the cent; time billed after the last day only if the answer key lists it | Spend for days nobody was working, or amounts that don't foot |
+| 67 | Every feed event comes from a revision of the worker's own order, outcomes agree with the dates, events apply first in, first out | A feed log that claims what Bridgeway never sent, or an old change overwriting a newer one |
+| 68 | Keystone's contingent worker history chains cleanly and every version is explained: by a feed event applied that day, by Keystone ending the contract, or by hand | A Keystone change nobody can account for; a contingent ID colliding with an employee's |
+| 69 | The discrepancy answer key is sound: known types, references that exist, dates inside the extract | Scoring detection against a key that is itself wrong |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -601,7 +604,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 66 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 69 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)

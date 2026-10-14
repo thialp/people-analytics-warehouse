@@ -38,6 +38,7 @@ import pandas as pd
 import contingent_workforce
 import fringe_research
 import fx_rates
+import keystone_feed
 import source_systems
 import reference_data as ref
 
@@ -1788,15 +1789,20 @@ write(pd.DataFrame(source_systems.lineage_rows()), "ref_raw_table_lineage")
 write(pd.DataFrame(source_systems.column_rows()), "ref_raw_column")
 
 # ======================================================================================
-# 8. Contingent workforce (release 3): the Bridgeway VMS extract
+# 8. Contingent workforce (release 3): Bridgeway VMS, Keystone HR and the feed between them
 # ======================================================================================
-# Its own random stream, run after the employee simulation, so no employee draw moves.
+# Each on its own random stream, run after the employee simulation, so no employee draw moves.
+# First the clean Bridgeway program; then Keystone's view of it through the one-way feed,
+# with the seeded discrepancies and their answer key (which also seeds Bridgeway's own
+# hygiene problems, so the Bridgeway tables are written from its output).
 cw_tables, cw_program = contingent_workforce.simulate(
     stream=domain_stream("contingent"), office=OFFICE, dept=DEPT, country=COUNTRY, job=job, workers=dim_worker,
     cost_centers=cost_center_rows, reorg_date=REORG_DATE, restructure_date=RESTRUCTURE_DATE)
+cw_tables, keystone = keystone_feed.simulate(
+    stream=domain_stream("keystone"), bw=cw_tables, program=cw_program, cost_centers=cost_center_rows)
 for _table in source_systems.RELEASE_3_TABLES:
-    df = cw_tables.get(_table, pd.DataFrame(columns=source_systems.columns(_table)))
-    write(df[source_systems.columns(_table)], _table)    # Keystone side and the feed: phase 4
+    write(cw_tables[_table][source_systems.columns(_table)], _table)
+write(cw_tables["ref_cw_discrepancy_type"], "ref_cw_discrepancy_type")
 
 print(f"Active headcount at {LAST_ME}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
       f"people managers: {sum(1 for w in active.values() if w['is_pm']):,}")

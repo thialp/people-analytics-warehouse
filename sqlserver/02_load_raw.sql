@@ -498,6 +498,29 @@ DECLARE @n_feed_bridgeway_keystone_event INT = (SELECT COUNT(*) FROM raw.feed_br
 PRINT CONCAT('raw.feed_bridgeway_keystone_event', '   ', @n_feed_bridgeway_keystone_event, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.gen_cw_discrepancy_truth;
+CREATE TABLE raw.gen_cw_discrepancy_truth (
+    [discrepancy_id]   NVARCHAR(400) NULL,
+    [discrepancy_code] NVARCHAR(400) NULL,
+    [root_cause_code]  NVARCHAR(400) NULL,
+    [bw_worker_id]     NVARCHAR(400) NULL,
+    [person_id]        NVARCHAR(400) NULL,
+    [service_order_id] NVARCHAR(400) NULL,
+    [feed_event_id]    NVARCHAR(400) NULL,
+    [timesheet_id]     NVARCHAR(400) NULL,
+    [fields_affected]  NVARCHAR(400) NULL,
+    [start_date]       NVARCHAR(400) NULL,
+    [end_date]         NVARCHAR(400) NULL,
+    [resolution]       NVARCHAR(400) NULL,
+    [detail]           NVARCHAR(400) NULL
+);
+BULK INSERT raw.gen_cw_discrepancy_truth
+FROM '/repo/data/sqlserver/gen_cw_discrepancy_truth.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_gen_cw_discrepancy_truth INT = (SELECT COUNT(*) FROM raw.gen_cw_discrepancy_truth);
+PRINT CONCAT('raw.gen_cw_discrepancy_truth', '        ', @n_gen_cw_discrepancy_truth, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.ks_contingent_worker;
 CREATE TABLE raw.ks_contingent_worker (
     [ks_record_id]         NVARCHAR(400) NULL,
@@ -525,6 +548,22 @@ FROM '/repo/data/raw/ks_contingent_worker.csv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ks_contingent_worker INT = (SELECT COUNT(*) FROM raw.ks_contingent_worker);
 PRINT CONCAT('raw.ks_contingent_worker', '            ', @n_ks_contingent_worker, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ref_cw_discrepancy_type;
+CREATE TABLE raw.ref_cw_discrepancy_type (
+    [discrepancy_code]    NVARCHAR(400) NULL,
+    [discrepancy_name]    NVARCHAR(400) NULL,
+    [what_happened]       NVARCHAR(400) NULL,
+    [what_a_manager_sees] NVARCHAR(400) NULL,
+    [who_can_fix_it]      NVARCHAR(400) NULL,
+    [severity]            NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_cw_discrepancy_type
+FROM '/repo/data/sqlserver/ref_cw_discrepancy_type.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_cw_discrepancy_type INT = (SELECT COUNT(*) FROM raw.ref_cw_discrepancy_type);
+PRINT CONCAT('raw.ref_cw_discrepancy_type', '         ', @n_ref_cw_discrepancy_type, ' rows');
 GO
 
 DROP TABLE IF EXISTS raw.ref_fringe_rate;

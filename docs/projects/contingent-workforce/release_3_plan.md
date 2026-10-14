@@ -14,7 +14,7 @@ Like release 2, it is one generator release and one rebuild. Every number on Das
 | 1. Remove part-time | Done 2026-10-14 | Every employee is 1.0 FTE. The generator keeps every random draw, so people, hires, exits, moves, seats and requisitions are identical to release 2; only the 1,899 FTE-change job and seat records are gone. FTE Changes removed from the headcount walk, compensation walk, cost bridge and footprint (DuckDB, Custom SQL); `part_time_headcount` dropped; test 23 now checks full-time. 59 tests pass; checker and all validation scripts PASS (06, 07, 09, 11 run locally too). FY26: 30,014 people = 30,014.0 FTE; loaded constant $3,410.5M (was $3,336.5M); pay per FTE $110,062.73 → $113,663.81. Totals: [release_3_totals_phase_1.md](release_3_totals_phase_1.md). Workbook impact: [release_3_migration_notes.md](release_3_migration_notes.md) |
 | 2. Source systems and lineage | Done 2026-10-14 | `generator/source_systems.py`: five systems (Keystone HR, Bridgeway VMS, integration log, public reference data, warehouse metadata), the source of all 38 raw tables, and the column contract of the 11 release 3 tables, written as raw tables `ref_source_system`, `ref_raw_table_lineage`, `ref_raw_column`. The 8 contingent workforce tables land with headers only. 11 staging models; tests 60 (lineage) and 61 (column contract) pass and catch deliberate breaks; SQL Server raw load regenerated; checker PASS. Docs: [source systems and lineage](../../warehouse/source_systems.md), data dictionary section, README architecture. Existing raw files and marts unchanged |
 | 3. Contingent worker simulation | Done 2026-10-14 | `generator/contingent_workforce.py` (own random stream, after the employee simulation: no employee file changes), parameters in `reference_data.py`. Burn-in from Jul 2013 so the Jun 2021 population has real ages; extract as of 2026-06-30; workers ended before Jul 2020 archived. 23 suppliers, 23,408 rate card lines, 43,423 workers, 58,276 service orders, 160,611 revisions, 632,365 timesheet rows. Active CW 8,564 (Jun 2021) → 11,941 (Jun 2026), 71% Contractor / 13% Consultant / 17% BPO, 64% Technology, 41% India; FY26 billed spend $1,087.9M (≈ a quarter of workforce cost). Tests 62–66 pass and catch deliberate breaks; control totals gain a contingent workforce table. [Bridgeway simulation](bridgeway_simulation.md), [totals](release_3_totals_phase_3.md) |
-| 4. Feed and discrepancy injection | Not started | |
+| 4. Feed and discrepancy injection | Done 2026-10-14 | `generator/keystone_feed.py` (own random stream: employee data and every mart unchanged). 106,357 feed events (1,410 failed, 6,345 late, 252 partly applied); 42,073 Keystone records, 140,681 versions (feed, Keystone inactivations, HR Ops, managers); Bridgeway hygiene seeded (late or missing closures, 139 timesheets after the last day, 62 renewals submitted as new workers). Answer key `gen_cw_discrepancy_truth`: 28,869 periods across 13 types (CW00 to CW12, catalogue `ref_cw_discrepancy_type`), built by replaying each Keystone record ideal vs real; zero unexplained days; about 3% of active CW carry an open discrepancy on any June 30; every worker active in one system but not the other on three test dates is explained by the key. Tests 67–69 (and 66 amended) pass and catch deliberate breaks. [Keystone and the feed](keystone_feed.md), [totals](release_3_totals_phase_4.md) |
 | 5. Plan, conversions, spend | Not started | |
 | 6. Marts: existing case studies | Not started | |
 | 7. Marts: case study 6 | Not started | |
@@ -181,11 +181,15 @@ Rates and hours never go to Keystone: managers in Keystone cannot see what a wor
 
 `gen_cw_discrepancy_truth`: every discrepancy the generator injected, with type, start and end dates. It is used by tests to **score the warehouse's detection** (how many injected cases it found, how many it flagged wrongly). It is clearly labelled a test fixture; Tableau never reads it.
 
+> **Phase 4:** it is loaded as a raw table from its own lineage system, `GEN` (synthetic data generator), so lineage test 60 covers it and test 69 checks it. One row per cause and continuous period, with the root cause, the records involved, a resolution and a sentence of evidence. Dashboards show only the detection score derived from it, on the methodology page.
+
 ---
 
 ## 8. Discrepancies seeded in the data
 
 Starting rates are tuned so that, on a typical month-end, about **3–5% of active CW** carry at least one open discrepancy: noticeable, not alarming, as in a healthy real program.
+
+> **Phase 4:** built as **13 types, CW00 to CW12**: *Change in transit* (CW00) is split from *Change arrived late* so normal lag is never a problem; failed attribute changes are CW12; *rate outside the card band* is not seeded (the order scatter already produces it: a case study 6 finding, not an injected defect). Each type carries a severity and an owner in `ref_cw_discrepancy_type`; failures caused by a broken link or a missing record keep that **root cause**. The result lands at about 3%. Final catalogue, rates and volumes: [Keystone and the feed](keystone_feed.md#the-discrepancy-catalogue). The table below is the original draft.
 
 | # | Discrepancy (named after what happened) | How it is seeded | What a Keystone-only manager sees | Who can fix it |
 |---|---|---|---|---|
@@ -269,14 +273,15 @@ Built in phase 2: **60** every raw table names exactly one source system, **61**
 64. Contractor and Consultant engagement ≤ 48 months, except the seeded breaches (all of which are flagged).
 65. A rate changes only on a revision whose reason is extension or renewal.
 66. No billed hours after the assignment end, except the seeded billing anomalies (all flagged).
-67. Every feed event refers to an existing revision; applied date ≥ sent date.
-68. Every Keystone CW version is explained by a feed event or a Keystone-side edit.
-69. Identity resolution: every Bridgeway worker and every Keystone CW appears exactly once in the resolution output (matched or unmatched).
+67. Every feed event refers to an existing revision of the worker's own order, of the matching type; applied date ≥ sent date; outcomes agree with the dates; first in, first out per worker. *(Built in phase 4.)*
+68. Every Keystone CW version is explained by a feed event applied that day, a Keystone inactivation, or a hand edit; the history chains; person IDs never collide with employees. *(Built in phase 4.)*
+69. The answer key is well formed: known types, references that exist, dates inside the extract. *(Built in phase 4; test 66 amended to accept only the after-end timesheets the key lists.)*
 70. Active CW per month-end from the snapshot = active CW in the CW headcount walk.
 71. CW spend in `mart_cw_spend` = billed hours × rate, to the cent, and ties to `bw_timesheet_month`.
 72. Workforce walk: Opening + movements = Closing for Employees, CW and Total; a conversion nets to zero in Total.
 73. Detection: every injected discrepancy open at a month-end is detected (recall 100% for rule-detectable types); false flags listed and explained.
 74. Plan vs actual: actual CW headcount and spend tie to the CW snapshot and spend marts.
+75. Identity resolution: every Bridgeway worker and every Keystone CW appears exactly once in the resolution output (matched or unmatched). *(Moved from 69 to phase 7, where the model is built.)*
 
 ---
 
@@ -288,10 +293,10 @@ Built in phase 2: **60** every raw table names exactly one source system, **61**
 | 1 | Remove part-time (section 11) | Walks reconcile; employee headcount unchanged, FTE = headcount |
 | 2 | Source systems: names, raw table shells, lineage doc, data dictionary skeleton | Tests 60–61 |
 | 3 | CW simulation: suppliers, workers, orders, revisions, rate card, timesheets (own random stream) | Tests 62–66; population and spend targets |
-| 4 | Feed log and Keystone CW history; discrepancy injection; truth table | Tests 67–69 |
+| 4 | Feed log and Keystone CW history; discrepancy injection; truth table | Tests 67–69 (identity resolution test moves to 75, phase 7) |
 | 5 | CW plan line; conversions into employee requisitions | Test 74; employee hires unchanged except conversions |
 | 6 | Marts for case studies 1–5 (worker type in the walk, CW spend panel, cost bridge drivers, footprint) | Tests 70–72; existing tests pass |
-| 7 | Marts for case study 6 | Tests 71, 73 |
+| 7 | Marts for case study 6 | Tests 71, 73, 75 |
 | 8 | SQL Server twin, Custom SQL files, DuckDB checker; Mac run | All PASS |
 | 9 | Expected values for every dashboard; docs: data dictionary, case study 6, README, control totals | Check tables generated |
 | 10 | Tableau: republish #1 and #2 on release 3, build #3, then design and build #6 | Check tables match |

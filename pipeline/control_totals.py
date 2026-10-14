@@ -113,6 +113,58 @@ group by e.fiscal_year
 order by e.fiscal_year
 """
 
+KS_TOTALS = """
+with ends as (select make_date(y, 6, 30) as fy_end, y as fiscal_year from range(2021, 2027) t(y)),
+bw as (    -- working in Bridgeway on the fiscal year-end, by the revision in effect that day
+    select e.fiscal_year, o.bw_worker_id
+    from ends e
+    join staging.stg_bw_service_order_revision r
+      on r.effective_start_date <= e.fy_end and r.effective_end_date_filled >= e.fy_end
+     and r.status in ('Approved', 'Closed')
+     and r.assignment_start_date <= e.fy_end and r.assignment_end_date >= e.fy_end
+    join staging.stg_bw_service_order o using (service_order_id)
+),
+ks as (    -- active in Keystone and past the contract start
+    select e.fiscal_year, k.person_id
+    from ends e
+    join staging.stg_ks_contingent_worker k
+      on k.effective_start_date <= e.fy_end and k.effective_end_date_filled >= e.fy_end
+     and k.status = 'Active' and k.contract_start_date <= e.fy_end
+),
+feed as (
+    select case when month(sent_date) >= 7 then year(sent_date) + 1 else year(sent_date) end as fiscal_year,
+           count(*) as sent,
+           count(*) filter (where outcome = 'Failed') as failed,
+           count(*) filter (where outcome = 'Applied Late') as late
+    from staging.stg_feed_bridgeway_keystone_event group by 1
+),
+open_dq as (   -- seeded discrepancies open on the year-end (answer key), on workers working in Bridgeway
+    select e.fiscal_year, count(distinct t.bw_worker_id) as workers
+    from ends e
+    join staging.stg_gen_cw_discrepancy_truth t
+      on t.start_date <= e.fy_end and t.end_date_filled >= e.fy_end and t.discrepancy_code <> 'CW00'
+    join bw b on b.fiscal_year = e.fiscal_year and b.bw_worker_id = t.bw_worker_id
+    group by 1
+)
+select 'FY' || right(cast(e.fiscal_year as varchar), 2),
+       (select count(distinct bw_worker_id) from bw where bw.fiscal_year = e.fiscal_year),
+       (select count(distinct person_id) from ks where ks.fiscal_year = e.fiscal_year),
+       f.sent, f.late, f.failed, d.workers,
+       round(100.0 * d.workers / (select count(distinct bw_worker_id) from bw where bw.fiscal_year = e.fiscal_year), 1)
+from ends e
+left join feed f using (fiscal_year)
+left join open_dq d using (fiscal_year)
+order by e.fiscal_year
+"""
+
+DQ_TOTALS = """
+select t.discrepancy_code, y.discrepancy_name, y.severity, count(*) as periods,
+       count(*) filter (where t.end_date is null) as open_at_extract
+from staging.stg_gen_cw_discrepancy_truth t
+join staging.stg_cw_discrepancy_type y using (discrepancy_code)
+group by all order by 1
+"""
+
 
 def table(rows, headers) -> str:
     out = ["| " + " | ".join(headers) + " |", "|" + "---|" * len(headers)]
@@ -137,6 +189,16 @@ def main() -> None:
           "month-end FX. FY21 is one month (June 2021): timesheets start with the warehouse history.\n")
     print(table(con.sql(CW_TOTALS).fetchall(), ["FY", "Active CW", "Contractor", "Consultant", "BPO",
                                                 "Engagements started", "Billed spend $M"]))
+
+    print("\n## Keystone HR and the feed\n")
+    print("Working on June 30 in each system (Bridgeway: the revision in effect that day; Keystone: active and past "
+          "the contract start), feed events sent in the fiscal year, and workers with at least one seeded "
+          "discrepancy open on June 30 (answer key, excluding changes in transit). FY21 feed counts are the "
+          "whole year: the feed log covers every extracted worker's history.\n")
+    print(table(con.sql(KS_TOTALS).fetchall(), ["FY", "Working in Bridgeway", "Active in Keystone", "Feed events",
+                                                "Applied late", "Failed", "Workers with an open discrepancy", "%"]))
+    print("\n## Answer key\n")
+    print(table(con.sql(DQ_TOTALS).fetchall(), ["Code", "Discrepancy", "Severity", "Periods", "Open at extract"]))
 
     for schema in ("raw", "marts"):
         names = [r[0] for r in con.sql(

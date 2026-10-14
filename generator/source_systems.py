@@ -50,12 +50,16 @@ SOURCE_SYSTEMS = [
      "record_of": "ECB euro reference rates; employer fringe rates researched from OECD, BLS and national sources",
      "used_by": "Finance, the warehouse",
      "extract": "Loaded when sources publish"},
+    {"system_code": "GEN", "system_name": "Synthetic data generator", "system_type": "Test fixture",
+     "record_of": "The answer key: every discrepancy the generator seeded between Bridgeway and Keystone, with its cause and dates",
+     "used_by": "The tests and the detection score: how much of what was seeded the warehouse finds. Never a business source",
+     "extract": "Written with the data by generator/keystone_feed.py"},
 ]
 
 # --------------------------------------------------------------------------------------
 # Every raw table: source system, module, grain and history type
 # --------------------------------------------------------------------------------------
-_KS, _BW, _INT, _PUB, _WH = "KS", "BW", "INT", "PUB", "WH"
+_KS, _BW, _INT, _PUB, _WH, _GEN = "KS", "BW", "INT", "PUB", "WH", "GEN"
 RAW_TABLE_LINEAGE = [
     # Keystone HR: people
     ("dim_worker", _KS, "Core HR", "worker", "Type 1", 2),
@@ -103,6 +107,9 @@ RAW_TABLE_LINEAGE = [
     ("ref_source_system", _WH, "Warehouse metadata", "source system", "Type 1", 3),
     ("ref_raw_table_lineage", _WH, "Warehouse metadata", "raw table", "Type 1", 3),
     ("ref_raw_column", _WH, "Warehouse metadata", "release 3 raw table x column", "Type 1", 3),
+    ("ref_cw_discrepancy_type", _WH, "Warehouse metadata", "discrepancy type", "Type 1", 3),
+    # The answer key (release 3): a test fixture, never a business source
+    ("gen_cw_discrepancy_truth", _GEN, "Answer key", "seeded discrepancy x continuous period", "Effective-dated", 3),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -189,19 +196,19 @@ RAW_COLUMNS: dict[str, list[tuple[str, str, str]]] = {
     "ks_contingent_worker": [
         ("ks_record_id", "VARCHAR", "Record key"),
         ("person_id", "VARCHAR", "Keystone person ID, the same W... key space as employees"),
-        ("bw_worker_id", "VARCHAR", "Bridgeway worker ID as Keystone stored it from the feed; can be blank or mistyped"),
+        ("bw_worker_id", "VARCHAR", "Bridgeway worker ID as Keystone stored it from the feed; blank when a load dropped it or a record was created by hand without one, mistyped when typed by hand"),
         ("effective_start_date", "DATE", "First day the version applies"),
         ("effective_end_date", "DATE", "Last day (inclusive); empty for the current version"),
-        ("change_source", "VARCHAR", "Feed, HR Ops or Manager: who wrote the version"),
+        ("change_source", "VARCHAR", "Feed, HR Ops, Manager, or System (Keystone inactivating the worker the day after the contract end date it holds)"),
         ("feed_event_id", "VARCHAR", "-> feed_bridgeway_keystone_event when change_source = Feed"),
         ("first_name", "VARCHAR", "As Keystone holds it"),
         ("last_name", "VARCHAR", "As Keystone holds it"),
         ("cw_type", "VARCHAR", "Contractor, Consultant or BPO"),
-        ("supplier_name", "VARCHAR", "Free text as fed; Keystone has no supplier table"),
+        ("supplier_name", "VARCHAR", "Free text: exact as fed, or as typed by hand; Keystone has no supplier table"),
         ("status", "VARCHAR", "Active or Inactive"),
-        ("contract_start_date", "DATE", "As Keystone knows it"),
+        ("contract_start_date", "DATE", "First day of the engagement as Keystone knows it; renewals and extensions move the end, never the start"),
         ("contract_end_date", "DATE", "As Keystone knows it; Keystone inactivates the worker the day after"),
-        ("inactive_reason", "VARCHAR", "Contract ended, Ended early, Converted to employee, Manual; empty while active"),
+        ("inactive_reason", "VARCHAR", "Contract ended, Ended early or Manual; empty while active"),
         ("department_id", "VARCHAR", "-> dim_department"),
         ("cost_center_id", "VARCHAR", "-> dim_cost_center"),
         ("location_id", "VARCHAR", "-> dim_location"),
@@ -211,17 +218,40 @@ RAW_COLUMNS: dict[str, list[tuple[str, str, str]]] = {
         ("feed_event_id", "VARCHAR", "Event key"),
         ("revision_id", "VARCHAR", "-> bw_service_order_revision that caused the event"),
         ("bw_worker_id", "VARCHAR", "-> bw_contingent_worker"),
-        ("event_type", "VARCHAR", "New Worker, Extension, Early End, Rate Change, Attribute Change, Renewal, Closure"),
-        ("sent_date", "DATE", "Day Bridgeway sent the change"),
-        ("applied_date", "DATE", "Day Keystone applied it; empty if it failed"),
-        ("outcome", "VARCHAR", "Applied, Applied Late, Partly Applied, Failed"),
+        ("event_type", "VARCHAR", "New Worker, Renewal, Extension, Early End or Attribute Change. Rates and closures are not sent: Keystone holds neither"),
+        ("sent_date", "DATE", "Day Bridgeway sent the change: the revision's effective start"),
+        ("applied_date", "DATE", "Day Keystone applied it; empty if it failed or is still queued"),
+        ("outcome", "VARCHAR", "Applied (within 2 days), Applied Late (3 days or more), Partly Applied (created without the Bridgeway ID), Failed, or Queued on the extract date"),
         ("error_text", "VARCHAR", "Integration message for failures and partial loads"),
     ],
 }
 
 # The registry tables themselves, so test 61 covers them too
+RAW_COLUMNS["ref_cw_discrepancy_type"] = [
+    ("discrepancy_code", "VARCHAR", "CW00 to CW12"),
+    ("discrepancy_name", "VARCHAR", "Named after what happened in the systems"),
+    ("what_happened", "VARCHAR", "The event behind it"),
+    ("what_a_manager_sees", "VARCHAR", "What someone looking only at Keystone sees"),
+    ("who_can_fix_it", "VARCHAR", "The team that can correct the source; the warehouse only flags"),
+    ("severity", "VARCHAR", "Expected, Data hygiene, Cost risk, Access risk or Compliance risk"),
+]
+RAW_COLUMNS["gen_cw_discrepancy_truth"] = [
+    ("discrepancy_id", "VARCHAR", "Answer key row"),
+    ("discrepancy_code", "VARCHAR", "-> ref_cw_discrepancy_type: what the systems show"),
+    ("root_cause_code", "VARCHAR", "-> ref_cw_discrepancy_type: why (differs when a broken link or a missing record made a later change fail)"),
+    ("bw_worker_id", "VARCHAR", "The Bridgeway worker it is about; empty for a Keystone-only worker"),
+    ("person_id", "VARCHAR", "The Keystone person involved; empty if Keystone has no record"),
+    ("service_order_id", "VARCHAR", "The order involved, when there is one"),
+    ("feed_event_id", "VARCHAR", "The feed event involved, when there is one"),
+    ("timesheet_id", "VARCHAR", "The timesheet involved (CW11)"),
+    ("fields_affected", "VARCHAR", "What disagrees, semicolon separated"),
+    ("start_date", "DATE", "First day it is true"),
+    ("end_date", "DATE", "Last day it is true; empty if still open on the extract date"),
+    ("resolution", "VARCHAR", "How it ended, or Open at extract"),
+    ("detail", "VARCHAR", "The facts behind it, in a sentence"),
+]
 RAW_COLUMNS["ref_source_system"] = [
-    ("system_code", "VARCHAR", "KS, BW, INT, WH or PUB"),
+    ("system_code", "VARCHAR", "KS, BW, INT, PUB, WH or GEN"),
     ("system_name", "VARCHAR", "System name"),
     ("system_type", "VARCHAR", "What kind of system it is"),
     ("record_of", "VARCHAR", "What it is the system of record for"),
@@ -260,6 +290,6 @@ def columns(table: str) -> list[str]:
     return [c for c, _, _ in RAW_COLUMNS[table]]
 
 
-# Release 3 operational tables (not the registry). The generator writes them; until the
-# contingent workforce simulation lands (phase 3) they are written with headers only.
+# Release 3 operational tables and the answer key (not the registry): written from the
+# Bridgeway and Keystone simulations.
 RELEASE_3_TABLES = [t for t, _, _, _, _, r in RAW_TABLE_LINEAGE if r == 3 and not t.startswith("ref_")]

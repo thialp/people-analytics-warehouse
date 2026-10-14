@@ -246,7 +246,9 @@ The contingent workforce comes from two systems. **Bridgeway VMS** (`bw_`) is th
 
 **The extract.** Bridgeway is extracted as of **2026-06-30**, like the rest of the warehouse: no revision, approval or closure dated later is in it, but orders opened by then that start in July 2026 are (approved, or still pending approval). Workers whose last assignment ended before **2020-07-01** are archived in Bridgeway and not extracted.
 
-> **Release 3 status:** the Bridgeway tables are filled (phase 3). `ks_contingent_worker` and `feed_bridgeway_keystone_event` keep their headers only until phase 4. Columns are the contract test 61 enforces.
+> **Release 3 status:** Bridgeway (phase 3), Keystone, the feed and the answer key (phase 4) are filled. How Keystone and the feed are simulated, and the discrepancy catalogue: [Keystone and the feed](../projects/contingent-workforce/keystone_feed.md). Columns are the contract test 61 enforces.
+>
+> **Seeded on purpose.** The data carries the disagreements real programs have: between the two systems, and inside Bridgeway itself (orders closed late or never, time billed after the last day, a renewal submitted as a new worker). Every one is in the answer key, `gen_cw_discrepancy_truth`.
 
 #### bw_supplier
 Suppliers in Bridgeway VMS (23, all fictional). One stopped taking new orders in June 2022 (`is_active` false).
@@ -334,7 +336,7 @@ Every change to an order is a new revision, effective-dated, one per day at most
 | `hours_per_week` | DECIMAL | Contracted hours; empty for monthly BPO orders |
 
 #### bw_timesheet_month
-Billed time per worker, order, month and rate, from June 2021 (the start of the warehouse history). Hourly orders bill weekdays × 8 less time off; BPO orders bill the share of the month worked. `billed_amount_local` = `billed_units × bill_rate`, to the cent (test 66).
+Billed time per worker, order, month and rate, from June 2021 (the start of the warehouse history). Hourly orders bill weekdays × 8 less time off; BPO orders bill the share of the month worked. `billed_amount_local` = `billed_units × bill_rate`, to the cent (test 66). 139 timesheets bill a month after the worker's last day: seeded discrepancy CW11, each listed in the answer key.
 
 | Column | Type | Description |
 |---|---|---|
@@ -349,43 +351,74 @@ Billed time per worker, order, month and rate, from June 2021 (the start of the 
 | `billed_amount_local` | DECIMAL | billed_units x bill_rate |
 
 #### ks_contingent_worker
-The Keystone HR profile of each contingent worker, SCD Type 2. Written by the feed from Bridgeway or by hand in Keystone. Keystone inactivates the worker the day after `contract_end_date`. **No rows until phase 4.**
+The Keystone HR person record of each contingent worker, SCD Type 2, one version per day. Written by the feed from Bridgeway (`change_source` Feed), by Keystone itself when it inactivates a worker the day after the contract end it holds (System), and by hand (HR Ops, Manager). Contingent workers take person IDs from W500001, in the order Keystone created them; employees run from W100001, so the two never collide (test 68). The stored `bw_worker_id` is how the warehouse links Keystone to Bridgeway; it is blank or mistyped on a few records (discrepancy CW06), and a few records have no Bridgeway worker at all (CW09).
 
 | Column | Type | Description |
 |---|---|---|
 | `ks_record_id` | VARCHAR | Record key |
 | `person_id` | VARCHAR | Keystone person ID, the same W... key space as employees |
-| `bw_worker_id` | VARCHAR | Bridgeway worker ID as Keystone stored it from the feed; can be blank or mistyped |
+| `bw_worker_id` | VARCHAR | Bridgeway worker ID as Keystone stored it from the feed; blank when a load dropped it or a record was created by hand without one, mistyped when typed by hand |
 | `effective_start_date` | DATE | First day the version applies |
 | `effective_end_date` | DATE | Last day (inclusive); empty for the current version |
-| `change_source` | VARCHAR | Feed, HR Ops or Manager: who wrote the version |
+| `change_source` | VARCHAR | Feed, HR Ops, Manager, or System (Keystone inactivating the worker the day after the contract end date it holds) |
 | `feed_event_id` | VARCHAR | → feed_bridgeway_keystone_event when change_source = Feed |
 | `first_name` | VARCHAR | As Keystone holds it |
 | `last_name` | VARCHAR | As Keystone holds it |
 | `cw_type` | VARCHAR | Contractor, Consultant or BPO |
-| `supplier_name` | VARCHAR | Free text as fed; Keystone has no supplier table |
+| `supplier_name` | VARCHAR | Free text: exact as fed, or as typed by hand; Keystone has no supplier table |
 | `status` | VARCHAR | Active or Inactive |
-| `contract_start_date` | DATE | As Keystone knows it |
+| `contract_start_date` | DATE | First day of the engagement as Keystone knows it; renewals and extensions move the end, never the start |
 | `contract_end_date` | DATE | As Keystone knows it; Keystone inactivates the worker the day after |
-| `inactive_reason` | VARCHAR | Contract ended, Ended early, Converted to employee, Manual; empty while active |
+| `inactive_reason` | VARCHAR | Contract ended, Ended early or Manual; empty while active |
 | `department_id` | VARCHAR | → dim_department |
 | `cost_center_id` | VARCHAR | → dim_cost_center |
 | `location_id` | VARCHAR | → dim_location |
 | `manager_worker_id` | VARCHAR | Arcadia employee the worker reports to (→ dim_worker) |
 
 #### feed_bridgeway_keystone_event
-Every change Bridgeway sent to Keystone, when it was applied, or that it failed or arrived partly. **No rows until phase 4.**
+Every change Bridgeway sent to Keystone: one event per revision Keystone cares about, with its outcome. Events for one worker are applied first in, first out, so a late event holds up the ones behind it (test 67). The payload is the revision itself (`revision_id`).
 
 | Column | Type | Description |
 |---|---|---|
 | `feed_event_id` | VARCHAR | Event key |
 | `revision_id` | VARCHAR | → bw_service_order_revision that caused the event |
 | `bw_worker_id` | VARCHAR | → bw_contingent_worker |
-| `event_type` | VARCHAR | New Worker, Extension, Early End, Rate Change, Attribute Change, Renewal, Closure |
-| `sent_date` | DATE | Day Bridgeway sent the change |
-| `applied_date` | DATE | Day Keystone applied it; empty if it failed |
-| `outcome` | VARCHAR | Applied, Applied Late, Partly Applied, Failed |
+| `event_type` | VARCHAR | New Worker, Renewal, Extension, Early End or Attribute Change. Rates and closures are not sent: Keystone holds neither |
+| `sent_date` | DATE | Day Bridgeway sent the change: the revision's effective start |
+| `applied_date` | DATE | Day Keystone applied it; empty if it failed or is still queued |
+| `outcome` | VARCHAR | Applied (within 2 days), Applied Late (3 days or more), Partly Applied (created without the Bridgeway ID), Failed, or Queued on the extract date |
 | `error_text` | VARCHAR | Integration message for failures and partial loads |
+
+#### gen_cw_discrepancy_truth
+**The answer key. A test fixture, not a business source** (system `GEN`). Every discrepancy the generator seeded, with its cause and the days it was true: one row per cause and continuous period. The warehouse detects discrepancies from Bridgeway, Keystone and the feed alone; this table only scores what it finds (case study 6). A Keystone-side discrepancy counts only on days when either system shows the worker working. How it is built: [Keystone and the feed](../projects/contingent-workforce/keystone_feed.md#the-answer-key).
+
+| Column | Type | Description |
+|---|---|---|
+| `discrepancy_id` | VARCHAR | Answer key row |
+| `discrepancy_code` | VARCHAR | → ref_cw_discrepancy_type: what the systems show |
+| `root_cause_code` | VARCHAR | → ref_cw_discrepancy_type: why (differs when a broken link or a missing record made a later change fail) |
+| `bw_worker_id` | VARCHAR | The Bridgeway worker it is about; empty for a Keystone-only worker |
+| `person_id` | VARCHAR | The Keystone person involved; empty if Keystone has no record |
+| `service_order_id` | VARCHAR | The order involved, when there is one |
+| `feed_event_id` | VARCHAR | The feed event involved, when there is one |
+| `timesheet_id` | VARCHAR | The timesheet involved (CW11) |
+| `fields_affected` | VARCHAR | What disagrees, semicolon separated |
+| `start_date` | DATE | First day it is true |
+| `end_date` | DATE | Last day it is true; empty if still open on the extract date |
+| `resolution` | VARCHAR | How it ended, or Open at extract |
+| `detail` | VARCHAR | The facts behind it, in a sentence |
+
+#### ref_cw_discrepancy_type
+The 13 discrepancy types, CW00 to CW12, named after what happened in the systems (warehouse metadata).
+
+| Column | Type | Description |
+|---|---|---|
+| `discrepancy_code` | VARCHAR | CW00 to CW12 |
+| `discrepancy_name` | VARCHAR | Named after what happened in the systems |
+| `what_happened` | VARCHAR | The event behind it |
+| `what_a_manager_sees` | VARCHAR | What someone looking only at Keystone sees |
+| `who_can_fix_it` | VARCHAR | The team that can correct the source; the warehouse only flags |
+| `severity` | VARCHAR | Expected, Data hygiene, Cost risk, Access risk or Compliance risk |
 
 ### Lineage registry (release 3)
 
@@ -393,8 +426,8 @@ Written by [`generator/source_systems.py`](../../generator/source_systems.py) wi
 
 | Table | Grain | Columns |
 |---|---|---|
-| `ref_source_system` | source system (5) | `system_code`, `system_name`, `system_type`, `record_of`, `used_by`, `extract` |
-| `ref_raw_table_lineage` | raw table (38) | `table_name`, `system_code`, `module`, `grain`, `history_type`, `added_in_release` |
+| `ref_source_system` | source system (6) | `system_code`, `system_name`, `system_type`, `record_of`, `used_by`, `extract` |
+| `ref_raw_table_lineage` | raw table (40) | `table_name`, `system_code`, `module`, `grain`, `history_type`, `added_in_release` |
 | `ref_raw_column` | release 3 raw table × column | `table_name`, `column_order`, `column_name`, `data_type`, `description` |
 
 ## Marts (`data/marts/`)

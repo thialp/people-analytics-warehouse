@@ -508,3 +508,75 @@ CW_BPO_SUPPLIER_ROLES = {"SUP-019": ["Security"], "SUP-020": ["Facilities", "Sec
                          "SUP-021": ["Service Desk"], "SUP-022": ["Customer Support"]}
 CW_EMAIL_DOMAIN = "ext.arcadia-systems.example"      # reserved .example domain: never a real address
 EMPLOYEE_EMAIL_DOMAIN = "arcadia-systems.example"
+
+
+# ======================================================================================
+# Keystone HR and the Bridgeway -> Keystone feed (release 3, phase 4)
+# How the one-way integration behaves, and what people do by hand in Keystone. Every rate
+# here is a seeded imperfection; the answer key (gen_cw_discrepancy_truth) records each one.
+# ======================================================================================
+KS_CW_PERSON_ID_START = 500_001          # contingent workers take Keystone person IDs from W500001
+KS_HISTORY_KEEP_FROM = "2021-06-30"      # the answer key covers the warehouse history window
+
+# Days from sent to applied for an event that goes through; 3+ days is "arrived late"
+FEED_LAG_DAYS = {0: 0.50, 1: 0.33, 2: 0.11}
+FEED_LATE_DAYS = (3, 15)                  # the remaining 6%: uniform, inclusive
+# Share of events that fail outright, by event type
+FEED_FAIL = {"New Worker": 0.005, "Renewal": 0.015, "Extension": 0.015, "Early End": 0.02,
+             "Attribute Change": 0.01}
+FEED_PARTIAL_LINK = 0.006                 # a New Worker loads without the Bridgeway ID (blank link)
+FEED_ERRORS = {
+    "timeout": "Delivery failed: message dead-lettered after 3 retries",
+    "validation": "Validation failed: target record locked by another transaction",
+    "mapping": "Mapping error: payload rejected by the inbound schema",
+    "not_found": "Worker not found for external ID {bw}",
+    "partial": "Partial load: external worker ID not mapped; record created without it",
+}
+
+# HR Ops repairs: probability a case is fixed by hand, and the delay in days (uniform, inclusive)
+KS_FIX = {"Never reached Keystone": (0.65, (7, 60)), "Link ID missing or mistyped": (0.55, (15, 120)),
+          "Extension never arrived": (0.60, (2, 20)), "Early end never arrived": (0.50, (3, 30)),
+          "Attribute change never arrived": (0.30, (10, 60))}
+KS_MANUAL_LINK_TYPO = 0.25                # a record HR Ops creates by hand has the Bridgeway ID mistyped
+KS_MANUAL_SUPPLIER_VARIANT = 0.50         # ... and the supplier typed its own way
+
+# Edits made in Keystone only (managers and HR Ops), per active worker per month
+KS_LOCAL_EDIT_MONTHLY = {"Cost center": 0.0012, "Manager": 0.0016, "Office": 0.0006}
+KS_LOCAL_EDIT_BY_MANAGER = 0.60           # the rest by HR Ops
+
+# Contingent workers created by hand in Keystone with no Bridgeway order, per month from KS_ONLY_FROM
+KS_ONLY_MONTHLY = 0.6
+KS_ONLY_FROM = "2019-01-01"
+
+# Bridgeway-side hygiene
+BW_SLOW_CLOSURE_SHARE = 0.03              # ended orders not closed within the normal 0-15 days
+BW_SLOW_CLOSURE_DAYS = (17, 400)          # closed this late (open past the 15-day grace), or never if that falls after the extract
+BW_BILLED_AFTER_END_SHARE = 0.004         # ended orders that bill time in the month after the last day
+BW_SPLIT_RENEWAL_SHARE = 0.005            # renewals the supplier submitted as a new worker (a second Bridgeway ID)
+
+# Supplier names as people type them in Keystone (by hand); the feed sends the exact name
+KS_SUPPLIER_VARIANTS = {
+    "Vantrell Technical Staffing": ["Vantrell Tech Staffing", "VANTRELL TECHNICAL STAFFING INC"],
+    "Quorlan Digital Workforce": ["Quorlan Digital", "Quorlan Digital Workforce Pvt Ltd"],
+    "Halvery Engineering Services": ["Halvery Engg Services", "Halvery Engineering"],
+    "Brennick Talent Partners": ["Brennick Talent", "Brennick Talent Partners LLC"],
+    "Thornquist Systems Staffing": ["Thornquist Systems", "Thornquist Staffing Sp. z o.o."],
+    "Ellsmere IT Resourcing": ["Ellsmere IT", "Ellsmere I.T. Resourcing"],
+    "Marrowby Software Services": ["Marrowby Software", "Marrowby SW Services"],
+    "Calderine Tech Partners": ["Calderine Tech", "Calderine Technology Partners"],
+    "Ostrel Data Staffing": ["Ostrel Data", "Ostrel Data Staffing Ltd"],
+    "Wexcombe Delivery Group": ["Wexcombe Delivery", "Wexcombe Group"],
+    "Pellatine Contract Talent": ["Pellatine Contract", "Pellatine Talent"],
+    "Drumlow Engineering": ["Drumlow Engineering GmbH", "Drumlow Eng."],
+    "Fenwarren Staffing": ["Fenwarren Staffing Inc", "Fen Warren Staffing"],
+    "Ashgrove Advisory": ["Ashgrove Advisory Group", "Ashgrove"],
+    "Kilnford Consulting": ["Kilnford Consulting Ltd", "Kilnford"],
+    "Merriden Vale Partners": ["Merriden Vale", "MerridenVale Partners"],
+    "Corvanne Consulting": ["Corvanne Consulting Pte", "Corvanne"],
+    "Halsted Brook Advisory": ["Halsted Brook", "Halstead Brook Advisory"],
+    "Sentrel Security Services": ["Sentrel Security", "Sentrel Security Svcs"],
+    "Brightmoor Facility Services": ["Brightmoor Facilities", "Brightmoor Facility Svcs"],
+    "Quaystone Service Desk Solutions": ["Quaystone Service Desk", "Quaystone SD Solutions"],
+    "Ravelin Customer Care": ["Ravelin CX", "Ravelin Customer Care Inc"],
+    "Tollbrook Facilities Group": ["Tollbrook Facilities", "Tollbrook Group"],
+}
