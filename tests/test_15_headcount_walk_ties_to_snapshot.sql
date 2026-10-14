@@ -11,6 +11,7 @@ WITH walk AS (
         SUM(CASE WHEN w.movement_category = 'Closing' THEN w.fte       END) AS closing_fte
     FROM marts.mart_headcount_fte_walk AS w
     JOIN marts.mart_dim_month AS m ON m.month_end_date = w.month_end_date
+    WHERE w.worker_type = 'Employee'          -- contingent workers: test 70
     GROUP BY ALL
 ),
 snap AS (

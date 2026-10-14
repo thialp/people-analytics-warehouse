@@ -91,10 +91,17 @@ def table(header: list[str], rows: list[list], align: str | None = None) -> str:
 class HeadcountWalk:
     """The Executive Summary measures (build book section 6) for one Start..End month range."""
 
-    def __init__(self, con: duckdb.DuckDBPyConnection, start: str, end: str, function: str | None = None):
+    def __init__(self, con: duckdb.DuckDBPyConnection, start: str, end: str, function: str | None = None,
+                 worker_type: str | None = "Employee"):
+        """worker_type Employee (the default, the dashboard's employee view), Contingent, or None
+        for the Total workforce. For contingent workers, hires are engagement starts and the
+        leavers are in `ends`; `conv` is the signed conversions (+ into Employee, - out of Contingent)."""
         self.start, self.end = date.fromisoformat(start), date.fromisoformat(end)
         where = "w.month_end_date BETWEEN ? AND ?"
         params: list = [start, end]
+        if worker_type:
+            where += " AND w.worker_type = ?"
+            params.append(worker_type)
         if function:
             where += " AND d.function_name = ?"
             params.append(function)
@@ -106,21 +113,23 @@ class HeadcountWalk:
               SUM(CASE WHEN w.movement_category = 'Opening' AND w.month_end_date = ? THEN w.fte END)       AS open_fte,
               SUM(CASE WHEN w.movement_category = 'Closing' AND w.month_end_date = ? THEN w.headcount END) AS close_hc,
               SUM(CASE WHEN w.movement_category = 'Closing' AND w.month_end_date = ? THEN w.fte END)       AS close_fte,
-              SUM(CASE WHEN w.movement_category = 'Hires' THEN w.headcount END)                    AS hires,
-              SUM(CASE WHEN w.movement_category = 'Hires' THEN w.fte END)                          AS hires_fte,
+              SUM(CASE WHEN w.movement_category IN ('Hires', 'Starts') THEN w.headcount END)       AS hires,
+              SUM(CASE WHEN w.movement_category IN ('Hires', 'Starts') THEN w.fte END)             AS hires_fte,
               -SUM(CASE WHEN w.movement_category = 'Voluntary Terminations' THEN w.headcount END)  AS vol,
               -SUM(CASE WHEN w.movement_category = 'Voluntary Terminations' THEN w.fte END)        AS vol_fte,
               -SUM(CASE WHEN w.movement_category = 'Involuntary Terminations' THEN w.headcount END) AS invol,
               -SUM(CASE WHEN w.movement_category = 'Involuntary Terminations' THEN w.fte END)      AS invol_fte,
               SUM(CASE WHEN w.movement_category = 'Internal Moves In' THEN w.headcount END)        AS moves,
               SUM(CASE WHEN w.movement_category = 'Internal Moves In' AND w.movement_reason = 'Promotion'
-                       THEN w.headcount END)                                                       AS promotions
+                       THEN w.headcount END)                                                       AS promotions,
+              -SUM(CASE WHEN w.movement_category = 'Ends' THEN w.headcount END)                    AS ends,
+              SUM(CASE WHEN w.movement_category = 'Conversions' THEN w.headcount END)              AS conv
             FROM marts.mart_headcount_fte_walk AS w
             LEFT JOIN marts.mart_dim_department AS d ON d.department_id = w.department_id
             WHERE {where}
         """, [start, start, end, end, *params]).fetchone()
         names = ["months", "oc_sum", "open_hc", "open_fte", "close_hc", "close_fte",
-                 "hires", "hires_fte", "vol", "vol_fte", "invol", "invol_fte", "moves", "promotions"]
+                 "hires", "hires_fte", "vol", "vol_fte", "invol", "invol_fte", "moves", "promotions", "ends", "conv"]
         for k, v in zip(names, row):
             setattr(self, k, float(v or 0))
         self.avg_hc = self.oc_sum / 2 / self.months if self.months else 0
@@ -171,14 +180,17 @@ Month-ends: {month_label(months[0])} to {month_label(last)} ({len(months)}). The
                  ["Hires", signed(w.hires), f"{signed(w.hires_fte)} ({n1(w.hires_fte)})"],
                  ["Voluntary leavers", n0(-w.vol), f"{n0(-w.vol_fte)} ({n1(w.vol_fte)})"],
                  ["Involuntary leavers", n0(-w.invol), f"{n0(-w.invol_fte)} ({n1(w.invol_fte)})"],
+                 ["Conversions from contingent (release 3)", signed(w.conv), f"{signed(w.conv)} ({n1(w.conv)})"],
                  [f"Closing ({month_label(w.end)})", n0(w.close_hc), f"{n0(w.close_fte)} ({n1(w.close_fte)})"],
                  ["Waterfall title",
                   f"{w.label}: {n0(w.hires)} hires {verb} {n0(leavers)} leavers, {add} {n0(abs(net))} people",
                   f"{w.label} in FTE: {n0(w.hires_fte)} FTE hired, {n0(leavers_fte)} FTE left, {signed(net_fte)} FTE net"],
              ]),
              "",
-             f"FTE ties: {n1(w.open_fte)} + {n1(w.hires_fte)} − {n1(w.vol_fte)} − {n1(w.invol_fte)} = {n1(w.close_fte)}. "
-             "Every employee is 1.0 FTE (release 3 removed part-time), so FTE equals headcount.",
+             f"FTE ties: {n1(w.open_fte)} + {n1(w.hires_fte)} − {n1(w.vol_fte)} − {n1(w.invol_fte)} + {n1(w.conv)} conversions = {n1(w.close_fte)}. "
+             "Every employee is 1.0 FTE (release 3 removed part-time), so FTE equals headcount. "
+             "Since release 3, a contingent worker hired as an employee is a Conversion, not a Hire: "
+             "the employee view's Hires exclude them.",
              ""]
         if w.months >= 3:
             s += [table(["Card", "Value", "Note (Headcount mode)"], [
@@ -241,6 +253,33 @@ Month-ends: {month_label(months[0])} to {month_label(last)} ({len(months)}). The
     out.append("## Every fiscal year (Trend and quick checks)\n\n" + table(
         ["FY", "Opening", "Hires", "Voluntary", "Involuntary", "Closing", "Closing FTE", "Voluntary turnover", "Internal moves"],
         fy_rows) + "\n")
+
+    # Release 3: the worker-type split (Employees / Contingent / Total)
+    split_rows = []
+    for y in range(first_fy, last.year + 1):
+        e = HeadcountWalk(con, *fy(y))
+        c = HeadcountWalk(con, *fy(y), worker_type="Contingent")
+        t = HeadcountWalk(con, *fy(y), worker_type=None)
+        split_rows.append([f"FY{str(y)[2:]}", n0(e.close_hc), n0(c.close_hc), n0(t.close_hc),
+                           pct(c.close_hc / t.close_hc), n0(c.hires), n0(c.ends), n0(-c.conv),
+                           signed(t.close_hc - t.open_hc)])
+    c = HeadcountWalk(con, *fy(last.year), worker_type="Contingent")
+    t = HeadcountWalk(con, *fy(last.year), worker_type=None)
+    reasons = con.execute("""
+        SELECT movement_category, movement_reason, SUM(headcount) FROM marts.mart_headcount_fte_walk
+        WHERE worker_type = 'Contingent' AND month_end_date BETWEEN ? AND ?
+          AND movement_category IN ('Starts', 'Ends', 'Conversions')
+        GROUP BY ALL ORDER BY 1 DESC, 3 DESC""", list(fy(last.year))).fetchall()
+    out.append(f"""## Worker type split (release 3: Employees, Contingent, Total)
+
+The walk carries `worker_type`. **Employee** is the view above. **Contingent** counts contingent workers from Bridgeway as held at each month-end: Starts, Ends and Internal Moves, plus Conversions out to Employee. **Total** is both: a conversion is -1 Contingent and +1 Employee in the same month, so it never moves the Total. In a Total waterfall, use `walk_step` (Opening, Joined, Left, Moved out, Moved in, Converted, Closing) to put the two vocabularies on one axis.
+
+""" + table(["FY", "Employees (closing)", "Contingent (closing)", "Total (closing)", "Contingent share",
+             "Contingent starts", "Contingent ends", "Conversions", "Total net change"], split_rows) + f"""
+
+FY{str(last.year)[2:]} contingent walk: {n0(c.open_hc)} + {n0(c.hires)} starts − {n0(c.ends)} ends − {n0(-c.conv)} conversions = {n0(c.close_hc)} (internal moves net to zero). Total: {n0(t.open_hc)} + {n0(t.hires)} joined − {n0(t.vol + t.invol + t.ends)} left = {n0(t.close_hc)}.
+
+""" + table(["Contingent line", "Reason", f"FY{str(last.year)[2:]}"], [[a, b, signed(int(n))] for a, b, n in reasons], "llr") + "\n")
     return "\n".join(out)
 
 

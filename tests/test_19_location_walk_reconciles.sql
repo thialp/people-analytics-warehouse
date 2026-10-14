@@ -3,4 +3,5 @@
 SELECT *
 FROM marts.mart_location_headcount
 WHERE opening_headcount + hires - voluntary_terminations - involuntary_terminations
+      + contingent_starts - contingent_ends + conversions_in - conversions_out
       + relocations_in - relocations_out <> closing_headcount

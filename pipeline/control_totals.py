@@ -36,6 +36,7 @@ with walk as (
         headcount,
         fte
     from marts.mart_headcount_fte_walk
+    where worker_type = 'Employee'      -- employees; contingent workers have their own tables
 ),
 months as (
     select fiscal_year, min(month_end_date) as first_me, max(month_end_date) as last_me
@@ -51,7 +52,7 @@ select
     'FY' || right(cast(w.fiscal_year as varchar), 2)                                        as fy,
     sum(case when w.movement_category = 'Opening' and w.month_end_date = m.first_me
              then w.headcount end)                                                          as opening_hc,
-    sum(case when w.movement_category = 'Hires' then w.headcount end)                       as hires,
+    sum(case when w.movement_category in ('Hires', 'Conversions') then w.headcount end)    as hires,   -- conversions are employee hires too
     -sum(case when w.movement_category = 'Voluntary Terminations' then w.headcount end)     as voluntary,
     -sum(case when w.movement_category = 'Involuntary Terminations' then w.headcount end)   as involuntary,
     sum(case when w.movement_category = 'Internal Moves In' then w.headcount end)           as moves_in,
