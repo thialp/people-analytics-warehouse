@@ -1,0 +1,109 @@
+table_name,column_order,column_name,data_type,description
+bw_supplier,1,supplier_id,VARCHAR,"Supplier key, e.g. SUP-014"
+bw_supplier,2,supplier_name,VARCHAR,Fictional supplier name
+bw_supplier,3,cw_types_offered,VARCHAR,"CW types the supplier provides, semicolon separated: Contractor, Consultant, BPO"
+bw_supplier,4,hq_country_code,VARCHAR,Country of the supplier's head office
+bw_supplier,5,onboarded_date,DATE,First day the supplier could take service orders
+bw_supplier,6,is_active,BOOLEAN,False once Arcadia stopped using the supplier
+bw_rate_card,1,rate_card_id,VARCHAR,Rate card line key
+bw_rate_card,2,fiscal_year,INTEGER,Arcadia fiscal year the line applies to (July to June)
+bw_rate_card,3,country_code,VARCHAR,Country where the work is done
+bw_rate_card,4,cw_type,VARCHAR,"Contractor, Consultant or BPO"
+bw_rate_card,5,role_family,VARCHAR,"Development, QA, Data, Analyst, Project Delivery, Architecture, Design, Operations; BPO: Security, Facilities, Service Desk"
+bw_rate_card,6,seniority,VARCHAR,"Junior, Mid, Senior or Lead"
+bw_rate_card,7,rate_type,VARCHAR,"Hourly, or Monthly for BPO"
+bw_rate_card,8,billing_currency,VARCHAR,Currency the rate is billed in
+bw_rate_card,9,rate_low,DECIMAL,Bottom of the band
+bw_rate_card,10,rate_target,DECIMAL,Target rate
+bw_rate_card,11,rate_high,DECIMAL,Top of the band
+bw_contingent_worker,1,bw_worker_id,VARCHAR,"Bridgeway worker key, e.g. BW00012345. Bridgeway never stores the Keystone person ID"
+bw_contingent_worker,2,first_name,VARCHAR,Fictional
+bw_contingent_worker,3,last_name,VARCHAR,Fictional
+bw_contingent_worker,4,email,VARCHAR,Work email issued for the engagement (fictional domain)
+bw_contingent_worker,5,supplier_id,VARCHAR,-> bw_supplier
+bw_contingent_worker,6,cw_type,VARCHAR,"Contractor, Consultant or BPO"
+bw_contingent_worker,7,original_start_date,DATE,First day of the first engagement under this Bridgeway ID
+bw_contingent_worker,8,created_date,DATE,Day the supplier submitted the worker
+bw_service_order,1,service_order_id,VARCHAR,"Service order key, e.g. SO0012345"
+bw_service_order,2,bw_worker_id,VARCHAR,-> bw_contingent_worker
+bw_service_order,3,supplier_id,VARCHAR,-> bw_supplier
+bw_service_order,4,order_type,VARCHAR,"New engagement, or Renewal of an earlier order for the same worker"
+bw_service_order,5,renews_service_order_id,VARCHAR,The order this one renews; empty for a new engagement
+bw_service_order,6,opened_date,DATE,Manager raised the request
+bw_service_order,7,submitted_date,DATE,Supplier submitted the worker
+bw_service_order,8,approved_date,DATE,Order approved; empty if never approved
+bw_service_order,9,final_status,VARCHAR,Status of the current revision at the extract date
+bw_service_order_revision,1,revision_id,VARCHAR,Revision key
+bw_service_order_revision,2,service_order_id,VARCHAR,-> bw_service_order
+bw_service_order_revision,3,revision_no,INTEGER,"0 for the original order, then 1, 2, ..."
+bw_service_order_revision,4,revision_reason,VARCHAR,"Original, Extension, Extension with rate change, Early end, Cost center change, Manager change, Office change, Closure"
+bw_service_order_revision,5,effective_start_date,DATE,First day the revision is in effect
+bw_service_order_revision,6,effective_end_date,DATE,Last day in effect (inclusive); empty for the current revision
+bw_service_order_revision,7,is_current,BOOLEAN,True on exactly one revision per order
+bw_service_order_revision,8,status,VARCHAR,"Draft, Pending Approval, Approved, Active, Ended, Closed, Withdrawn, Rejected"
+bw_service_order_revision,9,assignment_start_date,DATE,First working day of the assignment
+bw_service_order_revision,10,assignment_end_date,DATE,Last working day of the assignment as this revision states it
+bw_service_order_revision,11,closed_date,DATE,Day the order was closed in Bridgeway; empty while open
+bw_service_order_revision,12,role_family,VARCHAR,See bw_rate_card
+bw_service_order_revision,13,seniority,VARCHAR,"Junior, Mid, Senior or Lead"
+bw_service_order_revision,14,job_title,VARCHAR,Title on the order
+bw_service_order_revision,15,cost_center_code,VARCHAR,"Cost center as typed on the order (text, not validated against Keystone)"
+bw_service_order_revision,16,hiring_manager_email,VARCHAR,Arcadia manager who owns the order
+bw_service_order_revision,17,office_code,VARCHAR,Arcadia office where the work is done
+bw_service_order_revision,18,bill_rate,DECIMAL,"Rate in billing currency: per hour, or per month for BPO"
+bw_service_order_revision,19,rate_type,VARCHAR,Hourly or Monthly
+bw_service_order_revision,20,billing_currency,VARCHAR,ISO currency code
+bw_service_order_revision,21,hours_per_week,DECIMAL,Contracted hours; empty for monthly BPO orders
+bw_timesheet_month,1,timesheet_id,VARCHAR,Timesheet month key
+bw_timesheet_month,2,bw_worker_id,VARCHAR,-> bw_contingent_worker
+bw_timesheet_month,3,service_order_id,VARCHAR,-> bw_service_order
+bw_timesheet_month,4,month_end_date,DATE,Month billed
+bw_timesheet_month,5,billed_hours,DECIMAL,Approved hours; 0 for monthly BPO orders
+bw_timesheet_month,6,billed_units,DECIMAL,"Hours for hourly orders; months (1.0, or a fraction in start and end months) for BPO"
+bw_timesheet_month,7,bill_rate,DECIMAL,Rate applied
+bw_timesheet_month,8,billing_currency,VARCHAR,ISO currency code
+bw_timesheet_month,9,billed_amount_local,DECIMAL,billed_units x bill_rate
+ks_contingent_worker,1,ks_record_id,VARCHAR,Record key
+ks_contingent_worker,2,person_id,VARCHAR,"Keystone person ID, the same W... key space as employees"
+ks_contingent_worker,3,bw_worker_id,VARCHAR,Bridgeway worker ID as Keystone stored it from the feed; can be blank or mistyped
+ks_contingent_worker,4,effective_start_date,DATE,First day the version applies
+ks_contingent_worker,5,effective_end_date,DATE,Last day (inclusive); empty for the current version
+ks_contingent_worker,6,change_source,VARCHAR,"Feed, HR Ops or Manager: who wrote the version"
+ks_contingent_worker,7,feed_event_id,VARCHAR,-> feed_bridgeway_keystone_event when change_source = Feed
+ks_contingent_worker,8,first_name,VARCHAR,As Keystone holds it
+ks_contingent_worker,9,last_name,VARCHAR,As Keystone holds it
+ks_contingent_worker,10,cw_type,VARCHAR,"Contractor, Consultant or BPO"
+ks_contingent_worker,11,supplier_name,VARCHAR,Free text as fed; Keystone has no supplier table
+ks_contingent_worker,12,status,VARCHAR,Active or Inactive
+ks_contingent_worker,13,contract_start_date,DATE,As Keystone knows it
+ks_contingent_worker,14,contract_end_date,DATE,As Keystone knows it; Keystone inactivates the worker the day after
+ks_contingent_worker,15,inactive_reason,VARCHAR,"Contract ended, Ended early, Converted to employee, Manual; empty while active"
+ks_contingent_worker,16,department_id,VARCHAR,-> dim_department
+ks_contingent_worker,17,cost_center_id,VARCHAR,-> dim_cost_center
+ks_contingent_worker,18,location_id,VARCHAR,-> dim_location
+ks_contingent_worker,19,manager_worker_id,VARCHAR,Arcadia employee the worker reports to (-> dim_worker)
+feed_bridgeway_keystone_event,1,feed_event_id,VARCHAR,Event key
+feed_bridgeway_keystone_event,2,revision_id,VARCHAR,-> bw_service_order_revision that caused the event
+feed_bridgeway_keystone_event,3,bw_worker_id,VARCHAR,-> bw_contingent_worker
+feed_bridgeway_keystone_event,4,event_type,VARCHAR,"New Worker, Extension, Early End, Rate Change, Attribute Change, Renewal, Closure"
+feed_bridgeway_keystone_event,5,sent_date,DATE,Day Bridgeway sent the change
+feed_bridgeway_keystone_event,6,applied_date,DATE,Day Keystone applied it; empty if it failed
+feed_bridgeway_keystone_event,7,outcome,VARCHAR,"Applied, Applied Late, Partly Applied, Failed"
+feed_bridgeway_keystone_event,8,error_text,VARCHAR,Integration message for failures and partial loads
+ref_source_system,1,system_code,VARCHAR,"KS, BW, INT, WH or PUB"
+ref_source_system,2,system_name,VARCHAR,System name
+ref_source_system,3,system_type,VARCHAR,What kind of system it is
+ref_source_system,4,record_of,VARCHAR,What it is the system of record for
+ref_source_system,5,used_by,VARCHAR,Who works in it
+ref_source_system,6,extract,VARCHAR,How the warehouse receives it
+ref_raw_table_lineage,1,table_name,VARCHAR,Raw table
+ref_raw_table_lineage,2,system_code,VARCHAR,-> ref_source_system
+ref_raw_table_lineage,3,module,VARCHAR,Module of the source system
+ref_raw_table_lineage,4,grain,VARCHAR,One row per ...
+ref_raw_table_lineage,5,history_type,VARCHAR,"Type 1, SCD Type 2, Dated, Transaction, Accumulating snapshot, Versioned, Effective-dated"
+ref_raw_table_lineage,6,added_in_release,INTEGER,Warehouse release that added the table
+ref_raw_column,1,table_name,VARCHAR,Raw table
+ref_raw_column,2,column_order,INTEGER,1-based position in the extract
+ref_raw_column,3,column_name,VARCHAR,Column
+ref_raw_column,4,data_type,VARCHAR,Type staging casts to
+ref_raw_column,5,description,VARCHAR,What it holds

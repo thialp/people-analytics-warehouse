@@ -12,7 +12,7 @@ Like release 2, it is one generator release and one rebuild. Every number on Das
 |---|---|---|
 | 0. Branch and baseline | Done 2026-10-14 | Branch `warehouse-release-3` from `main` (`8ac0f31`); regenerated raw files and marts match the committed ones; 59 tests pass; totals in [baseline_release_2.md](baseline_release_2.md) (FY26 closing 30,014 people, 29,363.5 FTE, $3,336.5M loaded constant) |
 | 1. Remove part-time | Done 2026-10-14 | Every employee is 1.0 FTE. The generator keeps every random draw, so people, hires, exits, moves, seats and requisitions are identical to release 2; only the 1,899 FTE-change job and seat records are gone. FTE Changes removed from the headcount walk, compensation walk, cost bridge and footprint (DuckDB, Custom SQL); `part_time_headcount` dropped; test 23 now checks full-time. 59 tests pass; checker and all validation scripts PASS (06, 07, 09, 11 run locally too). FY26: 30,014 people = 30,014.0 FTE; loaded constant $3,410.5M (was $3,336.5M); pay per FTE $110,062.73 → $113,663.81. Totals: [release_3_totals_phase_1.md](release_3_totals_phase_1.md). Workbook impact: [release_3_migration_notes.md](release_3_migration_notes.md) |
-| 2. Source systems and lineage | Not started | |
+| 2. Source systems and lineage | Done 2026-10-14 | `generator/source_systems.py`: five systems (Keystone HR, Bridgeway VMS, integration log, public reference data, warehouse metadata), the source of all 38 raw tables, and the column contract of the 11 release 3 tables, written as raw tables `ref_source_system`, `ref_raw_table_lineage`, `ref_raw_column`. The 8 contingent workforce tables land with headers only. 11 staging models; tests 60 (lineage) and 61 (column contract) pass and catch deliberate breaks; SQL Server raw load regenerated; checker PASS. Docs: [source systems and lineage](../../warehouse/source_systems.md), data dictionary section, README architecture. Existing raw files and marts unchanged |
 | 3. Contingent worker simulation | Not started | |
 | 4. Feed and discrepancy injection | Not started | |
 | 5. Plan, conversions, spend | Not started | |
@@ -121,7 +121,7 @@ Start, end and duration distributions are tuned to look like a real large progra
 
 ### Rate card
 
-`ref_cw_rate_card`: country × CW type × role family × seniority → `bill_rate_usd_median`, `band_low`, `band_high`, `rate_type` (`Hourly`, or `Monthly` for BPO), `billing_currency`, `effective_fiscal_year`.
+`bw_rate_card` (a Bridgeway table: rate cards are vendor-management configuration): fiscal year × country × CW type × role family × seniority → `rate_low`, `rate_target`, `rate_high`, `rate_type` (`Hourly`, or `Monthly` for BPO), `billing_currency`.
 
 Anchors, hourly USD median for a mid-level Contractor in development (from aggregate benchmarks, rounded; everything else is derived with multipliers):
 
@@ -148,6 +148,8 @@ Rough size check: ≈ 12,000 CW × ≈ $45/hr blended × 2,080 ≈ **$1.1B a yea
 ---
 
 ## 7. New raw tables
+
+> **Phase 2:** the column contract was settled and its source of truth is now [`generator/source_systems.py`](../../../generator/source_systems.py), enforced by test 61 and listed in the [data dictionary](../../warehouse/data_dictionary.md#contingent-workforce-release-3). Changes from this draft: the rate card is `bw_rate_card` (in Bridgeway); `bw_service_order` gains `supplier_id`, `order_type`, `renews_service_order_id`; `bw_timesheet_month` gains `billed_units` (months for BPO); `ks_contingent_worker` gains `ks_record_id`, `change_source`, `feed_event_id`, `inactive_reason`. The tables below are the original draft.
 
 ### Bridgeway VMS (`bw_`)
 
@@ -260,19 +262,21 @@ Starting rates are tuned so that, on a typical month-end, about **3–5% of acti
 
 ## 12. Tests (added to the 59 existing; numbers indicative)
 
-60. Revisions per service order chain with no gaps or overlaps; exactly one current revision per order.
-61. Assignment start ≤ end; start on or after approval.
-62. Contractor and Consultant engagement ≤ 48 months, except the seeded breaches (all of which are flagged).
-63. A rate changes only on a revision whose reason is extension or renewal.
-64. No billed hours after the assignment end, except the seeded billing anomalies (all flagged).
-65. Every feed event refers to an existing revision; applied date ≥ sent date.
-66. Every Keystone CW version is explained by a feed event or a Keystone-side edit.
-67. Identity resolution: every Bridgeway worker and every Keystone CW appears exactly once in the resolution output (matched or unmatched).
-68. Active CW per month-end from the snapshot = active CW in the CW headcount walk.
-69. CW spend in `mart_cw_spend` = billed hours × rate, to the cent, and ties to `bw_timesheet_month`.
-70. Workforce walk: Opening + movements = Closing for Employees, CW and Total; a conversion nets to zero in Total.
-71. Detection: every injected discrepancy open at a month-end is detected (recall 100% for rule-detectable types); false flags listed and explained.
-72. Plan vs actual: actual CW headcount and spend tie to the CW snapshot and spend marts.
+Built in phase 2: **60** every raw table names exactly one source system, **61** every release 3 extract matches its column contract. The contingent workforce tests follow.
+
+62. Revisions per service order chain with no gaps or overlaps; exactly one current revision per order.
+63. Assignment start ≤ end; start on or after approval.
+64. Contractor and Consultant engagement ≤ 48 months, except the seeded breaches (all of which are flagged).
+65. A rate changes only on a revision whose reason is extension or renewal.
+66. No billed hours after the assignment end, except the seeded billing anomalies (all flagged).
+67. Every feed event refers to an existing revision; applied date ≥ sent date.
+68. Every Keystone CW version is explained by a feed event or a Keystone-side edit.
+69. Identity resolution: every Bridgeway worker and every Keystone CW appears exactly once in the resolution output (matched or unmatched).
+70. Active CW per month-end from the snapshot = active CW in the CW headcount walk.
+71. CW spend in `mart_cw_spend` = billed hours × rate, to the cent, and ties to `bw_timesheet_month`.
+72. Workforce walk: Opening + movements = Closing for Employees, CW and Total; a conversion nets to zero in Total.
+73. Detection: every injected discrepancy open at a month-end is detected (recall 100% for rule-detectable types); false flags listed and explained.
+74. Plan vs actual: actual CW headcount and spend tie to the CW snapshot and spend marts.
 
 ---
 
@@ -282,12 +286,12 @@ Starting rates are tuned so that, on a typical month-end, about **3–5% of acti
 |---|---|---|
 | 0 | Branch `warehouse-release-3`; record release 2 control totals | Regenerated files match; 59 tests pass |
 | 1 | Remove part-time (section 11) | Walks reconcile; employee headcount unchanged, FTE = headcount |
-| 2 | Source systems: names, raw table shells, lineage doc, data dictionary skeleton | Docs reviewed |
-| 3 | CW simulation: suppliers, workers, orders, revisions, rate card, timesheets (own random stream) | Tests 60–64; population and spend targets |
-| 4 | Feed log and Keystone CW history; discrepancy injection; truth table | Tests 65–67 |
-| 5 | CW plan line; conversions into employee requisitions | Test 72; employee hires unchanged except conversions |
-| 6 | Marts for case studies 1–5 (worker type in the walk, CW spend panel, cost bridge drivers, footprint) | Tests 68–70; existing tests pass |
-| 7 | Marts for case study 6 | Tests 69, 71 |
+| 2 | Source systems: names, raw table shells, lineage doc, data dictionary skeleton | Tests 60–61 |
+| 3 | CW simulation: suppliers, workers, orders, revisions, rate card, timesheets (own random stream) | Tests 62–66; population and spend targets |
+| 4 | Feed log and Keystone CW history; discrepancy injection; truth table | Tests 67–69 |
+| 5 | CW plan line; conversions into employee requisitions | Test 74; employee hires unchanged except conversions |
+| 6 | Marts for case studies 1–5 (worker type in the walk, CW spend panel, cost bridge drivers, footprint) | Tests 70–72; existing tests pass |
+| 7 | Marts for case study 6 | Tests 71, 73 |
 | 8 | SQL Server twin, Custom SQL files, DuckDB checker; Mac run | All PASS |
 | 9 | Expected values for every dashboard; docs: data dictionary, case study 6, README, control totals | Check tables generated |
 | 10 | Tableau: republish #1 and #2 on release 3, build #3, then design and build #6 | Check tables match |

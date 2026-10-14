@@ -37,10 +37,10 @@ The five case studies share one warehouse. This section covers what they have in
 
 ```mermaid
 flowchart LR
-    subgraph Sources["Source systems (simulated)"]
-        HR["HR system<br/>workers · jobs · seats · managers · pay · reviews"]
-        ATS["Recruiting<br/>requisitions · applicants"]
-        FIN["Finance<br/>pay structure · hiring plan · bonus plan"]
+    subgraph Sources["Source systems (simulated, fictional)"]
+        HR["Keystone HR<br/>employees · jobs · pay · seats · requisitions · applicants · plan<br/>HR profile of contingent workers"]
+        VMS["Bridgeway VMS<br/>suppliers · contingent workers · service orders · rates · timesheets"]
+        FEED["Integration log<br/>Bridgeway → Keystone, one way"]
     end
     subgraph Public["Public reference data"]
         ECB["ECB daily FX rates"]
@@ -52,12 +52,13 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain"]
         MART["marts<br/>walks · fills · plan vs actual · org"]
-        TEST{{"59 data tests"}}
+        TEST{{"61 data tests"}}
     end
     TAB["Tableau Public"]
+    VMS -. feed .-> HR
     HR --> RAW
-    ATS --> RAW
-    FIN --> RAW
+    VMS --> RAW
+    FEED --> RAW
     ECB --> RAW
     FRG --> RAW
     GEO --> RAW
@@ -66,7 +67,7 @@ flowchart LR
 
 | Layer | What happens there | Files |
 |---|---|---|
-| **raw** | CSVs load as text, untouched, like a landing zone | [`data/raw/`](data/raw/) |
+| **raw** | CSVs load as text, untouched, like a landing zone; every table names its source system ([lineage](docs/warehouse/source_systems.md)) | [`data/raw/`](data/raw/) |
 | **staging** | Data types set; same-day pay corrections resolved; job level renamed `grade` once | [`sql/01_staging/`](sql/01_staging/) |
 | **intermediate** | Pay valued at its posting-date FX rate; effective-dated history turned into one row per worker (and per seat) per month-end; a running pay ledger; seat fills and vacancy chains; the reporting chain walked to the CEO | [`sql/02_intermediate/`](sql/02_intermediate/) |
 | **marts** | Business-ready tables for Tableau | [`sql/03_marts/`](sql/03_marts/) |
@@ -227,6 +228,8 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 57 | The region walk closes in every row and equals the walk by group | A region card that disagrees with the walk |
 | 58 | Promotions and demotions from job history = the walk's, counted from pay | Two sources, two answers |
 | 59 | Office moves' opening headcount = the walk's opening | A "share of headcount" on the wrong base |
+| 60 | Every raw table names exactly one source system (Keystone HR, Bridgeway VMS, the integration log, public reference data), and every lineage row a loaded table | An extract nobody documented, or lineage left behind for a dropped table |
+| 61 | Every release 3 extract carries exactly its documented columns, in order | A source column added, dropped, renamed or reordered before any model reads it |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -593,7 +596,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 59 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 61 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)

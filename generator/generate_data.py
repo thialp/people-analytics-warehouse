@@ -37,6 +37,7 @@ import pandas as pd
 
 import fringe_research
 import fx_rates
+import source_systems
 import reference_data as ref
 
 SEED = 20261009
@@ -1777,6 +1778,17 @@ write(pd.DataFrame([{"rate_set": ref.FX_CONSTANT_RATE_SET, "rate_date": CONST_DA
 fringe, fringe_cites = fringe_research.build()
 write(pd.DataFrame(fringe), "ref_fringe_rate")
 write(pd.DataFrame(fringe_cites).drop_duplicates(), "ref_fringe_source")
+
+# Release 3: where every raw table comes from (Keystone HR, Bridgeway VMS, the integration
+# log, public reference data) and the column contract of every table release 3 adds.
+write(pd.DataFrame(source_systems.SOURCE_SYSTEMS), "ref_source_system")
+write(pd.DataFrame(source_systems.lineage_rows()), "ref_raw_table_lineage")
+write(pd.DataFrame(source_systems.column_rows()), "ref_raw_column")
+
+# Release 3 contingent workforce tables. Written with headers only until the simulation
+# lands (release 3, phase 3), so the warehouse, tests and SQL Server load already carry them.
+for _table in source_systems.RELEASE_3_TABLES:
+    write(pd.DataFrame(columns=source_systems.columns(_table)), _table)
 
 print(f"Active headcount at {LAST_ME}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
       f"people managers: {sum(1 for w in active.values() if w['is_pm']):,}")

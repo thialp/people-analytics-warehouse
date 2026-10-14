@@ -1,0 +1,6 @@
+system_code|system_name|system_type|record_of|used_by|extract
+KS|Keystone HR|HR system of record|Employees, jobs, pay, seats, requisitions, applicants, workforce plan; the HR profile of every contingent worker|Managers, employees, HR Operations, Talent Acquisition, Finance planning|Nightly full extract of current and history tables
+BW|Bridgeway VMS|Vendor management system|Suppliers, contingent workers, service orders and their revisions, bill rates, timesheets|Vendor Management, hiring managers raising requests, suppliers|Nightly full extract; revisions are effective-dated, one current per service order
+INT|Bridgeway to Keystone integration|Integration log|Every change Bridgeway sent to Keystone, when it was applied and whether it failed|Integration support|Nightly extract of the event log
+WH|Arcadia warehouse metadata|Warehouse metadata|Which system every raw table comes from, and the column contract of every release 3 extract|The warehouse build and its tests; the methodology pages of the dashboards|Written with the data by generator/source_systems.py
+PUB|Public reference data|External reference|ECB euro reference rates; employer fringe rates researched from OECD, BLS and national sources|Finance, the warehouse|Loaded when sources publish

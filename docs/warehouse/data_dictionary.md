@@ -4,7 +4,7 @@ Arcadia Systems is fictional and all data is synthetic. History runs from 2021-0
 
 ## Raw tables (`data/raw/`)
 
-Twenty-seven tables in five groups: people and their history, the organization, the pay structure, seats, requisitions and the plan, and external reference data. The raw files call the 1–12 ladder **job level**; from staging onward it is called `grade`, the name the published marts and dashboards use.
+Thirty-eight tables in seven groups: people and their history, the organization, the pay structure, seats, requisitions and the plan, external reference data, the **contingent workforce** (release 3) and the **lineage registry** (release 3). Every raw table comes from one source system: **Keystone HR**, **Bridgeway VMS**, the integration log between them, or public reference data; the map is in [source systems and lineage](source_systems.md) and in the raw table `ref_raw_table_lineage` (test 60). The raw files call the 1–12 ladder **job level**; from staging onward it is called `grade`, the name the published marts and dashboards use.
 
 ### People and history
 
@@ -239,6 +239,161 @@ Employer cost on top of base salary, by country and calendar year, built from pu
 
 #### ref_fringe_source
 One row per country, year, component and source document: `country_code`, `year`, `component`, `source_id`, `source_title`, `source_url`. Test 28 checks that every non-zero component has at least one.
+
+### Contingent workforce (release 3)
+
+The contingent workforce comes from two systems. **Bridgeway VMS** (`bw_`) is the source of truth for who is a contingent worker, on which terms and at what rate; **Keystone HR** (`ks_`) holds the HR profile managers see; the **integration log** (`feed_`) records what travelled between them. How the systems relate, and what flows on the feed: [source systems and lineage](source_systems.md).
+
+> **Release 3, phase 2:** these tables are loaded with their headers and **no rows yet**; the contingent workforce simulation fills them in phase 3. Columns are the contract test 61 enforces.
+
+#### bw_supplier
+Suppliers in Bridgeway VMS.
+
+| Column | Type | Description |
+|---|---|---|
+| `supplier_id` | VARCHAR | Supplier key, e.g. SUP-014 |
+| `supplier_name` | VARCHAR | Fictional supplier name |
+| `cw_types_offered` | VARCHAR | CW types the supplier provides, semicolon separated: Contractor, Consultant, BPO |
+| `hq_country_code` | VARCHAR | Country of the supplier's head office |
+| `onboarded_date` | DATE | First day the supplier could take service orders |
+| `is_active` | BOOLEAN | False once Arcadia stopped using the supplier |
+
+#### bw_rate_card
+Target bill rate and band per fiscal year, country, CW type, role family and seniority. Moves every July 1; an order keeps its rate until a renewal or a renegotiated extension.
+
+| Column | Type | Description |
+|---|---|---|
+| `rate_card_id` | VARCHAR | Rate card line key |
+| `fiscal_year` | INTEGER | Arcadia fiscal year the line applies to (July to June) |
+| `country_code` | VARCHAR | Country where the work is done |
+| `cw_type` | VARCHAR | Contractor, Consultant or BPO |
+| `role_family` | VARCHAR | Development, QA, Data, Analyst, Project Delivery, Architecture, Design, Operations; BPO: Security, Facilities, Service Desk |
+| `seniority` | VARCHAR | Junior, Mid, Senior or Lead |
+| `rate_type` | VARCHAR | Hourly, or Monthly for BPO |
+| `billing_currency` | VARCHAR | Currency the rate is billed in |
+| `rate_low` | DECIMAL | Bottom of the band |
+| `rate_target` | DECIMAL | Target rate |
+| `rate_high` | DECIMAL | Top of the band |
+
+#### bw_contingent_worker
+Workers as Bridgeway knows them. **No Keystone person ID**: the link is stored on the Keystone side.
+
+| Column | Type | Description |
+|---|---|---|
+| `bw_worker_id` | VARCHAR | Bridgeway worker key, e.g. BW00012345. Bridgeway never stores the Keystone person ID |
+| `first_name` | VARCHAR | Fictional |
+| `last_name` | VARCHAR | Fictional |
+| `email` | VARCHAR | Work email issued for the engagement (fictional domain) |
+| `supplier_id` | VARCHAR | → bw_supplier |
+| `cw_type` | VARCHAR | Contractor, Consultant or BPO |
+| `original_start_date` | DATE | First day of the first engagement under this Bridgeway ID |
+| `created_date` | DATE | Day the supplier submitted the worker |
+
+#### bw_service_order
+One row per service order (accumulating snapshot). A renewal is a new order naming the one it renews.
+
+| Column | Type | Description |
+|---|---|---|
+| `service_order_id` | VARCHAR | Service order key, e.g. SO0012345 |
+| `bw_worker_id` | VARCHAR | → bw_contingent_worker |
+| `supplier_id` | VARCHAR | → bw_supplier |
+| `order_type` | VARCHAR | New engagement, or Renewal of an earlier order for the same worker |
+| `renews_service_order_id` | VARCHAR | The order this one renews; empty for a new engagement |
+| `opened_date` | DATE | Manager raised the request |
+| `submitted_date` | DATE | Supplier submitted the worker |
+| `approved_date` | DATE | Order approved; empty if never approved |
+| `final_status` | VARCHAR | Status of the current revision at the extract date |
+
+#### bw_service_order_revision
+Every change to an order is a new revision, effective-dated, with exactly one current per order. The rate changes only on an extension or renewal revision.
+
+| Column | Type | Description |
+|---|---|---|
+| `revision_id` | VARCHAR | Revision key |
+| `service_order_id` | VARCHAR | → bw_service_order |
+| `revision_no` | INTEGER | 0 for the original order, then 1, 2, ... |
+| `revision_reason` | VARCHAR | Original, Extension, Extension with rate change, Early end, Cost center change, Manager change, Office change, Closure |
+| `effective_start_date` | DATE | First day the revision is in effect |
+| `effective_end_date` | DATE | Last day in effect (inclusive); empty for the current revision |
+| `is_current` | BOOLEAN | True on exactly one revision per order |
+| `status` | VARCHAR | Draft, Pending Approval, Approved, Active, Ended, Closed, Withdrawn, Rejected |
+| `assignment_start_date` | DATE | First working day of the assignment |
+| `assignment_end_date` | DATE | Last working day of the assignment as this revision states it |
+| `closed_date` | DATE | Day the order was closed in Bridgeway; empty while open |
+| `role_family` | VARCHAR | See bw_rate_card |
+| `seniority` | VARCHAR | Junior, Mid, Senior or Lead |
+| `job_title` | VARCHAR | Title on the order |
+| `cost_center_code` | VARCHAR | Cost center as typed on the order (text, not validated against Keystone) |
+| `hiring_manager_email` | VARCHAR | Arcadia manager who owns the order |
+| `office_code` | VARCHAR | Arcadia office where the work is done |
+| `bill_rate` | DECIMAL | Rate in billing currency: per hour, or per month for BPO |
+| `rate_type` | VARCHAR | Hourly or Monthly |
+| `billing_currency` | VARCHAR | ISO currency code |
+| `hours_per_week` | DECIMAL | Contracted hours; empty for monthly BPO orders |
+
+#### bw_timesheet_month
+Billed time per worker, order and month. Spend = `billed_units × bill_rate`.
+
+| Column | Type | Description |
+|---|---|---|
+| `timesheet_id` | VARCHAR | Timesheet month key |
+| `bw_worker_id` | VARCHAR | → bw_contingent_worker |
+| `service_order_id` | VARCHAR | → bw_service_order |
+| `month_end_date` | DATE | Month billed |
+| `billed_hours` | DECIMAL | Approved hours; 0 for monthly BPO orders |
+| `billed_units` | DECIMAL | Hours for hourly orders; months (1.0, or a fraction in start and end months) for BPO |
+| `bill_rate` | DECIMAL | Rate applied |
+| `billing_currency` | VARCHAR | ISO currency code |
+| `billed_amount_local` | DECIMAL | billed_units x bill_rate |
+
+#### ks_contingent_worker
+The Keystone HR profile of each contingent worker, SCD Type 2. Written by the feed from Bridgeway or by hand in Keystone. Keystone inactivates the worker the day after `contract_end_date`.
+
+| Column | Type | Description |
+|---|---|---|
+| `ks_record_id` | VARCHAR | Record key |
+| `person_id` | VARCHAR | Keystone person ID, the same W... key space as employees |
+| `bw_worker_id` | VARCHAR | Bridgeway worker ID as Keystone stored it from the feed; can be blank or mistyped |
+| `effective_start_date` | DATE | First day the version applies |
+| `effective_end_date` | DATE | Last day (inclusive); empty for the current version |
+| `change_source` | VARCHAR | Feed, HR Ops or Manager: who wrote the version |
+| `feed_event_id` | VARCHAR | → feed_bridgeway_keystone_event when change_source = Feed |
+| `first_name` | VARCHAR | As Keystone holds it |
+| `last_name` | VARCHAR | As Keystone holds it |
+| `cw_type` | VARCHAR | Contractor, Consultant or BPO |
+| `supplier_name` | VARCHAR | Free text as fed; Keystone has no supplier table |
+| `status` | VARCHAR | Active or Inactive |
+| `contract_start_date` | DATE | As Keystone knows it |
+| `contract_end_date` | DATE | As Keystone knows it; Keystone inactivates the worker the day after |
+| `inactive_reason` | VARCHAR | Contract ended, Ended early, Converted to employee, Manual; empty while active |
+| `department_id` | VARCHAR | → dim_department |
+| `cost_center_id` | VARCHAR | → dim_cost_center |
+| `location_id` | VARCHAR | → dim_location |
+| `manager_worker_id` | VARCHAR | Arcadia employee the worker reports to (→ dim_worker) |
+
+#### feed_bridgeway_keystone_event
+Every change Bridgeway sent to Keystone, when it was applied, or that it failed or arrived partly.
+
+| Column | Type | Description |
+|---|---|---|
+| `feed_event_id` | VARCHAR | Event key |
+| `revision_id` | VARCHAR | → bw_service_order_revision that caused the event |
+| `bw_worker_id` | VARCHAR | → bw_contingent_worker |
+| `event_type` | VARCHAR | New Worker, Extension, Early End, Rate Change, Attribute Change, Renewal, Closure |
+| `sent_date` | DATE | Day Bridgeway sent the change |
+| `applied_date` | DATE | Day Keystone applied it; empty if it failed |
+| `outcome` | VARCHAR | Applied, Applied Late, Partly Applied, Failed |
+| `error_text` | VARCHAR | Integration message for failures and partial loads |
+
+### Lineage registry (release 3)
+
+Written by [`generator/source_systems.py`](../../generator/source_systems.py) with the data, so the warehouse documents and tests its own lineage.
+
+| Table | Grain | Columns |
+|---|---|---|
+| `ref_source_system` | source system (5) | `system_code`, `system_name`, `system_type`, `record_of`, `used_by`, `extract` |
+| `ref_raw_table_lineage` | raw table (38) | `table_name`, `system_code`, `module`, `grain`, `history_type`, `added_in_release` |
+| `ref_raw_column` | release 3 raw table × column | `table_name`, `column_order`, `column_name`, `data_type`, `description` |
 
 ## Marts (`data/marts/`)
 
