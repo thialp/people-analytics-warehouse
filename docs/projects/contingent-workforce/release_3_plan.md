@@ -20,7 +20,7 @@ Like release 2, it is one generator release and one rebuild. Every number on Das
 | 7. Marts: case study 6 | Not started | |
 | 8. SQL Server twin and Custom SQL | Not started | |
 | 9. Expected values, docs | Not started | |
-| 10. Tableau: Dashboards #1 and #2, then #3, then #6 | Not started | |
+| 10. Tableau: Dashboards #1 and #2, then #3, then #6 | Not started | Includes the **Growth by Region fix** on Dashboard #2: the card ignores View and Group, so it shows the company while the KPI cards show the selected group; rebuild it on the region walk query ([migration notes](release_3_migration_notes.md#fix-carried-in-release-3-growth-by-region-follows-the-group-logged-2026-10-14)) |
 
 ---
 
