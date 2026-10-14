@@ -445,15 +445,16 @@ Pay measures in the two cost marts are **annualized run-rates at the month-end**
 | `loaded_usd_constant` | Base × (1 + fringe rate), constant FX |
 
 ### mart_workforce_cost_bridge
-Grain: **month-end × department × driver.** For each department and month, Opening + all drivers = Closing.
+Grain: **month-end × department × worker type × driver.** For each department, worker type and month, Opening + all drivers = Closing. Since release 3 it explains total workforce cost: employees' loaded pay plus contingent workers' annualized bill run-rate (no fringe, so the same value in base and loaded). Contingent drivers and the Shapley growth mix: [methodology](../projects/workforce-cost-bridge/methodology.md#release-3-total-workforce-cost-and-the-growth-mix).
 
 | Column | Description |
 |---|---|
 | `month_end_date` / `prior_month_end_date` | The month being explained, and the month-end it starts from |
 | `fiscal_year`, `fiscal_quarter_label`, `fiscal_period` | Fiscal calendar, e.g. `FY26 Q2`, `FY26 P06` |
 | `department_id`, `department_name`, `sub_function`, `function_name`, `cost_center` | Department the line is attributed to |
-| `driver_order` | 1 to 13, for sorting a waterfall (10 was FTE Changes, retired in release 3) |
-| `driver` | Opening Run-Rate, Hires, Terminations, Transfers In, Transfers Out, Promotions, Demotions, Tenure & Market Adjustments, International Mobility, Fringe Rate Changes, FX Rate Changes, Closing Run-Rate |
+| `worker_type` | Employee or Contingent (release 3) |
+| `driver_order` | 1 to 13, for sorting a waterfall; contingent drivers share their employee counterpart's number (2 Contingent Starts, 3 Contingent Ends, 8 Contingent Rate Changes); 10 is Conversions (once FTE Changes) |
+| `driver` | Opening Run-Rate, Hires, Terminations, Transfers In, Transfers Out, Promotions, Demotions, Tenure & Market Adjustments, International Mobility, Conversions, Fringe Rate Changes, FX Rate Changes, Closing Run-Rate; for contingent workers Contingent Starts, Contingent Ends, Contingent Rate Changes. An employee hired from the contingent workforce is in Conversions, not Hires |
 | `driver_group` | Balance, Headcount Movement, Pay Rate, Workforce Mix, Fringe & FX |
 | `worker_count` | Workers contributing to the line |
 | `headcount` | Signed headcount change; for Opening and Closing, the headcount itself |
@@ -481,22 +482,24 @@ Grain: **month-end × department × country × grade × job family.**
 | `range_mid_usd_constant` | Sum of range midpoints × FTE at constant FX. Compa-ratio = `SUM(base_usd_constant) / SUM(range_mid_usd_constant)` |
 
 ### mart_headcount_fte_walk
-Grain: **month-end × department × country × job family × grade × movement category × movement reason.** For every slice and month, Opening + every movement = Closing, in headcount and FTE (test 13). Codes only: names come from the five `mart_dim_*` files below, which Tableau relates on matching column names.
+Grain: **month-end × worker type × department × country × job family × grade × movement category × movement reason.** For every worker type, slice and month, Opening + every movement = Closing, in headcount and FTE (test 13); Employees, Contingent and the Total each close every month, and a conversion never moves the Total (test 72). Codes only: names come from the five `mart_dim_*` files below, which Tableau relates on matching column names.
 
 | Column | Description |
 |---|---|
 | `month_end_date` | The month being walked; → `mart_dim_month` |
+| `worker_type` | Employee (Keystone HR) or Contingent (Bridgeway VMS, as held at each month-end; release 3) |
 | `department_id` | → `mart_dim_department` |
 | `country_code` | → `mart_dim_country` |
-| `job_family_code` | → `mart_dim_job_family` |
-| `grade` | → `mart_dim_grade` |
-| `movement_order` | 1 to 8, for sorting a waterfall (7 was FTE Changes, retired in release 3) |
-| `movement_category` | Opening, Hires, Voluntary Terminations, Involuntary Terminations, Internal Moves Out, Internal Moves In, Closing |
-| `movement_reason` | New Hire · Voluntary · Involuntary · Transfer · Reorganization · Location Change · Promotion · Demotion · Job Change · Opening · Closing |
+| `job_family_code` | → `mart_dim_job_family`; empty for contingent workers |
+| `grade` | → `mart_dim_grade`; empty for contingent workers |
+| `movement_order` | 1 to 8, for sorting a waterfall; 7 is Conversions (once FTE Changes) |
+| `movement_category` | Opening, Hires, Voluntary Terminations, Involuntary Terminations, Internal Moves Out, Internal Moves In, Conversions, Closing; for contingent workers Opening, Starts, Ends, Internal Moves Out/In, Conversions, Closing |
+| `movement_reason` | New Hire · Voluntary · Involuntary · Transfer · Reorganization · Location Change · Promotion · Demotion · Job Change · Contingent to Employee · Opening · Closing; contingent Starts: New engagement · Returned after a lapse; Ends: Completed · Ended early · Lapsed: approved late |
+| `walk_step` | The same line in one vocabulary for both worker types: Opening, Joined, Left, Moved out, Moved in, Converted, Closing. Use it for a Total waterfall |
 | `headcount` | Signed headcount change; for Opening and Closing, the headcount itself |
 | `fte` | Signed FTE change; for Opening and Closing, the FTE itself |
 
-Rules: headcount includes executive officers. A move is booked out of the old slice and into the new one at the worker's prior FTE, so moves net to zero at any roll-up that contains both slices; an FTE change in the same month is a separate FTE Changes line. When several slice attributes change in one month, one reason is recorded: department (Reorganization if a reorg action is on file, otherwise Transfer), then country, then grade, then job family.
+Rules: headcount includes executive officers. A move is booked out of the old slice and into the new one at the worker's prior FTE, so moves net to zero at any roll-up that contains both slices. A contingent worker hired as an employee is booked −1 Contingent and +1 Employee as Conversions in the same month; the employee is not in Hires. A contingent worker counts 1.0 in `fte`. **Lapsed: approved late** is a contingent worker whose extension or renewal was approved after the old end date: the month-end report of the time did not count them, and the history is never restated, so they end one month and return (*Returned after a lapse*) the next. When several slice attributes change in one month, one reason is recorded: department (Reorganization if a reorg action is on file, otherwise Transfer), then country, then grade, then job family.
 
 **Walking across several months:** take Opening from the first month, Closing from the last month, and sum every other line in between. Test 14 guarantees the months chain together.
 
@@ -531,20 +534,22 @@ Grain: **worker × fiscal year-end.** `manager_worker_id`, `skip_level_manager_i
 Grain: **country × calendar year (2021–2026).** The fringe rate and its four components, `is_estimate`, `method_note` and `source_count`.
 
 ### mart_location_headcount
-One row per month-end per office. Movements are positive counts; the column name carries the direction.
+One row per month-end per office per worker type (Employee or Contingent; release 3). Movements are positive counts; the column name carries the direction. Filter on `worker_type`, or sum both for the whole workforce.
 
 | Column | Definition |
 |---|---|
 | `opening_headcount` | Workers at this office at the prior month-end |
 | `hires` | Workers who joined the company at this office |
 | `voluntary_terminations`, `involuntary_terminations` | Workers who left the company from this office |
+| `contingent_starts`, `contingent_ends` | Contingent rows: engagements starting and ending at this office |
+| `conversions_in`, `conversions_out` | Contingent workers hired as employees: out of the Contingent row, into the Employee row |
 | `relocations_in`, `relocations_out` | Workers who changed office between the two month-ends, including within a country |
 | `closing_headcount`, `closing_fte` | Workers at this office at the month-end, and their FTE |
 
-`opening + hires − voluntary − involuntary + relocations_in − relocations_out = closing` for every row (test 19).
+`opening + hires − voluntary − involuntary + contingent_starts − contingent_ends + conversions_in − conversions_out + relocations_in − relocations_out = closing` for every row (test 19).
 
 ### mart_mobility_flows
-One row per month-end per origin office per destination office: `from_location_id`, `from_city`, `from_region`, `from_latitude`, `from_longitude`, the same five for `to_`, `flow_scope` (`Domestic` or `International`), `has_coordinates` (always true now that every office has coordinates) and `workers`. Flows out of and into each office equal its relocations (test 22).
+One row per month-end per worker type per origin office per destination office: `worker_type` (release 3), `from_location_id`, `from_city`, `from_region`, `from_latitude`, `from_longitude`, the same five for `to_`, `flow_scope` (`Domestic` or `International`), `has_coordinates` (always true now that every office has coordinates) and `workers`. Flows out of and into each office equal its relocations (test 22).
 
 ### mart_office_moves
 One row per date pair × view × group × `group_side` × origin office × destination office × `move_reason`: the people who changed office between two month-ends on the compensation walk's grid, keyed like the walk (`view_name`, `group_id`, `group_name`, `group_parent`) so one set of filters drives both. Columns for the date pair (with `report_start_date`, `report_as_of_date`), the group and its side (`Both`, `From`, `To`), both offices with city, country, region and coordinates, `flow_scope`, `flow_scope_label`, `region_scope`, `move_reason`, `workers` and `open_headcount` (the group's headcount at the From date, equal to the walk's Opening; NULL for a group that did not exist yet, test 59). Compared From vs To only, so a person who moved twice counts once. In the Office and Country views `To` equals the walk's Transfers In and `From` equals Transfers Out (test 39); the views agree with each other (test 40). The DuckDB twin of `tableau/custom_sql_office_moves.sql`; not exported to CSV. Field reference: [office_moves.md](../projects/compensation-walk/office_moves.md).
@@ -580,12 +585,27 @@ Grain: **seat fill** (external hire or internal move), 30,575 rows from FY22. Th
 Grain: **month-end × vacant seat** (Open or Frozen; 62,055 rows): `status`, `status_since`, `days_in_status`, `vacated_by`, `vacated_date`, `days_vacant`, `vacancy_age_band`, `is_stale` (vacant 90 days or more), the open requisition (`open_requisition_id`, `req_type`, `requisition_approved_date`), and the seat's organization, cost center, office, country, region, job and grade, `created_date`, `created_reason`. At 30 Jun 2026: 725 open (77 stale) and 252 frozen (136 stale).
 
 ### mart_plan_vs_actual
-Grain: **plan version × cost center × fiscal quarter** (29,415 rows; the 615 contingent-only cost center rows are zero on every employee measure). The plan (`planned_*`) beside the actuals: `actual_ending_headcount`, `actual_ending_fte`, `actual_net_new`, `actual_net_new_reuse_candidates`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `actual_cost_usd_plan_fx` (comparable with `planned_cost_usd`) and `actual_cost_usd_constant`; plus `version_order`, `is_latest_version` and the cost center's department, function, country and region. For every version and quarter, the actual headcount sums to the company and the actual fills to the seat fills (test 56). Attainment = actual ÷ planned.
+Grain: **plan version × cost center × fiscal quarter** (29,415 rows; the 615 contingent-only cost center rows are zero on every employee measure). The plan (`planned_*`) beside the actuals: `actual_ending_headcount`, `actual_ending_fte`, `actual_net_new`, `actual_net_new_reuse_candidates`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `actual_cost_usd_plan_fx` (comparable with `planned_cost_usd`) and `actual_cost_usd_constant`; plus `version_order`, `is_latest_version` and the cost center's department, function, country and region. For every version and quarter, the actual headcount sums to the company and the actual fills to the seat fills (test 56). Attainment = actual ÷ planned. Release 3 adds the contingent line: `planned_cw_headcount` beside `actual_cw_headcount` (Bridgeway on the quarter-end), and `planned_cw_spend_usd` beside `actual_cw_spend_usd_plan_fx` (annualized bill run-rate at the plan's FX) and `actual_cw_spend_usd_constant` (test 74).
+
+### mart_cw_spend
+Grain: **month-end × cost center × supplier × contingent worker type × role family × billing currency** (release 3). What contingent workers cost, two ways side by side: **billed in the month** (`workers_billed`, `billed_hours`, `billed_units`, `billed_amount_local`, `billed_usd_nominal` at the month-end rate, `billed_usd_constant`) and **working at the month-end** (`workers_at_month_end`, `run_rate_local`, `run_rate_usd_nominal`, `run_rate_usd_constant`: hourly rate × contracted hours × 52, or monthly rate × 12). Also `fiscal_year`, `fiscal_quarter_label`, `department_id`, `country_code`, `supplier_name`. A month's billing is placed on the order revision in effect at the month-end. Billing ties to `bw_timesheet_month` to the cent and the month-end columns to the Bridgeway snapshot (test 71). Billed spend runs below the run-rate because timesheets carry time off and partial months.
+
+### mart_workforce_cost_growth_mix
+Grain: **date pair × view × group × factor** (release 3; 1,224 rows): each fiscal quarter-end against the same quarter-end a year earlier (17 pairs), for the Company and each Function. Splits the change in **total workforce cost** (employees' loaded pay plus contingent run-rate, nominal USD) into six factors: Volume, Workforce mix (employees vs contingent), Location mix, Level mix (grade, or contingent type), Rate (cost per head at constant FX) and Currency, with `factor_order` 0 (Opening cost) to 7 (Closing cost) for a waterfall. `shapley_effect_usd` is each factor's Shapley value (its average effect over every order of the six factors); `sequential_effect_usd` moves them one at a time in the listed order; `order_bias_usd` is the difference. Both add up to closing minus opening exactly (test 78). Also `fiscal_year`, `fiscal_quarter_label`, `pair_type`, `factor_meaning`, `opening_headcount`, `closing_headcount`. Method: [growth mix](../projects/workforce-cost-bridge/methodology.md#release-3-total-workforce-cost-and-the-growth-mix).
 
 ### mart_seat_corridors
 Grain: **fiscal quarter × from office × to office** (821 rows): where backfilled seats moved, from the prior incumbent's office to the new incumbent's, with both offices' coordinates and pay zones, `location_change`, `seats`, `seats_levelled_down`, `seats_levelled_up`, `seats_relocated_for_backfill`, `pay_change_usd_constant`, `location_effect_usd_constant`. Draws the map lines in the Footprint pattern (`MAKELINE`).
 
 ## Intermediate models
+
+### int_cw_month_end_snapshot
+One row per contingent worker (Bridgeway worker ID) per month-end on which they were working, **as Bridgeway held it that day**: the service order revision in effect on the month-end says the assignment has started and not ended. History is never restated, so an extension approved after the old end date counts from its approval. Carries the order, type, supplier, cost center (and so department and country), office, role, seniority, rate and its annualized run-rate in billing currency and in USD (month-end and constant rates). Test 70.
+
+### int_cw_movement
+The contingent counterpart of `int_worker_movement`: one row per contingent worker per month, with the state at both month-ends and the classification (Start, End, Conversion, Internal Move, No Change) and reason.
+
+### int_cw_conversion
+One row per contingent worker hired as an employee that the warehouse can link: Keystone's *Converted to employee* record, through the Bridgeway worker ID Keystone stored, to the employee. `is_walk_conversion` marks those that were contingent at the prior month-end and employees at this one: all of them in this data (1,174). A conversion whose stored link is blank or mistyped (CW06) is an ordinary hire.
 
 ### int_worker_movement
 One row per worker per month for everyone active at the prior month-end, the current month-end or both: the worker's slice, office and FTE at each end, `movement_type` (Hire, Termination, Internal Move, No Change), `movement_reason`. Test 18 checks there is never a second row for the same worker and month.

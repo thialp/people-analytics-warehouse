@@ -52,7 +52,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain"]
         MART["marts<br/>walks · fills · plan vs actual · org"]
-        TEST{{"71 data tests"}}
+        TEST{{"76 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -238,8 +238,13 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 67 | Every feed event comes from a revision of the worker's own order, outcomes agree with the dates, events apply first in, first out | A feed log that claims what Bridgeway never sent, or an old change overwriting a newer one |
 | 68 | Keystone's contingent worker history chains cleanly and every version is explained: by a feed event applied that day, by Keystone ending the contract, or by hand | A Keystone change nobody can account for; a contingent ID colliding with an employee's |
 | 69 | The discrepancy answer key is sound: known types, references that exist, dates inside the extract | Scoring detection against a key that is itself wrong |
+| 70 | The contingent side of the walk is the Bridgeway month-end snapshot, moved; one row per worker per month-end | Contractors counted twice, or lost between months |
+| 71 | Contingent spend ties to the timesheets to the cent, in every month and currency, and to the month-end run-rate | A spend panel that does not add up to what suppliers invoiced |
+| 72 | Employees, Contingent and the Total each close every month; conversions out equal conversions in, so they never move the Total | A conversion that makes a person appear twice, or vanish |
+| 74 | Plan versus actual carries exactly the contingent workers Bridgeway counted on each quarter-end, and their run-rate | A plan comparison against the wrong population |
 | 76 | The plan's contingent line covers every cost center with contingent workers, in every version, within 20% of the actual | A plan that silently leaves out where contractors work |
 | 77 | A conversion to employee agrees across Keystone, recruiting and Bridgeway: same person, hire date, same month as the last contingent day | A conversion counted twice, or a hire claimed as one when it was not |
+| 78 | The growth-mix factors (Shapley and sequential) add up to the change in total workforce cost exactly, and tie to both snapshots | An attribution that explains more, or less, than what happened |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -287,7 +292,7 @@ A hiring plan is approved as numbers per cost center and quarter: net-new seats,
 | [`int_position_snapshot`](sql/02_intermediate/int_position_snapshot.sql) | Every seat at every month-end: status, incumbent, open requisition. Filled seats equal the people headcount (test 45) |
 | [`int_seat_fill`](sql/02_intermediate/int_seat_fill.sql) | One row per fill (external hire or internal move): net-new or backfill, the prior incumbent, what happened to the seat, level and location change, pay walk, reuse check |
 | [`int_seat_vacancy_chain`](sql/02_intermediate/int_seat_vacancy_chain.sql) | An internal fill empties another seat: each fill is linked to the move that emptied its seat, so one resignation's whole chain carries one `chain_id` |
-| [`mart_position_fill`](sql/03_marts/mart_position_fill.sql), [`mart_vacancy_pool`](sql/03_marts/mart_vacancy_pool.sql), [`mart_plan_vs_actual`](sql/03_marts/mart_plan_vs_actual.sql), [`mart_seat_corridors`](sql/03_marts/mart_seat_corridors.sql) | Fills, empty seats by age, plan beside actual per version, cost center and quarter, and where backfilled seats moved |
+| [`mart_position_fill`](sql/03_marts/mart_position_fill.sql), [`mart_vacancy_pool`](sql/03_marts/mart_vacancy_pool.sql), [`mart_plan_vs_actual`](sql/03_marts/mart_plan_vs_actual.sql), [`mart_seat_corridors`](sql/03_marts/mart_seat_corridors.sql) | Fills, empty seats by age, plan beside actual per version, cost center and quarter (since release 3 with the contingent line: headcount and run-rate), and where backfilled seats moved |
 
 **Key calculations.**
 
@@ -435,7 +440,7 @@ Location strategy questions (where to hire next, which hubs are growing, whether
 | Model | What it does |
 |---|---|
 | [`int_worker_movement`](sql/02_intermediate/int_worker_movement.sql) | Carries each worker's office at both month-ends |
-| [`mart_location_headcount`](sql/03_marts/mart_location_headcount.sql) | One row per office per month: opening, hires, leavers by type, relocations in and out, closing (headcount and FTE) |
+| [`mart_location_headcount`](sql/03_marts/mart_location_headcount.sql) | One row per office per month and worker type (Employee, Contingent since release 3): opening, hires or contingent starts, leavers by type or contingent ends, conversions, relocations in and out, closing (headcount and FTE) |
 | [`mart_mobility_flows`](sql/03_marts/mart_mobility_flows.sql) | Origin and destination office for every relocation, with both ends' coordinates, so Tableau can draw `MAKELINE` without relating the location table twice |
 | [`mart_dim_location`](sql/03_marts/mart_dim_location.sql) | 35 offices with real postal codes and their GeoNames coordinates (street addresses are fictional), the pay zone and the date each office opened |
 
@@ -606,7 +611,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 71 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 76 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)

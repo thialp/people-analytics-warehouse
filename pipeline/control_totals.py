@@ -213,6 +213,27 @@ where p.fiscal_quarter = 4
 group by p.fiscal_year, a.cw order by p.fiscal_year
 """
 
+GROWTH_MIX = """
+select 'FY' || right(cast(fiscal_year as varchar), 2), factor,
+       round(shapley_effect_usd / 1e6, 1), round(sequential_effect_usd / 1e6, 1), round(order_bias_usd / 1e6, 1)
+from marts.mart_workforce_cost_growth_mix
+where view_name = 'Company' and month(to_month_end) = 6
+order by fiscal_year, factor_order
+"""
+
+WALK_BY_TYPE = """
+select 'FY' || right(cast(case when month(month_end_date) >= 7 then year(month_end_date) + 1
+                              else year(month_end_date) end as varchar), 2) as fy,
+       sum(headcount) filter (where worker_type = 'Employee' and movement_category = 'Closing' and month(month_end_date) = 6),
+       sum(headcount) filter (where worker_type = 'Contingent' and movement_category = 'Closing' and month(month_end_date) = 6),
+       sum(headcount) filter (where worker_type = 'Contingent' and movement_category = 'Starts'),
+       -sum(headcount) filter (where worker_type = 'Contingent' and movement_category = 'Ends'),
+       sum(headcount) filter (where worker_type = 'Employee' and movement_category = 'Conversions'),
+       -sum(headcount) filter (where worker_type = 'Contingent' and movement_category = 'Conversions')
+from marts.mart_headcount_fte_walk
+group by 1 order by 1
+"""
+
 
 def table(rows, headers) -> str:
     out = ["| " + " | ".join(headers) + " |", "|" + "---|" * len(headers)]
@@ -258,6 +279,14 @@ def main() -> None:
           "annualized run-rate in USD at the version's FX.\n")
     print(table(con.sql(CW_PLAN_TOTALS).fetchall(), ["FY", "Actual CW", "Budget", "RF1", "RF2", "RF3",
                                                      "Budget spend $M", "RF3 spend $M"]))
+
+    print("\n## Workforce walk by worker type\n")
+    print("Closing headcount on June 30, contingent starts and ends in the year, and conversions (into Employee "
+          "and out of Contingent: they must match).\n")
+    print(table(con.sql(WALK_BY_TYPE).fetchall(), ["FY", "Employees", "Contingent", "Contingent starts",
+                                                   "Contingent ends", "Conversions in", "Conversions out"]))
+    print("\n## Total workforce cost growth mix (Company, year over year to June 30, $M nominal)\n")
+    print(table(con.sql(GROWTH_MIX).fetchall(), ["FY", "Factor", "Shapley", "Sequential", "Order bias"]))
 
     for schema in ("raw", "marts"):
         names = [r[0] for r in con.sql(

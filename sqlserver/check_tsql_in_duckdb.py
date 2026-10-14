@@ -136,6 +136,11 @@ def compare(con: duckdb.DuckDBPyConnection, mart: str, other: str, where: str = 
             return f"ROUND(CAST({q} AS DOUBLE) + 1e-6, 2)"   # off the half-cent boundary
         return f"CAST({q} AS {'DATE' if d == 'DATE' else 'VARCHAR'})"
 
+    other_cols = {r[0] for r in con.execute(f"DESCRIBE SELECT * FROM {other}").fetchall()}
+    missing = [c for c, _ in cols if c not in other_cols]
+    if missing:                                        # the mart moved ahead of the T-SQL: say what is missing
+        print(f"   DIFF   {other:<34} lacks the mart's columns {', '.join(missing)} ({mart})")
+        return False
     sel = ", ".join(f"{norm(c, d)} AS \"{c}\"" for c, d in cols)
     src = mart if mart.startswith("tmp_") else f"p.marts.{mart}"
     a, b = f"SELECT {sel} FROM {src} {where}", f"SELECT {sel} FROM {other}"
