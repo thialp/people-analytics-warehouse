@@ -133,11 +133,11 @@ erDiagram
 | Raw table | Grain | Rows |
 |---|---|---:|
 | `dim_worker` | worker (fictional names) | 46,980 |
-| `fact_job_history` | worker × effective-dated job record (SCD2), with seat, manager and leadership role | 98,028 |
+| `fact_job_history` | worker × effective-dated job record (SCD2), with seat, manager and leadership role | 96,129 |
 | `fact_compensation_history` | worker × effective-dated pay record (SCD2), incl. corrections | 186,191 |
 | `fact_performance_review` | worker × fiscal year rating | 154,151 |
 | `fact_bonus_payout` | worker × fiscal year bonus | 154,151 |
-| `dim_position` | seat × effective-dated record (SCD2): status, grade, office, cost center | 101,297 |
+| `dim_position` | seat × effective-dated record (SCD2): status, grade, office, cost center | 99,398 |
 | `fact_position_assignment` | who held which seat, from when to when, how they arrived and left | 54,094 |
 | `fact_requisition` | requisition: opened, approved, filled or cancelled | 31,323 |
 | `dim_candidate` | applicant × requisition | 188,982 |
@@ -190,7 +190,7 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 20 | Offices add up to the company headcount walk | The map and the walk telling different stories |
 | 21 | Relocations net to zero company-wide every month | Relocations creating or destroying people |
 | 22 | Flows out of and into each office equal its relocations; no self-loops; every office has coordinates | Map lines that don't match the numbers |
-| 23 | Part-time headcount at every opening and closing equals a recount from the worker-level table | A part-time count that drifts from the workers it describes |
+| 23 | Every employee is 1.0 FTE: no job record below full-time, and FTE equals headcount on every walk line | Part-time or an FTE movement slipping back in after release 3 removed them |
 | 24 | **Everyone except the CEO reports to a manager employed that day**; exactly one CEO | People with no manager, or reporting to someone who has left |
 | 25 | Managers outrank people managers; ICs report at their level or higher; non-leaders report inside their department | Inverted or cross-department reporting lines |
 | 26 | Every reporting chain ends at the CEO in under 15 steps | Loops and dead ends in the hierarchy |
@@ -338,7 +338,6 @@ Opening headcount
   + Hires
   − Voluntary terminations  − Involuntary terminations
   − Internal moves out  + Internal moves in
-  ± FTE changes (FTE only)
 = Closing headcount
 ```
 
@@ -378,7 +377,7 @@ Company-wide headcount walk by fiscal year:
 - **FY26 grew 5.5%** (+1,567) on 5,235 hires against 3,668 leavers. Voluntary turnover was 10.1% annualized, highest in Commercial (14.8% including involuntary).
 - **FY24's restructuring shows twice:** involuntary terminations rose to 1,015, the highest of the five years, and hires fell to 3,634, so headcount barely moved (+276).
 - **FY25's internal moves jumped to 4,432** with the reorganization into Data & AI Platform: a large shift between departments with no effect on the company total, which test 16 checks every month.
-- **FTE trails headcount by 650.5** at FY26 close (29,363.5 FTE for 30,014 people) because 2,330 of those people work part-time schedules. Reporting one without the other overstates capacity.
+- **FTE equals headcount** (30,014 at FY26 close): every Arcadia employee is full-time. Since release 3 the workforce that is not on Arcadia's payroll is the contingent workforce, counted separately rather than as fractions of an FTE.
 
 ### Performance: choosing the grain of history
 
@@ -390,7 +389,7 @@ Company-wide headcount walk by fiscal year:
 | As-of date-range join, recomputed for both month-ends | none | 4.57 |
 | **Month-end snapshot built once, then an equality join** | **16,396,870** | **3.75** (1.93 build + 1.83 walk) |
 
-The daily scaffold stores 30 times more rows than the month-end snapshot, is 12 times slower, and is past Tableau Public's 15-million-row limit even at the real size (49.8M rows). The snapshot is built once and reused by every downstream model; after that, each walk runs 2.5 times faster than recomputing the date-range joins, and the two SQL designs return identical results. At 10x and five years even the snapshot passes the limit, which is why Tableau gets the aggregated walk mart (521,029 rows), not the snapshot.
+The daily scaffold stores 30 times more rows than the month-end snapshot, is 12 times slower, and is past Tableau Public's 15-million-row limit even at the real size (49.8M rows). The snapshot is built once and reused by every downstream model; after that, each walk runs 2.5 times faster than recomputing the date-range joins, and the two SQL designs return identical results. At 10x and five years even the snapshot passes the limit, which is why Tableau gets the aggregated walk mart (519,173 rows), not the snapshot.
 
 ### Tableau
 
@@ -470,15 +469,15 @@ Three rules make the walk close in every group, under any filter: each line is p
 
 | | Total | Average per FTE |
 |---|---:|---:|
-| Opening (30 Jun 2025) | $3,066.1M | $110,084.39 |
-| Hires − exits | +$144.7M | −$1,009.55 |
-| Tenure increases | +$105.8M | +$3,604.57 |
-| Promotions − demotions | +$20.4M | +$693.87 |
-| Fringe rate changes | +$8.3M | +$282.90 |
-| Market, same-country and cross-border pay resets, FTE | −$8.8M | +$7.46 |
-| Closing (30 Jun 2026) | $3,336.5M | $113,663.64 |
+| Opening (30 Jun 2025) | $3,130.0M | $110,062.73 |
+| Hires − exits | +$142.6M | −$996.76 |
+| Tenure increases | +$108.1M | +$3,601.77 |
+| Promotions − demotions | +$20.8M | +$694.70 |
+| Fringe rate changes | +$8.5M | +$283.76 |
+| Market, same-country and cross-border pay resets | +$0.5M | +$17.61 |
+| Closing (30 Jun 2026) | $3,410.5M | $113,663.81 |
 
-Hiring is the cost story (+$145M), while tenure raises are the average-pay story. New hires join below the average, so hires and exits together pull the average down by $1,010 per FTE, a little over a quarter of what anniversary raises add.
+Hiring is the cost story (+$143M), while tenure raises are the average-pay story. New hires join below the average, so hires and exits together pull the average down by $997 per FTE, a little over a quarter of what anniversary raises add.
 
 Ten tests (34 to 40 and 57 to 59) prove the ledger explains every worker's change, that every one of the 9,126 group walks closes, ties to the snapshot, nets its transfers to zero and agrees across views, and that office moves, the region walk and career moves tie to the walk. Month-over-month department walks match the cost bridge of case study 5 to the cent on opening, closing, hires and exits (the two split a promotion month's pay change differently by design).
 
@@ -490,7 +489,7 @@ One dashboard, **1400 x 850**, built on Custom SQL data sources and published as
 |---|---|
 | Rail | Period (valid From/To pairs only), View by (six views), group picker, pay lens (average per FTE or total payroll), cost (loaded or base), currency (constant or nominal), reset; all parameter actions, so one click drives every data source |
 | KPI band | Opening, closing, change in dollars and percent, and people, all following the lens |
-| Waterfall | Compact (hires and exits, promotions, raises, fringe and other) with an Expand button that opens all 13 steps; a trimmed value axis that stays a true running total |
+| Waterfall | Compact (hires and exits, promotions, raises, fringe and other) with an Expand button that opens all 12 steps; a trimmed value axis that stays a true running total |
 | Top drivers | The four largest individual steps, ranked, each with a one-line reason |
 | Office moves | A map of who changed office, the five busiest routes, and headcount growth by region |
 
@@ -502,7 +501,7 @@ Build guides: [`docs/projects/compensation-walk/`](docs/projects/compensation-wa
 
 ### Business problem
 
-Finance sees that the annual pay run-rate rose **$229.5M (+7.4%) in FY2026**, from $3,107.0M to $3,336.5M. The number alone doesn't help anyone decide anything. Leaders need to know:
+Finance sees that the annual pay run-rate rose **$238.8M (+7.5%) in FY2026**, from $3,171.7M to $3,410.5M. The number alone doesn't help anyone decide anything. Leaders need to know:
 
 - How much came from **more people** versus **paying people more**?
 - How much was **promotions** versus **tenure raises**?
@@ -524,7 +523,7 @@ loaded = base × (1 + fringe rate)
 Opening Run-Rate
   + Hires  − Terminations  + Transfers In  − Transfers Out
   + Promotions  − Demotions  + Tenure & Market Adjustments  + International Mobility
-  + FTE Changes  + Fringe Rate Changes  + FX Rate Changes
+  + Fringe Rate Changes  + FX Rate Changes
 = Closing Run-Rate
 ```
 
@@ -532,7 +531,7 @@ Opening Run-Rate
 
 ```
 pay    = (B1·X1p − B0·X0) · F0 · (1 + R0)
-FTE    =  B1·X1p · (F1 − F0) · (1 + R0)
+FTE    =  B1·X1p · (F1 − F0) · (1 + R0)      always 0 since release 3 (every employee is 1.0 FTE)
 fringe =  B1·X1p · F1 · (R1 − R0)
 FX     =  B1 · F1 · (1 + R1) · (X1 − X1p)
 ```
@@ -547,26 +546,25 @@ Company-wide walk of **loaded** run-rate by fiscal year, USD millions, nominal (
 
 | Driver | FY22 | FY23 | FY24 | FY25 | FY26 |
 |---|---:|---:|---:|---:|---:|
-| **Opening run-rate** | **2,364.2** | **2,450.1** | **2,718.2** | **2,816.9** | **3,107.0** |
-| Hires | +413.0 | +490.7 | +349.1 | +417.2 | +538.5 |
-| Terminations | −307.7 | −353.7 | −345.2 | −324.3 | −400.4 |
+| **Opening run-rate** | **2,387.6** | **2,482.5** | **2,761.8** | **2,868.9** | **3,171.7** |
+| Hires | +418.4 | +496.2 | +352.4 | +421.6 | +543.7 |
+| Terminations | −311.3 | −358.1 | −351.4 | −330.8 | −409.0 |
 | Transfers in / out (net) | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| Promotions | +16.5 | +17.3 | +20.9 | +20.7 | +24.2 |
+| Promotions | +16.7 | +17.5 | +21.3 | +21.2 | +24.8 |
 | Demotions | −0.7 | −0.6 | −0.8 | −0.7 | −0.9 |
-| Tenure & market adjustments | +92.3 | +94.4 | +104.7 | +107.8 | +113.6 |
-| International mobility | +0.3 | −1.3 | +0.1 | −0.9 | −0.7 |
-| FTE changes | −7.3 | −8.1 | −9.4 | −10.5 | −10.5 |
-| Fringe rate changes | 0.0 | −2.4 | +2.6 | +6.0 | +9.3 |
-| FX rate changes | −120.5 | +31.6 | −23.2 | +74.8 | −43.7 |
-| **Closing run-rate** | **2,450.1** | **2,718.2** | **2,816.9** | **3,107.0** | **3,336.5** |
-| Closing in constant currency | 2,487.1 | 2,727.3 | 2,849.8 | 3,066.1 | 3,336.5 |
+| Tenure & market adjustments | +93.4 | +95.8 | +106.5 | +109.9 | +116.0 |
+| International mobility | +0.3 | −1.3 | +0.2 | −0.9 | −0.8 |
+| Fringe rate changes | 0.0 | −2.4 | +2.6 | +6.1 | +9.5 |
+| FX rate changes | −121.9 | +32.2 | −23.6 | +76.5 | −44.7 |
+| **Closing run-rate** | **2,482.5** | **2,761.8** | **2,868.9** | **3,171.7** | **3,410.5** |
+| Closing in constant currency | 2,519.9 | 2,771.1 | 2,902.5 | 3,130.0 | 3,410.5 |
 
-- **FY26 growth was half people, half pay.** Net hiring added $138.1M; tenure raises and promotions, net of demotions, added $136.9M. Currency took back $43.7M, which a constant-currency budget would never see.
-- **Tenure raises are the steady engine.** $92–114M every year, close to 4% of the opening run-rate, whatever happens to hiring.
-- **FY22 shows what a strong dollar does.** FX took $120.5M off the run-rate as the euro, pound and yen fell against the dollar in 2022, more than the year's tenure raises added.
-- **FY24 was the restructuring year.** Hires fell to 3,634 and terminations nearly matched them, so headcount grew by only 276. Run-rate still grew $98.7M because anniversary raises kept going.
+- **FY26 growth was half people, half pay.** Net hiring added $134.7M; tenure raises and promotions, net of demotions, added $139.9M. Currency took back $44.7M, which a constant-currency budget would never see.
+- **Tenure raises are the steady engine.** $93–116M every year, close to 4% of the opening run-rate, whatever happens to hiring.
+- **FY22 shows what a strong dollar does.** FX took $121.9M off the run-rate as the euro, pound and yen fell against the dollar in 2022, more than the year's tenure raises added.
+- **FY24 was the restructuring year.** Hires fell to 3,634 and terminations nearly matched them, so headcount grew by only 276. Run-rate still grew $107.1M because anniversary raises kept going.
 - **Fringe moves with the law.** The UK's 2025 employer NIC increase, Australia's annual superannuation steps and Ireland's 2026 pension auto-enrolment show up as fringe-rate changes in the year they take effect. FY22 shows none, because 2021 reuses each country's 2022 rates.
-- **FY25's transfers doubled** ($231.2M each way against $99–154M in other years) because of the reorganization into Data & AI Platform: a large move between departments with zero company-level effect, as test 10 checks.
+- **FY25's transfers doubled** ($236.0M each way against $100–157M in other years) because of the reorganization into Data & AI Platform: a large move between departments with zero company-level effect, as test 10 checks.
 - **Constant currency equals nominal at FY26 close** because the constant rate set is the 2026-06-30 ECB rates, which test 11 checks.
 
 ### Tableau

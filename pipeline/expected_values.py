@@ -104,10 +104,8 @@ class HeadcountWalk:
               SUM(CASE WHEN w.movement_category IN ('Opening', 'Closing') THEN w.headcount END)         AS oc_sum,
               SUM(CASE WHEN w.movement_category = 'Opening' AND w.month_end_date = ? THEN w.headcount END) AS open_hc,
               SUM(CASE WHEN w.movement_category = 'Opening' AND w.month_end_date = ? THEN w.fte END)       AS open_fte,
-              SUM(CASE WHEN w.movement_category = 'Opening' AND w.month_end_date = ? THEN w.part_time_headcount END) AS open_pt,
               SUM(CASE WHEN w.movement_category = 'Closing' AND w.month_end_date = ? THEN w.headcount END) AS close_hc,
               SUM(CASE WHEN w.movement_category = 'Closing' AND w.month_end_date = ? THEN w.fte END)       AS close_fte,
-              SUM(CASE WHEN w.movement_category = 'Closing' AND w.month_end_date = ? THEN w.part_time_headcount END) AS close_pt,
               SUM(CASE WHEN w.movement_category = 'Hires' THEN w.headcount END)                    AS hires,
               SUM(CASE WHEN w.movement_category = 'Hires' THEN w.fte END)                          AS hires_fte,
               -SUM(CASE WHEN w.movement_category = 'Voluntary Terminations' THEN w.headcount END)  AS vol,
@@ -116,14 +114,13 @@ class HeadcountWalk:
               -SUM(CASE WHEN w.movement_category = 'Involuntary Terminations' THEN w.fte END)      AS invol_fte,
               SUM(CASE WHEN w.movement_category = 'Internal Moves In' THEN w.headcount END)        AS moves,
               SUM(CASE WHEN w.movement_category = 'Internal Moves In' AND w.movement_reason = 'Promotion'
-                       THEN w.headcount END)                                                       AS promotions,
-              SUM(CASE WHEN w.movement_category = 'FTE Changes' THEN w.fte END)                    AS fte_changes
+                       THEN w.headcount END)                                                       AS promotions
             FROM marts.mart_headcount_fte_walk AS w
             LEFT JOIN marts.mart_dim_department AS d ON d.department_id = w.department_id
             WHERE {where}
-        """, [start, start, start, end, end, end, *params]).fetchone()
-        names = ["months", "oc_sum", "open_hc", "open_fte", "open_pt", "close_hc", "close_fte", "close_pt",
-                 "hires", "hires_fte", "vol", "vol_fte", "invol", "invol_fte", "moves", "promotions", "fte_changes"]
+        """, [start, start, end, end, *params]).fetchone()
+        names = ["months", "oc_sum", "open_hc", "open_fte", "close_hc", "close_fte",
+                 "hires", "hires_fte", "vol", "vol_fte", "invol", "invol_fte", "moves", "promotions"]
         for k, v in zip(names, row):
             setattr(self, k, float(v or 0))
         self.avg_hc = self.oc_sum / 2 / self.months if self.months else 0
@@ -174,22 +171,20 @@ Month-ends: {month_label(months[0])} to {month_label(last)} ({len(months)}). The
                  ["Hires", signed(w.hires), f"{signed(w.hires_fte)} ({n1(w.hires_fte)})"],
                  ["Voluntary leavers", n0(-w.vol), f"{n0(-w.vol_fte)} ({n1(w.vol_fte)})"],
                  ["Involuntary leavers", n0(-w.invol), f"{n0(-w.invol_fte)} ({n1(w.invol_fte)})"],
-                 ["FTE changes", "—", f"{signed(w.fte_changes)} ({n1(w.fte_changes)})"],
                  [f"Closing ({month_label(w.end)})", n0(w.close_hc), f"{n0(w.close_fte)} ({n1(w.close_fte)})"],
                  ["Waterfall title",
                   f"{w.label}: {n0(w.hires)} hires {verb} {n0(leavers)} leavers, {add} {n0(abs(net))} people",
                   f"{w.label} in FTE: {n0(w.hires_fte)} FTE hired, {n0(leavers_fte)} FTE left, {signed(net_fte)} FTE net"],
              ]),
              "",
-             f"FTE ties: {n1(w.open_fte)} + {n1(w.hires_fte)} − {n1(w.vol_fte)} − {n1(w.invol_fte)} "
-             f"{'+' if w.fte_changes >= 0 else '−'} {n1(abs(w.fte_changes))} = {n1(w.close_fte)}.",
+             f"FTE ties: {n1(w.open_fte)} + {n1(w.hires_fte)} − {n1(w.vol_fte)} − {n1(w.invol_fte)} = {n1(w.close_fte)}. "
+             "Every employee is 1.0 FTE (release 3 removed part-time), so FTE equals headcount.",
              ""]
         if w.months >= 3:
-            gap_open, gap_close = w.open_hc - w.open_fte, w.close_hc - w.close_fte
             s += [table(["Card", "Value", "Note (Headcount mode)"], [
                 ["Closing headcount", n0(w.close_hc),
                  f"{signed(round((w.close_hc / w.open_hc - 1) * 1000) / 10, n1)}% vs {n0(w.open_hc)} at start"],
-                ["Closing FTE", n1(w.close_fte), f"{n0(w.close_pt)} part-time · {n1(gap_close)} below headcount"],
+                ["Closing FTE", n1(w.close_fte), "Equals headcount: every employee is 1.0 FTE"],
                 ["Hires", n0(w.hires), f"{pct(w.hire_rate)} annualized · {n0(w.hires_fte)} FTE"],
                 ["Voluntary turnover (annualized)", pct(w.vol_rate),
                  f"{n0(w.vol)} left by choice · {n0(w.vol_fte)} FTE"],
@@ -197,12 +192,11 @@ Month-ends: {month_label(months[0])} to {month_label(last)} ({len(months)}). The
                  f"{n0(w.promotions)} promotions · {n0(w.moves - w.promotions)} other moves"],
             ], "lrl"), "",
                 f"Caption: *{n0(w.moves)} internal moves ({n0(w.promotions)} promotions, {n0(w.moves - w.promotions)} other) "
-                f"move people between teams, so they net to zero at company level. FTE {n0(w.open_fte)} → {n0(w.close_fte)}, "
-                f"including {signed(w.fte_changes)} from schedule changes.*", "",
+                f"move people between teams, so they net to zero at company level.*", "",
                 "Waterfall tooltips (Headcount):", "",
                 table(["Bar", "Line 1", "Line 2"], [
                     ["Opening", f"Active at the end of {month_label(prior)}",
-                     f"{n0(w.open_pt)} part-time ({pct(w.open_pt / w.open_hc)}) · FTE is {n1(gap_open)} below headcount"],
+                     f"{n0(w.open_hc)} people = {n1(w.open_fte)} FTE"],
                     ["Hires", f"{pct(w.hires / w.open_hc)} of opening headcount · about {n0(w.hires / w.months)} per month",
                      f"{n0(w.hires)} people = {n1(w.hires_fte)} FTE"],
                     ["Voluntary", f"{pct(w.vol / w.open_hc)} of opening headcount · about {n0(w.vol / w.months)} per month",
@@ -210,7 +204,7 @@ Month-ends: {month_label(months[0])} to {month_label(last)} ({len(months)}). The
                     ["Involuntary", f"{pct(w.invol / w.open_hc)} of opening headcount · about {n0(w.invol / w.months)} per month",
                      f"{n0(w.invol)} people = {n1(w.invol_fte)} FTE"],
                     ["Closing", f"Active at the end of {month_label(w.end)} · {signed(round((w.close_hc / w.open_hc - 1) * 1000) / 10, n1)}% vs opening",
-                     f"{n0(w.close_pt)} part-time ({pct(w.close_pt / w.close_hc)}) · FTE is {n1(gap_close)} below headcount"],
+                     f"{n0(w.close_hc)} people = {n1(w.close_fte)} FTE"],
                 ], "lll"), ""]
             funcs = [r[0] for r in con.execute(
                 "SELECT DISTINCT function_name FROM marts.mart_dim_department ORDER BY 1").fetchall()]

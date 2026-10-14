@@ -18,7 +18,7 @@ The walk takes a group's compensation at the **From** month-end, explains every 
 + Promotions + Demotions                                       career
 + Tenure Increases + Market Adjustments                        pay rate
 + Same-Country Transfer Adjustments + International Transfer Adjustments  location
-+ FTE Changes + Fringe Rate Changes + FX Translation           hours, statutory cost, currency
++ Fringe Rate Changes + FX Translation                         statutory cost, currency
 = Closing
 ```
 
@@ -89,7 +89,7 @@ For a worker present at both ends of a month, the change in each measure is appl
 | Order | Driver | Base amount | Loaded amount |
 |---|---|---|---|
 | 1 | Pay events | each pay record that took effect in the month, minus the record it replaced, at the **prior** month-end FX rate and the prior FTE | × (1 + prior fringe rate) |
-| 2 | FTE Changes | `new pay × prior-month FX × (FTE₁ − FTE₀)` | × (1 + prior fringe rate) |
+| 2 | FTE Changes (retired in release 3) | `new pay × prior-month FX × (FTE₁ − FTE₀)`, always 0 now that every employee is 1.0 FTE; no step line is written | × (1 + prior fringe rate) |
 | 3 | Fringe Rate Changes | 0 | `new pay × prior-month FX × FTE₁ × (fringe₁ − fringe₀)` |
 | 4 | FX Translation | `new pay × FTE₁ × (FX₁ − FX at prior month-end)` | × (1 + new fringe rate) |
 
@@ -165,7 +165,7 @@ Every measure is a signed sum: aggregate with `SUM()` only. In the walk, Exits a
 |---|---|
 | `worker_count` | People behind the line, unsigned. Opening and Closing: people in the group. Flows: people moving. Pay drivers: people with at least one event of that kind (e.g. 1,824 people promoted in FY26). Divide a pay driver's dollars by it for the average raise per person affected. Not additive across steps. |
 | `headcount` | Signed headcount. Opening + Hires + Exits + Transfers = Closing. Zero on pay drivers. |
-| `fte` | Signed FTE. As headcount, plus FTE Changes carries the change in hours of people who stayed. |
+| `fte` | Signed FTE. Equals headcount: every employee is 1.0 FTE since release 3. |
 | `base_usd_nominal` | Annualized base pay (annual base × FTE) at each month-end's actual FX rate |
 | `base_usd_constant` | Same at the constant rate set (30 June 2026), so currency movements are removed |
 | `loaded_usd_nominal` | Base × (1 + employer fringe rate), nominal FX |
@@ -189,7 +189,6 @@ So each step's contribution to the change in average is `(Dₖ − nₖ × Ā₀
 
 * **Pay drivers** move no FTE, so they contribute their dollars spread over closing FTE.
 * **Hires, exits and transfers** contribute only to the extent they are paid differently from the opening average. Hiring below the average lowers it; losing below-average earners raises it.
-* **FTE Changes** behave like a mix effect: hours added or removed at a pay rate different from the average.
 
 `avg_*` holds Ā₀ on Opening, Ā₁ on Closing and the contribution on every other step. Steps 2 to 14 add up to Ā₁ − Ā₀ (test 35). In Tableau, a waterfall of `SUM([avg_loaded_usd_constant])` over steps 1 to 14 lands exactly on the Closing bar.
 
@@ -199,23 +198,22 @@ So each step's contribution to the change in average is `(Dₖ − nₖ × Ā₀
 
 | Step | People | Total $ | Avg per FTE |
 |---|---:|---:|---:|
-| Opening | 28,438 | 3,066,147,621 | **110,084.39** |
-| Hires | 4,790 | +485,725,626 | −1,223.30 |
-| Exits | 3,223 | −341,052,810 | +213.75 |
-| Promotions | 1,824 | +21,155,975 | +720.71 |
-| Demotions | 148 | −787,909 | −26.84 |
-| Tenure Increases | 25,189 | +105,810,276 | +3,604.57 |
-| Market Adjustments | 287 | +1,522,137 | +51.85 |
-| Same-Country Transfer Adjustments | 583 | +146,962 | +5.01 |
-| International Transfer Adjustments | 125 | −1,159,094 | −39.49 |
-| FTE Changes | 353 | −9,274,040 | −9.92 |
-| Fringe Rate Changes | 11,312 | +8,304,439 | +282.90 |
+| Opening | 28,438 | 3,129,964,046 | **110,062.73** |
+| Hires | 4,790 | +491,177,210 | −1,200.58 |
+| Exits | 3,223 | −348,616,594 | +203.82 |
+| Promotions | 1,824 | +21,649,192 | +721.52 |
+| Demotions | 148 | −804,811 | −26.82 |
+| Tenure Increases | 25,189 | +108,071,152 | +3,601.77 |
+| Market Adjustments | 287 | +1,555,254 | +51.83 |
+| Same-Country Transfer Adjustments | 583 | +193,228 | +6.44 |
+| International Transfer Adjustments | 125 | −1,220,144 | −40.66 |
+| Fringe Rate Changes | 11,312 | +8,514,217 | +283.76 |
 | FX Translation | 17,038 | 0 (constant FX) | 0 |
-| Closing | 30,005 | 3,336,539,182 | **113,663.64** |
+| Closing | 30,005 | 3,410,482,750 | **113,663.81** |
 
-Total loaded cost grew 8.8%, mostly because of headcount: hires minus exits added $145M. The **average** grew $3,579 (3.3%). Tenure increases added $3,605 per FTE, promotions $721 and statutory fringe increases $283. New hires, paid below the average, took $1,223 back; less than before release 2, because salary ranges now move every July 1, so a new hire starts on this year's range while the people already here climbed last year's.
+Total loaded cost grew 9.0%, mostly because of headcount: hires minus exits added $143M. The **average** grew $3,601 (3.3%). Tenure increases added $3,602 per FTE, promotions $722 and statutory fringe increases $284. New hires, paid below the average, took $1,201 back; less than before release 2, because salary ranges now move every July 1, so a new hire starts on this year's range while the people already here climbed last year's.
 
-(Release 2 values. Release 1 opened FY26 at 28,436 people and an average of 107,553.68.)
+(Release 3 values: every employee is 1.0 FTE, so FTE equals headcount and the FTE Changes step is gone. Release 2 opened FY26 at an average of 110,084.39 with 353 people changing hours; release 1 at 107,553.68.)
 
 ## 8. Reconciling to the other dashboards
 

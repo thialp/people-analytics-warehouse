@@ -154,8 +154,8 @@ workers_without_a_valid_manager
 0
 4. Control totals (executive officers excluded)
 month_end_date  headcount  fte       loaded_usd_nominal  loaded_usd_constant
-2022-06-30      25052      24725.50  2450138920.49       2487093187.74
-2026-06-30      30005      29354.50  3336539181.84       3336539181.84
+2022-06-30      25052      25052.00  2482526955.64       2519944448.45
+2026-06-30      30005      30005.00  3410482749.84       3410482749.84
 5. The pay ledger explains every change in every worker's cost (expected 0)
 worker_months_not_explained
 0
@@ -194,8 +194,8 @@ views              6        6  PASS
 2. Groups whose walk does not close: Opening + steps <> Closing (expected 0)
 0
 3. Company, FY23 (30 Jun 2022 to 30 Jun 2023)
-Opening   25052   2450138920.28   2487093187.28
-Closing   26932   2718192220.16   2727327688.63
+Opening   25052   2482526955.47   2519944448.29
+Closing   26932   2761818121.64   2771129945.16
 4. FY26 company walk, loaded cost at constant FX ...
 ```
 
@@ -332,7 +332,7 @@ Why Extract: the query aggregates about 1.35 million worker-months on every refr
 2. Pick schema **rpt** and drag **vw_workforce_cost_snapshot** onto the canvas.
 3. Rename it **Workforce Cost Snapshot (SQL Server)** and set it to **Extract**.
 
-Expected: 24 columns and 197,603 rows.
+Expected: 24 columns and 233,866 rows.
 
 Keep the two data sources separate. They have different grains, and joining them would duplicate dollars.
 
@@ -364,18 +364,19 @@ Use the **Workforce Cost Bridge** data source.
 
 | Driver | Expected (USD) |
 |---|---:|
-| Opening Run-Rate | 3,042,851,180 |
-| Hires | +451,657,231 |
-| Terminations | −378,384,468 |
-| Transfers In / Out | +137,683,196 / −137,683,196 |
-| Promotions | +22,003,572 |
-| Demotions | −694,074 |
-| Tenure & Market Adjustments | +105,140,681 |
-| International Mobility | +702,852 |
-| FTE Changes | −12,321,035 |
-| Fringe Rate Changes | +8,979,057 |
-| FX Rate Changes | −44,431,732 |
-| **Grand Total (Closing)** | **3,195,503,265** |
+| Opening Run-Rate | 3,171,717,783 |
+| Hires | +543,683,946 |
+| Terminations | −408,961,394 |
+| Transfers In / Out | +157,393,285 / −157,393,285 |
+| Promotions | +24,784,185 |
+| Demotions | −879,216 |
+| Tenure & Market Adjustments | +116,038,891 |
+| International Mobility | −787,039 |
+| Fringe Rate Changes | +9,537,549 |
+| FX Rate Changes | −44,651,955 |
+| **Grand Total (Closing)** | **3,410,482,750** |
+
+(Warehouse release 3. There is no FTE Changes driver: every employee is 1.0 FTE.)
 
 If these match, your SQL Server, Custom SQL and Tableau calculation all agree with the published data.
 

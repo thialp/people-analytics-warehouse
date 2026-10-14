@@ -90,8 +90,8 @@ docker compose logs -f build
 Wait for the line `arcadia-build exited with code 0`, then press `Ctrl+C`. Every row with a `result` column should say **PASS**, every "expected 0" check should show `0`, and the control totals should read:
 
 ```
-2022-06-30   25052   24725.50   2450138920.49   2487093187.74
-2026-06-30   30005   29354.50   3336539181.84   3336539181.84
+2022-06-30   25052   25052.00   2482526955.64   2519944448.45
+2026-06-30   30005   30005.00   3410482749.84   3410482749.84
 ```
 
 SQL Server may show a cent different in the last column (each group is rounded to the cent before the total is added up). The expected values live in [`sqlserver/05_validate.sql`](../../sqlserver/05_validate.sql); if the data is ever regenerated, that script is the source of truth.

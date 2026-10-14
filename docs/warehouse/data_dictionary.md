@@ -22,7 +22,7 @@ One row per worker ever employed (46,980).
 | `is_executive_officer` | `True` for the CEO and the eight function heads, who are excluded from compensation reporting |
 
 #### fact_job_history
-Effective-dated job assignments (SCD Type 2). A new row starts whenever department, office, job, level, FTE, manager or leadership role changes.
+Effective-dated job assignments (SCD Type 2). A new row starts whenever department, office, job, level, manager or leadership role changes.
 
 | Column | Description |
 |---|---|
@@ -30,13 +30,13 @@ Effective-dated job assignments (SCD Type 2). A new row starts whenever departme
 | `worker_id` | → `dim_worker` |
 | `effective_start_date` | First day the record applies |
 | `effective_end_date` | Last day the record applies (inclusive); empty = current |
-| `action_reason` | `Hire`, `Promotion`, `Demotion`, `Transfer`, `Reorganization`, `Succession`, `Location Change`, `FTE Change`, `Manager Change`, `Became People Manager`, `Returned to Individual Contributor`. When two changes land on the same day, one record carries the higher-ranked reason, in this order |
+| `action_reason` | `Hire`, `Promotion`, `Demotion`, `Transfer`, `Reorganization`, `Succession`, `Location Change`, `Manager Change`, `Became People Manager`, `Returned to Individual Contributor`. When two changes land on the same day, one record carries the higher-ranked reason, in this order |
 | `position_id` | The seat held (→ `dim_position`); it changes when the worker moves to another seat (transfer, reorganization, internal move). Test 43 checks every record names the seat the worker holds that day |
 | `department_id` | → `dim_department` |
 | `location_id` | → `dim_location` |
 | `job_profile_id` | → `dim_job_profile`: family + level, e.g. `SWE-L3`, `SWE-M5` (people-manager variant), `EXE-CEO` |
 | `job_level` | 1 (Associate) to 12 (Chief Executive Officer); see `dim_job_level` |
-| `fte` | 1.0, 0.8 or 0.5 |
+| `fte` | Always 1.0: every employee is full-time (release 3 removed part-time; test 23) |
 | `manager_worker_id` | Direct manager (→ `dim_worker`). Empty only for the CEO, who reports to the board |
 | `is_people_manager` | `True` if the worker has a team to lead |
 | `leads_org_unit_id` | The org unit this worker leads (→ `dim_org_unit`): the company for the CEO, a function, sub-function or department for their heads; empty for everyone else |
@@ -152,13 +152,13 @@ Pay ranges in local currency by fiscal year (FY21–FY26), level and country: `r
 The position (seat) layer of case study 1. How it is simulated and used: [Workforce Planning](../projects/workforce-planning/workforce_planning.md).
 
 #### dim_position
-Seat history (SCD Type 2): a new record whenever a seat changes status, grade, office, FTE or department. 101,297 records for 33,359 seats.
+Seat history (SCD Type 2): a new record whenever a seat changes status, grade, office or department. 99,398 records for 33,359 seats.
 
 | Column | Description |
 |---|---|
 | `position_record_id`, `position_id` | Record key (`PS…`) and seat key (`P…`) |
 | `effective_start_date`, `effective_end_date` | Inclusive; empty = current. Records chain with no gaps (test 41) |
-| `change_reason` | `Initial`, `Net-new`, `Filled`, `Vacated`, `Re-levelled with incumbent` (promotion or demotion in place), `Re-levelled for backfill`, `Relocated with incumbent`, `Relocated for backfill`, `FTE change with incumbent`, `Job change with incumbent`, `Reorganization`, `Frozen`, `Unfrozen`, `Requisition cancelled`, `Eliminated` |
+| `change_reason` | `Initial`, `Net-new`, `Filled`, `Vacated`, `Re-levelled with incumbent` (promotion or demotion in place), `Re-levelled for backfill`, `Relocated with incumbent`, `Relocated for backfill`, `Job change with incumbent`, `Reorganization`, `Frozen`, `Unfrozen`, `Requisition cancelled`, `Eliminated` |
 | `status` | `Filled`, `Open`, `Frozen` or `Eliminated`. Filled exactly when someone holds the seat (test 44) |
 | `department_id`, `cost_center_id`, `location_id`, `job_profile_id`, `job_level`, `fte` | The seat as it stands in that record |
 | `created_date`, `created_reason` | When the seat was created and why: `Initial` (held at the start of history), `Net-new` (growth), `Team split` (a new manager seat when a team passes nine) |
@@ -259,8 +259,8 @@ Grain: **month-end × department × driver.** For each department and month, Ope
 | `month_end_date` / `prior_month_end_date` | The month being explained, and the month-end it starts from |
 | `fiscal_year`, `fiscal_quarter_label`, `fiscal_period` | Fiscal calendar, e.g. `FY26 Q2`, `FY26 P06` |
 | `department_id`, `department_name`, `sub_function`, `function_name`, `cost_center` | Department the line is attributed to |
-| `driver_order` | 1 to 13, for sorting a waterfall |
-| `driver` | Opening Run-Rate, Hires, Terminations, Transfers In, Transfers Out, Promotions, Demotions, Tenure & Market Adjustments, International Mobility, FTE Changes, Fringe Rate Changes, FX Rate Changes, Closing Run-Rate |
+| `driver_order` | 1 to 13, for sorting a waterfall (10 was FTE Changes, retired in release 3) |
+| `driver` | Opening Run-Rate, Hires, Terminations, Transfers In, Transfers Out, Promotions, Demotions, Tenure & Market Adjustments, International Mobility, Fringe Rate Changes, FX Rate Changes, Closing Run-Rate |
 | `driver_group` | Balance, Headcount Movement, Pay Rate, Workforce Mix, Fringe & FX |
 | `worker_count` | Workers contributing to the line |
 | `headcount` | Signed headcount change; for Opening and Closing, the headcount itself |
@@ -270,7 +270,7 @@ Grain: **month-end × department × driver.** For each department and month, Ope
 **Walking across several months:** take Opening from the first month, Closing from the last month, and sum every other driver across the months in between. Test 08 guarantees the months chain together.
 
 ### mart_compensation_walk
-Grain: **date pair × view × group × walk step × movement reason.** For any two month-ends on the grid (Month over Month, Quarter over Quarter, Year over Year and Fiscal Year to Date pairs ending after 2022-06-30: 88 pairs) and every group in six views (Company, Function, Sub-function, Department, Office, Country): Opening + Hires + Exits + Transfers In/Out + Promotions + Demotions + Tenure Increases + Market Adjustments + Same-Country Transfer Adjustments + International Transfer Adjustments + FTE Changes + Fringe Rate Changes + FX Translation = Closing, in headcount, FTE and the four dollar measures, as totals (`base_usd_*`, `loaded_usd_*`), as an average walk per FTE (`avg_*`) and as a percent walk (`pct_*`). Filter to one `view_name` and one date pair. Every row also carries `report_start_date` and `report_as_of_date` (the data window). Same columns as the Tableau Custom SQL `tableau/custom_sql_compensation_walk.sql`.
+Grain: **date pair × view × group × walk step × movement reason.** For any two month-ends on the grid (Month over Month, Quarter over Quarter, Year over Year and Fiscal Year to Date pairs ending after 2022-06-30: 88 pairs) and every group in six views (Company, Function, Sub-function, Department, Office, Country): Opening + Hires + Exits + Transfers In/Out + Promotions + Demotions + Tenure Increases + Market Adjustments + Same-Country Transfer Adjustments + International Transfer Adjustments + Fringe Rate Changes + FX Translation = Closing, in headcount, FTE and the four dollar measures, as totals (`base_usd_*`, `loaded_usd_*`), as an average walk per FTE (`avg_*`) and as a percent walk (`pct_*`). Filter to one `view_name` and one date pair. Every row also carries `report_start_date` and `report_as_of_date` (the data window). Same columns as the Tableau Custom SQL `tableau/custom_sql_compensation_walk.sql`.
 
 Full field reference, rules and worked examples: [`compensation_walk.md`](../projects/compensation-walk/compensation_walk.md).
 
@@ -297,12 +297,11 @@ Grain: **month-end × department × country × job family × grade × movement c
 | `country_code` | → `mart_dim_country` |
 | `job_family_code` | → `mart_dim_job_family` |
 | `grade` | → `mart_dim_grade` |
-| `movement_order` | 1 to 8, for sorting a waterfall |
-| `movement_category` | Opening, Hires, Voluntary Terminations, Involuntary Terminations, Internal Moves Out, Internal Moves In, FTE Changes, Closing |
-| `movement_reason` | New Hire · Voluntary · Involuntary · Transfer · Reorganization · Location Change · Promotion · Demotion · Job Change · FTE Increase · FTE Reduction · Opening · Closing |
+| `movement_order` | 1 to 8, for sorting a waterfall (7 was FTE Changes, retired in release 3) |
+| `movement_category` | Opening, Hires, Voluntary Terminations, Involuntary Terminations, Internal Moves Out, Internal Moves In, Closing |
+| `movement_reason` | New Hire · Voluntary · Involuntary · Transfer · Reorganization · Location Change · Promotion · Demotion · Job Change · Opening · Closing |
 | `headcount` | Signed headcount change; for Opening and Closing, the headcount itself |
 | `fte` | Signed FTE change; for Opening and Closing, the FTE itself |
-| `part_time_headcount` | Workers under 1.0 FTE. Filled on Opening and Closing rows only (the levels); every movement row carries 0, because a move or FTE change can flip a worker between full-time and part-time (test 23) |
 
 Rules: headcount includes executive officers. A move is booked out of the old slice and into the new one at the worker's prior FTE, so moves net to zero at any roll-up that contains both slices; an FTE change in the same month is a separate FTE Changes line. When several slice attributes change in one month, one reason is recorded: department (Reorganization if a reorg action is on file, otherwise Transfer), then country, then grade, then job family.
 
@@ -396,7 +395,7 @@ Grain: **fiscal quarter × from office × to office** (821 rows): where backfill
 ## Intermediate models
 
 ### int_worker_movement
-One row per worker per month for everyone active at the prior month-end, the current month-end or both: the worker's slice, office and FTE at each end, `movement_type` (Hire, Termination, Internal Move, No Change), `movement_reason` and `fte_changed`. Test 18 checks there is never a second row for the same worker and month.
+One row per worker per month for everyone active at the prior month-end, the current month-end or both: the worker's slice, office and FTE at each end, `movement_type` (Hire, Termination, Internal Move, No Change), `movement_reason`. Test 18 checks there is never a second row for the same worker and month.
 
 ### int_worker_in_month_hire_and_exit
 Workers hired and terminated between the same two month-ends. A month-end walk cannot show them, so they are listed here instead of disappearing. The current data has none.

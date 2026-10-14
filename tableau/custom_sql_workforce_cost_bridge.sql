@@ -157,9 +157,7 @@ CROSS APPLY (VALUES
          CASE WHEN m.is_continuing = 1 AND m.pay_driver = 'International Mobility' THEN 1 ELSE 0 END,
          0,  0,     m.pay_base_nom, m.pay_base_con,
                     m.pay_load_nom + m.fringe_load_nom, m.pay_load_con + m.fringe_load_con),
-    (10, 'FTE Changes',            'Workforce Mix',      w.dept_c,
-         CASE WHEN m.is_continuing = 1 AND w.f1 <> w.f0 THEN 1 ELSE 0 END,
-         0,  w.f1 - w.f0, m.fte_base_nom, m.fte_base_con, m.fte_load_nom, m.fte_load_con),
+    /* 10 was FTE Changes; release 3 removed part-time, so the driver no longer exists */
     (11, 'Fringe Rate Changes',    'Fringe & FX',        w.dept_c,
          CASE WHEN m.is_continuing = 1 AND m.pay_driver <> 'International Mobility'
                    AND w.r1 <> w.r0 THEN 1 ELSE 0 END,

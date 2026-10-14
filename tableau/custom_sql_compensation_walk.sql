@@ -14,7 +14,7 @@
     + Promotions + Demotions                                 (career)
     + Tenure Increases + Market Adjustments                  (pay rate)
     + Same-Country Transfer Adj. + International Transfer Adj. (location)
-    + FTE Changes + Fringe Rate Changes + FX Translation     (hours, statutory, currency)
+    + Fringe Rate Changes + FX Translation                   (statutory, currency)
     = Closing
 
   for headcount, FTE and four dollar measures (base / loaded x nominal /
@@ -363,9 +363,7 @@ FROM (
                 (11, 'International Transfer Adjustments', 'Location',       'close', CAST(NULL AS VARCHAR(30)),
                      CASE WHEN pg.intl_people   > 0 THEN 1 ELSE 0 END,
                      pg.intl_people,   0, 0, pg.intl_bn,   pg.intl_bc,   pg.intl_ln,   pg.intl_lc),
-                (12, 'FTE Changes',                        'Workforce Rate', 'close', CAST(NULL AS VARCHAR(30)),
-                     CASE WHEN pg.fte_people    > 0 THEN 1 ELSE 0 END,
-                     pg.fte_people,    0, pg.f1 - pg.f0, pg.fte_bn, pg.fte_bc, pg.fte_ln, pg.fte_lc),
+                /* 12 was FTE Changes; release 3 removed part-time, so the step no longer exists */
                 (13, 'Fringe Rate Changes',                'Statutory',      'close', CAST(NULL AS VARCHAR(30)),
                      CASE WHEN pg.fringe_people > 0 THEN 1 ELSE 0 END,
                      pg.fringe_people, 0, 0, 0, 0, pg.fringe_ln, pg.fringe_lc),

@@ -14,7 +14,6 @@
 --   + Tenure & Market Adj.     pay change for everyone else: anniversary (tenure)
 --                              raises, market adjustments, same-country relocations
 --   + International Mobility   pay and fringe re-levelling when someone changes country
---   + FTE Changes              moves between full-time and part-time
 --   + Fringe Rate Changes      new calendar-year fringe rates for the same country
 --   + FX Rate Changes          month-over-month currency movement (nominal only)
 --   = Closing Run-Rate
@@ -28,7 +27,8 @@
 -- 1 = current month-end and X1p = the CURRENT currency at the PRIOR month-end rate:
 --
 --   pay change    = (B1 * X1p - B0 * X0) * F0 * (1 + R0)
---   FTE change    =  B1 * X1p * (F1 - F0) * (1 + R0)
+--   FTE change    =  B1 * X1p * (F1 - F0) * (1 + R0)   (always 0 since release 3: every
+--                                                       employee is 1.0 FTE; no driver line)
 --   fringe change =  B1 * X1p * F1 * (R1 - R0)
 --   FX change     =  B1 * F1 * (1 + R1) * (X1 - X1p)
 --
@@ -171,10 +171,6 @@ driver_lines AS (
     WHERE movement_type IN ('Stayer', 'Transfer')
       AND (pay_base_nom <> 0 OR pay_base_con <> 0 OR pay_driver = 'International Mobility')
 
-    UNION ALL
-    SELECT month_end_date, dept_c, 'FTE Changes', worker_id,
-           0, f1 - f0, fte_base_nom, fte_base_con, fte_load_nom, fte_load_con
-    FROM valued WHERE movement_type IN ('Stayer', 'Transfer') AND f1 <> f0
 
     UNION ALL
     SELECT month_end_date, dept_c, 'Fringe Rate Changes', worker_id,
@@ -205,7 +201,6 @@ driver_order AS (
         (7,  'Demotions',                   'Pay Rate'),
         (8,  'Tenure & Market Adjustments', 'Pay Rate'),
         (9,  'International Mobility',      'Pay Rate'),
-        (10, 'FTE Changes',                 'Workforce Mix'),
         (11, 'Fringe Rate Changes',         'Fringe & FX'),
         (12, 'FX Rate Changes',             'Fringe & FX'),
         (13, 'Closing Run-Rate',            'Balance')

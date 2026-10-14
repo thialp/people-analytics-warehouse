@@ -14,7 +14,8 @@ What it simulates
     anniversary from a tenure schedule, promotions (one level up) and demotions
     (one level down) after the annual review, and a performance bonus.
   * Hires, voluntary and involuntary terminations, transfers, international moves,
-    office relocations, FTE changes, a restructuring and a reorganization.
+    office relocations, a restructuring and a reorganization. Every employee is 1.0 FTE
+    (release 3: no part-time).
   * Real ECB FX rates and researched fringe rates (see fx_rates.py, fringe_research.py).
 
 Events inside a month are applied in date order, so effective-dated records never
@@ -677,7 +678,8 @@ def new_worker(hire_date: dt.date, dept_id: str, level: int, family: str, cc: st
     w = {"worker_id": next_id("worker", "W"), "first_name": first, "last_name": last,
          "hire_date": hire_date, "termination_date": None, "termination_type": None,
          "is_exec": is_exec, "exec_profile": exec_profile, "position_id": None, "assignment": None,
-         "dept": dept_id, "family": family, "level": level, "country": cc, "loc": loc, "fte": fte,
+         "dept": dept_id, "family": family, "level": level, "country": cc, "loc": loc, "fte": 1.0,
+         "fte_draw": fte,
          "salary": salary, "mgr": None, "is_pm": False, "leads": leads, "level_since": hire_date,
          "last_rating": None, "job": None, "comp": None}
     workers[w["worker_id"]] = w
@@ -1414,9 +1416,11 @@ for i in range(1, len(MONTH_ENDS)):
                 w["salary"] = new_salary
                 comp_change(w, on, "Market Adjustment")
         elif kind == "fte":
+            # Release 3: every employee is 1.0 FTE, so there are no FTE changes. The draw that
+            # release 2 made is still made (tracked in fte_draw, never written out), so every
+            # other random decision is unchanged and release 3 checks as a pure FTE change.
             if not w["leads"]:
-                w["fte"] = 1.0 if w["fte"] < 1.0 else float(rng.choice([0.8, 0.5], p=[0.75, 0.25]))
-                job_change(w, on, "FTE Change")
+                w["fte_draw"] = 1.0 if w["fte_draw"] < 1.0 else float(rng.choice([0.8, 0.5], p=[0.75, 0.25]))
         elif kind == "relocate":
             if not w["is_exec"]:
                 relocate(w, on)

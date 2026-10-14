@@ -10,7 +10,6 @@
 --   active at prior only            -> Termination (voluntary or involuntary)
 --   active at current only          -> Hire
 --   active at both, slice changed   -> Internal Move (out of the old slice, into the new)
---   active at both, FTE changed     -> FTE Change (FTE only, no headcount effect)
 --
 -- When several slice attributes change in the same month, ONE reason is
 -- recorded, in this order of precedence:
@@ -105,7 +104,6 @@ SELECT
         WHEN current_grade > prior_grade                 THEN 'Promotion'
         WHEN current_grade < prior_grade                 THEN 'Demotion'
         WHEN prior_job_family <> current_job_family      THEN 'Job Change'
-    END AS movement_reason,
-    in_prior AND in_current AND prior_fte <> current_fte AS fte_changed
+    END AS movement_reason
 FROM compared;
 

@@ -1,5 +1,8 @@
 # Executive Summary: build book
 
+> **Warehouse release 3:** part-time was removed (every employee is 1.0 FTE), so part-time counts and the FTE Changes step described here no longer exist in the data. This guide describes the dashboard as built on release 2; what changes is listed in [release 3 migration notes](../contingent-workforce/release_3_migration_notes.md).
+
+
 **Headcount & FTE Walk · Arcadia Systems** · [Open on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)
 
 ![Executive Summary dashboard](../../images/executive_summary_dashboard.png)

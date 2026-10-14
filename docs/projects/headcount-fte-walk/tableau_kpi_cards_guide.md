@@ -1,5 +1,8 @@
 # KPI cards as map layers: the Headcount & FTE Walk card band
 
+> **Warehouse release 3:** part-time was removed (every employee is 1.0 FTE), so part-time counts and the FTE Changes step described here no longer exist in the data. This guide describes the dashboard as built on release 2; what changes is listed in [release 3 migration notes](../contingent-workforce/release_3_migration_notes.md).
+
+
 ![Headcount and FTE Walk preview](../../images/headcount_walk_preview.png)
 
 The five cards under the header (Closing headcount, Closing FTE, Hires, Voluntary turnover, Internal moves) are **one Tableau sheet**. Every title, number and note on it is text drawn as a map layer, positioned by calculated fields. A transparent card image sits underneath. The result:

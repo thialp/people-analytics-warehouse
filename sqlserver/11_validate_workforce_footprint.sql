@@ -54,7 +54,7 @@ PRINT '1. Shape';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'office rows'          AS check_name, (SELECT COUNT(*) FROM #fp WHERE row_type = 'Office') AS actual, 576679 AS expected
+              SELECT 'office rows'          AS check_name, (SELECT COUNT(*) FROM #fp WHERE row_type = 'Office') AS actual, 553295 AS expected
     UNION ALL SELECT 'route rows',          (SELECT COUNT(*) FROM #fp WHERE row_type = 'Route'), 89593
     UNION ALL SELECT 'date pairs',          (SELECT COUNT(*) FROM (SELECT DISTINCT from_month_end, to_month_end FROM #fp) AS p), 88
     UNION ALL SELECT 'views',               (SELECT COUNT(DISTINCT view_name) FROM #fp), 6
@@ -172,7 +172,7 @@ FROM (
     UNION ALL SELECT 'office moves (one country)', SUM(CASE WHEN step = 'Office Moves In' THEN headcount ELSE 0 END), 600 FROM #fp WHERE row_type = 'Office' AND view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'
     UNION ALL SELECT 'cross-border moves',   SUM(CASE WHEN step = 'Cross-border Moves In' THEN headcount ELSE 0 END), 125 FROM #fp WHERE row_type = 'Office' AND view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'
     UNION ALL SELECT 'closing headcount',    SUM(CASE WHEN step = 'Closing' THEN headcount ELSE 0 END), 30005 FROM #fp WHERE row_type = 'Office' AND view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'
-    UNION ALL SELECT 'closing FTE x 10',     CAST(ROUND(10 * SUM(CASE WHEN step = 'Closing' THEN fte ELSE 0 END), 0) AS INT), 293545 FROM #fp WHERE row_type = 'Office' AND view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'
+    UNION ALL SELECT 'closing FTE x 10',     CAST(ROUND(10 * SUM(CASE WHEN step = 'Closing' THEN fte ELSE 0 END), 0) AS INT), 300050 FROM #fp WHERE row_type = 'Office' AND view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'
     UNION ALL SELECT 'offices with people',  COUNT(DISTINCT CASE WHEN step = 'Closing' THEN location_id END), 35 FROM #fp WHERE row_type = 'Office' AND view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'
     UNION ALL SELECT 'route lines',          COUNT(*), 155 FROM #fp WHERE row_type = 'Route' AND view_name = 'Company' AND from_month_end = '2025-06-30' AND to_month_end = '2026-06-30'
 ) AS c;

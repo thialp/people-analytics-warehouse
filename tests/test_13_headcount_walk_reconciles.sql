@@ -1,6 +1,6 @@
 -- Headcount and FTE walk, the core control: for every slice
 -- (department x country x job family x grade) and every month,
---   Opening + Hires + Terminations + Internal Moves + FTE Changes = Closing
+--   Opening + Hires + Terminations + Internal Moves = Closing
 -- exactly, in headcount and in FTE.
 WITH totals AS (
     SELECT

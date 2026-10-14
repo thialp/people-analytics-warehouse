@@ -17,7 +17,6 @@
               + Transfers In - Transfers Out
               + Office Moves In - Office Moves Out                 (same country)
               + Cross-border Moves In - Cross-border Moves Out
-              + FTE Changes (FTE only)
       = Closing
 
   ROW TYPES
@@ -49,7 +48,6 @@
     office same, group changed      Transfers Out / Transfers In (only the
                                     Function, Sub-function and Department
                                     views can have these)
-    FTE changed                     FTE Changes at the closing office
   Out and In lines carry the OPENING FTE, so the FTE walk closes per office.
   In the Company view every move is out of one office and into another:
   Office Moves In = Office Moves Out, and they net to zero.
@@ -219,8 +217,7 @@ FROM (
             CASE WHEN pg.worker_class = 'Continuing' AND pg.o_cty <> pg.c_cty THEN 1 ELSE 0 END),
         (10, 'Cross-border Moves Out', 'Office moves',    v.open_key,  pg.o_loc, -pg.n, -pg.o_fte,            pg.n,
             CASE WHEN pg.worker_class = 'Continuing' AND pg.o_cty <> pg.c_cty THEN 1 ELSE 0 END),
-        (11, 'FTE Changes',            'FTE',             v.close_key, pg.c_loc,  0,     pg.c_fte - pg.o_fte, pg.fte_n,
-            CASE WHEN pg.worker_class = 'Continuing' AND pg.fte_n > 0 THEN 1 ELSE 0 END),
+        /* 11 was FTE Changes; release 3 removed part-time */
         (12, 'Closing',                'Balance',         v.close_key, pg.c_loc,  pg.n,  pg.c_fte,            pg.n,
             CASE WHEN pg.worker_class <> 'Exit' THEN 1 ELSE 0 END)
     ) AS sd (step_order, step, step_group, group_id, loc, hc, fte, n, include_line)

@@ -31,10 +31,10 @@ PRINT '1. Shape (the same rows as mart_headcount_fte_walk.csv, no row repeated b
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #hc) AS actual, 521029 AS expected
+              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #hc) AS actual, 519173 AS expected
     UNION ALL SELECT 'distinct keys (month x slice x category x reason)',
                      (SELECT COUNT(*) FROM (SELECT DISTINCT month_end_date, department_id, country_code, job_family_code,
-                                                   grade, movement_category, movement_reason FROM #hc) AS k), 521029
+                                                   grade, movement_category, movement_reason FROM #hc) AS k), 519173
     UNION ALL SELECT 'month-ends',  (SELECT COUNT(DISTINCT month_end_date) FROM #hc), 60
     UNION ALL SELECT 'functions',   (SELECT COUNT(DISTINCT function_name) FROM #hc), 9
     UNION ALL SELECT 'rows without a name from a dimension',
@@ -77,9 +77,9 @@ FROM (
     UNION ALL SELECT 'closing (Jun 2026)',
                      (SELECT SUM(headcount) FROM #hc WHERE movement_category = 'Closing' AND month_end_date = '2026-06-30'), 30014
     UNION ALL SELECT 'closing FTE x 10',
-                     (SELECT CAST(ROUND(SUM(fte) * 10, 0) AS INT) FROM #hc WHERE movement_category = 'Closing' AND month_end_date = '2026-06-30'), 293635
-    UNION ALL SELECT 'closing part-time',
-                     (SELECT SUM(part_time_headcount) FROM #hc WHERE movement_category = 'Closing' AND month_end_date = '2026-06-30'), 2330
+                     (SELECT CAST(ROUND(SUM(fte) * 10, 0) AS INT) FROM #hc WHERE movement_category = 'Closing' AND month_end_date = '2026-06-30'), 300140
+    UNION ALL SELECT 'lines where FTE differs from headcount (release 3: every employee is 1.0 FTE)',
+                     (SELECT COUNT(*) FROM #hc WHERE fte <> headcount), 0
 ) AS c;
 GO
 

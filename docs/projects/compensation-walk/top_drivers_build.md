@@ -1,5 +1,8 @@
 # Top drivers card: build guide (walk data source)
 
+> **Warehouse release 3:** part-time was removed (every employee is 1.0 FTE), so part-time counts and the FTE Changes step described here no longer exist in the data. This guide describes the dashboard as built on release 2; what changes is listed in [release 3 migration notes](../contingent-workforce/release_3_migration_notes.md).
+
+
 Question the card answers: **which drivers matter most, and why?** Four rows, ranked by size, each with its amount (teal adds, coral subtracts), a bar and a one-line reason with the real counts. It follows Period, View, Group, Lens, Cost and Currency, because every value is the same `Walk Row` the waterfall draws.
 
 Design source: `design/build_sketch_svg.py` (`drivers()`), card at 930, 190, 440 x 314 (container `Card Drivers`).

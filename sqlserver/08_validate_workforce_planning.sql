@@ -20,7 +20,7 @@ SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
               SELECT 'dw.DimCostCenter rows'          AS check_name, (SELECT COUNT(*) FROM dw.DimCostCenter)          AS actual, 630     AS expected
-    UNION ALL SELECT 'dw.DimPosition rows',                          (SELECT COUNT(*) FROM dw.DimPosition),                     101297
+    UNION ALL SELECT 'dw.DimPosition rows',                          (SELECT COUNT(*) FROM dw.DimPosition),                      99398
     UNION ALL SELECT 'dw.FactPositionAssignment rows',               (SELECT COUNT(*) FROM dw.FactPositionAssignment),          54094
     UNION ALL SELECT 'dw.FactRequisition rows',                      (SELECT COUNT(*) FROM dw.FactRequisition),                 31323
     UNION ALL SELECT 'dw.FactWorkforcePlan rows',                    (SELECT COUNT(*) FROM dw.FactWorkforcePlan),               28800

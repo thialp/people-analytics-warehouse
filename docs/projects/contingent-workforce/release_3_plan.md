@@ -11,7 +11,7 @@ Like release 2, it is one generator release and one rebuild. Every number on Das
 | Phase | State | Evidence |
 |---|---|---|
 | 0. Branch and baseline | Done 2026-10-14 | Branch `warehouse-release-3` from `main` (`8ac0f31`); regenerated raw files and marts match the committed ones; 59 tests pass; totals in [baseline_release_2.md](baseline_release_2.md) (FY26 closing 30,014 people, 29,363.5 FTE, $3,336.5M loaded constant) |
-| 1. Remove part-time | Not started | |
+| 1. Remove part-time | Done 2026-10-14 | Every employee is 1.0 FTE. The generator keeps every random draw, so people, hires, exits, moves, seats and requisitions are identical to release 2; only the 1,899 FTE-change job and seat records are gone. FTE Changes removed from the headcount walk, compensation walk, cost bridge and footprint (DuckDB, Custom SQL); `part_time_headcount` dropped; test 23 now checks full-time. 59 tests pass; checker and all validation scripts PASS (06, 07, 09, 11 run locally too). FY26: 30,014 people = 30,014.0 FTE; loaded constant $3,410.5M (was $3,336.5M); pay per FTE $110,062.73 → $113,663.81. Totals: [release_3_totals_phase_1.md](release_3_totals_phase_1.md). Workbook impact: [release_3_migration_notes.md](release_3_migration_notes.md) |
 | 2. Source systems and lineage | Not started | |
 | 3. Contingent worker simulation | Not started | |
 | 4. Feed and discrepancy injection | Not started | |

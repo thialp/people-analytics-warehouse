@@ -11,19 +11,19 @@
 
   Grain: month-end x department x country x job family x grade x movement category x reason.
   For every slice and month: Opening + Hires - Voluntary - Involuntary - Internal Moves Out
-  + Internal Moves In (+ FTE Changes, FTE only) = Closing.
+  + Internal Moves In = Closing.
 
   Rules (the same as sql/02_intermediate/int_worker_movement.sql and
   sql/03_marts/mart_headcount_fte_walk.sql in the DuckDB pipeline):
     * a slice is department x country x job family x grade;
     * a worker in the prior month-end only is a termination (by termination type), in the
       current only a hire, in both with another slice an internal move, booked out of the
-      old slice and into the new one at the PRIOR FTE;
+      old slice and into the new one;
     * one reason per move: department (Reorganization if a reorg job action took effect in
       the month, else Transfer), then country (Location Change), then grade (Promotion /
       Demotion), then job family (Job Change);
-    * an FTE change of someone who stayed is its own line in the current slice;
-    * part_time_headcount (workers under 1.0 FTE) only on Opening and Closing;
+    * every employee is 1.0 FTE (release 3 removed part-time), so fte = headcount on every
+      line; movement_order keeps its release 2 numbers (7, FTE Changes, is no longer used);
     * executive officers are counted (they are excluded only where pay is shown).
 
   grade and fiscal_year are returned as text, as the workbook typed them on the CSVs.
@@ -43,7 +43,6 @@ SELECT
     w.movement_reason,
     w.headcount,
     w.fte,
-    w.part_time_headcount,
     /* mart_dim_month */
     cal.PriorMonthEndDate                                              AS prior_month_end_date,
     CAST(cal.FiscalYear AS VARCHAR(4))                                 AS fiscal_year,
@@ -77,8 +76,7 @@ FROM (
         ln.month_end_date, ln.department_id, ln.country_code, ln.job_family_code, ln.grade,
         ln.movement_order, ln.movement_category, ln.movement_reason,
         SUM(ln.hc)                                                     AS headcount,
-        CAST(SUM(CAST(ln.fte AS DECIMAL(18, 4))) AS DECIMAL(18, 2))    AS fte,
-        SUM(ln.pt)                                                     AS part_time_headcount
+        CAST(SUM(CAST(ln.fte AS DECIMAL(18, 4))) AS DECIMAL(18, 2))    AS fte
     FROM (
         /* 2. each worker-month becomes the walk lines it feeds, in the prior (P) or current (C) slice */
         SELECT
@@ -87,7 +85,7 @@ FROM (
             CASE WHEN v.side = 'P' THEN m.prior_country_code  ELSE m.current_country_code  END AS country_code,
             CASE WHEN v.side = 'P' THEN m.prior_family_code   ELSE m.current_family_code   END AS job_family_code,
             CASE WHEN v.side = 'P' THEN m.prior_grade         ELSE m.current_grade         END AS grade,
-            v.movement_order, v.movement_category, v.movement_reason, v.hc, v.fte, v.pt
+            v.movement_order, v.movement_category, v.movement_reason, v.hc, v.fte
         FROM (
             /* 1. every worker active at either end of each month, compared */
             SELECT
@@ -116,9 +114,7 @@ FROM (
                     WHEN c.current_grade > c.prior_grade                 THEN 'Promotion'
                     WHEN c.current_grade < c.prior_grade                 THEN 'Demotion'
                     WHEN c.prior_family_code <> c.current_family_code    THEN 'Job Change'
-                END AS movement_reason,
-                CASE WHEN c.in_prior = 1 AND c.in_current = 1 AND c.prior_fte <> c.current_fte
-                     THEN 1 ELSE 0 END AS fte_changed
+                END AS movement_reason
             FROM (
                 SELECT
                     p.month_end_date,
@@ -157,24 +153,19 @@ FROM (
             ) AS c
         ) AS m
         CROSS APPLY (VALUES
-            (1, 'Opening', 'Opening', 1, m.prior_fte,
-                CASE WHEN m.prior_fte < 1 THEN 1 ELSE 0 END, 'P', m.in_prior),
-            (2, 'Hires', m.movement_reason, 1, m.current_fte, 0, 'C',
+            (1, 'Opening', 'Opening', 1, m.prior_fte, 'P', m.in_prior),
+            (2, 'Hires', m.movement_reason, 1, m.current_fte, 'C',
                 CASE WHEN m.movement_type = 'Hire' THEN 1 ELSE 0 END),
             (CASE WHEN m.movement_reason = 'Voluntary' THEN 3 ELSE 4 END,
                 CASE WHEN m.movement_reason = 'Voluntary' THEN 'Voluntary Terminations' ELSE 'Involuntary Terminations' END,
-                m.movement_reason, -1, -m.prior_fte, 0, 'P',
+                m.movement_reason, -1, -m.prior_fte, 'P',
                 CASE WHEN m.movement_type = 'Termination' THEN 1 ELSE 0 END),
-            (5, 'Internal Moves Out', m.movement_reason, -1, -m.prior_fte, 0, 'P',
+            (5, 'Internal Moves Out', m.movement_reason, -1, -m.prior_fte, 'P',
                 CASE WHEN m.movement_type = 'Internal Move' THEN 1 ELSE 0 END),
-            (6, 'Internal Moves In', m.movement_reason, 1, m.prior_fte, 0, 'C',
+            (6, 'Internal Moves In', m.movement_reason, 1, m.prior_fte, 'C',
                 CASE WHEN m.movement_type = 'Internal Move' THEN 1 ELSE 0 END),
-            (7, 'FTE Changes',
-                CASE WHEN m.current_fte > m.prior_fte THEN 'FTE Increase' ELSE 'FTE Reduction' END,
-                0, m.current_fte - m.prior_fte, 0, 'C', m.fte_changed),
-            (8, 'Closing', 'Closing', 1, m.current_fte,
-                CASE WHEN m.current_fte < 1 THEN 1 ELSE 0 END, 'C', m.in_current)
-        ) AS v (movement_order, movement_category, movement_reason, hc, fte, pt, side, keep_line)
+            (8, 'Closing', 'Closing', 1, m.current_fte, 'C', m.in_current)
+        ) AS v (movement_order, movement_category, movement_reason, hc, fte, side, keep_line)
         WHERE v.keep_line = 1
     ) AS ln
     GROUP BY ln.month_end_date, ln.department_id, ln.country_code, ln.job_family_code, ln.grade,
