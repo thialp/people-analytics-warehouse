@@ -4,7 +4,7 @@ WITH walk AS (
     SELECT month_end_date, SUM(headcount) AS headcount,
            SUM(loaded_usd_nominal) AS loaded_nominal, SUM(loaded_usd_constant) AS loaded_constant
     FROM marts.mart_workforce_cost_bridge
-    WHERE driver = 'Closing Run-Rate'
+    WHERE driver = 'Closing Run-Rate' AND worker_type = 'Employee'   -- contingent workers: test 78
     GROUP BY month_end_date
 ),
 snapshot AS (

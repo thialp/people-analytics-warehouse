@@ -57,6 +57,8 @@ EXPORTS = [
     "mart_position_fill",
     "mart_vacancy_pool",
     "mart_plan_vs_actual",
+    "mart_cw_spend",
+    "mart_workforce_cost_growth_mix",
     "mart_seat_corridors",
     "mart_region_walk",
     "mart_career_moves",

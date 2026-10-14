@@ -14,7 +14,7 @@ snapshot_mart AS (
 walk_mart AS (
     SELECT month_end_date, SUM(headcount) AS headcount
     FROM marts.mart_workforce_cost_bridge
-    WHERE driver = 'Closing Run-Rate'
+    WHERE driver = 'Closing Run-Rate' AND worker_type = 'Employee'
     GROUP BY month_end_date
 )
 SELECT e.month_end_date, e.non_exec_headcount, s.headcount AS snapshot_headcount, w.headcount AS walk_headcount

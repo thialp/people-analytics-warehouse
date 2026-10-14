@@ -2,12 +2,12 @@
 -- opening run-rate for the next. This is what lets Tableau walk across any range
 -- of months by summing monthly drivers.
 WITH closing AS (
-    SELECT department_id, month_end_date, headcount, loaded_usd_nominal, loaded_usd_constant
+    SELECT department_id, worker_type, month_end_date, headcount, loaded_usd_nominal, loaded_usd_constant
     FROM marts.mart_workforce_cost_bridge
     WHERE driver = 'Closing Run-Rate'
 ),
 opening AS (
-    SELECT department_id, prior_month_end_date AS month_end_date, headcount, loaded_usd_nominal, loaded_usd_constant
+    SELECT department_id, worker_type, prior_month_end_date AS month_end_date, headcount, loaded_usd_nominal, loaded_usd_constant
     FROM marts.mart_workforce_cost_bridge
     WHERE driver = 'Opening Run-Rate'
 )
@@ -19,6 +19,7 @@ SELECT
 FROM closing AS c
 FULL OUTER JOIN opening AS o
   ON o.department_id = c.department_id
+ AND o.worker_type = c.worker_type
  AND o.month_end_date = c.month_end_date
 WHERE COALESCE(c.month_end_date, o.month_end_date) < (SELECT MAX(month_end_date) FROM marts.mart_workforce_cost_bridge)
   AND COALESCE(c.month_end_date, o.month_end_date) > (SELECT MIN(prior_month_end_date) FROM marts.mart_workforce_cost_bridge)
