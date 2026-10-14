@@ -1,5 +1,5 @@
 # Local DuckDB warehouse (rebuilt by pipeline/run_pipeline.py)
-warehouse/
+/warehouse/
 
 # Python
 __pycache__/
