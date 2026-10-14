@@ -1,7 +1,8 @@
 /*
   custom_sql_plan_vs_actual.sql
   Tableau Custom SQL for Dashboard #3, Workforce Planning (SQL Server, database ArcadiaHR).
-  Plan vs actual: one row per plan version x cost center x fiscal quarter, 28,800 rows.
+  Plan vs actual: one row per plan version x cost center x fiscal quarter, 29,415 rows (615 of them
+  are cost centers with contingent workers only: zero on every employee measure).
 
   Reads the reporting view rpt.vw_plan_vs_actual (built by sqlserver/04_create_reporting_views.sql
   from the seat layer in 03b). The columns are listed so the data source documents itself and

@@ -165,6 +165,53 @@ join staging.stg_cw_discrepancy_type y using (discrepancy_code)
 group by all order by 1
 """
 
+CONV_TOTALS = """
+select 'FY' || right(cast(fy as varchar), 2), conversions, exits, round(100.0 * conversions / exits, 1),
+       external_hires, round(100.0 * conversions / external_hires, 1)
+from (
+    select case when month(w.original_hire_date) >= 7 then year(w.original_hire_date) + 1 else year(w.original_hire_date) end as fy,
+           count(*) as conversions
+    from staging.stg_candidate c join staging.stg_worker w using (worker_id)
+    where c.candidate_source = 'Contingent conversion' group by 1
+) conv
+join (
+    select case when month(last_day) >= 7 then year(last_day) + 1 else year(last_day) end as fy, count(*) as exits
+    from (select o.bw_worker_id, max(r.assignment_end_date) as last_day
+          from staging.stg_bw_service_order_revision r join staging.stg_bw_service_order o using (service_order_id)
+          where r.is_current and r.status in ('Approved', 'Closed') group by 1)
+    where last_day < date '2026-06-30' group by 1
+) ends using (fy)
+join (
+    select case when month(filled_date) >= 7 then year(filled_date) + 1 else year(filled_date) end as fy, count(*) as external_hires
+    from staging.stg_requisition where fill_source = 'External' and status = 'Filled' group by 1
+) hires using (fy)
+order by fy
+"""
+
+CW_PLAN_TOTALS = """
+with q4 as (select distinct fiscal_year, quarter_end_date from staging.stg_workforce_plan where fiscal_quarter = 4),
+actual as (
+    select q.fiscal_year, count(distinct o.bw_worker_id) as cw
+    from q4 q
+    join staging.stg_bw_service_order_revision r
+      on r.effective_start_date <= q.quarter_end_date and r.effective_end_date_filled >= q.quarter_end_date
+     and r.status in ('Approved', 'Closed')
+     and r.assignment_start_date <= q.quarter_end_date and r.assignment_end_date >= q.quarter_end_date
+    join staging.stg_bw_service_order o using (service_order_id)
+    group by 1
+)
+select 'FY' || right(cast(p.fiscal_year as varchar), 2), a.cw,
+       sum(p.planned_cw_headcount) filter (where p.version_type = 'Budget'),
+       sum(p.planned_cw_headcount) filter (where p.version_type = 'RF1'),
+       sum(p.planned_cw_headcount) filter (where p.version_type = 'RF2'),
+       sum(p.planned_cw_headcount) filter (where p.version_type = 'RF3'),
+       round(sum(p.planned_cw_spend_usd) filter (where p.version_type = 'Budget') / 1e6, 1),
+       round(sum(p.planned_cw_spend_usd) filter (where p.version_type = 'RF3') / 1e6, 1)
+from staging.stg_workforce_plan p join actual a using (fiscal_year)
+where p.fiscal_quarter = 4
+group by p.fiscal_year, a.cw order by p.fiscal_year
+"""
+
 
 def table(rows, headers) -> str:
     out = ["| " + " | ".join(headers) + " |", "|" + "---|" * len(headers)]
@@ -199,6 +246,17 @@ def main() -> None:
                                                 "Applied late", "Failed", "Workers with an open discrepancy", "%"]))
     print("\n## Answer key\n")
     print(table(con.sql(DQ_TOTALS).fetchall(), ["Code", "Discrepancy", "Severity", "Periods", "Open at extract"]))
+
+    print("\n## Conversions to employee\n")
+    print("Contingent workers hired as employees through a requisition, by the fiscal year of the hire, beside "
+          "the contingent workers whose last Bridgeway day fell in the year and the external hires.\n")
+    print(table(con.sql(CONV_TOTALS).fetchall(), ["FY", "Conversions", "CW exits", "% of exits",
+                                                  "External hires", "% of hires"]))
+    print("\n## Contingent line of the plan (Q4)\n")
+    print("Contingent workers on June 30 in Bridgeway, against each plan version's Q4 line; spend is the planned "
+          "annualized run-rate in USD at the version's FX.\n")
+    print(table(con.sql(CW_PLAN_TOTALS).fetchall(), ["FY", "Actual CW", "Budget", "RF1", "RF2", "RF3",
+                                                     "Budget spend $M", "RF3 spend $M"]))
 
     for schema in ("raw", "marts"):
         names = [r[0] for r in con.sql(

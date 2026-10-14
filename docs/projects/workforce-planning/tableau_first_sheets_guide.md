@@ -8,7 +8,7 @@ Step by step in Tableau Desktop: connect to SQL Server, add the four data source
 |---|---|---|---:|
 | **Position Fill** | [`tableau/custom_sql_position_fill.sql`](../../../tableau/custom_sql_position_fill.sql) | one row per fill (external hire or internal move) | 30,575 |
 | **Vacancy Pool** | [`tableau/custom_sql_vacancy_pool.sql`](../../../tableau/custom_sql_vacancy_pool.sql) | one row per empty seat per month-end | 62,055 |
-| **Plan vs Actual** | [`tableau/custom_sql_plan_vs_actual.sql`](../../../tableau/custom_sql_plan_vs_actual.sql) | one row per plan version × cost center × quarter | 28,800 |
+| **Plan vs Actual** | [`tableau/custom_sql_plan_vs_actual.sql`](../../../tableau/custom_sql_plan_vs_actual.sql) | one row per plan version × cost center × quarter | 29,415 |
 | **Seat Corridors** | [`tableau/custom_sql_seat_corridors.sql`](../../../tableau/custom_sql_seat_corridors.sql) | one row per quarter × from office × to office (backfills that changed office) | 821 |
 
 Each file reads one reporting view (`rpt.vw_*`) and lists its columns, so field names are the warehouse names ([data dictionary](../../warehouse/data_dictionary.md#mart_position_fill)). All four were compared with the DuckDB marts row for row (`sqlserver/check_tsql_in_duckdb.py`).

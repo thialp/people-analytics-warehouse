@@ -1650,9 +1650,8 @@ write(pd.DataFrame(req_rows.values())[[
     "hiring_manager_id",
     "filled_by_worker_id", "fill_source"]].sort_values("requisition_id"), "fact_requisition")
 write(pd.DataFrame(cost_center_rows), "dim_cost_center")
-write(pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"]),
-      "fact_workforce_plan")
-write(pd.DataFrame(candidate_rows).sort_values("candidate_id"), "dim_candidate")
+# fact_workforce_plan and dim_candidate are written in section 8: the plan gains its
+# contingent line and some hires turn out to be contingent conversions.
 cand = pd.DataFrame(candidate_event_rows).sort_values(["candidate_id", "stage_order"]).reset_index(drop=True)
 cand.insert(0, "candidate_event_id", [f"CE{n:07d}" for n in range(1, len(cand) + 1)])
 write(cand, "fact_candidate_stage_event")
@@ -1795,14 +1794,41 @@ write(pd.DataFrame(source_systems.column_rows()), "ref_raw_column")
 # First the clean Bridgeway program; then Keystone's view of it through the one-way feed,
 # with the seeded discrepancies and their answer key (which also seeds Bridgeway's own
 # hygiene problems, so the Bridgeway tables are written from its output).
+#
+# Conversions (phase 5): external hires into requisitions are the pool a contingent worker can
+# be hired from when their engagement ends. The hire stays exactly as simulated; the
+# contingent worker turns out to be that person, and the applicant's source says so.
+_accepted = {(c["requisition_id"], c["worker_id"]): c["candidate_id"] for c in candidate_rows
+             if c["final_status"] == "Accepted" and not c["is_internal"]}
+external_hires = pd.DataFrame([{
+    "worker_id": r["filled_by_worker_id"], "hire_date": r["filled_date"], "candidate_id": cid,
+    "country": r["cost_center_id"].rsplit("-", 1)[1], "department_id": r["department_id"],
+    "function": DEPT[r["department_id"]]["function"],
+    "first_name": workers[r["filled_by_worker_id"]]["first_name"],
+    "last_name": workers[r["filled_by_worker_id"]]["last_name"]}
+    for r in req_rows.values()
+    if r["status"] == "Filled" and r["fill_source"] == "External"
+    and (cid := _accepted.get((r["requisition_id"], r["filled_by_worker_id"])))
+    and workers[r["filled_by_worker_id"]]["hire_date"] == r["filled_date"]])
 cw_tables, cw_program = contingent_workforce.simulate(
     stream=domain_stream("contingent"), office=OFFICE, dept=DEPT, country=COUNTRY, job=job, workers=dim_worker,
-    cost_centers=cost_center_rows, reorg_date=REORG_DATE, restructure_date=RESTRUCTURE_DATE)
+    cost_centers=cost_center_rows, reorg_date=REORG_DATE, restructure_date=RESTRUCTURE_DATE,
+    hires=external_hires, conversion_stream=domain_stream("conversions"))
 cw_tables, keystone = keystone_feed.simulate(
     stream=domain_stream("keystone"), bw=cw_tables, program=cw_program, cost_centers=cost_center_rows)
 for _table in source_systems.RELEASE_3_TABLES:
     write(cw_tables[_table][source_systems.columns(_table)], _table)
 write(cw_tables["ref_cw_discrepancy_type"], "ref_cw_discrepancy_type")
+
+_converted = {c["candidate_id"] for c in cw_program.conversions.values()}
+for c in candidate_rows:
+    if c["candidate_id"] in _converted:
+        c["candidate_source"] = "Contingent conversion"
+write(pd.DataFrame(candidate_rows).sort_values("candidate_id"), "dim_candidate")
+
+# The plan's contingent line, from its own stream so no employee plan number moves.
+_plan = pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"])
+write(contingent_workforce.plan_line(_plan, cw_tables, domain_stream("plan_cw")), "fact_workforce_plan")
 
 print(f"Active headcount at {LAST_ME}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
       f"people managers: {sum(1 for w in active.values() if w['is_pm']):,}")

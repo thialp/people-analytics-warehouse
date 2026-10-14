@@ -62,7 +62,7 @@ SELECT
     CAST(candidate_id     AS VARCHAR(12))                  AS CandidateID,
     CAST(requisition_id   AS VARCHAR(12))                  AS RequisitionID,
     CAST(CASE WHEN is_internal IN ('True', 'true', '1') THEN 1 ELSE 0 END AS BIT) AS IsInternal,
-    CAST(candidate_source AS VARCHAR(20))                  AS CandidateSource,
+    CAST(candidate_source AS VARCHAR(30))                  AS CandidateSource,
     CAST(NULLIF(worker_id, '') AS VARCHAR(12))             AS WorkerID,
     CAST(final_status     AS VARCHAR(12))                  AS FinalStatus
 INTO dw.DimCandidate

@@ -77,11 +77,12 @@ ks_contingent_worker,11,supplier_name,VARCHAR,"Free text: exact as fed, or as ty
 ks_contingent_worker,12,status,VARCHAR,Active or Inactive
 ks_contingent_worker,13,contract_start_date,DATE,"First day of the engagement as Keystone knows it; renewals and extensions move the end, never the start"
 ks_contingent_worker,14,contract_end_date,DATE,As Keystone knows it; Keystone inactivates the worker the day after
-ks_contingent_worker,15,inactive_reason,VARCHAR,"Contract ended, Ended early or Manual; empty while active"
-ks_contingent_worker,16,department_id,VARCHAR,-> dim_department
-ks_contingent_worker,17,cost_center_id,VARCHAR,-> dim_cost_center
-ks_contingent_worker,18,location_id,VARCHAR,-> dim_location
-ks_contingent_worker,19,manager_worker_id,VARCHAR,Arcadia employee the worker reports to (-> dim_worker)
+ks_contingent_worker,15,inactive_reason,VARCHAR,"Contract ended, Ended early, Manual, or Converted to employee; empty while active"
+ks_contingent_worker,16,converted_to_worker_id,VARCHAR,"The employee the worker became (-> dim_worker) when inactive_reason is Converted to employee: a new person, a new ID"
+ks_contingent_worker,17,department_id,VARCHAR,-> dim_department
+ks_contingent_worker,18,cost_center_id,VARCHAR,-> dim_cost_center
+ks_contingent_worker,19,location_id,VARCHAR,-> dim_location
+ks_contingent_worker,20,manager_worker_id,VARCHAR,Arcadia employee the worker reports to (-> dim_worker)
 feed_bridgeway_keystone_event,1,feed_event_id,VARCHAR,Event key
 feed_bridgeway_keystone_event,2,revision_id,VARCHAR,-> bw_service_order_revision that caused the event
 feed_bridgeway_keystone_event,3,bw_worker_id,VARCHAR,-> bw_contingent_worker

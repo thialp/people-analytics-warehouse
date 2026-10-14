@@ -1,8 +1,9 @@
 -- Keystone's contingent worker history is a clean effective-dated record, and every version
 -- is explained: a Feed version by an event that was applied that very day, a System version
 -- by Keystone inactivating the worker the day after the contract end it held, and HR Ops or
--- Manager versions by hand (no feed event). Statuses carry a reason only when inactive, and
--- contingent person IDs never collide with an employee's.
+-- Manager versions by hand (no feed event). Statuses carry a reason only when inactive, a
+-- conversion names the employee the worker became, and contingent person IDs never collide
+-- with an employee's.
 WITH k AS (
     SELECT k.*,
            LAG(k.effective_end_date) OVER w     AS prev_end,
@@ -38,6 +39,9 @@ SELECT ks_record_id, 'unknown change source' FROM k WHERE change_source NOT IN (
 UNION ALL
 SELECT ks_record_id, 'inactive reason does not match the status'
 FROM k WHERE (status = 'Inactive') <> (inactive_reason IS NOT NULL) OR status NOT IN ('Active', 'Inactive')
+UNION ALL
+SELECT ks_record_id, 'converted employee ID without a conversion, or the reverse'
+FROM k WHERE (COALESCE(inactive_reason, '') = 'Converted to employee') <> (converted_to_worker_id IS NOT NULL)
 UNION ALL
 SELECT DISTINCT k.person_id, 'contingent person ID used by an employee'
 FROM k JOIN staging.stg_worker AS w ON w.worker_id = k.person_id

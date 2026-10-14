@@ -36,6 +36,7 @@ The same list is a raw table, `ref_source_system`, written from [`generator/sour
 2. Once approved, Bridgeway sends a **New Worker** event. **Keystone** creates a person ID (`W…`, the same key space as employees), sets the department, cost center, office and manager, and **stores the Bridgeway worker ID**.
 3. Every later change in Bridgeway is a **new revision** of the order (extension, rate change with an extension, early end, cost center, manager or office change) and, for the changes Keystone cares about, a new feed event. Rate changes and closures are not sent: Keystone holds no rates. A renewal or extension moves Keystone's contract end, never its start. A worker's events are applied first in, first out.
 4. **Keystone inactivates a contingent worker the day after the contract end date it holds.** If an extension never arrives, Keystone ends a worker Bridgeway still has active.
+5. **Some are hired as employees.** HR closes the contingent record on the hire date as *Converted to employee*, naming the new employee ID; the hire fills a requisition with an applicant whose source is *Contingent conversion*. Bridgeway is not told: its order simply ended. See [conversions and the plan](../projects/contingent-workforce/conversions_and_plan.md).
 
 | Fact | Bridgeway | Keystone | Flows on the feed |
 |---|:-:|:-:|:-:|

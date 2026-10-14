@@ -52,7 +52,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain"]
         MART["marts<br/>walks · fills · plan vs actual · org"]
-        TEST{{"69 data tests"}}
+        TEST{{"71 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -143,7 +143,7 @@ erDiagram
 | `fact_requisition` | requisition: opened, approved, filled or cancelled | 31,323 |
 | `dim_candidate` | applicant × requisition | 188,982 |
 | `fact_candidate_stage_event` | applicant × stage reached | 531,691 |
-| `fact_workforce_plan` | plan version × cost center × fiscal quarter | 28,800 |
+| `fact_workforce_plan` | plan version × cost center × fiscal quarter | 29,415 |
 | `dim_cost_center` | department × country | 630 |
 | `dim_org_unit` | company, functions, sub-functions, departments | 44 |
 | `dim_department` | department, with function and sub-function | 32 |
@@ -238,6 +238,8 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 67 | Every feed event comes from a revision of the worker's own order, outcomes agree with the dates, events apply first in, first out | A feed log that claims what Bridgeway never sent, or an old change overwriting a newer one |
 | 68 | Keystone's contingent worker history chains cleanly and every version is explained: by a feed event applied that day, by Keystone ending the contract, or by hand | A Keystone change nobody can account for; a contingent ID colliding with an employee's |
 | 69 | The discrepancy answer key is sound: known types, references that exist, dates inside the extract | Scoring detection against a key that is itself wrong |
+| 76 | The plan's contingent line covers every cost center with contingent workers, in every version, within 20% of the actual | A plan that silently leaves out where contractors work |
+| 77 | A conversion to employee agrees across Keystone, recruiting and Bridgeway: same person, hire date, same month as the last contingent day | A conversion counted twice, or a hire claimed as one when it was not |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -604,7 +606,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 69 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 71 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)

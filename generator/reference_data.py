@@ -531,6 +531,7 @@ FEED_ERRORS = {
     "mapping": "Mapping error: payload rejected by the inbound schema",
     "not_found": "Worker not found for external ID {bw}",
     "partial": "Partial load: external worker ID not mapped; record created without it",
+    "converted": "Rejected: worker {bw} was converted to an employee; the contingent record is closed",
 }
 
 # HR Ops repairs: probability a case is fixed by hand, and the delay in days (uniform, inclusive)
@@ -580,3 +581,24 @@ KS_SUPPLIER_VARIANTS = {
     "Ravelin Customer Care": ["Ravelin CX", "Ravelin Customer Care Inc"],
     "Tollbrook Facilities Group": ["Tollbrook Facilities", "Tollbrook Group"],
 }
+
+
+# ======================================================================================
+# Conversions and the contingent workforce plan line (release 3, phase 5)
+# ======================================================================================
+# A contingent worker whose engagement ends may be hired as an employee into an open
+# requisition: the same person, a new employee ID. Only Contractors and Consultants; the
+# hire is in the same country and department (or, failing that, function), in the same
+# calendar month as the first day after the engagement, and at most this many days later,
+# so a conversion moves a person between worker types without changing the total.
+CW_CONVERSION_ATTEMPT = 0.065            # share of eligible engagement ends that look for a requisition to fill
+CW_CONVERSION_MAX_GAP_DAYS = 21
+CW_CONVERSION_FROM = "2021-07-01"        # requisitions (and so conversions) are in the warehouse from FY22
+
+# The plan carries a contingent line per cost center x quarter x version: planned CW
+# headcount at the quarter end and the annualized spend run-rate (hourly rate x contracted
+# hours x 52, or monthly rate x 12), in USD at the plan's FX date. Contingent plans are
+# looser than employee plans: managers bring contractors in as work appears.
+PLAN_CW_ERROR = {"Budget": (0.030, 0.080), "RF1": (0.020, 0.060), "RF2": (0.010, 0.040), "RF3": (0.005, 0.025)}
+PLAN_CW_COST_EXTRA_SD = 0.020
+PLAN_CW_FY_BUDGET_SHIFT = {2024: 0.050}  # the FY24 budget did not foresee the February 2024 contractor cuts

@@ -4,7 +4,7 @@ Arcadia Systems, Bridgeway VMS and every supplier and person here are fictional;
 
 Release 3, phase 3. [`generator/contingent_workforce.py`](../../../generator/contingent_workforce.py) simulates Arcadia's contingent workforce program month by month and writes the six Bridgeway VMS tables the warehouse loads. Every parameter is in [`generator/reference_data.py`](../../../generator/reference_data.py) under *Contingent workforce*. The simulation draws from its own random stream, after the employee simulation, so no employee number moves.
 
-This is the **clean** program: what Bridgeway knows is true. Phase 4 adds the disagreements between Bridgeway and Keystone HR, the system managers use, and three hygiene problems inside Bridgeway: orders closed late or never, time billed after the last day, and renewals submitted as a new worker. The counts below are the clean program's; the extract differs slightly (62 more workers, 112 fewer revisions, 139 more timesheets). See [Keystone and the feed](keystone_feed.md).
+This is the **clean** program: what Bridgeway knows is true. Phase 4 adds the disagreements between Bridgeway and Keystone HR, the system managers use, and three hygiene problems inside Bridgeway: orders closed late or never, time billed after the last day, and renewals submitted as a new worker. The counts below are the clean program's; the extract differs slightly (61 more workers, 112 fewer revisions, 139 more timesheets). See [Keystone and the feed](keystone_feed.md).
 
 ## The life of an engagement
 

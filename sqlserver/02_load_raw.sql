@@ -471,6 +471,8 @@ CREATE TABLE raw.fact_workforce_plan (
     [planned_net_new]          NVARCHAR(400) NULL,
     [planned_backfills]        NVARCHAR(400) NULL,
     [planned_cost_usd]         NVARCHAR(400) NULL,
+    [planned_cw_headcount]     NVARCHAR(400) NULL,
+    [planned_cw_spend_usd]     NVARCHAR(400) NULL,
     [plan_fx_rate_date]        NVARCHAR(400) NULL
 );
 BULK INSERT raw.fact_workforce_plan
@@ -523,25 +525,26 @@ GO
 
 DROP TABLE IF EXISTS raw.ks_contingent_worker;
 CREATE TABLE raw.ks_contingent_worker (
-    [ks_record_id]         NVARCHAR(400) NULL,
-    [person_id]            NVARCHAR(400) NULL,
-    [bw_worker_id]         NVARCHAR(400) NULL,
-    [effective_start_date] NVARCHAR(400) NULL,
-    [effective_end_date]   NVARCHAR(400) NULL,
-    [change_source]        NVARCHAR(400) NULL,
-    [feed_event_id]        NVARCHAR(400) NULL,
-    [first_name]           NVARCHAR(400) NULL,
-    [last_name]            NVARCHAR(400) NULL,
-    [cw_type]              NVARCHAR(400) NULL,
-    [supplier_name]        NVARCHAR(400) NULL,
-    [status]               NVARCHAR(400) NULL,
-    [contract_start_date]  NVARCHAR(400) NULL,
-    [contract_end_date]    NVARCHAR(400) NULL,
-    [inactive_reason]      NVARCHAR(400) NULL,
-    [department_id]        NVARCHAR(400) NULL,
-    [cost_center_id]       NVARCHAR(400) NULL,
-    [location_id]          NVARCHAR(400) NULL,
-    [manager_worker_id]    NVARCHAR(400) NULL
+    [ks_record_id]           NVARCHAR(400) NULL,
+    [person_id]              NVARCHAR(400) NULL,
+    [bw_worker_id]           NVARCHAR(400) NULL,
+    [effective_start_date]   NVARCHAR(400) NULL,
+    [effective_end_date]     NVARCHAR(400) NULL,
+    [change_source]          NVARCHAR(400) NULL,
+    [feed_event_id]          NVARCHAR(400) NULL,
+    [first_name]             NVARCHAR(400) NULL,
+    [last_name]              NVARCHAR(400) NULL,
+    [cw_type]                NVARCHAR(400) NULL,
+    [supplier_name]          NVARCHAR(400) NULL,
+    [status]                 NVARCHAR(400) NULL,
+    [contract_start_date]    NVARCHAR(400) NULL,
+    [contract_end_date]      NVARCHAR(400) NULL,
+    [inactive_reason]        NVARCHAR(400) NULL,
+    [converted_to_worker_id] NVARCHAR(400) NULL,
+    [department_id]          NVARCHAR(400) NULL,
+    [cost_center_id]         NVARCHAR(400) NULL,
+    [location_id]            NVARCHAR(400) NULL,
+    [manager_worker_id]      NVARCHAR(400) NULL
 );
 BULK INSERT raw.ks_contingent_worker
 FROM '/repo/data/raw/ks_contingent_worker.csv'

@@ -41,6 +41,7 @@ Arcadia Systems, Bridgeway VMS and every supplier and person here are fictional.
 from __future__ import annotations
 
 import calendar
+import math
 import datetime as dt
 import re
 from collections import defaultdict
@@ -527,6 +528,53 @@ class Program:
                 active[e.eng_id] = e
         self.active_at_end = active
 
+    # ---------------------------------------------------------------- conversions (phase 5)
+    def convert(self, hires: pd.DataFrame, stream: np.random.Generator):
+        """Some contingent workers are hired as employees when their engagement ends.
+
+        `hires` holds the external hires into requisitions (worker_id, hire_date, country,
+        department_id, function, first_name, last_name). For a share of Contractor and
+        Consultant engagements that end (completed or early, not in the restructuring), look
+        for a hire in the same country and department (or function) in the same calendar month
+        as the first day after the engagement, within CW_CONVERSION_MAX_GAP_DAYS: that hire is
+        the same person. Bridgeway's worker takes the employee's name; the engagement is marked
+        Converted. Drawn from its own stream, so nothing else in the program moves.
+        """
+        by_dept, by_fn = defaultdict(list), defaultdict(list)
+        for h in hires.sort_values(["hire_date", "worker_id"]).itertuples(index=False):
+            by_dept[(h.country, h.department_id)].append(h)
+            by_fn[(h.country, h.function)].append(h)
+        start = dt.date.fromisoformat(ref.CW_CONVERSION_FROM)
+        claimed: set[str] = set()
+        self.conversions: dict[str, dict] = {}
+        exits = sorted((e for e in self.engagements
+                        if e.end_reason in ("Completed", "Ended early") and e.cw_type != "BPO"
+                        and start <= e.end + ONE_DAY and e.end < self.extract),
+                       key=lambda e: (e.end, e.eng_id))
+        for e in exits:
+            if stream.random() >= ref.CW_CONVERSION_ATTEMPT:
+                continue
+            first = e.end + ONE_DAY
+            last = min(e.end + dt.timedelta(days=ref.CW_CONVERSION_MAX_GAP_DAYS), month_end(first.year, first.month))
+            options = []
+            for pool in (by_dept[(e.country, e.dept)], by_fn[(e.country, self.dept[e.dept]["function"])]):
+                options = [h for h in pool if first <= h.hire_date <= last and h.worker_id not in claimed]
+                if options:
+                    break
+            if not options:
+                continue
+            h = options[int(stream.integers(len(options)))]
+            claimed.add(h.worker_id)
+            e.end_reason = "Converted"
+            self.conversions[e.bw_worker_id] = {"worker_id": h.worker_id, "hire_date": h.hire_date,
+                                                "last_day": e.end, "candidate_id": h.candidate_id}
+            row = self.worker_rows[e.bw_worker_id]
+            base = f"{_slug(h.first_name)}.{_slug(h.last_name)}"
+            self.cw_email_seen[base] += 1
+            n = self.cw_email_seen[base]
+            row.update(first_name=h.first_name, last_name=h.last_name,
+                       email=f"{base}{'' if n == 1 else n}@{ref.CW_EMAIL_DOMAIN}")
+
     # ---------------------------------------------------------------- the extract
     def tables(self) -> dict[str, pd.DataFrame]:
         keep_workers = {e.bw_worker_id for e in self.engagements if e.end >= self.archive_before}
@@ -709,7 +757,80 @@ def to_currency(usd: float, currency: str, on: dt.date) -> float:
     return round_rate(usd / fx_rates.usd_per_local(currency, max(on, FX_FIRST_DAY)), currency)
 
 
-def simulate(**kwargs) -> tuple[dict[str, pd.DataFrame], Program]:
+def plan_line(plan: pd.DataFrame, bw: dict[str, pd.DataFrame], stream: np.random.Generator) -> pd.DataFrame:
+    """The contingent line of the workforce plan (phase 5).
+
+    For every plan row (version x cost center x quarter), the planned contingent headcount at
+    the quarter end and the planned annualized spend run-rate, in USD at the plan's FX date.
+    Like the employee plan, each version is the quarter's actual (as Bridgeway held it on the
+    quarter end) with a version's planning error: the budget furthest out and least accurate.
+    """
+    rev, so = bw["bw_service_order_revision"], bw["bw_service_order"]
+    rev = rev[rev["status"].isin(["Approved", "Closed"])].merge(so[["service_order_id", "bw_worker_id"]])
+    actual: dict[tuple, dict] = {}
+    for qe in sorted(plan["quarter_end_date"].unique()):
+        cur = rev[(rev["effective_start_date"] <= qe)
+                  & (rev["effective_end_date"].isna() | (rev["effective_end_date"].map(lambda d: d is not None and d >= qe)))
+                  & (rev["assignment_start_date"] <= qe) & (rev["assignment_end_date"] >= qe)]
+        cur = cur.drop_duplicates("bw_worker_id", keep="last")
+        annual = np.where(cur["rate_type"] == "Monthly", cur["bill_rate"] * 12,
+                          cur["bill_rate"] * cur["hours_per_week"].fillna(0).astype(float) * 52)
+        for cc, cur_g, ann in zip(cur["cost_center_code"], cur["billing_currency"], annual):
+            a = actual.setdefault((qe, cc), {"headcount": 0, "annual_local": defaultdict(float)})
+            a["headcount"] += 1
+            a["annual_local"][cur_g] += float(ann)
+    # cost centers with contingent workers but no employee plan line that year get one, with
+    # zeros on the employee side, in every version covering the quarter
+    first_q = {n: q for n, _, q in ref.PLAN_VERSIONS}
+    versions = plan[["plan_version", "version_type", "version_date", "fiscal_year"]].drop_duplicates()
+    have = set(zip(plan["plan_version"], plan["cost_center_id"], plan["quarter_end_date"]))
+    quarter_of = dict(zip(plan["quarter_end_date"], plan["fiscal_quarter"]))
+    fy_of = dict(zip(plan["quarter_end_date"], plan["fiscal_year"]))
+    extra = []
+    for (qe, cc) in sorted(actual):
+        for v in versions[versions["fiscal_year"] == fy_of[qe]].itertuples(index=False):
+            if quarter_of[qe] >= first_q[v.version_type] and (v.plan_version, cc, qe) not in have:
+                extra.append({"plan_version": v.plan_version, "version_type": v.version_type,
+                              "version_date": v.version_date, "fiscal_year": v.fiscal_year,
+                              "fiscal_quarter": quarter_of[qe], "quarter_end_date": qe, "cost_center_id": cc,
+                              "planned_ending_headcount": 0, "planned_ending_fte": 0.0, "planned_net_new": 0,
+                              "planned_backfills": 0, "planned_cost_usd": 0.0, "plan_fx_rate_date": v.version_date})
+    if extra:
+        plan = pd.concat([plan, pd.DataFrame(extra)], ignore_index=True) \
+            .sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"]).reset_index(drop=True)
+    hc_out, spend_out = [], []
+    z_cc = {}
+    for r in plan.itertuples(index=False):
+        key = (r.plan_version, r.cost_center_id)
+        if key not in z_cc:
+            z_cc[key] = stream.normal()              # a cost center's planning bias in this version
+        act = actual.get((r.quarter_end_date, r.cost_center_id))
+        z_q = stream.normal()
+        if not act:
+            hc_out.append(0)
+            spend_out.append(0.0)
+            continue
+        mu, sd = ref.PLAN_CW_ERROR[r.version_type]
+        if r.version_type == "Budget":
+            mu += ref.PLAN_CW_FY_BUDGET_SHIFT.get(r.fiscal_year, 0.0)
+        horizon = r.fiscal_quarter - first_q[r.version_type] + 1
+        hc = int(round(act["headcount"] * math.exp(mu + sd * math.sqrt(horizon) * (0.7 * z_cc[key] + 0.7 * z_q))))
+        usd = sum(v * fx_rates.usd_per_local(c, max(r.version_date, FX_FIRST_DAY)) for c, v in act["annual_local"].items())
+        usd *= (hc / act["headcount"]) * math.exp(stream.normal(0, ref.PLAN_CW_COST_EXTRA_SD))
+        hc_out.append(hc)
+        spend_out.append(round(usd, 2))
+    plan = plan.copy()
+    at = plan.columns.get_loc("planned_cost_usd") + 1
+    plan.insert(at, "planned_cw_headcount", hc_out)
+    plan.insert(at + 1, "planned_cw_spend_usd", spend_out)
+    return plan
+
+
+def simulate(*, hires: pd.DataFrame | None = None, conversion_stream: np.random.Generator | None = None,
+             **kwargs) -> tuple[dict[str, pd.DataFrame], Program]:
     program = Program(**kwargs)
     program.run()
+    program.conversions = {}
+    if hires is not None:
+        program.convert(hires, conversion_stream)
     return program.tables(), program

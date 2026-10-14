@@ -20,6 +20,7 @@ SELECT
     CAST(NULLIF(contract_start_date, '') AS DATE)            AS contract_start_date,
     CAST(NULLIF(contract_end_date, '') AS DATE)              AS contract_end_date,
     NULLIF(inactive_reason, '')                              AS inactive_reason,
+    NULLIF(converted_to_worker_id, '')                       AS converted_to_worker_id,
     NULLIF(department_id, '')                                AS department_id,
     NULLIF(cost_center_id, '')                               AS cost_center_id,
     NULLIF(location_id, '')                                  AS location_id,

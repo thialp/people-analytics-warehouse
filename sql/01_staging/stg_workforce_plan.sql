@@ -6,6 +6,9 @@
 -- the budget or with any reforecast.
 -- planned_cost_usd is the quarter-end loaded run-rate (annual base x FTE x (1 + fringe)),
 -- in USD at the plan's FX rates (ECB rates on the version date).
+-- Since release 3 the plan also carries a contingent line: planned_cw_headcount (contingent
+-- workers at the quarter end) and planned_cw_spend_usd (their annualized bill run-rate:
+-- hourly rate x contracted hours x 52, or monthly rate x 12), at the same FX rates.
 CREATE OR REPLACE TABLE staging.stg_workforce_plan AS
 SELECT
     plan_version,
@@ -20,5 +23,7 @@ SELECT
     CAST(planned_net_new AS INTEGER)                         AS planned_net_new,
     CAST(planned_backfills AS INTEGER)                       AS planned_backfills,
     CAST(planned_cost_usd AS DECIMAL(18, 2))                 AS planned_cost_usd,
+    CAST(planned_cw_headcount AS INTEGER)                    AS planned_cw_headcount,
+    CAST(planned_cw_spend_usd AS DECIMAL(18, 2))             AS planned_cw_spend_usd,
     CAST(plan_fx_rate_date AS DATE)                          AS plan_fx_rate_date
 FROM raw.fact_workforce_plan;

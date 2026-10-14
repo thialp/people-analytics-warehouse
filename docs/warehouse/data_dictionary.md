@@ -189,7 +189,7 @@ One row per requisition (31,323), an accumulating snapshot of its dates.
 | `filled_by_worker_id`, `fill_source` | Who filled it, `External` or `Internal` |
 
 #### dim_candidate
-One row per applicant per requisition (188,982): `candidate_id`, `requisition_id`, `is_internal`, `candidate_source` (Job board, Referral, Career site, Agency, Sourced, Internal), `worker_id` (filled only for the person hired) and `final_status` (`Accepted`, `Rejected`, `Withdrawn`, `Declined`, or `In process` on a requisition still open). A filled requisition has exactly one accepted applicant, the person who filled the seat (test 50).
+One row per applicant per requisition (188,982): `candidate_id`, `requisition_id`, `is_internal`, `candidate_source` (Job board, Referral, Career site, Agency, Sourced, Internal, or Contingent conversion: a contingent worker hired when their engagement ended, release 3), `worker_id` (filled only for the person hired) and `final_status` (`Accepted`, `Rejected`, `Withdrawn`, `Declined`, or `In process` on a requisition still open). A filled requisition has exactly one accepted applicant, the person who filled the seat (test 50).
 
 #### fact_candidate_stage_event
 One row per applicant per stage reached (531,691): `candidate_event_id`, `candidate_id`, `stage` (`Applied`, `Screen`, `Interview`, `Offer`, then `Accepted`, `Declined`, `Rejected` or `Withdrawn`), `stage_order`, `stage_date`. Stages run in order between approval and the fill or cancellation. Source and internal flag sit on `dim_candidate`, not on every stage.
@@ -198,7 +198,7 @@ One row per applicant per stage reached (531,691): `candidate_event_id`, `candid
 Department × country (630): `cost_center_id` (`CC-1010-US`), `cost_center_name` (`Core Platform Engineering - United States`), `department_id`, `department_cost_center` (the department's own code, `CC-1010`), `country_code`, `function`. Every seat record and requisition carries the cost center of its department and its office's country (test 51).
 
 #### fact_workforce_plan
-The hiring plan, one row per plan version × cost center × fiscal quarter (28,800). Versions are never overwritten (test 49).
+The workforce plan, one row per plan version × cost center × fiscal quarter (29,415). Versions are never overwritten (test 49). Since release 3 it carries a **contingent line** beside the employee plan; 615 rows exist only for that line (cost centers with contingent workers and no employee plan that year), with zeros on the employee side.
 
 | Column | Description |
 |---|---|
@@ -208,8 +208,10 @@ The hiring plan, one row per plan version × cost center × fiscal quarter (28,8
 | `planned_ending_headcount`, `planned_ending_fte` | Planned level at the quarter-end |
 | `planned_net_new`, `planned_backfills` | Planned fills in the quarter |
 | `planned_cost_usd`, `plan_fx_rate_date` | Planned quarter-end loaded run-rate, in USD at the FX of the version date |
+| `planned_cw_headcount` | Planned contingent workers at the quarter-end (release 3) |
+| `planned_cw_spend_usd` | Planned contingent spend: the annualized bill run-rate at the quarter-end (hourly rate × contracted hours × 52, or monthly rate × 12), in USD at the FX of the version date (release 3). Test 76 checks the line is complete |
 
-The generator writes each version around what happened, with an error that shrinks from the budget to RF3; the FY24 budget predates the restructuring. See [Workforce Planning, section 7](../projects/workforce-planning/workforce_planning.md#7-plan-versus-actual).
+The generator writes each version around what happened, with an error that shrinks from the budget to RF3; the FY24 budget predates the restructuring. The contingent line is looser (budgets run about 4% above the year-end contingent headcount) and has its own random stream, so no employee plan number moved when it was added. See [Workforce Planning, section 7](../projects/workforce-planning/workforce_planning.md#7-plan-versus-actual).
 
 ### External reference data
 
@@ -351,7 +353,7 @@ Billed time per worker, order, month and rate, from June 2021 (the start of the 
 | `billed_amount_local` | DECIMAL | billed_units x bill_rate |
 
 #### ks_contingent_worker
-The Keystone HR person record of each contingent worker, SCD Type 2, one version per day. Written by the feed from Bridgeway (`change_source` Feed), by Keystone itself when it inactivates a worker the day after the contract end it holds (System), and by hand (HR Ops, Manager). Contingent workers take person IDs from W500001, in the order Keystone created them; employees run from W100001, so the two never collide (test 68). The stored `bw_worker_id` is how the warehouse links Keystone to Bridgeway; it is blank or mistyped on a few records (discrepancy CW06), and a few records have no Bridgeway worker at all (CW09).
+The Keystone HR person record of each contingent worker, SCD Type 2, one version per day. Written by the feed from Bridgeway (`change_source` Feed), by Keystone itself when it inactivates a worker the day after the contract end it holds (System), and by hand (HR Ops, Manager). Contingent workers take person IDs from W500001, in the order Keystone created them; employees run from W100001, so the two never collide (test 68). The stored `bw_worker_id` is how the warehouse links Keystone to Bridgeway; it is blank or mistyped on a few records (discrepancy CW06), and a few records have no Bridgeway worker at all (CW09). When a contingent worker is hired as an employee, HR closes the record on the hire date as *Converted to employee*, naming the new employee in `converted_to_worker_id` (a new person, a new ID; test 77).
 
 | Column | Type | Description |
 |---|---|---|
@@ -369,7 +371,8 @@ The Keystone HR person record of each contingent worker, SCD Type 2, one version
 | `status` | VARCHAR | Active or Inactive |
 | `contract_start_date` | DATE | First day of the engagement as Keystone knows it; renewals and extensions move the end, never the start |
 | `contract_end_date` | DATE | As Keystone knows it; Keystone inactivates the worker the day after |
-| `inactive_reason` | VARCHAR | Contract ended, Ended early or Manual; empty while active |
+| `inactive_reason` | VARCHAR | Contract ended, Ended early, Manual, or Converted to employee; empty while active |
+| `converted_to_worker_id` | VARCHAR | The employee the worker became (→ dim_worker) when inactive_reason is Converted to employee: a new person, a new ID |
 | `department_id` | VARCHAR | → dim_department |
 | `cost_center_id` | VARCHAR | → dim_cost_center |
 | `location_id` | VARCHAR | → dim_location |
@@ -577,7 +580,7 @@ Grain: **seat fill** (external hire or internal move), 30,575 rows from FY22. Th
 Grain: **month-end × vacant seat** (Open or Frozen; 62,055 rows): `status`, `status_since`, `days_in_status`, `vacated_by`, `vacated_date`, `days_vacant`, `vacancy_age_band`, `is_stale` (vacant 90 days or more), the open requisition (`open_requisition_id`, `req_type`, `requisition_approved_date`), and the seat's organization, cost center, office, country, region, job and grade, `created_date`, `created_reason`. At 30 Jun 2026: 725 open (77 stale) and 252 frozen (136 stale).
 
 ### mart_plan_vs_actual
-Grain: **plan version × cost center × fiscal quarter** (28,800 rows). The plan (`planned_*`) beside the actuals: `actual_ending_headcount`, `actual_ending_fte`, `actual_net_new`, `actual_net_new_reuse_candidates`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `actual_cost_usd_plan_fx` (comparable with `planned_cost_usd`) and `actual_cost_usd_constant`; plus `version_order`, `is_latest_version` and the cost center's department, function, country and region. For every version and quarter, the actual headcount sums to the company and the actual fills to the seat fills (test 56). Attainment = actual ÷ planned.
+Grain: **plan version × cost center × fiscal quarter** (29,415 rows; the 615 contingent-only cost center rows are zero on every employee measure). The plan (`planned_*`) beside the actuals: `actual_ending_headcount`, `actual_ending_fte`, `actual_net_new`, `actual_net_new_reuse_candidates`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `actual_cost_usd_plan_fx` (comparable with `planned_cost_usd`) and `actual_cost_usd_constant`; plus `version_order`, `is_latest_version` and the cost center's department, function, country and region. For every version and quarter, the actual headcount sums to the company and the actual fills to the seat fills (test 56). Attainment = actual ÷ planned.
 
 ### mart_seat_corridors
 Grain: **fiscal quarter × from office × to office** (821 rows): where backfilled seats moved, from the prior incumbent's office to the new incumbent's, with both offices' coordinates and pay zones, `location_change`, `seats`, `seats_levelled_down`, `seats_levelled_up`, `seats_relocated_for_backfill`, `pay_change_usd_constant`, `location_effect_usd_constant`. Draws the map lines in the Footprint pattern (`MAKELINE`).

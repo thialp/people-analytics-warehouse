@@ -62,8 +62,9 @@ GROUP_FIELDS = {"contract": CONTRACT, "cost_center": ("department_id", "cost_cen
 GROUP_LABEL = {"record": "Whole record", "link": "Bridgeway worker ID", "contract": "Status and contract dates",
                "cost_center": "Cost center", "manager": "Manager", "office": "Office"}
 OUT_FIELDS = ["bw_worker_id", "first_name", "last_name", "cw_type", "supplier_name", "status",
-              "contract_start_date", "contract_end_date", "inactive_reason", "department_id",
-              "cost_center_id", "location_id", "manager_worker_id"]
+              "contract_start_date", "contract_end_date", "inactive_reason", "converted_to_worker_id",
+              "department_id", "cost_center_id", "location_id", "manager_worker_id"]
+CONVERTED = "Converted to employee"
 ATTR_FIELDS = ("department_id", "cost_center_id", "location_id", "manager_worker_id")
 
 EVENT_OF_REASON = {"Extension": "Extension", "Early end": "Early End", "Cost center change": "Attribute Change",
@@ -228,7 +229,7 @@ class Keystone:
         """CW07: a few renewals were submitted by the supplier as a brand new worker."""
         so, rev, wk = self.bw["bw_service_order"], self.bw["bw_service_order_revision"], self.bw["bw_contingent_worker"]
         rev0 = rev[rev["revision_no"] == 0].set_index("service_order_id")
-        breach = {e.bw_worker_id for e in self.p.engagements if e.cap_breach}
+        breach = {e.bw_worker_id for e in self.p.engagements if e.cap_breach} | set(self.p.conversions)
         cand = so[(so["order_type"] == "Renewal") & so["approved_date"].notna()].sort_values("service_order_id")
         chosen, seen = [], set()
         for o in cand.itertuples(index=False):
@@ -397,9 +398,21 @@ class Keystone:
                 rec.apply(ev["sent"], ev["payload"], ev["contract"], ev["end_kind"], "Feed", None)
                 g1 = _groups(rec.state)
                 ev["groups"] = {g for g in g0 if g0[g] != g1[g]} or ({"contract"} if ev["contract"] else {"manager"})
+        conv = self.p.conversions.get(evs[0]["bw_worker_id"])
+        if conv:
+            self.convert(rec, conv)
         rec.advance(self.extract)
         rec.freeze()
         return rec
+
+    def convert(self, rec: Record, conv: dict):
+        """HR runs the conversion in Keystone on the hire date: the contingent record closes as
+        Converted to employee and points at the new employee ID (a new person, a new ID)."""
+        if rec.state is None:
+            return                           # Keystone never had the record: nothing to close
+        rec.advance(conv["hire_date"])
+        rec.push(conv["hire_date"], dict(rec.state, status="Inactive", inactive_reason=CONVERTED,
+                                         converted_to_worker_id=conv["worker_id"]), "HR Ops", None)
 
     def replay_actual(self, bw_id: str, evs: list[dict], ideal: Record) -> tuple[Record, list]:
         rec = Record()
@@ -434,6 +447,9 @@ class Keystone:
                     on = dt.date(me.year, me.month, 1) + dt.timedelta(days=int(self.rng.integers(0, me.day)))
                     if first < on <= self.extract:
                         actions.append((on, 2, len(actions), "edit", kind))
+        if bw_id in self.p.conversions:
+            conv = self.p.conversions[bw_id]
+            actions.append((conv["hire_date"], 3, len(actions), "convert", conv))
         actions.sort(key=lambda a: (a[0], a[1], a[2]))
 
         k = 0
@@ -458,6 +474,9 @@ class Keystone:
                     ev["outcome"] = "Partly Applied" if ev["partial"] else None
                 elif st is None or st.get("bw_worker_id") != bw_id:
                     ev["not_found"] = "CW08" if st is None else "CW06"
+                    ev["applied"] = None
+                elif st.get("inactive_reason") == CONVERTED:
+                    ev["rejected"] = True            # a converted worker's contingent record is closed
                     ev["applied"] = None
                 else:
                     rec.apply(when, ev["payload"], ev["contract"], ev["end_kind"], "Feed", ev["key"])
@@ -487,6 +506,8 @@ class Keystone:
                 if kind == "relink":
                     payload["bw_worker_id"] = bw_id
                 rec.push(when, dict(rec.state, **payload), "HR Ops", None)
+            elif kind == "convert":
+                self.convert(rec, data)
             elif kind == "edit":
                 rec.advance(when)
                 st = rec.state
@@ -531,6 +552,8 @@ class Keystone:
                 mark(ev["sent"], {"record"} if code == "CW08" else ev["groups"], code, ev=ev)
             elif ev.get("not_found"):
                 mark(ev["sent"], ev["groups"], FAIL_CODE[ev["event_type"]], root=ev["not_found"], ev=ev)
+            elif ev.get("rejected"):
+                mark(ev["sent"], ev["groups"], FAIL_CODE[ev["event_type"]], ev=ev)
             else:
                 lag = ((ev["applied"] if ev["applied"] <= self.extract else self.extract + ONE_DAY) - ev["sent"]).days
                 if lag > 0:
@@ -618,6 +641,8 @@ class Keystone:
         if ev.get("not_found"):
             why = "the record was never created" if ev["not_found"] == "CW08" else "the stored Bridgeway ID is blank or mistyped"
             return f"{what} failed: worker not found because {why}"
+        if ev.get("rejected"):
+            return f"{what} was rejected: the worker had already been converted to an employee"
         if ev["applied"] is None or ev["applied"] > self.extract:
             return f"{what}, still queued"
         return f"{what}, applied {ev['applied']:%Y-%m-%d}"
@@ -763,6 +788,8 @@ class Keystone:
                 outcome, applied, err = "Failed", None, ref.FEED_ERRORS[ev["error"]]
             elif ev.get("not_found"):
                 outcome, applied, err = "Failed", None, ref.FEED_ERRORS["not_found"].format(bw=ev["bw_worker_id"])
+            elif ev.get("rejected"):
+                outcome, applied, err = "Failed", None, ref.FEED_ERRORS["converted"].format(bw=ev["bw_worker_id"])
             elif ev["applied"] > self.extract:
                 outcome, applied, err = "Queued", None, None
             elif ev.get("partial"):

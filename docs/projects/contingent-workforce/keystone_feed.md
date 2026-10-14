@@ -17,7 +17,7 @@ It writes four tables:
 | `gen_cw_discrepancy_truth` | **The answer key:** every discrepancy seeded, with its cause and the days it was true |
 | `ref_cw_discrepancy_type` | The catalogue of 13 discrepancy types |
 
-It also seeds three hygiene problems inside Bridgeway itself. Every parameter is in [`generator/reference_data.py`](../../../generator/reference_data.py) under *Keystone HR and the Bridgeway -> Keystone feed*. The module draws from its own random stream, so no employee number moves and every mart from case studies 1–5 is unchanged.
+It also seeds three hygiene problems inside Bridgeway itself. Numbers below are as regenerated in phase 5, which added [conversions to employee](conversions_and_plan.md): a converted worker's Keystone record closes as *Converted to employee*, and a late feed change for that worker is rejected. Every parameter is in [`generator/reference_data.py`](../../../generator/reference_data.py) under *Keystone HR and the Bridgeway -> Keystone feed*. The module draws from its own random stream, so no employee number moves and every mart from case studies 1–5 is unchanged.
 
 ## How a change travels
 
@@ -68,7 +68,7 @@ A record HR Ops creates by hand often names the supplier its own way (*Quorlan D
 |---|---|
 | Orders closed late or never | 3% of ended orders are closed 17 to 400 days after the last day instead of within 15; if that falls after the extract, the order is still open |
 | Time billed after the last day | 0.4% of ended orders bill 8 to 40 hours (or part of a month for BPO) in the month after; 139 timesheets, about $768K in billing currency |
-| A renewal submitted as a new worker | 0.5% of renewals approved before their first day were submitted as a new worker: a second Bridgeway ID for the same person, a *New engagement* order with no link to the one it continues, and so a second Keystone person (62 people; 59 still in the history window) |
+| A renewal submitted as a new worker | 0.5% of renewals approved before their first day were submitted as a new worker: a second Bridgeway ID for the same person, a *New engagement* order with no link to the one it continues, and so a second Keystone person (61 people; 58 still in the history window) |
 
 ## The discrepancy catalogue
 
@@ -76,19 +76,19 @@ Each type is named after what happened in the systems, not after any internal la
 
 | Code | Discrepancy | What a manager in Keystone sees | Who can fix it | Severity | Periods | Open at extract |
 |---|---|---|---|---|---:|---:|
-| CW00 | Change in transit | Yesterday's values | Nobody: it clears itself | Expected | 21,071 | 0 |
-| CW01 | Change arrived late | An old end date, cost center, manager or office for days | Integration support | Data hygiene | 3,108 | 24 |
-| CW02 | Extension never arrived | Keystone ends the worker at the old end date while Bridgeway has them working | Integration support, then HR Ops | Access risk | 650 | 58 |
-| CW03 | Early end never arrived | The worker is still active in Keystone after their last day | HR Ops | Access risk | 63 | 3 |
+| CW00 | Change in transit | Yesterday's values | Nobody: it clears itself | Expected | 21,136 | 0 |
+| CW01 | Change arrived late | An old end date, cost center, manager or office for days | Integration support | Data hygiene | 3,039 | 26 |
+| CW02 | Extension never arrived | Keystone ends the worker at the old end date while Bridgeway has them working | Integration support, then HR Ops | Access risk | 657 | 65 |
+| CW03 | Early end never arrived | The worker is still active in Keystone after their last day | HR Ops | Access risk | 70 | 6 |
 | CW04 | Ended but not closed in Bridgeway | Nothing: Bridgeway hygiene | Vendor management | Cost risk | 1,147 | 99 |
-| CW05 | Changed in Keystone only | Values Bridgeway does not have; the supplier still bills Bridgeway's cost center | The manager, in Bridgeway | Cost risk | 2,074 | 184 |
-| CW06 | Link ID missing or mistyped | Nothing, but later feed changes cannot find the worker | HR Ops | Data hygiene | 224 | 44 |
-| CW07 | One person, two IDs | The same person twice | HR Ops and vendor management | Data hygiene | 59 | 30 |
-| CW08 | Never reached Keystone | A worker missing from the team | Integration support, then HR Ops | Access risk | 128 | 32 |
-| CW09 | Keystone-only contingent worker | A worker no supplier bills for | HR Ops | Access risk | 39 | 2 |
+| CW05 | Changed in Keystone only | Values Bridgeway does not have; the supplier still bills Bridgeway's cost center | The manager, in Bridgeway | Cost risk | 2,148 | 219 |
+| CW06 | Link ID missing or mistyped | Nothing, but later feed changes cannot find the worker | HR Ops | Data hygiene | 213 | 49 |
+| CW07 | One person, two IDs | The same person twice | HR Ops and vendor management | Data hygiene | 58 | 30 |
+| CW08 | Never reached Keystone | A worker missing from the team | Integration support, then HR Ops | Access risk | 115 | 25 |
+| CW09 | Keystone-only contingent worker | A worker no supplier bills for | HR Ops | Access risk | 50 | 6 |
 | CW10 | Over the duration cap | Nothing | Vendor management and the hiring manager | Compliance risk | 13 | 1 |
 | CW11 | Billed after the assignment ended | Nothing: rates and timesheets are not in Keystone | Vendor management and Finance | Cost risk | 139 | 0 |
-| CW12 | Attribute change never arrived | The old cost center, manager or office | Integration support, then HR Ops | Data hygiene | 154 | 13 |
+| CW12 | Attribute change never arrived | The old cost center, manager or office | Integration support, then HR Ops | Data hygiene | 168 | 16 |
 
 Three changes from the plan's draft list:
 
@@ -107,36 +107,36 @@ Wherever the two disagree, that is a discrepancy. The key records it only on day
 
 **No difference is left without a cause** (the generator counts unexplained days, and the count is zero). The key covers the warehouse history window: rows that ended before 30 June 2021 are left out.
 
-**The key reconciles the two systems.** On 30 June 2026, 109 workers are working in Bridgeway but not active in Keystone under that Bridgeway ID, and 30 are active in Keystone but not working in Bridgeway under the ID it holds. Every one of the 139 has an open row in the key. The same holds on 30 June 2024 (71 and 24) and 31 December 2022 (65 and 18).
+**The key reconciles the two systems.** On 30 June 2026, 109 workers are working in Bridgeway but not active in Keystone under that Bridgeway ID, and 42 are active in Keystone but not working in Bridgeway under the ID it holds. Every one of the 151 has an open row in the key. The same holds on 30 June 2024 (75 and 26) and 31 December 2022 (64 and 18).
 
 How they end (excluding changes in transit and late changes):
 
 | Resolution | Periods |
 |---|---:|
-| Overwritten by a later feed event | 1,222 |
-| Worker no longer active | 1,087 |
+| Overwritten by a later feed event | 1,260 |
+| Worker no longer active | 1,071 |
 | Closed late in Bridgeway | 1,048 |
-| Fixed by hand in Keystone | 520 |
-| Open at extract | 466 |
-| Bridgeway changed to match | 183 |
-| Billed (CW11) / engagement ended (CW10) / other | 164 |
+| Open at extract | 516 |
+| Fixed by hand in Keystone | 513 |
+| Bridgeway changed to match | 205 |
+| Billed (CW11) / engagement ended (CW10) / other | 165 |
 
-A hand edit in Keystone lasts a median of 141 days before something overwrites it, a failed extension 58, a worker missing from Keystone 49.
+A hand edit in Keystone lasts a median of 140 days before something overwrites it, a failed extension 88, a worker missing from Keystone 69.
 
 ## What came out (extract of 30 June 2026)
 
 | FY | Working in Bridgeway on June 30 | Active in Keystone | Feed events sent | Applied late | Failed | Workers with an open discrepancy |
 |---|---:|---:|---:|---:|---:|---:|
-| FY22 | 9,288 | 9,241 | 13,693 | 832 | 169 | 280 (3.0%) |
-| FY23 | 10,228 | 10,173 | 14,958 | 899 | 196 | 298 (2.9%) |
-| FY24 | 9,910 | 9,864 | 15,059 | 870 | 215 | 289 (2.9%) |
-| FY25 | 10,707 | 10,668 | 16,397 | 986 | 209 | 315 (2.9%) |
-| FY26 | **11,941** | **11,864** | 17,432 | 1,025 | 260 | **364 (3.0%)** |
+| FY22 | 9,288 | 9,245 | 13,693 | 830 | 168 | 284 (3.1%) |
+| FY23 | 10,228 | 10,170 | 14,958 | 897 | 208 | 320 (3.1%) |
+| FY24 | 9,910 | 9,861 | 15,059 | 892 | 206 | 301 (3.0%) |
+| FY25 | 10,707 | 10,644 | 16,397 | 960 | 222 | 325 (3.0%) |
+| FY26 | **11,941** | **11,875** | 17,432 | 975 | 268 | **402 (3.4%)** |
 
-(*Open discrepancy* excludes changes in transit.) About 3% of active contingent workers carry at least one open discrepancy on any June 30: noticeable, not alarming, as in a healthy program. The two headcounts differ by only 77, but that net hides 139 workers who are wrong in one direction or the other: it nets workers Keystone lost against workers it kept too long.
+(*Open discrepancy* excludes changes in transit.) About 3% of active contingent workers carry at least one open discrepancy on any June 30: noticeable, not alarming, as in a healthy program. The two headcounts differ by only 66, but that net hides 151 workers who are wrong in one direction or the other: it nets workers Keystone lost against workers it kept too long.
 
-- **The feed:** 106,357 events (42,117 new workers, 14,707 renewals, 33,108 extensions, 3,645 early ends, 12,780 attribute changes). Of those, 98,318 were applied, 6,345 applied late, 252 partly applied, 1,410 failed, and 32 were still queued on the extract date.
-- **Keystone:** 42,073 contingent worker records and 140,681 versions. 104,808 versions came from the feed, 32,428 from Keystone's own inactivations, 1,841 from HR Ops and 1,604 from managers. 463 versions hold no Bridgeway ID.
+- **The feed:** 106,357 events (42,116 new workers, 14,708 renewals, 33,108 extensions, 3,645 early ends, 12,780 attribute changes). Of those, 98,341 were applied, 6,287 applied late, 261 partly applied, 1,433 failed (one of them rejected because the worker had already been converted to an employee), and 35 were still queued on the extract date.
+- **Keystone:** 42,098 contingent worker records and 141,791 versions. 104,777 versions came from the feed, 32,314 from Keystone's own inactivations, 3,055 from HR Ops (1,180 of them conversions to employee) and 1,645 from managers. 492 versions hold no Bridgeway ID.
 
 ## Checks
 
