@@ -8,14 +8,15 @@ Custom SQL with the DuckDB pipeline's marts, row for row.
     python sqlserver/check_tsql_in_duckdb.py
 
 What it runs
-  1. 03_build_dw.sql, 03b_build_dw_workforce_planning.sql, 04_create_reporting_views.sql
+  1. 03_build_dw.sql, 03b_build_dw_workforce_planning.sql, 03c_build_dw_contingent.sql,
+     04_create_reporting_views.sql, 04b_create_reporting_views_contingent.sql
      (index, constraint and ALTER COLUMN statements are skipped: DuckDB does not need them)
   2. every rpt view against its mart (numbers to the cent, flags as 0/1, the rest as text)
   3. the Tableau Custom SQL: the headcount & FTE walk (against its six CSVs), office moves,
-     region walk and career moves in full, the
+     region walk, career moves, workforce planning and the workforce cost bridge in full, the
      compensation walk for the pairs that end in FY26 (the full walk needs more memory
      than a laptop-sized DuckDB run allows)
-  4. the PASS/FAIL tables of 05_validate.sql and 08_validate_workforce_planning.sql
+  4. the PASS/FAIL tables of 05, 08, 10 and 12 (the contingent workforce)
   and, before all that, two SQL Server rules DuckDB does not enforce: primary-key columns
   must be made NOT NULL first, and text must fit its declared VARCHAR length.
 
@@ -31,6 +32,7 @@ import csv
 import re
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 import duckdb
@@ -39,14 +41,21 @@ from sqlglot import exp
 
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DB = ROOT / "warehouse" / "arcadia.duckdb"
-BUILD = ["03_build_dw.sql", "03b_build_dw_workforce_planning.sql", "04_create_reporting_views.sql"]
+BUILD = ["03_build_dw.sql", "03b_build_dw_workforce_planning.sql", "03c_build_dw_contingent.sql",
+         "04_create_reporting_views.sql", "04b_create_reporting_views_contingent.sql"]
 VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_org_leader_summary", "rpt.vw_org_leader_summary"),
          ("mart_fringe_rate", "rpt.vw_fringe_rate"),
          ("mart_position_fill", "rpt.vw_position_fill"),
          ("mart_vacancy_pool", "rpt.vw_vacancy_pool"),
          ("mart_plan_vs_actual", "rpt.vw_plan_vs_actual"),
-         ("mart_seat_corridors", "rpt.vw_seat_corridors")]
+         ("mart_seat_corridors", "rpt.vw_seat_corridors"),
+         ("mart_cw_spend", "rpt.vw_cw_spend"),
+         ("mart_workforce_cost_growth_mix", "rpt.vw_workforce_cost_growth_mix"),
+         ("mart_cw_discrepancy_detail", "rpt.vw_cw_discrepancy_detail"),
+         ("mart_cw_reconciliation", "rpt.vw_cw_reconciliation"),
+         ("mart_cw_engagement_cap", "rpt.vw_cw_engagement_cap"),
+         ("mart_cw_detection_score", "rpt.vw_cw_detection_score")]
 SKIP = re.compile(r"^\s*(CREATE\s+(CLUSTERED\s+|UNIQUE\s+)?INDEX|ALTER\s+TABLE|SET\s+NOCOUNT|USE\s|PRINT\s|DECLARE\s"
                   r"|IF\s+DB_ID|IF\s+SCHEMA_ID)", re.I)
 
@@ -117,7 +126,11 @@ def build(con: duckdb.DuckDBPyConnection):
             for stmt in sqlglot.parse(batch, read="tsql"):
                 if stmt is None or SKIP.match(stmt.sql(dialect="tsql")):
                     continue
+                started = time.time()
                 con.execute(to_duckdb(stmt))
+                if time.time() - started > 60:            # say which statements are slow
+                    head = " ".join(stmt.sql(dialect="tsql").split())[:70]
+                    print(f"      {time.time() - started:4.0f}s  {head}")
         print(f"   ran {name}")
 
 
@@ -260,8 +273,8 @@ def main() -> int:
             JOIN p.marts.mart_dim_month      AS m USING (month_end_date)
             JOIN p.marts.mart_dim_department AS d USING (department_id)
             JOIN p.marts.mart_dim_country    AS c USING (country_code)
-            JOIN p.marts.mart_dim_job_family AS j USING (job_family_code)
-            JOIN p.marts.mart_dim_grade      AS g USING (grade)""")
+            LEFT JOIN p.marts.mart_dim_job_family AS j USING (job_family_code)
+            LEFT JOIN p.marts.mart_dim_grade      AS g USING (grade)""")
         custom_sql(con, "custom_sql_headcount_fte_walk.sql", "headcount_fte_walk")
         ok &= compare(con, "tmp_headcount_fte_walk_csvs", "cs.headcount_fte_walk")
         con.execute("CREATE OR REPLACE TABLE tmp_hc AS SELECT * FROM cs.headcount_fte_walk")
@@ -269,12 +282,16 @@ def main() -> int:
         for name in ("position_fill", "vacancy_pool", "plan_vs_actual", "seat_corridors"):   # Dashboard #3
             custom_sql(con, f"custom_sql_{name}.sql", name)
             ok &= compare(con, f"mart_{name}", f"cs.{name}")
+        custom_sql(con, "custom_sql_workforce_cost_bridge.sql", "workforce_cost_bridge")
+        ok &= compare(con, "mart_workforce_cost_bridge", "cs.workforce_cost_bridge")
+        con.execute("CREATE OR REPLACE VIEW cb AS SELECT * FROM cs.workforce_cost_bridge")   # #cb in 12_validate
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
         ok &= validation(con, "05_validate.sql")
         ok &= validation(con, "08_validate_workforce_planning.sql")
         ok &= validation(con, "10_validate_headcount_fte_walk.sql")
+        ok &= validation(con, "12_validate_contingent_workforce.sql")
         con.close()
     ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")

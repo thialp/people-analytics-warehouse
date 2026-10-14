@@ -130,6 +130,8 @@ SELECT
     CAST(planned_net_new AS INT)                           AS PlannedNetNew,
     CAST(planned_backfills AS INT)                         AS PlannedBackfills,
     CAST(planned_cost_usd AS DECIMAL(18, 2))               AS PlannedCostUsd,
+    CAST(planned_cw_headcount AS INT)                      AS PlannedCwHeadcount,
+    CAST(planned_cw_spend_usd AS DECIMAL(18, 2))           AS PlannedCwSpendUsd,
     CONVERT(DATE, plan_fx_rate_date)                       AS PlanFxRateDate
 INTO dw.FactWorkforcePlan
 FROM raw.fact_workforce_plan;
@@ -552,6 +554,8 @@ SELECT
     p.PlannedCostUsd,
     CAST(ROUND(ISNULL(x.ActualCostUsdPlanFx, 0), 2) AS DECIMAL(18, 2)) AS ActualCostUsdPlanFx,
     CAST(ROUND(ISNULL(a.LoadedUsdConstant, 0), 2) AS DECIMAL(18, 2))   AS ActualCostUsdConstant,
+    p.PlannedCwHeadcount,
+    p.PlannedCwSpendUsd,
     p.PlanFxRateDate
 INTO dw.PlanVsActual
 FROM dw.FactWorkforcePlan AS p

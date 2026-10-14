@@ -33,7 +33,8 @@ SELECT
     CONVERT(DATE, NULLIF(termination_date, ''))            AS TerminationDate,
     CAST(NULLIF(termination_type, '') AS VARCHAR(20))      AS TerminationType,
     CAST(worker_type AS VARCHAR(40))                       AS WorkerType,
-    CAST(CASE WHEN is_executive_officer IN ('True', 'true', '1') THEN 1 ELSE 0 END AS BIT) AS IsExecutiveOfficer
+    CAST(CASE WHEN is_executive_officer IN ('True', 'true', '1') THEN 1 ELSE 0 END AS BIT) AS IsExecutiveOfficer,
+    CAST(work_email AS VARCHAR(80))                        AS WorkEmail
 INTO dw.DimWorker
 FROM raw.dim_worker;
 ALTER TABLE dw.DimWorker ALTER COLUMN WorkerID VARCHAR(12) NOT NULL;

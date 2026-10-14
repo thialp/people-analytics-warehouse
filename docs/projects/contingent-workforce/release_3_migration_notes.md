@@ -79,6 +79,23 @@ Add `worker_type` to the filters, or put it on Color for an employee / contingen
 
 Nothing in a published workbook changes. `dim_worker` gains a last column, `work_email` (how Bridgeway names a contingent worker's manager); a CSV-based source picks it up on refresh and ignores it otherwise. Case study 6 adds four marts for a new dashboard (#6): [case study 6](case_study_6.md).
 
+## Phase 8: SQL Server twin and Custom SQL (2026-10-14)
+
+The SQL Server warehouse now carries everything phases 6 and 7 added to the DuckDB marts. New scripts `03c_build_dw_contingent.sql` and `04b_create_reporting_views_contingent.sql`, and a validation script `12_validate_contingent_workforce.sql`; `build_all.sql` runs all three. Run guide and expected output: [SQL Server release 3 run](sql_server_release_3_run.md).
+
+| Data source | On SQL Server | Change for a workbook built on it |
+|---|---|---|
+| Dashboard #1 (Custom SQL) | `tableau/custom_sql_headcount_fte_walk.sql` | Paste the new text. New columns `worker_type` and `walk_step`; contingent lines; Conversions. Then the steps of phase 6 above (Worker Type filter, Conversions step). 597,097 rows (was 519,173) |
+| Cost bridge (Custom SQL) | `tableau/custom_sql_workforce_cost_bridge.sql` | Paste the new text. New column `worker_type`; add a Worker Type filter (Employee reproduces the old bridge, with Hires split into Hires + Conversions). 29,123 rows |
+| Plan vs actual | `rpt.vw_plan_vs_actual`, `tableau/custom_sql_plan_vs_actual.sql` | Five new columns at the end, before `plan_fx_rate_date`; existing fields unchanged |
+| Contingent spend, growth mix | `rpt.vw_cw_spend`, `rpt.vw_workforce_cost_growth_mix` | New: connect to the view (same columns as the CSV mart) |
+| Case study 6 | `rpt.vw_cw_discrepancy_detail`, `rpt.vw_cw_reconciliation`, `rpt.vw_cw_engagement_cap`, `rpt.vw_cw_detection_score` | New: connect to the views (Dashboard #6, phase 10) |
+| Compensation walk, office moves, region walk, career moves, workforce footprint | unchanged | Employees only, as decided (D10) |
+
+`mart_location_headcount` and `mart_mobility_flows` stay CSV-only, as before release 3: the workforce footprint on SQL Server is its own Custom SQL, keyed by date pair.
+
+Every view and Custom SQL file above matches its DuckDB mart row for row, and the T-SQL contingent intermediates match the DuckDB ones exactly, evidence text included (`python sqlserver/check_tsql_in_duckdb.py`). Two translation notes worth knowing: DuckDB's `ASOF JOIN` ("the last change sent by the month-end") is a range join on each change and the date of the next one; the supplier key's regular expression is two `REPLACE`s, because Keystone's supplier spellings hold no punctuation but spaces and full stops (12 fails if a new spelling maps to nothing).
+
 ## Fix carried in release 3: Growth by Region follows the group (logged 2026-10-14)
 
 **What is wrong on the published dashboard.** With a group selected (for example Function = Commercial, FY26), the KPI cards show that group, but **Growth by Region** still shows the whole company ("Arcadia overall +5.6% (28,436 | 30,015)"). The two cards on the same page tell different stories.

@@ -15,6 +15,11 @@
   over quarters); planned/actual_ending_headcount, _fte and _cost are levels (read the
   quarter you want, usually quarter_end_date = the fiscal year-end, never sum quarters).
 
+  Release 3: the plan's contingent line beside its actuals. actual_cw_headcount is the contingent
+  workers Bridgeway counted on the quarter-end; actual_cw_spend_usd_plan_fx their annualized bill
+  run-rate at the plan's FX rates (compare with planned_cw_spend_usd), _constant at the constant
+  rate set. Like headcount, these are levels.
+
   Checked row for row against the DuckDB mart by sqlserver/check_tsql_in_duckdb.py.
   Tableau rules: one SELECT, no CTEs, no ORDER BY, block comments only.
   Arcadia Systems is fictional and all data is synthetic.
@@ -52,5 +57,10 @@ SELECT
     v.planned_cost_usd,
     v.actual_cost_usd_plan_fx,
     v.actual_cost_usd_constant,
+    v.planned_cw_headcount,
+    v.actual_cw_headcount,
+    v.planned_cw_spend_usd,
+    v.actual_cw_spend_usd_plan_fx,
+    v.actual_cw_spend_usd_constant,
     v.plan_fx_rate_date
 FROM rpt.vw_plan_vs_actual AS v

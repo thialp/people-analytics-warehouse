@@ -12,6 +12,9 @@
 :r /repo/sqlserver/02_load_raw.sql
 :r /repo/sqlserver/03_build_dw.sql
 :r /repo/sqlserver/03b_build_dw_workforce_planning.sql
+:r /repo/sqlserver/03c_build_dw_contingent.sql
 :r /repo/sqlserver/04_create_reporting_views.sql
+:r /repo/sqlserver/04b_create_reporting_views_contingent.sql
 :r /repo/sqlserver/05_validate.sql
 :r /repo/sqlserver/08_validate_workforce_planning.sql
+:r /repo/sqlserver/12_validate_contingent_workforce.sql

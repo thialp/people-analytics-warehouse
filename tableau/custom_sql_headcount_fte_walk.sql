@@ -7,23 +7,32 @@
   query. Every column keeps the CSV's name, so Tableau gives each field the same caption and
   Replace Data Source maps them one to one. The dimension columns are joined in on keys that
   are unique in their dimension, so no fact row is repeated: the query returns exactly the
-  fact's 521,029 rows and the same totals.
+  fact's rows and the same totals.
 
-  Grain: month-end x department x country x job family x grade x movement category x reason.
-  For every slice and month: Opening + Hires - Voluntary - Involuntary - Internal Moves Out
-  + Internal Moves In = Closing.
+  Grain: month-end x worker type x department x country x job family x grade x movement
+  category x reason. For every slice and month: Opening + Hires - Voluntary - Involuntary
+  - Internal Moves Out + Internal Moves In + Conversions = Closing.
 
-  Rules (the same as sql/02_intermediate/int_worker_movement.sql and
+  Release 3: worker_type Employee (Keystone HR) or Contingent (Bridgeway VMS, as held at each
+  month-end: dw.CwMovement). Contingent workers have no job family or grade (theirs are
+  empty, so those two dimensions are LEFT JOINed); their lines are Opening, Starts, Ends,
+  Internal Moves, Conversions and Closing. A contingent worker hired as an employee is a
+  Conversion (movement_order 7): -1 for Contingent and +1 for Employee in the same month, so
+  the total never moves, and that employee is not in Hires. walk_step names each line the same
+  way for both worker types (Opening, Joined, Left, Moved out, Moved in, Converted, Closing).
+
+  Rules (the same as sql/02_intermediate/int_worker_movement.sql, int_cw_movement.sql and
   sql/03_marts/mart_headcount_fte_walk.sql in the DuckDB pipeline):
-    * a slice is department x country x job family x grade;
+    * an employee slice is department x country x job family x grade; a contingent worker's
+      is department x country;
     * a worker in the prior month-end only is a termination (by termination type), in the
       current only a hire, in both with another slice an internal move, booked out of the
       old slice and into the new one;
     * one reason per move: department (Reorganization if a reorg job action took effect in
       the month, else Transfer), then country (Location Change), then grade (Promotion /
       Demotion), then job family (Job Change);
-    * every employee is 1.0 FTE (release 3 removed part-time), so fte = headcount on every
-      line; movement_order keeps its release 2 numbers (7, FTE Changes, is no longer used);
+    * every employee is 1.0 FTE (release 3 removed part-time) and a contingent worker counts
+      1.0, so fte = headcount on every line;
     * executive officers are counted (they are excluded only where pay is shown).
 
   grade and fiscal_year are returned as text, as the workbook typed them on the CSVs.
@@ -34,6 +43,7 @@
 */
 SELECT
     w.month_end_date,
+    w.worker_type,
     w.department_id,
     w.country_code,
     w.job_family_code,
@@ -41,6 +51,10 @@ SELECT
     w.movement_order,
     w.movement_category,
     w.movement_reason,
+    CASE w.movement_order
+        WHEN 1 THEN 'Opening'   WHEN 2 THEN 'Joined'    WHEN 3 THEN 'Left'      WHEN 4 THEN 'Left'
+        WHEN 5 THEN 'Moved out' WHEN 6 THEN 'Moved in'  WHEN 7 THEN 'Converted' WHEN 8 THEN 'Closing'
+    END                                                                AS walk_step,
     w.headcount,
     w.fte,
     /* mart_dim_month */
@@ -73,7 +87,7 @@ SELECT
 FROM (
     /* 3. one line per slice, month and movement */
     SELECT
-        ln.month_end_date, ln.department_id, ln.country_code, ln.job_family_code, ln.grade,
+        ln.month_end_date, ln.worker_type, ln.department_id, ln.country_code, ln.job_family_code, ln.grade,
         ln.movement_order, ln.movement_category, ln.movement_reason,
         SUM(ln.hc)                                                     AS headcount,
         CAST(SUM(CAST(ln.fte AS DECIMAL(18, 4))) AS DECIMAL(18, 2))    AS fte
@@ -81,6 +95,7 @@ FROM (
         /* 2. each worker-month becomes the walk lines it feeds, in the prior (P) or current (C) slice */
         SELECT
             m.month_end_date,
+            'Employee'                                                 AS worker_type,
             CASE WHEN v.side = 'P' THEN m.prior_department_id ELSE m.current_department_id END AS department_id,
             CASE WHEN v.side = 'P' THEN m.prior_country_code  ELSE m.current_country_code  END AS country_code,
             CASE WHEN v.side = 'P' THEN m.prior_family_code   ELSE m.current_family_code   END AS job_family_code,
@@ -96,6 +111,7 @@ FROM (
                 c.prior_grade,         c.current_grade,
                 c.prior_fte,           c.current_fte,
                 c.in_prior,            c.in_current,
+                c.is_conversion,
                 CASE
                     WHEN c.in_current = 1 AND c.in_prior = 0 THEN 'Hire'
                     WHEN c.in_prior = 1 AND c.in_current = 0 THEN 'Termination'
@@ -126,6 +142,7 @@ FROM (
                     pri.Grade          AS prior_grade,           cur.Grade          AS current_grade,
                     pri.FTE            AS prior_fte,             cur.FTE            AS current_fte,
                     dw_w.TerminationType AS termination_type,
+                    CASE WHEN cv.WorkerID IS NULL THEN 0 ELSE 1 END AS is_conversion,
                     CASE WHEN EXISTS (
                         SELECT 1 FROM dw.FactJobHistory AS j
                         WHERE j.WorkerID = p.worker_id
@@ -150,12 +167,14 @@ FROM (
                 LEFT JOIN dw.WorkerMonthEndSnapshot AS cur
                        ON cur.MonthEndDate = p.month_end_date AND cur.WorkerID = p.worker_id
                 LEFT JOIN dw.DimJobProfile AS cjp ON cjp.JobProfileID = cur.JobProfileID
+                LEFT JOIN dw.CwConversion AS cv
+                       ON cv.WorkerID = p.worker_id AND cv.MonthEndDate = p.month_end_date AND cv.IsWalkConversion = 1
             ) AS c
         ) AS m
         CROSS APPLY (VALUES
             (1, 'Opening', 'Opening', 1, m.prior_fte, 'P', m.in_prior),
             (2, 'Hires', m.movement_reason, 1, m.current_fte, 'C',
-                CASE WHEN m.movement_type = 'Hire' THEN 1 ELSE 0 END),
+                CASE WHEN m.movement_type = 'Hire' AND m.is_conversion = 0 THEN 1 ELSE 0 END),
             (CASE WHEN m.movement_reason = 'Voluntary' THEN 3 ELSE 4 END,
                 CASE WHEN m.movement_reason = 'Voluntary' THEN 'Voluntary Terminations' ELSE 'Involuntary Terminations' END,
                 m.movement_reason, -1, -m.prior_fte, 'P',
@@ -164,16 +183,45 @@ FROM (
                 CASE WHEN m.movement_type = 'Internal Move' THEN 1 ELSE 0 END),
             (6, 'Internal Moves In', m.movement_reason, 1, m.prior_fte, 'C',
                 CASE WHEN m.movement_type = 'Internal Move' THEN 1 ELSE 0 END),
+            (7, 'Conversions', 'Contingent to Employee', 1, m.current_fte, 'C',
+                CASE WHEN m.movement_type = 'Hire' AND m.is_conversion = 1 THEN 1 ELSE 0 END),
             (8, 'Closing', 'Closing', 1, m.current_fte, 'C', m.in_current)
         ) AS v (movement_order, movement_category, movement_reason, hc, fte, side, keep_line)
         WHERE v.keep_line = 1
+
+        UNION ALL
+        /* 2b. contingent workers (Bridgeway, as held at each month-end): a slice is department x country */
+        SELECT
+            cm.MonthEndDate,
+            'Contingent',
+            CASE WHEN cv.side = 'P' THEN cm.PriorDepartmentID ELSE cm.CurrentDepartmentID END,
+            CASE WHEN cv.side = 'P' THEN cm.PriorCountryCode  ELSE cm.CurrentCountryCode  END,
+            NULL,
+            NULL,
+            cv.movement_order, cv.movement_category, cv.movement_reason, cv.hc, cv.fte
+        FROM dw.CwMovement AS cm
+        CROSS APPLY (VALUES
+            (1, 'Opening', 'Opening', 1, 1.0, 'P', CAST(cm.InPrior AS INT)),
+            (2, 'Starts', cm.MovementReason, 1, 1.0, 'C',
+                CASE WHEN cm.MovementType = 'Start' THEN 1 ELSE 0 END),
+            (3, 'Ends', cm.MovementReason, -1, -1.0, 'P',
+                CASE WHEN cm.MovementType = 'End' THEN 1 ELSE 0 END),
+            (5, 'Internal Moves Out', cm.MovementReason, -1, -1.0, 'P',
+                CASE WHEN cm.MovementType = 'Internal Move' THEN 1 ELSE 0 END),
+            (6, 'Internal Moves In', cm.MovementReason, 1, 1.0, 'C',
+                CASE WHEN cm.MovementType = 'Internal Move' THEN 1 ELSE 0 END),
+            (7, 'Conversions', cm.MovementReason, -1, -1.0, 'P',
+                CASE WHEN cm.MovementType = 'Conversion' THEN 1 ELSE 0 END),
+            (8, 'Closing', 'Closing', 1, 1.0, 'C', CAST(cm.InCurrent AS INT))
+        ) AS cv (movement_order, movement_category, movement_reason, hc, fte, side, keep_line)
+        WHERE cv.keep_line = 1
     ) AS ln
-    GROUP BY ln.month_end_date, ln.department_id, ln.country_code, ln.job_family_code, ln.grade,
+    GROUP BY ln.month_end_date, ln.worker_type, ln.department_id, ln.country_code, ln.job_family_code, ln.grade,
              ln.movement_order, ln.movement_category, ln.movement_reason
 ) AS w
 JOIN dw.MonthEndCalendar AS cal ON cal.MonthEndDate  = w.month_end_date
 JOIN dw.DimDepartment    AS d   ON d.DepartmentID    = w.department_id
 JOIN dw.DimCountry       AS co  ON co.CountryCode    = w.country_code
-JOIN (SELECT DISTINCT JobFamilyCode, JobFamily FROM dw.DimJobProfile) AS jf
+LEFT JOIN (SELECT DISTINCT JobFamilyCode, JobFamily FROM dw.DimJobProfile) AS jf
                                 ON jf.JobFamilyCode  = w.job_family_code
-JOIN dw.DimJobLevel      AS lv  ON lv.Grade          = w.grade
+LEFT JOIN dw.DimJobLevel AS lv  ON lv.Grade          = w.grade
