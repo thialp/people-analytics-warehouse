@@ -9,10 +9,10 @@ bw_rate_card,1,rate_card_id,VARCHAR,Rate card line key
 bw_rate_card,2,fiscal_year,INTEGER,Arcadia fiscal year the line applies to (July to June)
 bw_rate_card,3,country_code,VARCHAR,Country where the work is done
 bw_rate_card,4,cw_type,VARCHAR,"Contractor, Consultant or BPO"
-bw_rate_card,5,role_family,VARCHAR,"Development, QA, Data, Analyst, Project Delivery, Architecture, Design, Operations; BPO: Security, Facilities, Service Desk"
+bw_rate_card,5,role_family,VARCHAR,"Development, QA, Data, Analyst, Project Delivery, Architecture, Design, Operations; BPO: Security, Facilities, Service Desk, Customer Support"
 bw_rate_card,6,seniority,VARCHAR,"Junior, Mid, Senior or Lead"
 bw_rate_card,7,rate_type,VARCHAR,"Hourly, or Monthly for BPO"
-bw_rate_card,8,billing_currency,VARCHAR,Currency the rate is billed in
+bw_rate_card,8,billing_currency,VARCHAR,USD: the card is kept in USD; an order billing in local currency converts the target at the approval date's ECB rate
 bw_rate_card,9,rate_low,DECIMAL,Bottom of the band
 bw_rate_card,10,rate_target,DECIMAL,Target rate
 bw_rate_card,11,rate_high,DECIMAL,Top of the band
@@ -36,11 +36,11 @@ bw_service_order,9,final_status,VARCHAR,Status of the current revision at the ex
 bw_service_order_revision,1,revision_id,VARCHAR,Revision key
 bw_service_order_revision,2,service_order_id,VARCHAR,-> bw_service_order
 bw_service_order_revision,3,revision_no,INTEGER,"0 for the original order, then 1, 2, ..."
-bw_service_order_revision,4,revision_reason,VARCHAR,"Original, Extension, Extension with rate change, Early end, Cost center change, Manager change, Office change, Closure"
+bw_service_order_revision,4,revision_reason,VARCHAR,"Original or Renewal (revision 0), Extension, Rate change, Early end, Cost center change, Manager change, Office change, Closure"
 bw_service_order_revision,5,effective_start_date,DATE,First day the revision is in effect
 bw_service_order_revision,6,effective_end_date,DATE,Last day in effect (inclusive); empty for the current revision
 bw_service_order_revision,7,is_current,BOOLEAN,True on exactly one revision per order
-bw_service_order_revision,8,status,VARCHAR,"Draft, Pending Approval, Approved, Active, Ended, Closed, Withdrawn, Rejected"
+bw_service_order_revision,8,status,VARCHAR,"Pending Approval, Approved, Closed, Withdrawn, Rejected. Whether the worker is working on a date comes from the assignment dates, not the status"
 bw_service_order_revision,9,assignment_start_date,DATE,First working day of the assignment
 bw_service_order_revision,10,assignment_end_date,DATE,Last working day of the assignment as this revision states it
 bw_service_order_revision,11,closed_date,DATE,Day the order was closed in Bridgeway; empty while open
@@ -50,11 +50,11 @@ bw_service_order_revision,14,job_title,VARCHAR,Title on the order
 bw_service_order_revision,15,cost_center_code,VARCHAR,"Cost center as typed on the order (text, not validated against Keystone)"
 bw_service_order_revision,16,hiring_manager_email,VARCHAR,Arcadia manager who owns the order
 bw_service_order_revision,17,office_code,VARCHAR,Arcadia office where the work is done
-bw_service_order_revision,18,bill_rate,DECIMAL,"Rate in billing currency: per hour, or per month for BPO"
+bw_service_order_revision,18,bill_rate,DECIMAL,"Rate in billing currency: per hour, or per month for BPO. Applies from the revision's effective date"
 bw_service_order_revision,19,rate_type,VARCHAR,Hourly or Monthly
 bw_service_order_revision,20,billing_currency,VARCHAR,ISO currency code
 bw_service_order_revision,21,hours_per_week,DECIMAL,Contracted hours; empty for monthly BPO orders
-bw_timesheet_month,1,timesheet_id,VARCHAR,Timesheet month key
+bw_timesheet_month,1,timesheet_id,VARCHAR,Timesheet key: one per worker x service order x month x rate (a month whose rate changed has two)
 bw_timesheet_month,2,bw_worker_id,VARCHAR,-> bw_contingent_worker
 bw_timesheet_month,3,service_order_id,VARCHAR,-> bw_service_order
 bw_timesheet_month,4,month_end_date,DATE,Month billed

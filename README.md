@@ -52,7 +52,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain"]
         MART["marts<br/>walks · fills · plan vs actual · org"]
-        TEST{{"61 data tests"}}
+        TEST{{"66 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -230,6 +230,11 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 59 | Office moves' opening headcount = the walk's opening | A "share of headcount" on the wrong base |
 | 60 | Every raw table names exactly one source system (Keystone HR, Bridgeway VMS, the integration log, public reference data), and every lineage row a loaded table | An extract nobody documented, or lineage left behind for a dropped table |
 | 61 | Every release 3 extract carries exactly its documented columns, in order | A source column added, dropped, renamed or reordered before any model reads it |
+| 62 | Bridgeway service order revisions chain with no gap or overlap, exactly one current per order | Two versions of an order in force on the same day |
+| 63 | Service order dates happen in order; a new engagement starts after approval | A worker counted before anyone approved them |
+| 64 | No Contractor or Consultant engagement runs more than six months past the 48-month cap | An extension rule that lets contracts run forever |
+| 65 | A bill rate changes only on a rate change revision | A raise slipping into a contract that has no raises |
+| 66 | Billed time sits inside the assignment and adds up to the cent | Spend for days nobody was working, or amounts that don't foot |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -596,7 +601,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 61 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 66 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)

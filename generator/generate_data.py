@@ -35,6 +35,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import contingent_workforce
 import fringe_research
 import fx_rates
 import source_systems
@@ -1613,12 +1614,13 @@ print("Writing raw tables to", OUT_DIR)
 for old in ("ref_fx_rate_monthly_synthetic",):
     (OUT_DIR / f"{old}.csv").unlink(missing_ok=True)
 
-write(pd.DataFrame([{
+dim_worker = pd.DataFrame([{
     "worker_id": w["worker_id"], "first_name": w["first_name"], "last_name": w["last_name"],
     "original_hire_date": w["hire_date"], "termination_date": w["termination_date"],
     "termination_type": w["termination_type"], "worker_type": "Regular Employee",
     "is_executive_officer": w["is_exec"],
-} for w in workers.values()]).sort_values("worker_id"), "dim_worker")
+} for w in workers.values()]).sort_values("worker_id")
+write(dim_worker, "dim_worker")
 
 job = pd.DataFrame(job_rows)
 _bad = job[job["effective_end_date"].notna() & (job["effective_end_date"] < job["effective_start_date"])]
@@ -1785,10 +1787,16 @@ write(pd.DataFrame(source_systems.SOURCE_SYSTEMS), "ref_source_system")
 write(pd.DataFrame(source_systems.lineage_rows()), "ref_raw_table_lineage")
 write(pd.DataFrame(source_systems.column_rows()), "ref_raw_column")
 
-# Release 3 contingent workforce tables. Written with headers only until the simulation
-# lands (release 3, phase 3), so the warehouse, tests and SQL Server load already carry them.
+# ======================================================================================
+# 8. Contingent workforce (release 3): the Bridgeway VMS extract
+# ======================================================================================
+# Its own random stream, run after the employee simulation, so no employee draw moves.
+cw_tables, cw_program = contingent_workforce.simulate(
+    stream=domain_stream("contingent"), office=OFFICE, dept=DEPT, country=COUNTRY, job=job, workers=dim_worker,
+    cost_centers=cost_center_rows, reorg_date=REORG_DATE, restructure_date=RESTRUCTURE_DATE)
 for _table in source_systems.RELEASE_3_TABLES:
-    write(pd.DataFrame(columns=source_systems.columns(_table)), _table)
+    df = cw_tables.get(_table, pd.DataFrame(columns=source_systems.columns(_table)))
+    write(df[source_systems.columns(_table)], _table)    # Keystone side and the feed: phase 4
 
 print(f"Active headcount at {LAST_ME}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
       f"people managers: {sum(1 for w in active.values() if w['is_pm']):,}")

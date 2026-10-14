@@ -242,12 +242,14 @@ One row per country, year, component and source document: `country_code`, `year`
 
 ### Contingent workforce (release 3)
 
-The contingent workforce comes from two systems. **Bridgeway VMS** (`bw_`) is the source of truth for who is a contingent worker, on which terms and at what rate; **Keystone HR** (`ks_`) holds the HR profile managers see; the **integration log** (`feed_`) records what travelled between them. How the systems relate, and what flows on the feed: [source systems and lineage](source_systems.md).
+The contingent workforce comes from two systems. **Bridgeway VMS** (`bw_`) is the source of truth for who is a contingent worker, on which terms and at what rate; **Keystone HR** (`ks_`) holds the HR profile managers see; the **integration log** (`feed_`) records what travelled between them. How the systems relate, and what flows on the feed: [source systems and lineage](source_systems.md). How the program is simulated: [Bridgeway simulation](../projects/contingent-workforce/bridgeway_simulation.md).
 
-> **Release 3, phase 2:** these tables are loaded with their headers and **no rows yet**; the contingent workforce simulation fills them in phase 3. Columns are the contract test 61 enforces.
+**The extract.** Bridgeway is extracted as of **2026-06-30**, like the rest of the warehouse: no revision, approval or closure dated later is in it, but orders opened by then that start in July 2026 are (approved, or still pending approval). Workers whose last assignment ended before **2020-07-01** are archived in Bridgeway and not extracted.
+
+> **Release 3 status:** the Bridgeway tables are filled (phase 3). `ks_contingent_worker` and `feed_bridgeway_keystone_event` keep their headers only until phase 4. Columns are the contract test 61 enforces.
 
 #### bw_supplier
-Suppliers in Bridgeway VMS.
+Suppliers in Bridgeway VMS (23, all fictional). One stopped taking new orders in June 2022 (`is_active` false).
 
 | Column | Type | Description |
 |---|---|---|
@@ -259,7 +261,7 @@ Suppliers in Bridgeway VMS.
 | `is_active` | BOOLEAN | False once Arcadia stopped using the supplier |
 
 #### bw_rate_card
-Target bill rate and band per fiscal year, country, CW type, role family and seniority. Moves every July 1; an order keeps its rate until a renewal or a renegotiated extension.
+Target bill rate and band per fiscal year (FY14 to FY27), country, CW type, role family and seniority, in USD. Moves every July 1 by a market index (3% a year, plus up to 2 points in India, Brazil, Mexico and the Philippines). An order keeps its rate until a renegotiated extension or a renewal.
 
 | Column | Type | Description |
 |---|---|---|
@@ -267,16 +269,16 @@ Target bill rate and band per fiscal year, country, CW type, role family and sen
 | `fiscal_year` | INTEGER | Arcadia fiscal year the line applies to (July to June) |
 | `country_code` | VARCHAR | Country where the work is done |
 | `cw_type` | VARCHAR | Contractor, Consultant or BPO |
-| `role_family` | VARCHAR | Development, QA, Data, Analyst, Project Delivery, Architecture, Design, Operations; BPO: Security, Facilities, Service Desk |
+| `role_family` | VARCHAR | Development, QA, Data, Analyst, Project Delivery, Architecture, Design, Operations; BPO: Security, Facilities, Service Desk, Customer Support |
 | `seniority` | VARCHAR | Junior, Mid, Senior or Lead |
 | `rate_type` | VARCHAR | Hourly, or Monthly for BPO |
-| `billing_currency` | VARCHAR | Currency the rate is billed in |
+| `billing_currency` | VARCHAR | USD: the card is kept in USD; an order billing in local currency converts the target at the approval date's ECB rate |
 | `rate_low` | DECIMAL | Bottom of the band |
 | `rate_target` | DECIMAL | Target rate |
 | `rate_high` | DECIMAL | Top of the band |
 
 #### bw_contingent_worker
-Workers as Bridgeway knows them. **No Keystone person ID**: the link is stored on the Keystone side.
+Workers as Bridgeway knows them. **No Keystone person ID**: the link is stored on the Keystone side. `original_start_date` is empty for a worker who was withdrawn or rejected before starting.
 
 | Column | Type | Description |
 |---|---|---|
@@ -290,7 +292,7 @@ Workers as Bridgeway knows them. **No Keystone person ID**: the link is stored o
 | `created_date` | DATE | Day the supplier submitted the worker |
 
 #### bw_service_order
-One row per service order (accumulating snapshot). A renewal is a new order naming the one it renews.
+One row per service order (accumulating snapshot). A renewal is a new order naming the one it renews. `final_status` is the status of the current revision on the extract date.
 
 | Column | Type | Description |
 |---|---|---|
@@ -305,18 +307,18 @@ One row per service order (accumulating snapshot). A renewal is a new order nami
 | `final_status` | VARCHAR | Status of the current revision at the extract date |
 
 #### bw_service_order_revision
-Every change to an order is a new revision, effective-dated, with exactly one current per order. The rate changes only on an extension or renewal revision.
+Every change to an order is a new revision, effective-dated, one per day at most, with exactly one current per order (test 62). The rate changes only on a `Rate change` revision (test 65); an ended order gets a `Closure` revision with `status` = Closed a few days after its last day. Whether someone is working on a date comes from the assignment dates on the revision in effect that day.
 
 | Column | Type | Description |
 |---|---|---|
 | `revision_id` | VARCHAR | Revision key |
 | `service_order_id` | VARCHAR | → bw_service_order |
 | `revision_no` | INTEGER | 0 for the original order, then 1, 2, ... |
-| `revision_reason` | VARCHAR | Original, Extension, Extension with rate change, Early end, Cost center change, Manager change, Office change, Closure |
+| `revision_reason` | VARCHAR | Original or Renewal (revision 0), Extension, Rate change, Early end, Cost center change, Manager change, Office change, Closure |
 | `effective_start_date` | DATE | First day the revision is in effect |
 | `effective_end_date` | DATE | Last day in effect (inclusive); empty for the current revision |
 | `is_current` | BOOLEAN | True on exactly one revision per order |
-| `status` | VARCHAR | Draft, Pending Approval, Approved, Active, Ended, Closed, Withdrawn, Rejected |
+| `status` | VARCHAR | Pending Approval, Approved, Closed, Withdrawn, Rejected. Whether the worker is working on a date comes from the assignment dates, not the status |
 | `assignment_start_date` | DATE | First working day of the assignment |
 | `assignment_end_date` | DATE | Last working day of the assignment as this revision states it |
 | `closed_date` | DATE | Day the order was closed in Bridgeway; empty while open |
@@ -326,17 +328,17 @@ Every change to an order is a new revision, effective-dated, with exactly one cu
 | `cost_center_code` | VARCHAR | Cost center as typed on the order (text, not validated against Keystone) |
 | `hiring_manager_email` | VARCHAR | Arcadia manager who owns the order |
 | `office_code` | VARCHAR | Arcadia office where the work is done |
-| `bill_rate` | DECIMAL | Rate in billing currency: per hour, or per month for BPO |
+| `bill_rate` | DECIMAL | Rate in billing currency: per hour, or per month for BPO. Applies from the revision's effective date |
 | `rate_type` | VARCHAR | Hourly or Monthly |
 | `billing_currency` | VARCHAR | ISO currency code |
 | `hours_per_week` | DECIMAL | Contracted hours; empty for monthly BPO orders |
 
 #### bw_timesheet_month
-Billed time per worker, order and month. Spend = `billed_units × bill_rate`.
+Billed time per worker, order, month and rate, from June 2021 (the start of the warehouse history). Hourly orders bill weekdays × 8 less time off; BPO orders bill the share of the month worked. `billed_amount_local` = `billed_units × bill_rate`, to the cent (test 66).
 
 | Column | Type | Description |
 |---|---|---|
-| `timesheet_id` | VARCHAR | Timesheet month key |
+| `timesheet_id` | VARCHAR | Timesheet key: one per worker x service order x month x rate (a month whose rate changed has two) |
 | `bw_worker_id` | VARCHAR | → bw_contingent_worker |
 | `service_order_id` | VARCHAR | → bw_service_order |
 | `month_end_date` | DATE | Month billed |
@@ -347,7 +349,7 @@ Billed time per worker, order and month. Spend = `billed_units × bill_rate`.
 | `billed_amount_local` | DECIMAL | billed_units x bill_rate |
 
 #### ks_contingent_worker
-The Keystone HR profile of each contingent worker, SCD Type 2. Written by the feed from Bridgeway or by hand in Keystone. Keystone inactivates the worker the day after `contract_end_date`.
+The Keystone HR profile of each contingent worker, SCD Type 2. Written by the feed from Bridgeway or by hand in Keystone. Keystone inactivates the worker the day after `contract_end_date`. **No rows until phase 4.**
 
 | Column | Type | Description |
 |---|---|---|
@@ -372,7 +374,7 @@ The Keystone HR profile of each contingent worker, SCD Type 2. Written by the fe
 | `manager_worker_id` | VARCHAR | Arcadia employee the worker reports to (→ dim_worker) |
 
 #### feed_bridgeway_keystone_event
-Every change Bridgeway sent to Keystone, when it was applied, or that it failed or arrived partly.
+Every change Bridgeway sent to Keystone, when it was applied, or that it failed or arrived partly. **No rows until phase 4.**
 
 | Column | Type | Description |
 |---|---|---|

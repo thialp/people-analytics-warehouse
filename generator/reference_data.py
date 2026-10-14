@@ -396,3 +396,115 @@ NAMES = {
                       "Agarwal", "Bautista", "Chua", "Desai", "Fujita", "Ho", "Inoue", "Joshi", "Kapoor", "Lee",
                       "Menon", "Ng", "Pillai", "Reyes", "Suzuki", "Thomas", "Verma", "Watanabe", "Yamamoto", "Zhang"]),
 }
+
+
+# --------------------------------------------------------------------------------------
+# Contingent workforce (release 3): Bridgeway VMS
+# --------------------------------------------------------------------------------------
+# Every value here is a fictional design choice. Hourly rates were sanity-checked against
+# aggregate public market ranges for IT contracting (medians by country, no source rows).
+CW_BURN_IN_START = "2013-07-31"       # the simulation starts here so the Jun 2021 population has real ages
+CW_ARCHIVE_BEFORE = "2020-07-01"      # Bridgeway archives workers whose last assignment ended before this
+CW_EXTRACT_DATE = "2026-06-30"        # the extract the warehouse loads: nothing dated later is in it
+# Active contingent workers at each month-end: Jul 2013 start, Jun 2021, then growth by fiscal year.
+CW_TARGET_START = 4_600
+CW_TARGET_JUN_2021 = 8_350
+CW_FY_GROWTH = {2022: 0.08, 2023: 0.10, 2024: -0.03, 2025: 0.08, 2026: 0.115}   # FY24: the restructuring cut contractors too
+
+CW_TYPES = ["Contractor", "Consultant", "BPO"]
+CW_TYPE_FLOW = {"Contractor": 0.700, "Consultant": 0.225, "BPO": 0.075}   # share of NEW engagements (BPO stays longest)
+CW_MAX_MONTHS = 48                    # Contractor and Consultant: 24 initial + 24 extension; BPO uncapped
+CW_CAP_BREACH = 0.012                 # share of engagements reaching the cap that are extended anyway
+CW_INITIAL_TERM_MONTHS = {"Contractor": ({6: 0.15, 9: 0.10, 12: 0.40, 18: 0.15, 24: 0.20}),
+                          "Consultant": ({3: 0.20, 6: 0.40, 9: 0.15, 12: 0.25})}
+CW_EXTENSION_MONTHS = {3: 0.20, 6: 0.40, 9: 0.15, 12: 0.25}
+CW_EXTEND_PROBABILITY = {"Contractor": 0.66, "Consultant": 0.45}
+CW_RENEWAL_SHARE = 0.12               # extensions processed as a new service order instead of a revision
+CW_RENEGOTIATE_SHARE = 0.30           # extensions and renewals that change the rate
+CW_RENEGOTIATE_RANGE = (-0.05, 0.08)
+CW_BPO_RENEWAL_PROBABILITY = 0.82     # BPO orders run to June 30 and are renewed as a new order on July 1
+CW_EARLY_END_MONTHLY = {"Contractor": 0.0055, "Consultant": 0.0090, "BPO": 0.0035}
+CW_RESTRUCTURING_CUT = 0.35           # Commercial and Marketing contingent workers ended in the Feb 2024 restructuring
+CW_ATTRIBUTE_CHANGE_MONTHLY = {"Cost center change": 0.004, "Manager change": 0.006, "Office change": 0.002}
+CW_WITHDRAWN_SHARE = 0.04             # requests whose submitted worker is withdrawn or rejected before starting
+CW_LATE_EXTENSION_SHARE = 0.06        # extensions approved after the old end date
+CW_LOCAL_BILLING_SHARE = {"IN": 0.10, "PL": 0.30, "GB": 0.50, "CA": 0.60, "SG": 0.30, "AU": 0.50, "JP": 0.70,
+                          "DE": 0.40, "FR": 0.40, "NL": 0.40, "IE": 0.40, "ES": 0.40, "PT": 0.30, "CH": 0.60,
+                          "SE": 0.50, "MX": 0.10, "BR": 0.20, "ZA": 0.30, "AE": 0.20, "KR": 0.50, "PH": 0.10, "US": 0.0}
+CW_BPO_LOCAL_BILLING_SHARE = 0.80
+
+# Where engagements are placed, by type (renormalised over countries with an office open that day)
+CW_COUNTRY_MIX = {
+    "Contractor": {"IN": 0.50, "PL": 0.12, "MX": 0.10, "PH": 0.07, "PT": 0.05, "US": 0.06, "GB": 0.02, "CA": 0.02,
+                   "BR": 0.03, "ZA": 0.02, "ES": 0.01},
+    "Consultant": {"US": 0.28, "GB": 0.10, "IN": 0.24, "DE": 0.05, "SG": 0.05, "AU": 0.03, "FR": 0.03, "NL": 0.03,
+                   "CA": 0.04, "IE": 0.03, "ES": 0.03, "CH": 0.01, "SE": 0.02, "AE": 0.02, "JP": 0.02, "BR": 0.02},
+    "BPO": "workforce",               # proportional to each country's employee weight
+}
+CW_FUNCTION_MIX = {                   # department picked by function share, then by department size
+    "Contractor": {"Technology": 0.75, "Product": 0.06, "Operations": 0.08, "Commercial": 0.05,
+                   "Finance": 0.02, "People": 0.02, "Marketing": 0.01, "Legal & Compliance": 0.01},
+    "Consultant": {"Technology": 0.45, "Finance": 0.15, "People": 0.10, "Marketing": 0.10,
+                   "Legal & Compliance": 0.08, "Product": 0.07, "Commercial": 0.05},
+    "BPO": {"D-803": 0.55, "D-107": 0.25, "D-801": 0.20},   # facilities and security, service desk, customer support
+}
+CW_ROLE_FAMILIES_TECH = {"Development": 0.52, "QA": 0.15, "Data": 0.12, "Project Delivery": 0.08,
+                         "Architecture": 0.06, "Design": 0.07}
+CW_ROLE_FAMILIES_BUSINESS = {"Analyst": 0.40, "Project Delivery": 0.30, "Data": 0.15, "Operations": 0.15}
+CW_ROLE_FAMILIES_BPO = {"D-803": {"Security": 0.55, "Facilities": 0.45}, "D-107": {"Service Desk": 1.0},
+                        "D-801": {"Customer Support": 1.0}}
+CW_SENIORITY_MIX = {"Contractor": {"Junior": 0.20, "Mid": 0.45, "Senior": 0.27, "Lead": 0.08},
+                    "Consultant": {"Mid": 0.20, "Senior": 0.50, "Lead": 0.30},
+                    "BPO": {"Junior": 0.50, "Mid": 0.40, "Senior": 0.10}}
+CW_ROLE_TITLES = {"Development": "Software Developer", "QA": "QA Engineer", "Data": "Data Engineer",
+                  "Project Delivery": "Project Manager", "Architecture": "Solutions Architect",
+                  "Design": "UX Designer", "Analyst": "Business Analyst", "Operations": "Operations Specialist",
+                  "Security": "Security Officer", "Facilities": "Facilities Technician",
+                  "Service Desk": "Service Desk Analyst", "Customer Support": "Customer Support Agent"}
+
+# Rate card. Hourly USD target for a Mid Contractor in Development, FY2026. Anchors where aggregate
+# market medians were checked; other countries 20 + 70 x pay_index.
+CW_RATE_ANCHOR_USD = {"IN": 31.0, "PH": 28.0, "MX": 53.0, "PL": 63.0, "PT": 50.0, "US": 80.0, "GB": 93.0,
+                      "SG": 64.0, "CA": 78.0}
+CW_SENIORITY_FACTOR = {"Junior": 0.75, "Mid": 1.00, "Senior": 1.30, "Lead": 1.55}
+CW_TYPE_FACTOR = {"Contractor": 1.00, "Consultant": 1.35}
+CW_ROLE_FACTOR = {"Development": 1.00, "QA": 0.85, "Data": 1.10, "Analyst": 0.90, "Project Delivery": 1.00,
+                  "Architecture": 1.30, "Design": 0.95, "Operations": 0.75}
+CW_BPO_HOURLY_SHARE = 0.30            # BPO monthly fee = 168 h x anchor x this x role x seniority
+CW_BPO_ROLE_FACTOR = {"Security": 1.00, "Facilities": 0.90, "Service Desk": 1.25, "Customer Support": 1.10}
+CW_RATE_MARKET_INDEX = 0.03           # rate cards rise this much each July 1 (India +2 points)
+CW_RATE_MARKET_INDEX_COUNTRY_PP = {"IN": 0.02, "PH": 0.01, "MX": 0.01, "BR": 0.02}
+CW_RATE_BAND = (0.88, 1.15)           # band low / high as a share of target
+CW_RATE_NOISE_SD = 0.07               # order rates scatter around the target
+
+# Suppliers (fictional names, invented to match no real firm)
+#   id, name, types offered, HQ country, countries served (None = everywhere), size weight, onboarded, offboarded
+CW_SUPPLIERS = [
+    ("SUP-001", "Vantrell Technical Staffing",     "Contractor",            "US", None,                          5.0, "2012-03-01", None),
+    ("SUP-002", "Quorlan Digital Workforce",       "Contractor",            "IN", ["IN", "PL", "MX", "PH"],      6.0, "2014-06-01", None),
+    ("SUP-003", "Halvery Engineering Services",    "Contractor",            "IN", ["IN", "PH", "SG"],            4.0, "2015-01-15", None),
+    ("SUP-004", "Brennick Talent Partners",        "Contractor;Consultant", "US", ["US", "CA", "GB", "IE"],      3.0, "2013-09-01", None),
+    ("SUP-005", "Thornquist Systems Staffing",     "Contractor",            "PL", ["PL", "PT", "ES", "DE", "IE"], 3.5, "2016-02-01", None),
+    ("SUP-006", "Ellsmere IT Resourcing",          "Contractor",            "IN", ["IN"],                        3.0, "2015-05-01", None),
+    ("SUP-007", "Marrowby Software Services",      "Contractor",            "MX", ["MX", "BR", "US"],            2.5, "2016-01-10", None),
+    ("SUP-008", "Calderine Tech Partners",         "Contractor",            "SG", ["PH", "SG", "AU", "JP", "KR"], 1.5, "2017-04-01", None),
+    ("SUP-009", "Ostrel Data Staffing",            "Contractor",            "GB", None,                          1.5, "2018-08-01", None),
+    ("SUP-010", "Wexcombe Delivery Group",         "Contractor",            "ZA", ["ZA", "AE", "GB", "IE"],      1.0, "2017-11-01", None),
+    ("SUP-011", "Pellatine Contract Talent",       "Contractor",            "US", ["US"],                        1.0, "2014-02-01", "2022-06-30"),
+    ("SUP-012", "Drumlow Engineering",             "Contractor",            "DE", ["DE", "NL", "SE", "CH", "FR"], 1.0, "2019-03-01", None),
+    ("SUP-013", "Fenwarren Staffing",              "Contractor",            "CA", ["CA", "US"],                  1.0, "2020-01-15", None),
+    ("SUP-014", "Ashgrove Advisory",               "Consultant",            "US", None,                          3.0, "2013-01-01", None),
+    ("SUP-015", "Kilnford Consulting",             "Consultant",            "GB", None,                          2.5, "2014-10-01", None),
+    ("SUP-016", "Merriden Vale Partners",          "Consultant",            "US", ["US", "CA", "GB"],            1.5, "2016-07-01", None),
+    ("SUP-017", "Corvanne Consulting",             "Consultant",            "SG", ["SG", "IN", "AU", "JP", "KR", "AE"], 1.5, "2018-02-01", None),
+    ("SUP-018", "Halsted Brook Advisory",          "Consultant",            "DE", ["DE", "FR", "NL", "CH", "SE", "ES", "IE"], 1.0, "2019-09-01", None),
+    ("SUP-019", "Sentrel Security Services",       "BPO",                   "GB", None,                          3.0, "2012-01-01", None),
+    ("SUP-020", "Brightmoor Facility Services",    "BPO",                   "US", None,                          3.0, "2012-01-01", None),
+    ("SUP-021", "Quaystone Service Desk Solutions", "BPO",                  "IN", None,                          2.0, "2011-03-01", None),
+    ("SUP-022", "Ravelin Customer Care",           "BPO",                   "PH", None,                          2.0, "2012-05-01", None),
+    ("SUP-023", "Tollbrook Facilities Group",      "BPO",                   "MX", ["MX", "BR", "US", "CA"],      1.0, "2018-01-01", None),
+]
+CW_BPO_SUPPLIER_ROLES = {"SUP-019": ["Security"], "SUP-020": ["Facilities", "Security"], "SUP-023": ["Facilities"],
+                         "SUP-021": ["Service Desk"], "SUP-022": ["Customer Support"]}
+CW_EMAIL_DOMAIN = "ext.arcadia-systems.example"      # reserved .example domain: never a real address
+EMPLOYEE_EMAIL_DOMAIN = "arcadia-systems.example"

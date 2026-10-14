@@ -1,1 +1,24 @@
 supplier_id,supplier_name,cw_types_offered,hq_country_code,onboarded_date,is_active
+SUP-001,Vantrell Technical Staffing,Contractor,US,2012-03-01,True
+SUP-002,Quorlan Digital Workforce,Contractor,IN,2014-06-01,True
+SUP-003,Halvery Engineering Services,Contractor,IN,2015-01-15,True
+SUP-004,Brennick Talent Partners,Contractor;Consultant,US,2013-09-01,True
+SUP-005,Thornquist Systems Staffing,Contractor,PL,2016-02-01,True
+SUP-006,Ellsmere IT Resourcing,Contractor,IN,2015-05-01,True
+SUP-007,Marrowby Software Services,Contractor,MX,2016-01-10,True
+SUP-008,Calderine Tech Partners,Contractor,SG,2017-04-01,True
+SUP-009,Ostrel Data Staffing,Contractor,GB,2018-08-01,True
+SUP-010,Wexcombe Delivery Group,Contractor,ZA,2017-11-01,True
+SUP-011,Pellatine Contract Talent,Contractor,US,2014-02-01,False
+SUP-012,Drumlow Engineering,Contractor,DE,2019-03-01,True
+SUP-013,Fenwarren Staffing,Contractor,CA,2020-01-15,True
+SUP-014,Ashgrove Advisory,Consultant,US,2013-01-01,True
+SUP-015,Kilnford Consulting,Consultant,GB,2014-10-01,True
+SUP-016,Merriden Vale Partners,Consultant,US,2016-07-01,True
+SUP-017,Corvanne Consulting,Consultant,SG,2018-02-01,True
+SUP-018,Halsted Brook Advisory,Consultant,DE,2019-09-01,True
+SUP-019,Sentrel Security Services,BPO,GB,2012-01-01,True
+SUP-020,Brightmoor Facility Services,BPO,US,2012-01-01,True
+SUP-021,Quaystone Service Desk Solutions,BPO,IN,2011-03-01,True
+SUP-022,Ravelin Customer Care,BPO,PH,2012-05-01,True
+SUP-023,Tollbrook Facilities Group,BPO,MX,2018-01-01,True

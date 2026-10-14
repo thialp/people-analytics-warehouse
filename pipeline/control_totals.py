@@ -6,6 +6,8 @@ Run after pipeline/run_pipeline.py. It reads the DuckDB file and prints:
   * per fiscal year: opening and closing headcount, hires, voluntary and involuntary
     terminations, internal moves, closing FTE and the fiscal-year-end loaded cost
     (USD, constant currency)
+  * per fiscal year, the contingent workforce as Bridgeway VMS holds it (release 3):
+    active at the fiscal year-end by type, engagements started, and billed spend
 
 Use it to freeze the numbers before a change to the generator and to compare after:
 
@@ -66,6 +68,52 @@ order by w.fiscal_year
 """
 
 
+CW_TOTALS = """
+with fy as (
+    select distinct case when month(month_end_date) >= 7 then year(month_end_date) + 1
+                         else year(month_end_date) end as fiscal_year
+    from staging.stg_bw_timesheet_month
+),
+ends as (select fiscal_year, make_date(fiscal_year, 6, 30) as fy_end from fy),
+cur as (   -- the revision in effect on each fiscal year-end, working that day
+    select e.fiscal_year, w.cw_type, w.bw_worker_id
+    from ends e
+    join staging.stg_bw_service_order_revision r
+      on r.effective_start_date <= e.fy_end and r.effective_end_date_filled >= e.fy_end
+     and r.status in ('Approved', 'Closed')
+     and r.assignment_start_date <= e.fy_end and r.assignment_end_date >= e.fy_end
+    join staging.stg_bw_service_order o using (service_order_id)
+    join staging.stg_bw_contingent_worker w on w.bw_worker_id = o.bw_worker_id
+),
+starts as (
+    select case when month(original_start_date) >= 7 then year(original_start_date) + 1
+                else year(original_start_date) end as fiscal_year, count(*) as started
+    from staging.stg_bw_contingent_worker where original_start_date is not null group by 1
+),
+spend as (
+    select case when month(t.month_end_date) >= 7 then year(t.month_end_date) + 1
+                else year(t.month_end_date) end as fiscal_year,
+           sum(t.billed_amount_local * fx.usd_per_local_actual) as usd
+    from staging.stg_bw_timesheet_month t
+    join staging.stg_fx_rate fx on fx.currency_code = t.billing_currency and fx.rate_date = t.month_end_date
+    group by 1
+)
+select 'FY' || right(cast(e.fiscal_year as varchar), 2),
+       count(distinct c.bw_worker_id),
+       count(distinct case when c.cw_type = 'Contractor' then c.bw_worker_id end),
+       count(distinct case when c.cw_type = 'Consultant' then c.bw_worker_id end),
+       count(distinct case when c.cw_type = 'BPO' then c.bw_worker_id end),
+       max(s.started),
+       round(max(p.usd) / 1e6, 1)
+from ends e
+left join cur c using (fiscal_year)
+left join starts s using (fiscal_year)
+left join spend p using (fiscal_year)
+group by e.fiscal_year
+order by e.fiscal_year
+"""
+
+
 def table(rows, headers) -> str:
     out = ["| " + " | ".join(headers) + " |", "|" + "---|" * len(headers)]
     for r in rows:
@@ -83,6 +131,12 @@ def main() -> None:
     rows = con.sql(FY_TOTALS).fetchall()
     print(table(rows, ["FY", "Opening HC", "Hires", "Voluntary", "Involuntary", "Moves in",
                        "Closing HC", "Closing FTE", "FY-end loaded $M (constant)"]))
+
+    print("\n## Contingent workforce (Bridgeway VMS)\n")
+    print("Active on June 30 (the fiscal year-end), engagements started in the year, and billed spend at "
+          "month-end FX. FY21 is one month (June 2021): timesheets start with the warehouse history.\n")
+    print(table(con.sql(CW_TOTALS).fetchall(), ["FY", "Active CW", "Contractor", "Consultant", "BPO",
+                                                "Engagements started", "Billed spend $M"]))
 
     for schema in ("raw", "marts"):
         names = [r[0] for r in con.sql(
