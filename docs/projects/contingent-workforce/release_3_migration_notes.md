@@ -75,6 +75,10 @@ The marts now cover the whole workforce. Every changed mart gained a `worker_typ
 
 Add `worker_type` to the filters, or put it on Color for an employee / contingent split per office. The office walk's formula gains the four new columns (data dictionary, `mart_location_headcount`); with `worker_type = Employee`, `hires + conversions_in` is the old `hires`.
 
+## Phase 7: case study 6 (2026-10-14)
+
+Nothing in a published workbook changes. `dim_worker` gains a last column, `work_email` (how Bridgeway names a contingent worker's manager); a CSV-based source picks it up on refresh and ignores it otherwise. Case study 6 adds four marts for a new dashboard (#6): [case study 6](case_study_6.md).
+
 ## Fix carried in release 3: Growth by Region follows the group (logged 2026-10-14)
 
 **What is wrong on the published dashboard.** With a group selected (for example Function = Commercial, FY26), the KPI cards show that group, but **Growth by Region** still shows the whole company ("Arcadia overall +5.6% (28,436 | 30,015)"). The two cards on the same page tell different stories.

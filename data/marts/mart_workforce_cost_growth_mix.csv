@@ -797,7 +797,7 @@ from_month_end,to_month_end,fiscal_year,fiscal_quarter_label,pair_type,view_orde
 2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,1,Company,Arcadia Systems,3,Location mix,Which countries the people are in,-24238176.05,-24907272.56,-669096.51,36854,38334
 2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,1,Company,Arcadia Systems,4,Level mix,Which grades (or contingent types) the people are in,14671147.16,15324438.44,653291.27,36854,38334
 2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,1,Company,Arcadia Systems,5,Rate,What each person costs at constant exchange rates: pay and bill rates,132966108.47,136056681.51,3090573.04,36854,38334
-2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,1,Company,Arcadia Systems,6,Currency,What exchange rates did to the reported cost,-26371008.36,-27533277.51,-1162269.15,36854,38334
+2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,1,Company,Arcadia Systems,6,Currency,What exchange rates did to the reported cost,-26371008.36,-27533277.52,-1162269.15,36854,38334
 2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,1,Company,Arcadia Systems,7,Closing cost,Total workforce cost at the later date,4034937532.07,4034937532.07,0.00,36854,38334
 2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,2,Function,Commercial,0,Opening cost,Total workforce cost at the earlier date,818029901.67,818029901.67,0.00,7416,7747
 2024-03-31,2025-03-31,2025,FY25 Q3,Year over year,2,Function,Commercial,1,Volume,More or fewer people,37006262.24,36511313.03,-494949.21,7416,7747

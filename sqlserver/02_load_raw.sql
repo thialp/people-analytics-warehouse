@@ -309,7 +309,8 @@ CREATE TABLE raw.dim_worker (
     [termination_date]     NVARCHAR(400) NULL,
     [termination_type]     NVARCHAR(400) NULL,
     [worker_type]          NVARCHAR(400) NULL,
-    [is_executive_officer] NVARCHAR(400) NULL
+    [is_executive_officer] NVARCHAR(400) NULL,
+    [work_email]           NVARCHAR(400) NULL
 );
 BULK INSERT raw.dim_worker
 FROM '/repo/data/raw/dim_worker.csv'

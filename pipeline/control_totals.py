@@ -234,6 +234,19 @@ from marts.mart_headcount_fte_walk
 group by 1 order by 1
 """
 
+DETECTION = """
+select discrepancy_code, any_value(discrepancy_name), sum(injected), sum(detected), sum(false_flags),
+       round(100.0 * sum(detected) / nullif(sum(injected), 0), 1)
+from marts.mart_cw_detection_score group by 1 order by 1
+"""
+
+OPEN_NOW = """
+select discrepancy_code, discrepancy_name, severity, count(*), cast(median(age_days) as integer)
+from marts.mart_cw_discrepancy_detail
+where month_end_date = (select max(month_end_date) from marts.mart_cw_discrepancy_detail)
+group by all order by 4 desc
+"""
+
 
 def table(rows, headers) -> str:
     out = ["| " + " | ".join(headers) + " |", "|" + "---|" * len(headers)]
@@ -287,6 +300,13 @@ def main() -> None:
                                                    "Contingent ends", "Conversions in", "Conversions out"]))
     print("\n## Total workforce cost growth mix (Company, year over year to June 30, $M nominal)\n")
     print(table(con.sql(GROWTH_MIX).fetchall(), ["FY", "Factor", "Shapley", "Sequential", "Order bias"]))
+
+    print("\n## Case study 6: discrepancies found by the warehouse\n")
+    print("Open on the extract date (the work list), and the rules scored against the answer key over every "
+          "month-end (detected = flagged on the same worker and month-end; false flag = nothing seeded behind it).\n")
+    print(table(con.sql(OPEN_NOW).fetchall(), ["Code", "Discrepancy", "Severity", "Open", "Median age (days)"]))
+    print()
+    print(table(con.sql(DETECTION).fetchall(), ["Code", "Discrepancy", "Injected", "Detected", "False flags", "Recall %"]))
 
     for schema in ("raw", "marts"):
         names = [r[0] for r in con.sql(

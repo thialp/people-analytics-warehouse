@@ -115,12 +115,14 @@ subsets AS (
 
 v AS (   -- the cost with the factors in S at their later value
     SELECT f.from_month_end, f.to_month_end, f.view_order, f.view_name, f.group_name, s.bits, s.size,
-           SUM(  (CASE WHEN s.bits & 1  > 0 THEN f.v1 ELSE f.v0 END)
-               * (CASE WHEN s.bits & 2  > 0 THEN f.a1 ELSE f.a0 END)
-               * (CASE WHEN s.bits & 4  > 0 THEN f.b1 ELSE f.b0 END)
-               * (CASE WHEN s.bits & 8  > 0 THEN f.g1 ELSE f.g0 END)
-               * (CASE WHEN s.bits & 16 > 0 THEN f.r1 ELSE f.r0 END)
-               * (CASE WHEN s.bits & 32 > 0 THEN f.f1 ELSE f.f0 END)) AS cost
+           -- each product is rounded to exact decimals before summing, so the result does not
+           -- depend on the order a parallel sum adds rows in (the exports must be reproducible)
+           SUM(CAST(  (CASE WHEN s.bits & 1  > 0 THEN f.v1 ELSE f.v0 END)
+                    * (CASE WHEN s.bits & 2  > 0 THEN f.a1 ELSE f.a0 END)
+                    * (CASE WHEN s.bits & 4  > 0 THEN f.b1 ELSE f.b0 END)
+                    * (CASE WHEN s.bits & 8  > 0 THEN f.g1 ELSE f.g0 END)
+                    * (CASE WHEN s.bits & 16 > 0 THEN f.r1 ELSE f.r0 END)
+                    * (CASE WHEN s.bits & 32 > 0 THEN f.f1 ELSE f.f0 END) AS DECIMAL(38, 6))) AS cost
     FROM factors AS f CROSS JOIN subsets AS s
     GROUP BY ALL
 ),
@@ -139,9 +141,9 @@ factor_list AS (
 effects AS (
     SELECT v.from_month_end, v.to_month_end, v.view_order, v.view_name, v.group_name,
            fl.factor_order, fl.factor, fl.factor_meaning,
-           SUM(v.cost * CASE WHEN v.bits & fl.bit > 0
-                             THEN factorial(v.size - 1) * factorial(6 - v.size) / 720.0
-                             ELSE -(factorial(v.size) * factorial(5 - v.size) / 720.0) END)  AS shapley,
+           SUM(CAST(v.cost * CASE WHEN v.bits & fl.bit > 0
+                                  THEN factorial(v.size - 1) * factorial(6 - v.size)
+                                  ELSE -(factorial(v.size) * factorial(5 - v.size)) END AS DECIMAL(38, 6))) / 720 AS shapley,
            SUM(v.cost * CASE WHEN v.bits = 2 * fl.bit - 1 THEN 1
                              WHEN v.bits = fl.bit - 1     THEN -1 ELSE 0 END)               AS sequential
     FROM v CROSS JOIN factor_list AS fl

@@ -52,7 +52,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain"]
         MART["marts<br/>walks · fills · plan vs actual · org"]
-        TEST{{"76 data tests"}}
+        TEST{{"78 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -241,7 +241,9 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 70 | The contingent side of the walk is the Bridgeway month-end snapshot, moved; one row per worker per month-end | Contractors counted twice, or lost between months |
 | 71 | Contingent spend ties to the timesheets to the cent, in every month and currency, and to the month-end run-rate | A spend panel that does not add up to what suppliers invoiced |
 | 72 | Employees, Contingent and the Total each close every month; conversions out equal conversions in, so they never move the Total | A conversion that makes a person appear twice, or vanish |
+| 73 | The discrepancy rules find every discrepancy the generator seeded, on every month-end (recall 100%); the only false flags are explained name coincidences | Reconciliation rules that look plausible but miss what actually went wrong |
 | 74 | Plan versus actual carries exactly the contingent workers Bridgeway counted on each quarter-end, and their run-rate | A plan comparison against the wrong population |
+| 75 | Identity resolution keeps every Bridgeway worker and every Keystone person exactly once, and every supplier spelling maps to one supplier | A contractor dropped, or matched twice, while reconciling |
 | 76 | The plan's contingent line covers every cost center with contingent workers, in every version, within 20% of the actual | A plan that silently leaves out where contractors work |
 | 77 | A conversion to employee agrees across Keystone, recruiting and Bridgeway: same person, hire date, same month as the last contingent day | A conversion counted twice, or a hire claimed as one when it was not |
 | 78 | The growth-mix factors (Shapley and sequential) add up to the change in total workforce cost exactly, and tie to both snapshots | An attribution that explains more, or less, than what happened |
@@ -611,7 +613,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 76 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 78 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)

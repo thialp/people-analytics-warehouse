@@ -46,8 +46,8 @@ billed AS (
            SUM(p.billed_hours)                                                   AS billed_hours,
            SUM(p.billed_units)                                                   AS billed_units,
            SUM(p.billed_amount_local)                                            AS billed_amount_local,
-           SUM(CAST(p.billed_amount_local AS DECIMAL(38, 10)) * fx.usd_per_local_actual)   AS billed_usd_nominal,
-           SUM(CAST(p.billed_amount_local AS DECIMAL(38, 10)) * fx.usd_per_local_constant) AS billed_usd_constant
+           SUM(CAST(p.billed_amount_local * fx.usd_per_local_actual AS DECIMAL(38, 10)))   AS billed_usd_nominal,
+           SUM(CAST(p.billed_amount_local * fx.usd_per_local_constant AS DECIMAL(38, 10))) AS billed_usd_constant
     FROM placed AS p
     JOIN staging.stg_fx_rate AS fx ON fx.currency_code = p.billing_currency AND fx.rate_date = p.month_end_date
     GROUP BY ALL

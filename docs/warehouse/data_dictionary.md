@@ -20,6 +20,7 @@ One row per worker ever employed (46,980).
 | `termination_type` | `Voluntary` or `Involuntary`; empty if still employed |
 | `worker_type` | Always `Regular Employee` in this dataset |
 | `is_executive_officer` | `True` for the CEO and the eight function heads, who are excluded from compensation reporting |
+| `work_email` | `first.last@arcadia-systems.example`, numbered on a clash in worker ID order (release 3). Bridgeway names a contingent worker's manager by email, so this is how the warehouse compares managers across the systems |
 
 #### fact_job_history
 Effective-dated job assignments (SCD Type 2). A new row starts whenever department, office, job, level, manager or leadership role changes.
@@ -587,6 +588,17 @@ Grain: **month-end × vacant seat** (Open or Frozen; 62,055 rows): `status`, `st
 ### mart_plan_vs_actual
 Grain: **plan version × cost center × fiscal quarter** (29,415 rows; the 615 contingent-only cost center rows are zero on every employee measure). The plan (`planned_*`) beside the actuals: `actual_ending_headcount`, `actual_ending_fte`, `actual_net_new`, `actual_net_new_reuse_candidates`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `actual_cost_usd_plan_fx` (comparable with `planned_cost_usd`) and `actual_cost_usd_constant`; plus `version_order`, `is_latest_version` and the cost center's department, function, country and region. For every version and quarter, the actual headcount sums to the company and the actual fills to the seat fills (test 56). Attainment = actual ÷ planned. Release 3 adds the contingent line: `planned_cw_headcount` beside `actual_cw_headcount` (Bridgeway on the quarter-end), and `planned_cw_spend_usd` beside `actual_cw_spend_usd_plan_fx` (annualized bill run-rate at the plan's FX) and `actual_cw_spend_usd_constant` (test 74).
 
+### Case study 6 marts (release 3)
+
+How they work and what they find: [case study 6](../projects/contingent-workforce/case_study_6.md).
+
+| Mart | Grain | Columns |
+|---|---|---|
+| `mart_cw_discrepancy_detail` | month-end × discrepancy × worker, order or timesheet (latest 13 month-ends) | `discrepancy_code`, `discrepancy_name`, `severity`, `who_can_fix_it`, `root_cause_code`, `root_cause_name`, `identity_id`, `bw_worker_id`, `person_id`, `worker_name`, `cw_type`, `match_confidence`, `supplier_name`, `cost_center_id`, `department_id`, `department_name`, `function_name`, `country_code`, `manager_worker_id`, `fields_affected`, `since_date`, `age_days`, `age_band`, `service_order_id`, `feed_event_id`, `timesheet_id`, `evidence` |
+| `mart_cw_reconciliation` | month-end × function × supplier (× discrepancy type) | `row_type` Population (`cw_working_bridgeway`, `cw_working_keystone`, `workers_with_any_discrepancy`) or Discrepancy (`discrepancy_code`, `discrepancy_name`, `severity`, `who_can_fix_it`, `workers_affected`, `new_this_month`, `aged_0_7`, `aged_8_30`, `aged_31_90`, `aged_over_90`); never sum the two row types together |
+| `mart_cw_engagement_cap` | Bridgeway worker who started | `original_start_date`, `last_day`, `is_working_at_extract`, `engagement_status`, `months_engaged`, `extensions`, `renewals`, `cap_date`, `months_left_at_extract`, `is_over_cap`, `cap_band`, plus identity, name, type, supplier |
+| `mart_cw_detection_score` | month-end × discrepancy type | `injected`, `detected`, `missed`, `false_flags`, `recall`, `precision`: the rules scored against the answer key (test 73) |
+
 ### mart_cw_spend
 Grain: **month-end × cost center × supplier × contingent worker type × role family × billing currency** (release 3). What contingent workers cost, two ways side by side: **billed in the month** (`workers_billed`, `billed_hours`, `billed_units`, `billed_amount_local`, `billed_usd_nominal` at the month-end rate, `billed_usd_constant`) and **working at the month-end** (`workers_at_month_end`, `run_rate_local`, `run_rate_usd_nominal`, `run_rate_usd_constant`: hourly rate × contracted hours × 52, or monthly rate × 12). Also `fiscal_year`, `fiscal_quarter_label`, `department_id`, `country_code`, `supplier_name`. A month's billing is placed on the order revision in effect at the month-end. Billing ties to `bw_timesheet_month` to the cent and the month-end columns to the Bridgeway snapshot (test 71). Billed spend runs below the run-rate because timesheets carry time off and partial months.
 
@@ -597,6 +609,18 @@ Grain: **date pair × view × group × factor** (release 3; 1,224 rows): each fi
 Grain: **fiscal quarter × from office × to office** (821 rows): where backfilled seats moved, from the prior incumbent's office to the new incumbent's, with both offices' coordinates and pay zones, `location_change`, `seats`, `seats_levelled_down`, `seats_levelled_up`, `seats_relocated_for_backfill`, `pay_change_usd_constant`, `location_effect_usd_constant`. Draws the map lines in the Footprint pattern (`MAKELINE`).
 
 ## Intermediate models
+
+### int_cw_supplier_alias
+Every supplier spelling Keystone holds, mapped to a Bridgeway supplier on a normalized key (the first four letters and digits). Every spelling must map to exactly one (test 75).
+
+### int_cw_identity_resolution
+One row per identity: a Keystone contingent person matched to a Bridgeway worker, or either alone. Tier 1 (High): Keystone's stored Bridgeway ID and the same last name; tier 2 (Medium): same name, same supplier, starts within 7 days; tier 3 (Low): same name, starts within 30 days; mutual closest candidates only. `match_status` Matched, Keystone only, Bridgeway only or Never started; `match_evidence` says what the match rests on. Everyone appears exactly once (test 75).
+
+### int_cw_reconciliation_snapshot
+One row per identity per month-end on which either system shows the person working: what Keystone should hold (everything Bridgeway had sent by then, applied the day it was sent) beside what it holds, with `contract_differs`, `cost_center_differs`, `manager_differs`, `office_differs` and `link_differs`.
+
+### int_cw_discrepancy
+One row per month-end × identity (or order, or timesheet) × discrepancy type, found from the two systems and the feed log alone (never the answer key): `discrepancy_code`, `root_cause_code`, `fields_affected`, `since_date`, `age_days`, `evidence`, and the order, feed event or timesheet involved. Rules: [case study 6](../projects/contingent-workforce/case_study_6.md#3-why-they-differ-the-rules-int_cw_discrepancy).
 
 ### int_cw_month_end_snapshot
 One row per contingent worker (Bridgeway worker ID) per month-end on which they were working, **as Bridgeway held it that day**: the service order revision in effect on the month-end says the assignment has started and not ended. History is never restated, so an extension approved after the old end date counts from its approval. Carries the order, type, supplier, cost center (and so department and country), office, role, seniority, rate and its annualized run-rate in billing currency and in USD (month-end and constant rates). Test 70.

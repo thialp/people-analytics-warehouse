@@ -291,8 +291,8 @@ all_lines AS (
 SELECT
     month_end_date,
     identity_id,
-    ANY_VALUE(bw_worker_id)                                                AS bw_worker_id,
-    ANY_VALUE(person_id)                                                   AS person_id,
+    MIN(bw_worker_id)                                                      AS bw_worker_id,
+    MIN(person_id)                                                         AS person_id,
     discrepancy_code,
     MIN(root_cause_code)                                                   AS root_cause_code,
     ARRAY_TO_STRING(LIST_SORT(LIST(DISTINCT CASE grp WHEN 'contract' THEN 'Status and contract dates' WHEN 'cost_center' THEN 'Cost center'
@@ -302,9 +302,9 @@ SELECT
                                  ELSE 'Timesheet' END)), '; ')                AS fields_affected,
     MIN(since_date)                                                        AS since_date,
     month_end_date - MIN(since_date)                                       AS age_days,
-    ANY_VALUE(service_order_id)                                            AS service_order_id,
-    ANY_VALUE(feed_event_id)                                               AS feed_event_id,
-    ANY_VALUE(timesheet_id)                                                AS timesheet_id,
+    MIN(service_order_id)                                                  AS service_order_id,
+    ARG_MIN(feed_event_id, since_date)                                     AS feed_event_id,   -- the oldest cause
+    MIN(timesheet_id)                                                      AS timesheet_id,
     STRING_AGG(evidence, ' | ' ORDER BY grp)                               AS evidence
 FROM all_lines
 GROUP BY month_end_date, identity_id, discrepancy_code, COALESCE(service_order_id, ''), COALESCE(timesheet_id, '');
