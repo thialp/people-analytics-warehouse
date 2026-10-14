@@ -192,13 +192,7 @@ class Program:
                                    g["country"].to_numpy())
 
     def _emails(self, workers: pd.DataFrame):
-        seen: dict[str, int] = defaultdict(int)
-        self.emp_email = {}
-        for r in workers.sort_values("worker_id").itertuples(index=False):
-            base = f"{_slug(r.first_name)}.{_slug(r.last_name)}"
-            seen[base] += 1
-            n = seen[base]
-            self.emp_email[r.worker_id] = f"{base}{'' if n == 1 else n}@{ref.EMPLOYEE_EMAIL_DOMAIN}"
+        self.emp_email = dict(zip(workers["worker_id"], employee_emails(workers)))
 
     def pick_manager(self, dept: str, cc: str, on: dt.date) -> tuple[str, dt.date]:
         wid, start, end, end_date, country = self.mgr_by_dept[dept]
@@ -741,6 +735,19 @@ def money(units: float, rate: float) -> float:
     (binary floats land 0.3 x 1670.75 on 501.22499..., and Python's round() goes half to even)."""
     exact = Decimal(repr(units)) * Decimal(repr(rate))
     return float(exact.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def employee_emails(workers: pd.DataFrame) -> list[str]:
+    """Each employee's work email, in the row order of `workers`: first.last@ the employee domain,
+    numbered 2, 3, ... on a clash, in worker ID order."""
+    seen: dict[str, int] = defaultdict(int)
+    email = {}
+    for r in workers.sort_values("worker_id").itertuples(index=False):
+        base = f"{_slug(r.first_name)}.{_slug(r.last_name)}"
+        seen[base] += 1
+        n = seen[base]
+        email[r.worker_id] = f"{base}{'' if n == 1 else n}@{ref.EMPLOYEE_EMAIL_DOMAIN}"
+    return [email[w] for w in workers["worker_id"]]
 
 
 def _slug(name: str) -> str:

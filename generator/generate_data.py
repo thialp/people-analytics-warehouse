@@ -1621,6 +1621,9 @@ dim_worker = pd.DataFrame([{
     "termination_type": w["termination_type"], "worker_type": "Regular Employee",
     "is_executive_officer": w["is_exec"],
 } for w in workers.values()]).sort_values("worker_id")
+# Release 3: the work email (first.last@, numbered on a clash, in worker ID order). Bridgeway names
+# a contingent worker's manager by email, so the warehouse needs it to compare managers.
+dim_worker["work_email"] = contingent_workforce.employee_emails(dim_worker)
 write(dim_worker, "dim_worker")
 
 job = pd.DataFrame(job_rows)

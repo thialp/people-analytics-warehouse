@@ -397,7 +397,7 @@ class Keystone:
                 g0 = _groups(rec.state)
                 rec.apply(ev["sent"], ev["payload"], ev["contract"], ev["end_kind"], "Feed", None)
                 g1 = _groups(rec.state)
-                ev["groups"] = {g for g in g0 if g0[g] != g1[g]} or ({"contract"} if ev["contract"] else {"manager"})
+                ev["groups"] = {g for g in g0 if g0[g] != g1[g]}   # a change that alters nothing can cause no difference
         conv = self.p.conversions.get(evs[0]["bw_worker_id"])
         if conv:
             self.convert(rec, conv)
@@ -717,6 +717,8 @@ class Keystone:
             self.compare(bw_id, ideal, actual, markers)
         self.ks_only = self.keystone_only()
         self.bridgeway_truth()
+        if self.unexplained:
+            raise RuntimeError(f"{self.unexplained} days where Keystone differs from the ideal with no seeded cause")
 
     def last_active(self, bw_id: str) -> dt.date | None:
         """Last day the worker is active in either system; None if still active at the extract."""
@@ -759,8 +761,11 @@ class Keystone:
                                   f"last day {e.end:%Y-%m-%d}")
         for old_id, new_id, so_id, start in self.splits:
             created = self.records[new_id].versions[0][0] if self.records[new_id].versions else start
+            # open from the day the second ID starts working (like every type, it counts while someone works)
+            if max(created, start) > self.extract:
+                continue
             self.add_truth("CW07", bw_worker_id=new_id, person=self.person_of(new_id), service_order_id=so_id,
-                           fields="Bridgeway worker ID; Keystone person", start=created, end=self.last_active(new_id),
+                           fields="Bridgeway worker ID; Keystone person", start=max(created, start), end=self.last_active(new_id),
                            resolution="Open at extract" if self.last_active(new_id) is None else "Worker no longer active",
                            detail=f"Same person as Bridgeway {old_id} (Keystone {{person:{old_id}}})")
 
