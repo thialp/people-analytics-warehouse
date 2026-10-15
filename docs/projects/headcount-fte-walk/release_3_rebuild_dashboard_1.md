@@ -668,20 +668,29 @@ Sheet `Waterfall Caption` (rebuild; primary **Headcount Walk**, secondary **Regi
 // TO Still Here  ZN([Region Walk].[RW Hires Still Here])
 // TO Gap         [TO Joined] - [TO Still Here]
 ```
+Tableau has no comma function, so each number gets a text calc (same pattern each time):
+
 ```
-// Tie-out Text   (one line; comma pattern on each number, as the build book's 6.4)
+// TO Joined Text
+IF [TO Joined] >= 1000 THEN STR(INT([TO Joined] / 1000)) + "," + RIGHT("00" + STR(INT([TO Joined]) % 1000), 3)
+ELSE STR(INT([TO Joined])) END
+// TO Still Here Text   (same, with [TO Still Here])
+// TO Gap Text          (same, with [TO Gap])
+// TT Close Day         LEFT(DATENAME('month',[p_To]),3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
+```
+```
+// Tie-out Text   (one line)
 IF [p_Worker] <> "Employees" THEN "The Compensation Walk covers employees only."
 ELSEIF [p_View] = "Company" THEN
-    STR_comma([TO Joined]) + " joined; " + STR_comma([TO Still Here]) +
+    [TO Joined Text] + " joined; " + [TO Still Here Text] +
     " were still here on " + [TT Close Day] + ", the hires the Compensation Walk prices. The other " +
-    STR_comma([TO Gap]) + " left again before the end."
+    [TO Gap Text] + " left again before the end."
 ELSE
-    STR_comma([TO Joined]) + " joined " + [p_Group] + "; " + STR_comma([TO Still Here]) +
+    [TO Joined Text] + " joined " + [p_Group] + "; " + [TO Still Here Text] +
     " people new to Arcadia were in it on " + [TT Close Day] +
     " (the Compensation Walk's Hires). The rest left again or changed team."
 END
 ```
-`STR_comma(x)` is shorthand for the comma pattern: write it out each time (Tableau has no functions). `TT Close Day` = `LEFT(DATENAME('month',[p_To]),3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))`.
 
 Caption layout: line 1 the existing moves sentence (`WF Caption`, edited: delete the "FTE ... schedule changes" half), line 2 `<Tie-out Text>`. Tableau Book 8 slate, left. Same position as today (over the waterfall's bottom padding).
 

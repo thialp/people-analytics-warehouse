@@ -401,24 +401,37 @@ Under 65 characters at 9 pt, as the card needs: "1,309 people hired and still he
 
 Sheet `Tie-out` on **Region Walk** (primary), Headcount Walk secondary (2.3). `Link` on Detail from Region Walk; check the link icon is active on `Link` only.
 
+Tableau has no `comma()` function, so each number gets its own text calc (the same comma pattern each time). Create these on **Region Walk**:
+
 ```
+// TT To Day   (copy it from ArcadiaHR, or retype; it only uses p_To, so it works on any source.
+//              Do NOT write [ArcadiaHR].[TT To Day] in a Region Walk calc: ArcadiaHR is not in this blend)
+LEFT(DATENAME('month', [p_To]), 3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
+
 // RW Hires Still Here   SUM(IF [RW Is Current] THEN [hires] END)            (= the Hires driver's people)
 // TO Joined             ZN([Headcount Walk].[HW Joined])
 // TO Gap                [TO Joined] - [RW Hires Still Here]
+
+// TO Joined Text
+IF [TO Joined] >= 1000 THEN STR(INT([TO Joined] / 1000)) + "," + RIGHT("00" + STR(INT([TO Joined]) % 1000), 3)
+ELSE STR(INT([TO Joined])) END
+// TO Still Here Text   (same, with [RW Hires Still Here])
+// TO Gap Text          (same, with [TO Gap])
+
 // Tie-out Text
 IF [p_View] = "Office" THEN
-    comma([RW Hires Still Here]) + " people new to Arcadia were at " + [p_Group] + " on " + [TT To Day] +
+    [TO Still Here Text] + " people new to Arcadia were at " + [p_Group] + " on " + [TT To Day] +
     ". Headcount & FTE Walk has no office view."
 ELSEIF [p_View] = "Company" THEN
-    comma([TO Joined]) + " joined; " + comma([RW Hires Still Here]) + " were still here on " + [TT To Day] +
-    ", the hires the Compensation Walk prices. The other " + comma([TO Gap]) + " left again before the end."
+    [TO Joined Text] + " joined; " + [TO Still Here Text] + " were still here on " + [TT To Day] +
+    ", the hires the Compensation Walk prices. The other " + [TO Gap Text] + " left again before the end."
 ELSE
-    comma([TO Joined]) + " joined " + [p_Group] + "; " + comma([RW Hires Still Here]) +
+    [TO Joined Text] + " joined " + [p_Group] + "; " + [TO Still Here Text] +
     " people new to Arcadia were in it on " + [TT To Day] +
     " (the Compensation Walk's Hires). The rest left again or changed team."
 END
 ```
-`comma(x)` stands for the comma pattern (Dashboard #1 build book, 6.4): write it out each time. Copying is faster: the `Tie-out Text` formula is the same as Dashboard #1's (its section 9), with `RW Hires Still Here` / `TO Joined` on the swapped sources.
+Dashboard #1 uses the same three text helpers in its section 9.
 
 Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, left, one line, Entire View, shading None, tooltip off, deselect action (5.4). Dashboard: floating inside the waterfall card at its bottom (about x = card left + 12, y = card bottom − 22, width = card width − 24, height 18). Shrink the waterfall sheet's height by 18 so its axis labels stay clear.
 
