@@ -1,0 +1,14 @@
+discrepancy_code|discrepancy_name|what_happened|what_a_manager_sees|who_can_fix_it|severity
+CW00|Change in transit|Bridgeway sent a change in the last two days that Keystone has not applied yet|Yesterday's values|Nobody: it clears itself|Expected
+CW01|Change arrived late|The feed applied a change 3 or more days after Bridgeway sent it, or it is still queued|An old end date, cost center, manager or office for days|Integration support|Data hygiene
+CW02|Extension never arrived|An extension or renewal failed on the feed|Keystone ends the worker at the old end date while Bridgeway has them working|Integration support, then HR Ops|Access risk
+CW03|Early end never arrived|An early end failed on the feed|The worker is still active in Keystone after their last day|HR Ops|Access risk
+CW04|Ended but not closed in Bridgeway|The order is still open more than 15 days after the worker's last day|Nothing: Bridgeway hygiene|Vendor management|Cost risk
+CW05|Changed in Keystone only|A manager or HR Ops changed the cost center, manager or office in Keystone, not in Bridgeway|Values Bridgeway does not have; the supplier still bills Bridgeway's cost center|The manager, in Bridgeway|Cost risk
+CW06|Link ID missing or mistyped|Keystone holds a blank or wrong Bridgeway worker ID|Nothing, but later feed changes cannot find the worker|HR Ops|Data hygiene
+CW07|One person, two IDs|A renewal was submitted as a new worker: a second Bridgeway ID and a second Keystone person|The same person twice|HR Ops and vendor management|Data hygiene
+CW08|Never reached Keystone|The new-worker event failed, so Keystone has no record|A worker missing from the team|Integration support, then HR Ops|Access risk
+CW09|Keystone-only contingent worker|Someone created a contingent worker by hand in Keystone with no Bridgeway order|A worker no supplier bills for|HR Ops|Access risk
+CW10|Over the duration cap|A Contractor or Consultant engagement runs past 48 months|Nothing|Vendor management and the hiring manager|Compliance risk
+CW11|Billed after the assignment ended|Time billed in a month after the worker's last day|Nothing: rates and timesheets are not in Keystone|Vendor management and Finance|Cost risk
+CW12|Attribute change never arrived|A cost center, manager or office change failed on the feed|The old cost center, manager or office|Integration support, then HR Ops|Data hygiene

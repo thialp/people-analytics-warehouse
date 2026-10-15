@@ -14,7 +14,8 @@ What it simulates
     anniversary from a tenure schedule, promotions (one level up) and demotions
     (one level down) after the annual review, and a performance bonus.
   * Hires, voluntary and involuntary terminations, transfers, international moves,
-    office relocations, FTE changes, a restructuring and a reorganization.
+    office relocations, a restructuring and a reorganization. Every employee is 1.0 FTE
+    (release 3: no part-time).
   * Real ECB FX rates and researched fringe rates (see fx_rates.py, fringe_research.py).
 
 Events inside a month are applied in date order, so effective-dated records never
@@ -34,8 +35,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import contingent_workforce
 import fringe_research
 import fx_rates
+import keystone_feed
+import source_systems
 import reference_data as ref
 
 SEED = 20261009
@@ -677,7 +681,8 @@ def new_worker(hire_date: dt.date, dept_id: str, level: int, family: str, cc: st
     w = {"worker_id": next_id("worker", "W"), "first_name": first, "last_name": last,
          "hire_date": hire_date, "termination_date": None, "termination_type": None,
          "is_exec": is_exec, "exec_profile": exec_profile, "position_id": None, "assignment": None,
-         "dept": dept_id, "family": family, "level": level, "country": cc, "loc": loc, "fte": fte,
+         "dept": dept_id, "family": family, "level": level, "country": cc, "loc": loc, "fte": 1.0,
+         "fte_draw": fte,
          "salary": salary, "mgr": None, "is_pm": False, "leads": leads, "level_since": hire_date,
          "last_rating": None, "job": None, "comp": None}
     workers[w["worker_id"]] = w
@@ -1414,9 +1419,11 @@ for i in range(1, len(MONTH_ENDS)):
                 w["salary"] = new_salary
                 comp_change(w, on, "Market Adjustment")
         elif kind == "fte":
+            # Release 3: every employee is 1.0 FTE, so there are no FTE changes. The draw that
+            # release 2 made is still made (tracked in fte_draw, never written out), so every
+            # other random decision is unchanged and release 3 checks as a pure FTE change.
             if not w["leads"]:
-                w["fte"] = 1.0 if w["fte"] < 1.0 else float(rng.choice([0.8, 0.5], p=[0.75, 0.25]))
-                job_change(w, on, "FTE Change")
+                w["fte_draw"] = 1.0 if w["fte_draw"] < 1.0 else float(rng.choice([0.8, 0.5], p=[0.75, 0.25]))
         elif kind == "relocate":
             if not w["is_exec"]:
                 relocate(w, on)
@@ -1608,12 +1615,16 @@ print("Writing raw tables to", OUT_DIR)
 for old in ("ref_fx_rate_monthly_synthetic",):
     (OUT_DIR / f"{old}.csv").unlink(missing_ok=True)
 
-write(pd.DataFrame([{
+dim_worker = pd.DataFrame([{
     "worker_id": w["worker_id"], "first_name": w["first_name"], "last_name": w["last_name"],
     "original_hire_date": w["hire_date"], "termination_date": w["termination_date"],
     "termination_type": w["termination_type"], "worker_type": "Regular Employee",
     "is_executive_officer": w["is_exec"],
-} for w in workers.values()]).sort_values("worker_id"), "dim_worker")
+} for w in workers.values()]).sort_values("worker_id")
+# Release 3: the work email (first.last@, numbered on a clash, in worker ID order). Bridgeway names
+# a contingent worker's manager by email, so the warehouse needs it to compare managers.
+dim_worker["work_email"] = contingent_workforce.employee_emails(dim_worker)
+write(dim_worker, "dim_worker")
 
 job = pd.DataFrame(job_rows)
 _bad = job[job["effective_end_date"].notna() & (job["effective_end_date"] < job["effective_start_date"])]
@@ -1642,9 +1653,8 @@ write(pd.DataFrame(req_rows.values())[[
     "hiring_manager_id",
     "filled_by_worker_id", "fill_source"]].sort_values("requisition_id"), "fact_requisition")
 write(pd.DataFrame(cost_center_rows), "dim_cost_center")
-write(pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"]),
-      "fact_workforce_plan")
-write(pd.DataFrame(candidate_rows).sort_values("candidate_id"), "dim_candidate")
+# fact_workforce_plan and dim_candidate are written in section 8: the plan gains its
+# contingent line and some hires turn out to be contingent conversions.
 cand = pd.DataFrame(candidate_event_rows).sort_values(["candidate_id", "stage_order"]).reset_index(drop=True)
 cand.insert(0, "candidate_event_id", [f"CE{n:07d}" for n in range(1, len(cand) + 1)])
 write(cand, "fact_candidate_stage_event")
@@ -1773,6 +1783,55 @@ write(pd.DataFrame([{"rate_set": ref.FX_CONSTANT_RATE_SET, "rate_date": CONST_DA
 fringe, fringe_cites = fringe_research.build()
 write(pd.DataFrame(fringe), "ref_fringe_rate")
 write(pd.DataFrame(fringe_cites).drop_duplicates(), "ref_fringe_source")
+
+# Release 3: where every raw table comes from (Keystone HR, Bridgeway VMS, the integration
+# log, public reference data) and the column contract of every table release 3 adds.
+write(pd.DataFrame(source_systems.SOURCE_SYSTEMS), "ref_source_system")
+write(pd.DataFrame(source_systems.lineage_rows()), "ref_raw_table_lineage")
+write(pd.DataFrame(source_systems.column_rows()), "ref_raw_column")
+
+# ======================================================================================
+# 8. Contingent workforce (release 3): Bridgeway VMS, Keystone HR and the feed between them
+# ======================================================================================
+# Each on its own random stream, run after the employee simulation, so no employee draw moves.
+# First the clean Bridgeway program; then Keystone's view of it through the one-way feed,
+# with the seeded discrepancies and their answer key (which also seeds Bridgeway's own
+# hygiene problems, so the Bridgeway tables are written from its output).
+#
+# Conversions (phase 5): external hires into requisitions are the pool a contingent worker can
+# be hired from when their engagement ends. The hire stays exactly as simulated; the
+# contingent worker turns out to be that person, and the applicant's source says so.
+_accepted = {(c["requisition_id"], c["worker_id"]): c["candidate_id"] for c in candidate_rows
+             if c["final_status"] == "Accepted" and not c["is_internal"]}
+external_hires = pd.DataFrame([{
+    "worker_id": r["filled_by_worker_id"], "hire_date": r["filled_date"], "candidate_id": cid,
+    "country": r["cost_center_id"].rsplit("-", 1)[1], "department_id": r["department_id"],
+    "function": DEPT[r["department_id"]]["function"],
+    "first_name": workers[r["filled_by_worker_id"]]["first_name"],
+    "last_name": workers[r["filled_by_worker_id"]]["last_name"]}
+    for r in req_rows.values()
+    if r["status"] == "Filled" and r["fill_source"] == "External"
+    and (cid := _accepted.get((r["requisition_id"], r["filled_by_worker_id"])))
+    and workers[r["filled_by_worker_id"]]["hire_date"] == r["filled_date"]])
+cw_tables, cw_program = contingent_workforce.simulate(
+    stream=domain_stream("contingent"), office=OFFICE, dept=DEPT, country=COUNTRY, job=job, workers=dim_worker,
+    cost_centers=cost_center_rows, reorg_date=REORG_DATE, restructure_date=RESTRUCTURE_DATE,
+    hires=external_hires, conversion_stream=domain_stream("conversions"))
+cw_tables, keystone = keystone_feed.simulate(
+    stream=domain_stream("keystone"), bw=cw_tables, program=cw_program, cost_centers=cost_center_rows)
+for _table in source_systems.RELEASE_3_TABLES:
+    write(cw_tables[_table][source_systems.columns(_table)], _table)
+write(cw_tables["ref_cw_discrepancy_type"], "ref_cw_discrepancy_type")
+
+_converted = {c["candidate_id"] for c in cw_program.conversions.values()}
+for c in candidate_rows:
+    if c["candidate_id"] in _converted:
+        c["candidate_source"] = "Contingent conversion"
+write(pd.DataFrame(candidate_rows).sort_values("candidate_id"), "dim_candidate")
+
+# The plan's contingent line, from its own stream so no employee plan number moves.
+_plan = pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"])
+write(contingent_workforce.plan_line(_plan, cw_tables, domain_stream("plan_cw")), "fact_workforce_plan")
 
 print(f"Active headcount at {LAST_ME}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
       f"people managers: {sum(1 for w in active.values() if w['is_pm']):,}")

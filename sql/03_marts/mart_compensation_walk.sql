@@ -8,7 +8,7 @@
 --   Opening + Hires + Exits + Transfers In + Transfers Out
 --           + Promotions + Demotions + Tenure Increases + Market Adjustments
 --           + Same-Country Transfer Adjustments + International Transfer Adjustments
---           + FTE Changes + Fringe Rate Changes + FX Translation  =  Closing
+--           + Fringe Rate Changes + FX Translation  =  Closing
 --
 -- exactly, in headcount, FTE and all four dollar measures, for every row group.
 -- Field reference and worked examples: docs/projects/compensation-walk/compensation_walk.md
@@ -200,9 +200,7 @@ walk_line AS (
     SELECT from_date, to_date, view_order, view_name, close_key, 11, 'International Transfer Adjustments', 'Location', NULL, intl_people, 0, 0, intl_bn, intl_bc, intl_ln, intl_lc
     FROM view_row WHERE intl_people > 0
     UNION ALL
-    SELECT from_date, to_date, view_order, view_name, close_key, 12, 'FTE Changes', 'Workforce Rate', NULL, fte_people, 0, f1 - f0, fte_bn, fte_bc, fte_ln, fte_lc
-    FROM view_row WHERE fte_people > 0
-    UNION ALL
+    -- step 12 was FTE Changes; release 3 removed part-time, so it no longer exists
     SELECT from_date, to_date, view_order, view_name, close_key, 13, 'Fringe Rate Changes', 'Statutory', NULL, fringe_people, 0, 0, 0, 0, fringe_ln, fringe_lc
     FROM view_row WHERE fringe_people > 0
     UNION ALL

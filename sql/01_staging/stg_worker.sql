@@ -10,5 +10,6 @@ SELECT
     CAST(NULLIF(termination_date, '') AS DATE)      AS termination_date,
     NULLIF(termination_type, '')                    AS termination_type,
     worker_type,
-    CAST(is_executive_officer AS BOOLEAN)           AS is_executive_officer
+    CAST(is_executive_officer AS BOOLEAN)           AS is_executive_officer,
+    work_email                                      -- release 3: how Bridgeway names a manager
 FROM raw.dim_worker;

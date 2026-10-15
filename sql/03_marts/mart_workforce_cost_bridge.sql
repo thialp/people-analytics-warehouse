@@ -1,5 +1,19 @@
 -- mart_workforce_cost_bridge
--- Grain: one row per month x department x driver.
+-- Grain: one row per month x department x worker type x driver.
+--
+-- Release 3: the bridge explains the whole workforce cost, employees' loaded pay run-rate plus
+-- contingent workers' annualized bill run-rate (worker_type Employee / Contingent). A contingent
+-- worker has no fringe, so the run-rate counts the same in the base and loaded measures. The
+-- contingent drivers sit beside their employee counterparts in driver_order:
+--   Contingent Starts (2)        new engagements, at their current run-rate
+--   Contingent Ends (3)          ended engagements, at their prior run-rate
+--   Transfers In / Out (4, 5)    a change of department, at the prior run-rate
+--   Contingent Rate Changes (8)  renegotiated extensions and repriced renewals: (R1 X1p - R0 X0)
+--   Conversions (10)             a contingent worker hired as an employee: their prior run-rate
+--                                out of Contingent, their loaded pay into Employee (not in Hires);
+--                                the net is the cost of swapping a contractor for an employee
+--   FX Rate Changes (12)         R1 (X1 - X1p), nominal only
+-- Opening + drivers = Closing holds per department, worker type and month.
 --
 -- Explains how each department's annualized pay run-rate moved from the prior
 -- month-end to the current month-end. For every department and month:
@@ -14,7 +28,6 @@
 --   + Tenure & Market Adj.     pay change for everyone else: anniversary (tenure)
 --                              raises, market adjustments, same-country relocations
 --   + International Mobility   pay and fringe re-levelling when someone changes country
---   + FTE Changes              moves between full-time and part-time
 --   + Fringe Rate Changes      new calendar-year fringe rates for the same country
 --   + FX Rate Changes          month-over-month currency movement (nominal only)
 --   = Closing Run-Rate
@@ -28,7 +41,8 @@
 -- 1 = current month-end and X1p = the CURRENT currency at the PRIOR month-end rate:
 --
 --   pay change    = (B1 * X1p - B0 * X0) * F0 * (1 + R0)
---   FTE change    =  B1 * X1p * (F1 - F0) * (1 + R0)
+--   FTE change    =  B1 * X1p * (F1 - F0) * (1 + R0)   (always 0 since release 3: every
+--                                                       employee is 1.0 FTE; no driver line)
 --   fringe change =  B1 * X1p * F1 * (R1 - R0)
 --   FX change     =  B1 * F1 * (1 + R1) * (X1 - X1p)
 --
@@ -62,6 +76,10 @@ current_side AS (
     SELECT mp.month_end_date, mp.prior_month_end_date, s.* EXCLUDE (month_end_date)
     FROM month_pairs AS mp
     JOIN snap AS s ON s.month_end_date = mp.month_end_date
+),
+
+conversions AS (
+    SELECT worker_id, month_end_date FROM intermediate.int_cw_conversion WHERE is_walk_conversion
 ),
 
 -- every worker active at either end of each month, prior state (p) beside current state (c)
@@ -142,7 +160,9 @@ driver_lines AS (
     FROM valued WHERE movement_type <> 'Hire'
 
     UNION ALL
-    SELECT month_end_date, dept_c, 'Hires', worker_id,
+    SELECT month_end_date, dept_c,
+           CASE WHEN worker_id IN (SELECT worker_id FROM conversions AS cv WHERE cv.month_end_date = valued.month_end_date)
+                THEN 'Conversions' ELSE 'Hires' END, worker_id,
            1, f1, base_nom_1, base_con_1, load_nom_1, load_con_1
     FROM valued WHERE movement_type = 'Hire'
 
@@ -171,10 +191,6 @@ driver_lines AS (
     WHERE movement_type IN ('Stayer', 'Transfer')
       AND (pay_base_nom <> 0 OR pay_base_con <> 0 OR pay_driver = 'International Mobility')
 
-    UNION ALL
-    SELECT month_end_date, dept_c, 'FTE Changes', worker_id,
-           0, f1 - f0, fte_base_nom, fte_base_con, fte_load_nom, fte_load_con
-    FROM valued WHERE movement_type IN ('Stayer', 'Transfer') AND f1 <> f0
 
     UNION ALL
     SELECT month_end_date, dept_c, 'Fringe Rate Changes', worker_id,
@@ -194,6 +210,59 @@ driver_lines AS (
     FROM valued WHERE movement_type <> 'Termination'
 ),
 
+-- contingent workers: the Bridgeway run-rate at each end, R = annual run-rate in billing
+-- currency, X = USD per unit at the month-end, K = constant rate, X1p = current currency at
+-- the prior month-end rate
+cw AS (
+    SELECT m.*,
+           m.prior_run_rate_local AS r0, m.current_run_rate_local AS r1,
+           m.prior_fx_rate_actual AS x0, m.current_fx_rate_actual AS x1,
+           m.prior_fx_rate_constant AS k0, m.current_fx_rate_constant AS k1,
+           fx_cp.usd_per_local_actual AS x1p
+    FROM intermediate.int_cw_movement AS m
+    LEFT JOIN staging.stg_fx_rate AS fx_cp
+           ON fx_cp.currency_code = m.current_currency AND fx_cp.rate_date = m.prior_month_end_date
+),
+
+cw_lines AS (
+    SELECT month_end_date, prior_department_id AS department_id, 'Opening Run-Rate' AS driver, bw_worker_id AS worker_id,
+           1 AS headcount, 1.0 AS fte, r0 * x0 AS nom, r0 * k0 AS con
+    FROM cw WHERE in_prior
+    UNION ALL
+    SELECT month_end_date, current_department_id, 'Contingent Starts', bw_worker_id, 1, 1.0, r1 * x1, r1 * k1
+    FROM cw WHERE movement_type = 'Start'
+    UNION ALL
+    SELECT month_end_date, prior_department_id, 'Contingent Ends', bw_worker_id, -1, -1.0, -r0 * x0, -r0 * k0
+    FROM cw WHERE movement_type = 'End'
+    UNION ALL
+    SELECT month_end_date, prior_department_id, 'Conversions', bw_worker_id, -1, -1.0, -r0 * x0, -r0 * k0
+    FROM cw WHERE movement_type = 'Conversion'
+    UNION ALL
+    SELECT month_end_date, current_department_id, 'Transfers In', bw_worker_id, 1, 1.0, r0 * x0, r0 * k0
+    FROM cw WHERE in_prior AND in_current AND prior_department_id <> current_department_id
+    UNION ALL
+    SELECT month_end_date, prior_department_id, 'Transfers Out', bw_worker_id, -1, -1.0, -r0 * x0, -r0 * k0
+    FROM cw WHERE in_prior AND in_current AND prior_department_id <> current_department_id
+    UNION ALL
+    SELECT month_end_date, current_department_id, 'Contingent Rate Changes', bw_worker_id, 0, 0.0,
+           r1 * x1p - r0 * x0, r1 * k1 - r0 * k0
+    FROM cw WHERE in_prior AND in_current AND (r1 * x1p <> r0 * x0 OR r1 * k1 <> r0 * k0)
+    UNION ALL
+    SELECT month_end_date, current_department_id, 'FX Rate Changes', bw_worker_id, 0, 0.0, r1 * (x1 - x1p), 0
+    FROM cw WHERE in_prior AND in_current AND x1 <> x1p
+    UNION ALL
+    SELECT month_end_date, current_department_id, 'Closing Run-Rate', bw_worker_id, 1, 1.0, r1 * x1, r1 * k1
+    FROM cw WHERE in_current
+),
+
+all_lines AS (
+    SELECT dl.*, 'Employee' AS worker_type FROM driver_lines AS dl
+    UNION ALL
+    SELECT month_end_date, department_id, driver, worker_id, headcount, fte,
+           nom AS base_nom, con AS base_con, nom AS load_nom, con AS load_con, 'Contingent'
+    FROM cw_lines
+),
+
 driver_order AS (
     SELECT * FROM (VALUES
         (1,  'Opening Run-Rate',       'Balance'),
@@ -205,7 +274,10 @@ driver_order AS (
         (7,  'Demotions',                   'Pay Rate'),
         (8,  'Tenure & Market Adjustments', 'Pay Rate'),
         (9,  'International Mobility',      'Pay Rate'),
-        (10, 'FTE Changes',                 'Workforce Mix'),
+        (2,  'Contingent Starts',           'Headcount Movement'),
+        (3,  'Contingent Ends',             'Headcount Movement'),
+        (8,  'Contingent Rate Changes',     'Pay Rate'),
+        (10, 'Conversions',                 'Headcount Movement'),
         (11, 'Fringe Rate Changes',         'Fringe & FX'),
         (12, 'FX Rate Changes',             'Fringe & FX'),
         (13, 'Closing Run-Rate',            'Balance')
@@ -223,6 +295,7 @@ SELECT
     d.sub_function,
     d.function_name,
     d.cost_center,
+    dl.worker_type,
     o.driver_order,
     dl.driver,
     o.driver_group,
@@ -235,9 +308,9 @@ SELECT
     ROUND(SUM(CAST(dl.base_con AS DECIMAL(18, 4))), 2)      AS base_usd_constant,
     ROUND(SUM(CAST(dl.load_nom AS DECIMAL(18, 4))), 2)      AS loaded_usd_nominal,
     ROUND(SUM(CAST(dl.load_con AS DECIMAL(18, 4))), 2)      AS loaded_usd_constant
-FROM driver_lines AS dl
+FROM all_lines AS dl
 JOIN driver_order AS o                          ON o.driver = dl.driver
 JOIN intermediate.int_month_end_calendar AS cal ON cal.month_end_date = dl.month_end_date
 LEFT JOIN staging.stg_department AS d           ON d.department_id = dl.department_id
 GROUP BY ALL
-ORDER BY dl.month_end_date, dl.department_id, o.driver_order;
+ORDER BY dl.month_end_date, dl.department_id, dl.worker_type DESC, o.driver_order, dl.driver;

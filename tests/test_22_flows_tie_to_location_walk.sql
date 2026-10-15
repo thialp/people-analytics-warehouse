@@ -3,17 +3,17 @@
 -- Also guards the map: no self-loops, and every office has
 -- coordinates.
 WITH flows_out AS (
-    SELECT month_end_date, from_location_id AS location_id, SUM(workers) AS n
+    SELECT month_end_date, worker_type, from_location_id AS location_id, SUM(workers) AS n
     FROM marts.mart_mobility_flows GROUP BY ALL
 ),
 flows_in AS (
-    SELECT month_end_date, to_location_id AS location_id, SUM(workers) AS n
+    SELECT month_end_date, worker_type, to_location_id AS location_id, SUM(workers) AS n
     FROM marts.mart_mobility_flows GROUP BY ALL
 )
 SELECT 'flow mismatch' AS issue, l.month_end_date, l.location_id
 FROM marts.mart_location_headcount AS l
-LEFT JOIN flows_out AS o USING (month_end_date, location_id)
-LEFT JOIN flows_in  AS i USING (month_end_date, location_id)
+LEFT JOIN flows_out AS o USING (month_end_date, worker_type, location_id)
+LEFT JOIN flows_in  AS i USING (month_end_date, worker_type, location_id)
 WHERE l.relocations_out <> COALESCE(o.n, 0)
    OR l.relocations_in  <> COALESCE(i.n, 0)
 UNION ALL

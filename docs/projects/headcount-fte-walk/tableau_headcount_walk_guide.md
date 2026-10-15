@@ -1,5 +1,8 @@
 # Building the Headcount & FTE Walk Dashboard in Tableau Public
 
+> **Warehouse release 3:** part-time was removed (every employee is 1.0 FTE), so part-time counts and the FTE Changes step described here no longer exist in the data. This guide describes the dashboard as built on release 2; what changes is listed in [release 3 migration notes](../contingent-workforce/release_3_migration_notes.md).
+
+
 This guide builds the second dashboard, from [`mart_headcount_fte_walk`](../../../data/marts/mart_headcount_fte_walk.csv) and its five small dimension files. Plan on about two hours. Every step lists what you should see, so you can check as you go.
 
 The finished workbook has four dashboards, one per audience:

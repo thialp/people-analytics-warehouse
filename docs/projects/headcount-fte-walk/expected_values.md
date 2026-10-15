@@ -8,7 +8,7 @@ Check every card, title, caption and tooltip against these after refreshing the 
 
 | File | Rows |
 |---|---:|
-| `mart_headcount_fte_walk.csv` | 521,029 |
+| `mart_headcount_fte_walk.csv` | 597,097 |
 | `mart_dim_month.csv` | 60 |
 | `mart_dim_department.csv` | 32 |
 | `mart_dim_country.csv` | 22 |
@@ -21,35 +21,35 @@ Month-ends: Jul 2021 to Jun 2026 (60). The trend shows all 60; the Start and End
 
 | Item | Headcount | FTE |
 |---|---:|---:|
-| Opening (Jun 2025) | 28,447 | 27,862 (27,861.7) |
-| Hires | +5,235 | +5,188 (5,187.8) |
-| Voluntary leavers | −2,942 | −2,882 (2,881.6) |
-| Involuntary leavers | −726 | −711 (711.4) |
-| FTE changes | — | −93 (−93.0) |
-| Closing (Jun 2026) | 30,014 | 29,364 (29,363.5) |
-| Waterfall title | FY26: 5,235 hires outpaced 3,668 leavers, adding 1,567 people | FY26 in FTE: 5,188 FTE hired, 3,593 FTE left, +1,502 FTE net |
+| Opening (Jun 2025) | 28,447 | 28,447 (28,447.0) |
+| Hires | +4,965 | +4,965 (4,965.0) |
+| Voluntary leavers | −2,942 | −2,942 (2,942.0) |
+| Involuntary leavers | −726 | −726 (726.0) |
+| Conversions from contingent (release 3) | +270 | +270 (270.0) |
+| Closing (Jun 2026) | 30,014 | 30,014 (30,014.0) |
+| Waterfall title | FY26: 4,965 hires outpaced 3,668 leavers, adding 1,567 people | FY26 in FTE: 4,965 FTE hired, 3,668 FTE left, +1,567 FTE net |
 
-FTE ties: 27,861.7 + 5,187.8 − 2,881.6 − 711.4 − 93.0 = 29,363.5.
+FTE ties: 28,447.0 + 4,965.0 − 2,942.0 − 726.0 + 270.0 conversions = 30,014.0. Every employee is 1.0 FTE (release 3 removed part-time), so FTE equals headcount. Since release 3, a contingent worker hired as an employee is a Conversion, not a Hire: the employee view's Hires exclude them.
 
 | Card | Value | Note (Headcount mode) |
 |---|---:|---|
 | Closing headcount | 30,014 | +5.5% vs 28,447 at start |
-| Closing FTE | 29,363.5 | 2,330 part-time · 650.5 below headcount |
-| Hires | 5,235 | 17.9% annualized · 5,188 FTE |
-| Voluntary turnover (annualized) | 10.1% | 2,942 left by choice · 2,882 FTE |
+| Closing FTE | 30,014.0 | Equals headcount: every employee is 1.0 FTE |
+| Hires | 4,965 | 17.0% annualized · 4,965 FTE |
+| Voluntary turnover (annualized) | 10.1% | 2,942 left by choice · 2,942 FTE |
 | Internal moves | 3,633 | 2,015 promotions · 1,618 other moves |
 
-Caption: *3,633 internal moves (2,015 promotions, 1,618 other) move people between teams, so they net to zero at company level. FTE 27,862 → 29,364, including −93 from schedule changes.*
+Caption: *3,633 internal moves (2,015 promotions, 1,618 other) move people between teams, so they net to zero at company level.*
 
 Waterfall tooltips (Headcount):
 
 | Bar | Line 1 | Line 2 |
 |---|---|---|
-| Opening | Active at the end of Jun 2025 | 2,106 part-time (7.4%) · FTE is 585.3 below headcount |
-| Hires | 18.4% of opening headcount · about 436 per month | 5,235 people = 5,187.8 FTE |
-| Voluntary | 10.3% of opening headcount · about 245 per month | 2,942 people = 2,881.6 FTE |
-| Involuntary | 2.6% of opening headcount · about 60 per month | 726 people = 711.4 FTE |
-| Closing | Active at the end of Jun 2026 · +5.5% vs opening | 2,330 part-time (7.8%) · FTE is 650.5 below headcount |
+| Opening | Active at the end of Jun 2025 | 28,447 people = 28,447.0 FTE |
+| Hires | 17.5% of opening headcount · about 414 per month | 4,965 people = 4,965.0 FTE |
+| Voluntary | 10.3% of opening headcount · about 245 per month | 2,942 people = 2,942.0 FTE |
+| Involuntary | 2.6% of opening headcount · about 60 per month | 726 people = 726.0 FTE |
+| Closing | Active at the end of Jun 2026 · +5.5% vs opening | 30,014 people = 30,014.0 FTE |
 
 Turnover by function (sorted; groups averaging under 20 people hidden). Title: *Commercial has the highest turnover in FY26*
 
@@ -69,35 +69,35 @@ Turnover by function (sorted; groups averaging under 20 people hidden). Title: *
 
 | Item | Headcount | FTE |
 |---|---:|---:|
-| Opening (Jun 2021) | 23,516 | 23,280 (23,280.5) |
-| Hires | +4,677 | +4,623 (4,623.2) |
-| Voluntary leavers | −2,511 | −2,480 (2,479.6) |
-| Involuntary leavers | −621 | −614 (614.3) |
-| FTE changes | — | −75 (−75.3) |
-| Closing (Jun 2022) | 25,061 | 24,734 (24,734.5) |
-| Waterfall title | FY22: 4,677 hires outpaced 3,132 leavers, adding 1,545 people | FY22 in FTE: 4,623 FTE hired, 3,094 FTE left, +1,454 FTE net |
+| Opening (Jun 2021) | 23,516 | 23,516 (23,516.0) |
+| Hires | +4,452 | +4,452 (4,452.0) |
+| Voluntary leavers | −2,511 | −2,511 (2,511.0) |
+| Involuntary leavers | −621 | −621 (621.0) |
+| Conversions from contingent (release 3) | +225 | +225 (225.0) |
+| Closing (Jun 2022) | 25,061 | 25,061 (25,061.0) |
+| Waterfall title | FY22: 4,452 hires outpaced 3,132 leavers, adding 1,545 people | FY22 in FTE: 4,452 FTE hired, 3,132 FTE left, +1,545 FTE net |
 
-FTE ties: 23,280.5 + 4,623.2 − 2,479.6 − 614.3 − 75.3 = 24,734.5.
+FTE ties: 23,516.0 + 4,452.0 − 2,511.0 − 621.0 + 225.0 conversions = 25,061.0. Every employee is 1.0 FTE (release 3 removed part-time), so FTE equals headcount. Since release 3, a contingent worker hired as an employee is a Conversion, not a Hire: the employee view's Hires exclude them.
 
 | Card | Value | Note (Headcount mode) |
 |---|---:|---|
 | Closing headcount | 25,061 | +6.6% vs 23,516 at start |
-| Closing FTE | 24,734.5 | 1,145 part-time · 326.5 below headcount |
-| Hires | 4,677 | 19.3% annualized · 4,623 FTE |
-| Voluntary turnover (annualized) | 10.3% | 2,511 left by choice · 2,480 FTE |
+| Closing FTE | 25,061.0 | Equals headcount: every employee is 1.0 FTE |
+| Hires | 4,452 | 18.3% annualized · 4,452 FTE |
+| Voluntary turnover (annualized) | 10.3% | 2,511 left by choice · 2,511 FTE |
 | Internal moves | 2,870 | 1,674 promotions · 1,196 other moves |
 
-Caption: *2,870 internal moves (1,674 promotions, 1,196 other) move people between teams, so they net to zero at company level. FTE 23,280 → 24,734, including −75 from schedule changes.*
+Caption: *2,870 internal moves (1,674 promotions, 1,196 other) move people between teams, so they net to zero at company level.*
 
 Waterfall tooltips (Headcount):
 
 | Bar | Line 1 | Line 2 |
 |---|---|---|
-| Opening | Active at the end of Jun 2021 | 819 part-time (3.5%) · FTE is 235.5 below headcount |
-| Hires | 19.9% of opening headcount · about 390 per month | 4,677 people = 4,623.2 FTE |
-| Voluntary | 10.7% of opening headcount · about 209 per month | 2,511 people = 2,479.6 FTE |
-| Involuntary | 2.6% of opening headcount · about 52 per month | 621 people = 614.3 FTE |
-| Closing | Active at the end of Jun 2022 · +6.6% vs opening | 1,145 part-time (4.6%) · FTE is 326.5 below headcount |
+| Opening | Active at the end of Jun 2021 | 23,516 people = 23,516.0 FTE |
+| Hires | 18.9% of opening headcount · about 371 per month | 4,452 people = 4,452.0 FTE |
+| Voluntary | 10.7% of opening headcount · about 209 per month | 2,511 people = 2,511.0 FTE |
+| Involuntary | 2.6% of opening headcount · about 52 per month | 621 people = 621.0 FTE |
+| Closing | Active at the end of Jun 2022 · +6.6% vs opening | 25,061 people = 25,061.0 FTE |
 
 Turnover by function (sorted; groups averaging under 20 people hidden). Title: *Commercial has the highest turnover in FY22*
 
@@ -117,15 +117,15 @@ Turnover by function (sorted; groups averaging under 20 people hidden). Title: *
 
 | Item | Headcount | FTE |
 |---|---:|---:|
-| Opening (Jun 2025) | 28,447 | 27,862 (27,861.7) |
-| Hires | +868 | +859 (859.0) |
-| Voluntary leavers | −482 | −474 (473.6) |
-| Involuntary leavers | −112 | −110 (110.0) |
-| FTE changes | — | −19 (−19.1) |
-| Closing (Aug 2025) | 28,721 | 28,118 (28,118.0) |
-| Waterfall title | Jul 2025 to Aug 2025: 868 hires outpaced 594 leavers, adding 274 people | Jul 2025 to Aug 2025 in FTE: 859 FTE hired, 584 FTE left, +256 FTE net |
+| Opening (Jun 2025) | 28,447 | 28,447 (28,447.0) |
+| Hires | +821 | +821 (821.0) |
+| Voluntary leavers | −482 | −482 (482.0) |
+| Involuntary leavers | −112 | −112 (112.0) |
+| Conversions from contingent (release 3) | +47 | +47 (47.0) |
+| Closing (Aug 2025) | 28,721 | 28,721 (28,721.0) |
+| Waterfall title | Jul 2025 to Aug 2025: 821 hires outpaced 594 leavers, adding 274 people | Jul 2025 to Aug 2025 in FTE: 821 FTE hired, 594 FTE left, +274 FTE net |
 
-FTE ties: 27,861.7 + 859.0 − 473.6 − 110.0 − 19.1 = 28,118.0.
+FTE ties: 28,447.0 + 821.0 − 482.0 − 112.0 + 47.0 conversions = 28,721.0. Every employee is 1.0 FTE (release 3 removed part-time), so FTE equals headcount. Since release 3, a contingent worker hired as an employee is a Conversion, not a Hire: the employee view's Hires exclude them.
 
 ## Same month (From Jul 2025, To Jul 2025)
 
@@ -135,8 +135,31 @@ Opening (Jun 2025) 28,447, closing (Jul 2025) 28,593.
 
 | FY | Opening | Hires | Voluntary | Involuntary | Closing | Closing FTE | Voluntary turnover | Internal moves |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| FY22 | 23,516 | 4,677 | 2,511 | 621 | 25,061 | 24,734.5 | 10.3% | 2,870 |
-| FY23 | 25,061 | 5,538 | 2,943 | 715 | 26,941 | 26,510.1 | 11.3% | 3,069 |
-| FY24 | 26,941 | 3,634 | 2,343 | 1,015 | 27,217 | 26,715.8 | 8.7% | 3,327 |
-| FY25 | 27,217 | 4,376 | 2,532 | 614 | 28,447 | 27,861.7 | 9.1% | 4,432 |
-| FY26 | 28,447 | 5,235 | 2,942 | 726 | 30,014 | 29,363.5 | 10.1% | 3,633 |
+| FY22 | 23,516 | 4,452 | 2,511 | 621 | 25,061 | 25,061.0 | 10.3% | 2,870 |
+| FY23 | 25,061 | 5,313 | 2,943 | 715 | 26,941 | 26,941.0 | 11.3% | 3,069 |
+| FY24 | 26,941 | 3,421 | 2,343 | 1,015 | 27,217 | 27,217.0 | 8.7% | 3,327 |
+| FY25 | 27,217 | 4,135 | 2,532 | 614 | 28,447 | 28,447.0 | 9.1% | 4,432 |
+| FY26 | 28,447 | 4,965 | 2,942 | 726 | 30,014 | 30,014.0 | 10.1% | 3,633 |
+
+## Worker type split (release 3: Employees, Contingent, Total)
+
+The walk carries `worker_type`. **Employee** is the view above. **Contingent** counts contingent workers from Bridgeway as held at each month-end: Starts, Ends and Internal Moves, plus Conversions out to Employee. **Total** is both: a conversion is -1 Contingent and +1 Employee in the same month, so it never moves the Total. In a Total waterfall, use `walk_step` (Opening, Joined, Left, Moved out, Moved in, Converted, Closing) to put the two vocabularies on one axis.
+
+| FY | Employees (closing) | Contingent (closing) | Total (closing) | Contingent share | Contingent starts | Contingent ends | Conversions | Total net change |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| FY22 | 25,061 | 9,288 | 34,349 | 27.0% | 5,376 | 4,427 | 225 | +2,269 |
+| FY23 | 26,941 | 10,228 | 37,169 | 27.5% | 6,029 | 4,864 | 225 | +2,820 |
+| FY24 | 27,217 | 9,910 | 37,127 | 26.7% | 5,076 | 5,181 | 213 | −42 |
+| FY25 | 28,447 | 10,707 | 39,154 | 27.3% | 6,144 | 5,106 | 241 | +2,027 |
+| FY26 | 30,014 | 11,941 | 41,955 | 28.5% | 7,033 | 5,529 | 270 | +2,801 |
+
+FY26 contingent walk: 10,707 + 7,033 starts − 5,529 ends − 270 conversions = 11,941 (internal moves net to zero). Total: 39,154 + 11,998 joined − 9,197 left = 41,955.
+
+| Contingent line | Reason | FY26 |
+|---|---|---:|
+| Starts | New engagement | +6,907 |
+| Starts | Returned after a lapse | +126 |
+| Ends | Lapsed: approved late | −116 |
+| Ends | Ended early | −648 |
+| Ends | Completed | −4,765 |
+| Conversions | Contingent to Employee | −270 |

@@ -31,7 +31,7 @@ PRINT '1. Shape';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #walk) AS actual, 115544 AS expected
+              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #walk) AS actual, 108918 AS expected
     UNION ALL SELECT 'date pairs', (SELECT COUNT(*) FROM (SELECT DISTINCT from_month_end, to_month_end FROM #walk) AS p), 88
     UNION ALL SELECT 'views',      (SELECT COUNT(DISTINCT view_name) FROM #walk), 6
 ) AS c;
@@ -64,8 +64,8 @@ WHERE view_name = 'Company' AND from_month_end = '2022-06-30' AND to_month_end =
   AND step IN ('Opening', 'Closing');
 /*
   Expected:
-    Opening   25052   2450138920.28   2487093187.28
-    Closing   26932   2718192220.16   2727327688.63
+    Opening   25052   2482526955.47   2519944448.29
+    Closing   26932   2761818121.64   2771129945.16
   (The cost snapshot control totals in 05 read .81 / .50 / .83: they add up values
    already rounded to the cent per group. The walk sums people first, then rounds.)
 */
@@ -80,19 +80,19 @@ GROUP BY step_order, step
 ORDER BY step_order;
 /*
   Expected:
-     1  Opening                             28438   28438   3066147620.92   110084.39
-     2  Hires                                4790    4790    485725625.83    -1223.30
-     3  Exits                                3223   -3223   -341052810.18      213.75
-     6  Promotions                           1824       0     21155974.87      720.71
-     7  Demotions                             148       0      -787908.61      -26.84
-     8  Tenure Increases                    25189       0    105810275.68     3604.57
-     9  Market Adjustments                    287       0      1522136.82       51.85
-    10  Same-Country Transfer Adjustments     583       0       146961.74        5.01
-    11  International Transfer Adjustments    125       0     -1159094.31      -39.49
-    12  FTE Changes                           353       0     -9274040.16       -9.92
-    13  Fringe Rate Changes                 11312       0      8304439.07      282.90
+     1  Opening                             28438   28438   3129964045.86   110062.73
+     2  Hires                                4790    4790    491177210.36    -1200.58
+     3  Exits                                3223   -3223   -348616593.73      203.82
+     6  Promotions                           1824       0     21649191.69      721.52
+     7  Demotions                             148       0      -804811.47      -26.82
+     8  Tenure Increases                    25189       0    108071152.36     3601.77
+     9  Market Adjustments                    287       0      1555253.85       51.83
+    10  Same-Country Transfer Adjustments     583       0       193227.69        6.44
+    11  International Transfer Adjustments    125       0     -1220144.21      -40.66
+    13  Fringe Rate Changes                 11312       0      8514217.27      283.76
     14  FX Translation                      17038       0            0.00        0.00
-    15  Closing                             30005   30005   3336539181.68   113663.64
+    15  Closing                             30005   30005   3410482749.65   113663.81
+  (Step 12, FTE Changes, no longer exists: every employee is 1.0 FTE since release 3.)
 */
 GO
 

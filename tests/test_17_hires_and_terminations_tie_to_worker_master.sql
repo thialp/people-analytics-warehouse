@@ -1,6 +1,7 @@
 -- Hires and terminations in the walk come from comparing snapshots. Recount
 -- them straight from the worker master's hire and termination dates, and the
--- two must agree every month.
+-- two must agree every month. Since release 3 an employee hire is either in Hires or, for a
+-- contingent worker hired as an employee, in Conversions: the two together are the hires.
 --   hire in month:        hired after the prior month-end, on or before this one,
 --                         and still employed at this month-end
 --   termination in month: employed at the prior month-end (termination date is
@@ -9,10 +10,11 @@
 WITH walk AS (
     SELECT
         month_end_date,
-        SUM(CASE WHEN movement_category = 'Hires'                    THEN headcount  ELSE 0 END) AS walk_hires,
+        SUM(CASE WHEN movement_category IN ('Hires', 'Conversions') THEN headcount  ELSE 0 END) AS walk_hires,
         SUM(CASE WHEN movement_category = 'Voluntary Terminations'   THEN -headcount ELSE 0 END) AS walk_vol_terms,
         SUM(CASE WHEN movement_category = 'Involuntary Terminations' THEN -headcount ELSE 0 END) AS walk_invol_terms
     FROM marts.mart_headcount_fte_walk
+    WHERE worker_type = 'Employee'
     GROUP BY month_end_date
 ),
 master AS (

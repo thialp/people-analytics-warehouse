@@ -10,6 +10,130 @@ SET NOCOUNT ON;
 USE ArcadiaHR;
 GO
 
+DROP TABLE IF EXISTS raw.bw_contingent_worker;
+CREATE TABLE raw.bw_contingent_worker (
+    [bw_worker_id]        NVARCHAR(400) NULL,
+    [first_name]          NVARCHAR(400) NULL,
+    [last_name]           NVARCHAR(400) NULL,
+    [email]               NVARCHAR(400) NULL,
+    [supplier_id]         NVARCHAR(400) NULL,
+    [cw_type]             NVARCHAR(400) NULL,
+    [original_start_date] NVARCHAR(400) NULL,
+    [created_date]        NVARCHAR(400) NULL
+);
+BULK INSERT raw.bw_contingent_worker
+FROM '/repo/data/raw/bw_contingent_worker.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_bw_contingent_worker INT = (SELECT COUNT(*) FROM raw.bw_contingent_worker);
+PRINT CONCAT('raw.bw_contingent_worker', '            ', @n_bw_contingent_worker, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.bw_rate_card;
+CREATE TABLE raw.bw_rate_card (
+    [rate_card_id]     NVARCHAR(400) NULL,
+    [fiscal_year]      NVARCHAR(400) NULL,
+    [country_code]     NVARCHAR(400) NULL,
+    [cw_type]          NVARCHAR(400) NULL,
+    [role_family]      NVARCHAR(400) NULL,
+    [seniority]        NVARCHAR(400) NULL,
+    [rate_type]        NVARCHAR(400) NULL,
+    [billing_currency] NVARCHAR(400) NULL,
+    [rate_low]         NVARCHAR(400) NULL,
+    [rate_target]      NVARCHAR(400) NULL,
+    [rate_high]        NVARCHAR(400) NULL
+);
+BULK INSERT raw.bw_rate_card
+FROM '/repo/data/raw/bw_rate_card.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_bw_rate_card INT = (SELECT COUNT(*) FROM raw.bw_rate_card);
+PRINT CONCAT('raw.bw_rate_card', '                    ', @n_bw_rate_card, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.bw_service_order;
+CREATE TABLE raw.bw_service_order (
+    [service_order_id]        NVARCHAR(400) NULL,
+    [bw_worker_id]            NVARCHAR(400) NULL,
+    [supplier_id]             NVARCHAR(400) NULL,
+    [order_type]              NVARCHAR(400) NULL,
+    [renews_service_order_id] NVARCHAR(400) NULL,
+    [opened_date]             NVARCHAR(400) NULL,
+    [submitted_date]          NVARCHAR(400) NULL,
+    [approved_date]           NVARCHAR(400) NULL,
+    [final_status]            NVARCHAR(400) NULL
+);
+BULK INSERT raw.bw_service_order
+FROM '/repo/data/raw/bw_service_order.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_bw_service_order INT = (SELECT COUNT(*) FROM raw.bw_service_order);
+PRINT CONCAT('raw.bw_service_order', '                ', @n_bw_service_order, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.bw_service_order_revision;
+CREATE TABLE raw.bw_service_order_revision (
+    [revision_id]           NVARCHAR(400) NULL,
+    [service_order_id]      NVARCHAR(400) NULL,
+    [revision_no]           NVARCHAR(400) NULL,
+    [revision_reason]       NVARCHAR(400) NULL,
+    [effective_start_date]  NVARCHAR(400) NULL,
+    [effective_end_date]    NVARCHAR(400) NULL,
+    [is_current]            NVARCHAR(400) NULL,
+    [status]                NVARCHAR(400) NULL,
+    [assignment_start_date] NVARCHAR(400) NULL,
+    [assignment_end_date]   NVARCHAR(400) NULL,
+    [closed_date]           NVARCHAR(400) NULL,
+    [role_family]           NVARCHAR(400) NULL,
+    [seniority]             NVARCHAR(400) NULL,
+    [job_title]             NVARCHAR(400) NULL,
+    [cost_center_code]      NVARCHAR(400) NULL,
+    [hiring_manager_email]  NVARCHAR(400) NULL,
+    [office_code]           NVARCHAR(400) NULL,
+    [bill_rate]             NVARCHAR(400) NULL,
+    [rate_type]             NVARCHAR(400) NULL,
+    [billing_currency]      NVARCHAR(400) NULL,
+    [hours_per_week]        NVARCHAR(400) NULL
+);
+BULK INSERT raw.bw_service_order_revision
+FROM '/repo/data/raw/bw_service_order_revision.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_bw_service_order_revision INT = (SELECT COUNT(*) FROM raw.bw_service_order_revision);
+PRINT CONCAT('raw.bw_service_order_revision', '       ', @n_bw_service_order_revision, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.bw_supplier;
+CREATE TABLE raw.bw_supplier (
+    [supplier_id]      NVARCHAR(400) NULL,
+    [supplier_name]    NVARCHAR(400) NULL,
+    [cw_types_offered] NVARCHAR(400) NULL,
+    [hq_country_code]  NVARCHAR(400) NULL,
+    [onboarded_date]   NVARCHAR(400) NULL,
+    [is_active]        NVARCHAR(400) NULL
+);
+BULK INSERT raw.bw_supplier
+FROM '/repo/data/raw/bw_supplier.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_bw_supplier INT = (SELECT COUNT(*) FROM raw.bw_supplier);
+PRINT CONCAT('raw.bw_supplier', '                     ', @n_bw_supplier, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.bw_timesheet_month;
+CREATE TABLE raw.bw_timesheet_month (
+    [timesheet_id]        NVARCHAR(400) NULL,
+    [bw_worker_id]        NVARCHAR(400) NULL,
+    [service_order_id]    NVARCHAR(400) NULL,
+    [month_end_date]      NVARCHAR(400) NULL,
+    [billed_hours]        NVARCHAR(400) NULL,
+    [billed_units]        NVARCHAR(400) NULL,
+    [bill_rate]           NVARCHAR(400) NULL,
+    [billing_currency]    NVARCHAR(400) NULL,
+    [billed_amount_local] NVARCHAR(400) NULL
+);
+BULK INSERT raw.bw_timesheet_month
+FROM '/repo/data/raw/bw_timesheet_month.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_bw_timesheet_month INT = (SELECT COUNT(*) FROM raw.bw_timesheet_month);
+PRINT CONCAT('raw.bw_timesheet_month', '              ', @n_bw_timesheet_month, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.dim_candidate;
 CREATE TABLE raw.dim_candidate (
     [candidate_id]     NVARCHAR(400) NULL,
@@ -185,7 +309,8 @@ CREATE TABLE raw.dim_worker (
     [termination_date]     NVARCHAR(400) NULL,
     [termination_type]     NVARCHAR(400) NULL,
     [worker_type]          NVARCHAR(400) NULL,
-    [is_executive_officer] NVARCHAR(400) NULL
+    [is_executive_officer] NVARCHAR(400) NULL,
+    [work_email]           NVARCHAR(400) NULL
 );
 BULK INSERT raw.dim_worker
 FROM '/repo/data/raw/dim_worker.csv'
@@ -347,6 +472,8 @@ CREATE TABLE raw.fact_workforce_plan (
     [planned_net_new]          NVARCHAR(400) NULL,
     [planned_backfills]        NVARCHAR(400) NULL,
     [planned_cost_usd]         NVARCHAR(400) NULL,
+    [planned_cw_headcount]     NVARCHAR(400) NULL,
+    [planned_cw_spend_usd]     NVARCHAR(400) NULL,
     [plan_fx_rate_date]        NVARCHAR(400) NULL
 );
 BULK INSERT raw.fact_workforce_plan
@@ -354,6 +481,93 @@ FROM '/repo/data/raw/fact_workforce_plan.csv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_fact_workforce_plan INT = (SELECT COUNT(*) FROM raw.fact_workforce_plan);
 PRINT CONCAT('raw.fact_workforce_plan', '             ', @n_fact_workforce_plan, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.feed_bridgeway_keystone_event;
+CREATE TABLE raw.feed_bridgeway_keystone_event (
+    [feed_event_id] NVARCHAR(400) NULL,
+    [revision_id]   NVARCHAR(400) NULL,
+    [bw_worker_id]  NVARCHAR(400) NULL,
+    [event_type]    NVARCHAR(400) NULL,
+    [sent_date]     NVARCHAR(400) NULL,
+    [applied_date]  NVARCHAR(400) NULL,
+    [outcome]       NVARCHAR(400) NULL,
+    [error_text]    NVARCHAR(400) NULL
+);
+BULK INSERT raw.feed_bridgeway_keystone_event
+FROM '/repo/data/raw/feed_bridgeway_keystone_event.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_feed_bridgeway_keystone_event INT = (SELECT COUNT(*) FROM raw.feed_bridgeway_keystone_event);
+PRINT CONCAT('raw.feed_bridgeway_keystone_event', '   ', @n_feed_bridgeway_keystone_event, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.gen_cw_discrepancy_truth;
+CREATE TABLE raw.gen_cw_discrepancy_truth (
+    [discrepancy_id]   NVARCHAR(400) NULL,
+    [discrepancy_code] NVARCHAR(400) NULL,
+    [root_cause_code]  NVARCHAR(400) NULL,
+    [bw_worker_id]     NVARCHAR(400) NULL,
+    [person_id]        NVARCHAR(400) NULL,
+    [service_order_id] NVARCHAR(400) NULL,
+    [feed_event_id]    NVARCHAR(400) NULL,
+    [timesheet_id]     NVARCHAR(400) NULL,
+    [fields_affected]  NVARCHAR(400) NULL,
+    [start_date]       NVARCHAR(400) NULL,
+    [end_date]         NVARCHAR(400) NULL,
+    [resolution]       NVARCHAR(400) NULL,
+    [detail]           NVARCHAR(400) NULL
+);
+BULK INSERT raw.gen_cw_discrepancy_truth
+FROM '/repo/data/sqlserver/gen_cw_discrepancy_truth.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_gen_cw_discrepancy_truth INT = (SELECT COUNT(*) FROM raw.gen_cw_discrepancy_truth);
+PRINT CONCAT('raw.gen_cw_discrepancy_truth', '        ', @n_gen_cw_discrepancy_truth, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ks_contingent_worker;
+CREATE TABLE raw.ks_contingent_worker (
+    [ks_record_id]           NVARCHAR(400) NULL,
+    [person_id]              NVARCHAR(400) NULL,
+    [bw_worker_id]           NVARCHAR(400) NULL,
+    [effective_start_date]   NVARCHAR(400) NULL,
+    [effective_end_date]     NVARCHAR(400) NULL,
+    [change_source]          NVARCHAR(400) NULL,
+    [feed_event_id]          NVARCHAR(400) NULL,
+    [first_name]             NVARCHAR(400) NULL,
+    [last_name]              NVARCHAR(400) NULL,
+    [cw_type]                NVARCHAR(400) NULL,
+    [supplier_name]          NVARCHAR(400) NULL,
+    [status]                 NVARCHAR(400) NULL,
+    [contract_start_date]    NVARCHAR(400) NULL,
+    [contract_end_date]      NVARCHAR(400) NULL,
+    [inactive_reason]        NVARCHAR(400) NULL,
+    [converted_to_worker_id] NVARCHAR(400) NULL,
+    [department_id]          NVARCHAR(400) NULL,
+    [cost_center_id]         NVARCHAR(400) NULL,
+    [location_id]            NVARCHAR(400) NULL,
+    [manager_worker_id]      NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_contingent_worker
+FROM '/repo/data/raw/ks_contingent_worker.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_contingent_worker INT = (SELECT COUNT(*) FROM raw.ks_contingent_worker);
+PRINT CONCAT('raw.ks_contingent_worker', '            ', @n_ks_contingent_worker, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ref_cw_discrepancy_type;
+CREATE TABLE raw.ref_cw_discrepancy_type (
+    [discrepancy_code]    NVARCHAR(400) NULL,
+    [discrepancy_name]    NVARCHAR(400) NULL,
+    [what_happened]       NVARCHAR(400) NULL,
+    [what_a_manager_sees] NVARCHAR(400) NULL,
+    [who_can_fix_it]      NVARCHAR(400) NULL,
+    [severity]            NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_cw_discrepancy_type
+FROM '/repo/data/sqlserver/ref_cw_discrepancy_type.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_cw_discrepancy_type INT = (SELECT COUNT(*) FROM raw.ref_cw_discrepancy_type);
+PRINT CONCAT('raw.ref_cw_discrepancy_type', '         ', @n_ref_cw_discrepancy_type, ' rows');
 GO
 
 DROP TABLE IF EXISTS raw.ref_fringe_rate;
@@ -464,6 +678,37 @@ DECLARE @n_ref_performance_bonus INT = (SELECT COUNT(*) FROM raw.ref_performance
 PRINT CONCAT('raw.ref_performance_bonus', '           ', @n_ref_performance_bonus, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.ref_raw_column;
+CREATE TABLE raw.ref_raw_column (
+    [table_name]   NVARCHAR(400) NULL,
+    [column_order] NVARCHAR(400) NULL,
+    [column_name]  NVARCHAR(400) NULL,
+    [data_type]    NVARCHAR(400) NULL,
+    [description]  NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_raw_column
+FROM '/repo/data/sqlserver/ref_raw_column.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_raw_column INT = (SELECT COUNT(*) FROM raw.ref_raw_column);
+PRINT CONCAT('raw.ref_raw_column', '                  ', @n_ref_raw_column, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ref_raw_table_lineage;
+CREATE TABLE raw.ref_raw_table_lineage (
+    [table_name]       NVARCHAR(400) NULL,
+    [system_code]      NVARCHAR(400) NULL,
+    [module]           NVARCHAR(400) NULL,
+    [grain]            NVARCHAR(400) NULL,
+    [history_type]     NVARCHAR(400) NULL,
+    [added_in_release] NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_raw_table_lineage
+FROM '/repo/data/raw/ref_raw_table_lineage.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_raw_table_lineage INT = (SELECT COUNT(*) FROM raw.ref_raw_table_lineage);
+PRINT CONCAT('raw.ref_raw_table_lineage', '           ', @n_ref_raw_table_lineage, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.ref_salary_range;
 CREATE TABLE raw.ref_salary_range (
     [fiscal_year]            NVARCHAR(400) NULL,
@@ -480,6 +725,22 @@ FROM '/repo/data/raw/ref_salary_range.csv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_salary_range INT = (SELECT COUNT(*) FROM raw.ref_salary_range);
 PRINT CONCAT('raw.ref_salary_range', '                ', @n_ref_salary_range, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ref_source_system;
+CREATE TABLE raw.ref_source_system (
+    [system_code] NVARCHAR(400) NULL,
+    [system_name] NVARCHAR(400) NULL,
+    [system_type] NVARCHAR(400) NULL,
+    [record_of]   NVARCHAR(400) NULL,
+    [used_by]     NVARCHAR(400) NULL,
+    [extract]     NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_source_system
+FROM '/repo/data/sqlserver/ref_source_system.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_source_system INT = (SELECT COUNT(*) FROM raw.ref_source_system);
+PRINT CONCAT('raw.ref_source_system', '               ', @n_ref_source_system, ' rows');
 GO
 
 DROP TABLE IF EXISTS raw.ref_tenure_increase;

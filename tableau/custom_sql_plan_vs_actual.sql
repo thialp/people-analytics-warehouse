@@ -1,7 +1,8 @@
 /*
   custom_sql_plan_vs_actual.sql
   Tableau Custom SQL for Dashboard #3, Workforce Planning (SQL Server, database ArcadiaHR).
-  Plan vs actual: one row per plan version x cost center x fiscal quarter, 28,800 rows.
+  Plan vs actual: one row per plan version x cost center x fiscal quarter, 29,415 rows (615 of them
+  are cost centers with contingent workers only: zero on every employee measure).
 
   Reads the reporting view rpt.vw_plan_vs_actual (built by sqlserver/04_create_reporting_views.sql
   from the seat layer in 03b). The columns are listed so the data source documents itself and
@@ -13,6 +14,11 @@
   is_latest_version) before summing. planned/actual_net_new and _backfills are flows (sum
   over quarters); planned/actual_ending_headcount, _fte and _cost are levels (read the
   quarter you want, usually quarter_end_date = the fiscal year-end, never sum quarters).
+
+  Release 3: the plan's contingent line beside its actuals. actual_cw_headcount is the contingent
+  workers Bridgeway counted on the quarter-end; actual_cw_spend_usd_plan_fx their annualized bill
+  run-rate at the plan's FX rates (compare with planned_cw_spend_usd), _constant at the constant
+  rate set. Like headcount, these are levels.
 
   Checked row for row against the DuckDB mart by sqlserver/check_tsql_in_duckdb.py.
   Tableau rules: one SELECT, no CTEs, no ORDER BY, block comments only.
@@ -51,5 +57,10 @@ SELECT
     v.planned_cost_usd,
     v.actual_cost_usd_plan_fx,
     v.actual_cost_usd_constant,
+    v.planned_cw_headcount,
+    v.actual_cw_headcount,
+    v.planned_cw_spend_usd,
+    v.actual_cw_spend_usd_plan_fx,
+    v.actual_cw_spend_usd_constant,
     v.plan_fx_rate_date
 FROM rpt.vw_plan_vs_actual AS v

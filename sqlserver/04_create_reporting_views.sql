@@ -14,7 +14,10 @@
       Grain: country x calendar year. Same content as data/marts/mart_fringe_rate.csv.
   rpt.vw_position_fill, rpt.vw_vacancy_pool, rpt.vw_plan_vs_actual, rpt.vw_seat_corridors
       Workforce Planning (seats, requisitions, plan). Same content as the marts of
-      the same names in data/marts/; built on 03b_build_dw_workforce_planning.sql.
+      the same names in data/marts/; built on 03b_build_dw_workforce_planning.sql
+      (the plan's contingent line, actual_cw_*, on 03c_build_dw_contingent.sql).
+
+  The contingent workforce views (release 3) are in 04b_create_reporting_views_contingent.sql.
 
   The cost bridge is deliberately NOT a view: it lives in Tableau as Custom SQL
   (tableau/custom_sql_workforce_cost_bridge.sql), the way many enterprise
@@ -301,8 +304,15 @@ SELECT
     p.PlannedCostUsd               AS planned_cost_usd,
     p.ActualCostUsdPlanFx          AS actual_cost_usd_plan_fx,
     p.ActualCostUsdConstant        AS actual_cost_usd_constant,
+    p.PlannedCwHeadcount           AS planned_cw_headcount,
+    ISNULL(w.ActualCwHeadcount, 0) AS actual_cw_headcount,
+    p.PlannedCwSpendUsd            AS planned_cw_spend_usd,
+    CAST(ROUND(ISNULL(w.ActualCwSpendUsdPlanFx, 0), 2) AS DECIMAL(18, 2))   AS actual_cw_spend_usd_plan_fx,
+    CAST(ROUND(ISNULL(w.ActualCwSpendUsdConstant, 0), 2) AS DECIMAL(18, 2)) AS actual_cw_spend_usd_constant,
     p.PlanFxRateDate               AS plan_fx_rate_date
 FROM dw.PlanVsActual AS p
+LEFT JOIN dw.CwPlanActual AS w
+  ON w.PlanVersion = p.PlanVersion AND w.CostCenterID = p.CostCenterID AND w.FiscalQuarter = p.FiscalQuarter
 JOIN dw.DimCostCenter AS cc ON cc.CostCenterID = p.CostCenterID
 JOIN dw.DimDepartment AS d  ON d.DepartmentID  = cc.DepartmentID
 JOIN dw.DimCountry    AS c  ON c.CountryCode   = cc.CountryCode;

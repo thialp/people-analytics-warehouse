@@ -105,9 +105,12 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 | `02_load_raw.sql` | Lands each CSV as text with `BULK INSERT` |
 | `03_build_dw.sql` | Types and cleans the data, resolves pay corrections, values pay at its posting-date FX rate, builds the fiscal calendar, the indexed worker month-end snapshot, the pay ledger behind the compensation walk and the reporting chain |
 | `03b_build_dw_workforce_planning.sql` | The seat layer: cost centers, positions (SCD2), seat assignments, requisitions, the workforce plan, candidates, the seat month-end snapshot, seat fills with the pay walk, vacancy chains, plan vs actual |
+| `03c_build_dw_contingent.sql` | Release 3, the contingent workforce: Bridgeway VMS (workers, service orders and revisions, timesheets), Keystone HR's contingent records, the feed log; the contingent month-end snapshot, conversions to employee, contingent movement, the plan's contingent actuals; for case study 6 the supplier spellings, identity resolution, the two systems side by side and the discrepancy rules |
 | `04_create_reporting_views.sql` | Creates `rpt.vw_workforce_cost_snapshot`, `rpt.vw_org_leader_summary`, `rpt.vw_fringe_rate`, and for Workforce Planning `rpt.vw_position_fill`, `rpt.vw_vacancy_pool`, `rpt.vw_plan_vs_actual`, `rpt.vw_seat_corridors` |
+| `04b_create_reporting_views_contingent.sql` | Creates `rpt.vw_cw_spend`, `rpt.vw_workforce_cost_growth_mix` and, for case study 6, `rpt.vw_cw_discrepancy_detail`, `rpt.vw_cw_reconciliation`, `rpt.vw_cw_engagement_cap`, `rpt.vw_cw_detection_score` |
 | `05_validate.sql` | Checks row counts, reporting lines, control totals and that the pay ledger explains every worker's change in cost |
 | `08_validate_workforce_planning.sql` | Checks the seat layer: row counts, one incumbent per seat, filled seats = headcount, the seat pay walk, FY26 fills, the vacancy pool and plan vs actual |
+| `12_validate_contingent_workforce.sql` | Checks the contingent workforce: every raw row landed, the population and spend, identity resolution, the discrepancies open on 30 Jun 2026 and the detection score, and that the cost bridge Custom SQL closes and the growth mix effects add up |
 
 Expected output, abbreviated (5–10 minutes under emulation):
 
@@ -142,7 +145,19 @@ dw.FactCandidateStageEvent          531691
 dw.PositionMonthEndSnapshot        1701742
 dw.SeatFill                          30575
 dw.SeatVacancyChain                  30575
-dw.PlanVsActual                      28800
+dw.PlanVsActual                      29415
+TableName                       RowsLoaded
+dw.BwContingentWorker                43484
+dw.BwServiceOrderRevision           160499
+dw.BwTimesheetMonth                 632504
+dw.KsContingentWorker               141791
+dw.FeedBridgewayKeystoneEvent       106357
+dw.CwMonthEndSnapshot               598752
+dw.CwConversion                       1174
+dw.CwMovement                       616469
+dw.CwIdentityResolution              43552
+dw.CwReconciliationSnapshot         599228
+dw.CwDiscrepancy                     28586
 Created views rpt.vw_workforce_cost_snapshot, rpt.vw_org_leader_summary, rpt.vw_fringe_rate,
               rpt.vw_position_fill, rpt.vw_vacancy_pool, rpt.vw_plan_vs_actual, rpt.vw_seat_corridors
 1. Row counts
@@ -154,8 +169,8 @@ workers_without_a_valid_manager
 0
 4. Control totals (executive officers excluded)
 month_end_date  headcount  fte       loaded_usd_nominal  loaded_usd_constant
-2022-06-30      25052      24725.50  2450138920.49       2487093187.74
-2026-06-30      30005      29354.50  3336539181.84       3336539181.84
+2022-06-30      25052      25052.00  2482526955.64       2519944448.45
+2026-06-30      30005      30005.00  3410482749.84       3410482749.84
 5. The pay ledger explains every change in every worker's cost (expected 0)
 worker_months_not_explained
 0
@@ -167,11 +182,17 @@ month-ends where filled seats differ from headcount             0  PASS
 3. FY26 seat fills (fiscal_year = 2026)        (twelve rows, all PASS)
 4. Vacancy pool at 30 Jun 2026                 (four rows, all PASS)
 5. FY26 plan vs actual, company                (compare with the expected values in the script)
+Workforce cost bridge Custom SQL returned 29123 rows in <n> seconds
+1. Every raw row landed in dw                  (12: nine rows, all PASS)
+2. Population and spend                        (seven rows, all PASS)
+3. Who is who: identity resolution             (ten rows, all PASS)
+4. The discrepancies, open on 30 Jun 2026 ...  (nineteen rows, all PASS)
+5. Cost: the bridge closes ...                 (six rows, all PASS)
 ```
 
 Every row with a `result` column should say `PASS`, the single-number checks in 05 should show `0`, and the control totals should match (SQL Server may show a cent different from DuckDB: each group is rounded to the cent before the total is added up).
 
-**No SQL Server at hand?** `python sqlserver/check_tsql_in_duckdb.py` translates the same T-SQL to DuckDB with sqlglot, runs it on the same CSVs and compares every view and Custom SQL with the pipeline's marts, row for row (about a minute). It is how release 2 was checked before it ran on SQL Server.
+**No SQL Server at hand?** `python sqlserver/check_tsql_in_duckdb.py` translates the same T-SQL to DuckDB with sqlglot, runs it on the same CSVs and compares every view and Custom SQL with the pipeline's marts, row for row (about 15 minutes on a 2-core machine). It is how releases 2 and 3 were checked before they ran on SQL Server.
 
 ### Optional: validate the compensation walk
 
@@ -194,8 +215,8 @@ views              6        6  PASS
 2. Groups whose walk does not close: Opening + steps <> Closing (expected 0)
 0
 3. Company, FY23 (30 Jun 2022 to 30 Jun 2023)
-Opening   25052   2450138920.28   2487093187.28
-Closing   26932   2718192220.16   2727327688.63
+Opening   25052   2482526955.47   2519944448.29
+Closing   26932   2761818121.64   2771129945.16
 4. FY26 company walk, loaded cost at constant FX ...
 ```
 
@@ -332,7 +353,7 @@ Why Extract: the query aggregates about 1.35 million worker-months on every refr
 2. Pick schema **rpt** and drag **vw_workforce_cost_snapshot** onto the canvas.
 3. Rename it **Workforce Cost Snapshot (SQL Server)** and set it to **Extract**.
 
-Expected: 24 columns and 197,603 rows.
+Expected: 24 columns and 233,866 rows.
 
 Keep the two data sources separate. They have different grains, and joining them would duplicate dollars.
 
@@ -340,7 +361,7 @@ Keep the two data sources separate. They have different grains, and joining them
 
 Use the **Workforce Cost Bridge** data source.
 
-1. Drag **Fiscal Year** to Filters and keep only **2026**.
+1. Drag **Fiscal Year** to Filters and keep only **2026**. Drag **Worker Type** to Filters and keep only **Employee** (release 3: the bridge also explains the contingent workforce's bill run-rate, as worker type **Contingent**).
 2. Create a calculated field **Bridge Amount**:
 
    ```
@@ -364,18 +385,22 @@ Use the **Workforce Cost Bridge** data source.
 
 | Driver | Expected (USD) |
 |---|---:|
-| Opening Run-Rate | 3,042,851,180 |
-| Hires | +451,657,231 |
-| Terminations | −378,384,468 |
-| Transfers In / Out | +137,683,196 / −137,683,196 |
-| Promotions | +22,003,572 |
-| Demotions | −694,074 |
-| Tenure & Market Adjustments | +105,140,681 |
-| International Mobility | +702,852 |
-| FTE Changes | −12,321,035 |
-| Fringe Rate Changes | +8,979,057 |
-| FX Rate Changes | −44,431,732 |
-| **Grand Total (Closing)** | **3,195,503,265** |
+| Opening Run-Rate | 3,171,717,783 |
+| Hires | +524,006,326 |
+| Terminations | −408,961,394 |
+| Transfers In / Out | +157,393,285 / −157,393,285 |
+| Promotions | +24,784,185 |
+| Demotions | −879,216 |
+| Tenure & Market Adjustments | +116,038,891 |
+| International Mobility | −787,039 |
+| Conversions (contingent workers hired as employees) | +19,677,620 |
+| Fringe Rate Changes | +9,537,549 |
+| FX Rate Changes | −44,651,955 |
+| **Grand Total (Closing)** | **3,410,482,750** |
+
+(Warehouse release 3. There is no FTE Changes driver: every employee is 1.0 FTE. Hires + Conversions = 543,683,946, the Hires line before conversions were split out of it.)
+
+With **Worker Type = Contingent** instead: Opening 1,073,453,800; Contingent Starts +872,484,118; Contingent Ends −674,446,779; Transfers In / Out +38,877,944 / −38,877,944; Contingent Rate Changes +6,550,467; Conversions −32,702,296; FX Rate Changes −7,713,108; Closing **1,237,626,203**. The two conversion lines net to −13,024,675: what swapping 270 contractors for employees saved in FY26, at run-rate.
 
 If these match, your SQL Server, Custom SQL and Tableau calculation all agree with the published data.
 

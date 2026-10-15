@@ -8,7 +8,7 @@ Default state: **FY26** (Jun 30, 2025 to Jun 30, 2026), view **Company**, cost *
 
 | Custom SQL | Mart it matches | Rows |
 |---|---|---:|
-| `custom_sql_compensation_walk.sql` | `mart_compensation_walk` | 115,544 |
+| `custom_sql_compensation_walk.sql` | `mart_compensation_walk` | 108,918 |
 | `custom_sql_office_moves.sql` | `mart_office_moves` | 89,611 |
 | `custom_sql_region_walk.sql` (new) | `mart_region_walk` | 26,520 |
 | `custom_sql_career_moves.sql` (new) | `mart_career_moves` | 34,532 |
@@ -21,29 +21,28 @@ Pay per FTE is the step's `avg_loaded_usd_constant`; Total payroll is `loaded_us
 
 | Step | Group | People | Headcount | Pay per FTE | Total payroll |
 |---|---|---:|---:|---:|---:|
-| Opening | Balance | 28,438 | 28,438 | $110,084.39 | $3,066.1M |
-| Hires | Headcount | 4,790 | 4,790 | −$1,223.30 | +$485.7M |
-| Exits | Headcount | 3,223 | −3,223 | +$213.75 | −$341.1M |
-| Promotions | Career | 1,824 | 0 | +$720.71 | +$21.2M |
-| Demotions | Career | 148 | 0 | −$26.84 | −$0.8M |
-| Tenure Increases | Pay Rate | 25,189 | 0 | +$3,604.57 | +$105.8M |
-| Market Adjustments | Pay Rate | 287 | 0 | +$51.85 | +$1.5M |
-| Same-Country Transfer Adjustments | Location | 583 | 0 | +$5.01 | +$0.1M |
-| International Transfer Adjustments | Location | 125 | 0 | −$39.49 | −$1.2M |
-| FTE Changes | Workforce Rate | 353 | 0 | −$9.92 | −$9.3M |
-| Fringe Rate Changes | Statutory | 11,312 | 0 | +$282.90 | +$8.3M |
+| Opening | Balance | 28,438 | 28,438 | $110,062.73 | $3,130.0M |
+| Hires | Headcount | 4,790 | 4,790 | −$1,200.58 | +$491.2M |
+| Exits | Headcount | 3,223 | −3,223 | +$203.82 | −$348.6M |
+| Promotions | Career | 1,824 | 0 | +$721.52 | +$21.6M |
+| Demotions | Career | 148 | 0 | −$26.82 | −$0.8M |
+| Tenure Increases | Pay Rate | 25,189 | 0 | +$3,601.77 | +$108.1M |
+| Market Adjustments | Pay Rate | 287 | 0 | +$51.83 | +$1.6M |
+| Same-Country Transfer Adjustments | Location | 583 | 0 | +$6.44 | +$0.2M |
+| International Transfer Adjustments | Location | 125 | 0 | −$40.66 | −$1.2M |
+| Fringe Rate Changes | Statutory | 11,312 | 0 | +$283.76 | +$8.5M |
 | FX Translation | Currency | 17,038 | 0 | +$0.00 | +$0.0M |
-| Closing | Balance | 30,005 | 30,005 | $113,663.64 | $3,336.5M |
+| Closing | Balance | 30,005 | 30,005 | $113,663.81 | $3,410.5M |
 
-Checks: Pay per FTE $110,084.39 + steps = $113,663.64 (change +$3,579.24); Total payroll $3,066,147,620.92 + steps = $3,336,539,181.68.
+Checks: Pay per FTE $110,062.73 + steps = $113,663.81 (change +$3,601.08); Total payroll $3,129,964,045.86 + steps = $3,410,482,749.65.
 
 ## Titles and headlines
 
 | Element | Pay per FTE lens | Total payroll lens |
 |---|---|---|
-| Waterfall headline | Average pay per FTE rose $3,579 (+3.3%) | Total payroll rose $270.4M (+8.8%) |
+| Waterfall headline | Average pay per FTE rose $3,601 (+3.3%) | Total payroll rose $280.5M (+9.0%) |
 | Waterfall subtitle, line 1 | Jun 30, 2025 to Jun 30, 2026 · Pay per FTE = loaded cost ÷ FTE | Jun 30, 2025 to Jun 30, 2026 · Total payroll = loaded cost of all workers |
-| Waterfall subtitle, line 2 (two largest step groups) | Biggest moves: raises +$3,656, hires and exits −$1,010 | Biggest moves: hires and exits +$144.7M, raises +$107.3M |
+| Waterfall subtitle, line 2 (two largest step groups) | Biggest moves: raises +$3,654, hires and exits −$997 | Biggest moves: hires and exits +$142.6M, raises +$109.6M |
 | Page subtitle data note | Data covers Jun 30, 2022 to Jun 30, 2026 | same |
 
 ## Top drivers card (four largest individual steps)
@@ -52,28 +51,28 @@ Checks: Pay per FTE $110,084.39 + steps = $113,663.64 (change +$3,579.24); Total
 
 | Rank | Step | Value | People |
 |---|---|---:|---:|
-| 1 | Tenure Increases | +$3,605 | 25,189 |
-| 2 | Hires | −$1,223 | 4,790 |
-| 3 | Promotions | +$721 | 1,824 |
-| 4 | Fringe Rate Changes | +$283 | 11,312 |
+| 1 | Tenure Increases | +$3,602 | 25,189 |
+| 2 | Hires | −$1,201 | 4,790 |
+| 3 | Promotions | +$722 | 1,824 |
+| 4 | Fringe Rate Changes | +$284 | 11,312 |
 
 **Total payroll**
 
 | Rank | Step | Value | People |
 |---|---|---:|---:|
-| 1 | Hires | +$485.7M | 4,790 |
-| 2 | Exits | −$341.1M | 3,223 |
-| 3 | Tenure Increases | +$105.8M | 25,189 |
-| 4 | Promotions | +$21.2M | 1,824 |
+| 1 | Hires | +$491.2M | 4,790 |
+| 2 | Exits | −$348.6M | 3,223 |
+| 3 | Tenure Increases | +$108.1M | 25,189 |
+| 4 | Promotions | +$21.6M | 1,824 |
 
 ## Cost and Currency toggles
 
 | Cost | Currency | Opening per FTE | Closing per FTE | Change | Opening total | Closing total |
 |---|---|---:|---:|---:|---:|---:|
-| Loaded | Constant | $110,084.39 | $113,663.64 | +$3,579.24 | $3,066.1M | $3,336.5M |
-| Loaded | Nominal | $111,552.17 | $113,663.64 | +$2,111.46 | $3,107.0M | $3,336.5M |
-| Base | Constant | $92,605.53 | $95,387.16 | +$2,781.63 | $2,579.3M | $2,800.0M |
-| Base | Nominal | $93,934.56 | $95,387.16 | +$1,452.60 | $2,616.3M | $2,800.0M |
+| Loaded | Constant | $110,062.73 | $113,663.81 | +$3,601.08 | $3,130.0M | $3,410.5M |
+| Loaded | Nominal | $111,530.97 | $113,663.81 | +$2,132.84 | $3,171.7M | $3,410.5M |
+| Base | Constant | $92,591.92 | $95,389.54 | +$2,797.62 | $2,633.1M | $2,862.2M |
+| Base | Nominal | $93,921.39 | $95,389.54 | +$1,468.15 | $2,670.9M | $2,862.2M |
 
 ## Office moves panel
 
@@ -123,7 +122,7 @@ Headline: **1,850 promotions and 148 demotions; 16 reached Director and above**.
 
 | FY | Opening | Closing | Opening per FTE | Closing per FTE | Change | Opening total | Closing total |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| FY23 | 25,052 | 26,932 | $100,588.19 | $102,913.75 | +2.3% | $2,487.1M | $2,727.3M |
-| FY24 | 26,932 | 27,208 | $102,913.75 | $106,705.73 | +3.7% | $2,727.3M | $2,849.8M |
-| FY25 | 27,208 | 28,438 | $106,705.73 | $110,084.39 | +3.2% | $2,849.8M | $3,066.1M |
-| FY26 | 28,438 | 30,005 | $110,084.39 | $113,663.64 | +3.3% | $3,066.1M | $3,336.5M |
+| FY23 | 25,052 | 26,932 | $100,588.55 | $102,893.58 | +2.3% | $2,519.9M | $2,771.1M |
+| FY24 | 26,932 | 27,208 | $102,893.58 | $106,678.48 | +3.7% | $2,771.1M | $2,902.5M |
+| FY25 | 27,208 | 28,438 | $106,678.48 | $110,062.73 | +3.2% | $2,902.5M | $3,130.0M |
+| FY26 | 28,438 | 30,005 | $110,062.73 | $113,663.81 | +3.3% | $3,130.0M | $3,410.5M |

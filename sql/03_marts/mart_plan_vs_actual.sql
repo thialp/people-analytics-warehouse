@@ -9,6 +9,13 @@
 -- after the plan was set is not a variance. actual_cost_usd_constant is also given.
 -- is_latest_version marks the last version made before the quarter started (the
 -- budget for Q1, RF1 for Q2, RF2 for Q3, RF3 for Q4).
+--
+-- Release 3: the plan's contingent line beside its actuals. actual_cw_headcount is the
+-- contingent workers Bridgeway counted on the quarter-end (int_cw_month_end_snapshot);
+-- actual_cw_spend_usd_plan_fx is their annualized bill run-rate (hourly rate x contracted
+-- hours x 52, or monthly rate x 12) at the plan's FX rates, the same basis as
+-- planned_cw_spend_usd; actual_cw_spend_usd_constant is at the constant rate set.
+-- 615 rows exist only for the contingent line (zero on every employee measure).
 CREATE OR REPLACE TABLE marts.mart_plan_vs_actual AS
 WITH quarters AS (
     SELECT fiscal_year, fiscal_quarter, MAX(month_end_date) AS quarter_end_date,
@@ -51,6 +58,29 @@ cost_at_plan_fx AS (
       ON fx.currency_code = pe.currency_code AND fx.rate_date <= p.plan_fx_rate_date
     GROUP BY ALL
 ),
+cw AS (      -- contingent actuals at the quarter-end, by cost center and billing currency
+    SELECT s.month_end_date AS quarter_end_date, s.cost_center_id, s.billing_currency AS currency_code,
+           COUNT(*)                                                       AS headcount,
+           SUM(CAST(s.run_rate_local AS DECIMAL(38, 10)))                 AS run_rate_local,
+           SUM(CAST(s.run_rate_usd_constant AS DECIMAL(38, 10)))          AS run_rate_usd_constant
+    FROM intermediate.int_cw_month_end_snapshot AS s
+    WHERE s.month_end_date IN (SELECT quarter_end_date FROM quarters)
+    GROUP BY ALL
+),
+cw_at_plan_fx AS (
+    SELECT p.plan_version, p.cost_center_id, p.fiscal_quarter,
+           SUM(CAST(c.run_rate_local * fx.usd_per_local AS DECIMAL(38, 10))) AS actual_cw_spend_usd_plan_fx
+    FROM staging.stg_workforce_plan AS p
+    JOIN cw AS c ON c.quarter_end_date = p.quarter_end_date AND c.cost_center_id = p.cost_center_id
+    ASOF JOIN staging.stg_fx_rate_daily AS fx
+      ON fx.currency_code = c.currency_code AND fx.rate_date <= p.plan_fx_rate_date
+    GROUP BY ALL
+),
+cw_cc AS (
+    SELECT quarter_end_date, cost_center_id, SUM(headcount) AS headcount,
+           SUM(run_rate_usd_constant) AS run_rate_usd_constant
+    FROM cw GROUP BY ALL
+),
 people_cc AS (
     SELECT quarter_end_date, cost_center_id, SUM(headcount) AS headcount, SUM(fte) AS fte,
            SUM(loaded_usd_constant) AS loaded_usd_constant
@@ -90,6 +120,11 @@ SELECT
     p.planned_cost_usd,
     CAST(ROUND(COALESCE(x.actual_cost_usd_plan_fx, 0), 2) AS DECIMAL(18, 2)) AS actual_cost_usd_plan_fx,
     CAST(ROUND(COALESCE(a.loaded_usd_constant, 0), 2) AS DECIMAL(18, 2))     AS actual_cost_usd_constant,
+    p.planned_cw_headcount,
+    COALESCE(w.headcount, 0)                                 AS actual_cw_headcount,
+    p.planned_cw_spend_usd,
+    CAST(ROUND(COALESCE(y.actual_cw_spend_usd_plan_fx, 0), 2) AS DECIMAL(18, 2)) AS actual_cw_spend_usd_plan_fx,
+    CAST(ROUND(COALESCE(w.run_rate_usd_constant, 0), 2) AS DECIMAL(18, 2))       AS actual_cw_spend_usd_constant,
     p.plan_fx_rate_date
 FROM staging.stg_workforce_plan AS p
 JOIN quarters AS q ON q.quarter_end_date = p.quarter_end_date
@@ -100,4 +135,7 @@ LEFT JOIN people_cc AS a ON a.quarter_end_date = p.quarter_end_date AND a.cost_c
 LEFT JOIN fills AS f ON f.quarter_end_date = p.quarter_end_date AND f.cost_center_id = p.cost_center_id
 LEFT JOIN cost_at_plan_fx AS x
   ON x.plan_version = p.plan_version AND x.cost_center_id = p.cost_center_id AND x.fiscal_quarter = p.fiscal_quarter
+LEFT JOIN cw_cc AS w ON w.quarter_end_date = p.quarter_end_date AND w.cost_center_id = p.cost_center_id
+LEFT JOIN cw_at_plan_fx AS y
+  ON y.plan_version = p.plan_version AND y.cost_center_id = p.cost_center_id AND y.fiscal_quarter = p.fiscal_quarter
 ORDER BY p.fiscal_year, p.version_date, p.cost_center_id, p.fiscal_quarter;

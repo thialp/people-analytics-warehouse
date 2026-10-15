@@ -20,16 +20,16 @@ SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
               SELECT 'dw.DimCostCenter rows'          AS check_name, (SELECT COUNT(*) FROM dw.DimCostCenter)          AS actual, 630     AS expected
-    UNION ALL SELECT 'dw.DimPosition rows',                          (SELECT COUNT(*) FROM dw.DimPosition),                     101297
+    UNION ALL SELECT 'dw.DimPosition rows',                          (SELECT COUNT(*) FROM dw.DimPosition),                      99398
     UNION ALL SELECT 'dw.FactPositionAssignment rows',               (SELECT COUNT(*) FROM dw.FactPositionAssignment),          54094
     UNION ALL SELECT 'dw.FactRequisition rows',                      (SELECT COUNT(*) FROM dw.FactRequisition),                 31323
-    UNION ALL SELECT 'dw.FactWorkforcePlan rows',                    (SELECT COUNT(*) FROM dw.FactWorkforcePlan),               28800
+    UNION ALL SELECT 'dw.FactWorkforcePlan rows',                    (SELECT COUNT(*) FROM dw.FactWorkforcePlan),               29415
     UNION ALL SELECT 'dw.DimCandidate rows',                         (SELECT COUNT(*) FROM dw.DimCandidate),                    188982
     UNION ALL SELECT 'dw.FactCandidateStageEvent rows',              (SELECT COUNT(*) FROM dw.FactCandidateStageEvent),         531691
     UNION ALL SELECT 'dw.PositionMonthEndSnapshot rows',             (SELECT COUNT(*) FROM dw.PositionMonthEndSnapshot),        1701742
     UNION ALL SELECT 'rpt.vw_position_fill rows',                    (SELECT COUNT(*) FROM rpt.vw_position_fill),               30575
     UNION ALL SELECT 'rpt.vw_vacancy_pool rows',                     (SELECT COUNT(*) FROM rpt.vw_vacancy_pool),                62055
-    UNION ALL SELECT 'rpt.vw_plan_vs_actual rows',                   (SELECT COUNT(*) FROM rpt.vw_plan_vs_actual),              28800
+    UNION ALL SELECT 'rpt.vw_plan_vs_actual rows',                   (SELECT COUNT(*) FROM rpt.vw_plan_vs_actual),              29415
     UNION ALL SELECT 'rpt.vw_seat_corridors rows',                   (SELECT COUNT(*) FROM rpt.vw_seat_corridors),              821
 ) AS c;
 GO

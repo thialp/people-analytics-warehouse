@@ -19,6 +19,7 @@ open with any DuckDB client to explore the tables yourself.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import time
 from pathlib import Path
@@ -56,6 +57,12 @@ EXPORTS = [
     "mart_position_fill",
     "mart_vacancy_pool",
     "mart_plan_vs_actual",
+    "mart_cw_spend",
+    "mart_workforce_cost_growth_mix",
+    "mart_cw_reconciliation",
+    "mart_cw_discrepancy_detail",
+    "mart_cw_engagement_cap",
+    "mart_cw_detection_score",
     "mart_seat_corridors",
     "mart_region_walk",
     "mart_career_moves",
@@ -77,10 +84,36 @@ def load_raw(con: duckdb.DuckDBPyConnection):
         log(f"   raw.{csv.stem:<32}{n:>10,} rows")
 
 
+LAYERS = {"01_staging": "staging", "02_intermediate": "intermediate", "03_marts": "marts"}
+
+
+def model_order() -> list[Path]:
+    """Every model file, layer by layer, each after the models it reads.
+
+    Within a layer the order is alphabetical unless a model reads another model of the same
+    layer (`intermediate.int_x`), in which case it runs after it, as dbt does with ref().
+    A cycle is an error.
+    """
+    ordered: list[Path] = []
+    for folder in sorted(LAYERS):
+        layer = LAYERS[folder]
+        files = {f.stem: f for f in sorted((SQL_DIR / folder).glob("*.sql"))}
+        deps = {name: {m for m in re.findall(rf"\b{layer}\.(\w+)", f.read_text())
+                       if m in files and m != name} for name, f in files.items()}
+        done: set[str] = set()
+        while len(done) < len(files):
+            ready = [n for n in files if n not in done and deps[n] <= done]
+            if not ready:
+                raise RuntimeError(f"Circular model references in {folder}: {sorted(set(files) - done)}")
+            done.add(ready[0])
+            ordered.append(files[ready[0]])
+    return ordered
+
+
 def run_models(con: duckdb.DuckDBPyConnection):
     log("\n2. Building models")
-    for sql_file in sorted(SQL_DIR.rglob("*.sql")):
-        layer = {"01_staging": "staging", "02_intermediate": "intermediate", "03_marts": "marts"}[sql_file.parent.name]
+    for sql_file in model_order():
+        layer = LAYERS[sql_file.parent.name]
         start = time.perf_counter()
         con.execute(sql_file.read_text())
         n = con.execute(f"SELECT COUNT(*) FROM {layer}.{sql_file.stem}").fetchone()[0]

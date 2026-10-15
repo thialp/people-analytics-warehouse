@@ -5,6 +5,7 @@ WITH totals AS (
     SELECT
         month_end_date,
         department_id,
+        worker_type,
         SUM(CASE WHEN driver = 'Opening Run-Rate' THEN headcount ELSE 0 END)           AS hc_open,
         SUM(CASE WHEN driver NOT IN ('Opening Run-Rate', 'Closing Run-Rate')
                  THEN headcount ELSE 0 END)                                            AS hc_moves,
@@ -16,7 +17,7 @@ WITH totals AS (
         SUM(CASE WHEN driver = 'Closing Run-Rate' THEN -loaded_usd_constant ELSE loaded_usd_constant END) AS load_con_gap,
         COUNT(*)                                                                       AS driver_rows
     FROM marts.mart_workforce_cost_bridge
-    GROUP BY month_end_date, department_id
+    GROUP BY month_end_date, department_id, worker_type
 )
 SELECT *
 FROM totals

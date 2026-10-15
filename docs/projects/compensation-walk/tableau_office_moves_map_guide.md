@@ -225,7 +225,7 @@ Net change: <SUM(Net Change)> people (<AGG(Growth %)>)
 
 Check FY26: closing counts 10,187 / 9,803 / 6,638 / 2,287 / 1,100 add to 30,015; opening adds to 28,436; company +5.6%. Regions in the build: North America +5.7%, Asia Pacific +5.2%, Europe +6.0%, Latin America +5.0%, Middle East & Africa +6.1%; North America added the most people (+546).
 
-Do not add `p_View` or `p_Group` filters to this sheet.
+> **Superseded (2026-10-14):** following Period only leaves this card on the whole company while the KPI cards show the selected group. Release 3 rebuilds it on the region walk query, filtered by `p_From`, `p_To`, `p_View` and `p_Group`: see the [release 3 migration notes](../contingent-workforce/release_3_migration_notes.md#fix-carried-in-release-3-growth-by-region-follows-the-group-logged-2026-10-14).
 
 ## 5. Place on the dashboard (Summary, 1400 x 850)
 
