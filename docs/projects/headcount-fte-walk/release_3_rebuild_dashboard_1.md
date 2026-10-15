@@ -679,14 +679,14 @@ ELSE STR(INT([TO Joined])) END
 // TT Close Day         LEFT(DATENAME('month',[p_To]),3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
 ```
 ```
-// Tie-out Text   (one line)
-IF [p_Worker] <> "Employees" THEN "The Compensation Walk covers employees only."
+// Tie-out Text   (starts with "Note:"; one line; the same two numbers as Dashboard #2, seen from this page)
+IF [p_Worker] <> "Employees" THEN "Note: the Compensation Walk covers employees only."
 ELSEIF [p_View] = "Company" THEN
-    [TO Joined Text] + " joined; " + [TO Still Here Text] + " still here on " + [TT Close Day] +
-    " (the hires the Compensation Walk prices); " + [TO Gap Text] + " left again."
+    "Note: the Compensation Walk counts only people still here on " + [TT Close Day] + ": " + [TO Still Here Text] +
+    " of the " + [TO Joined Text] + " who joined (" + [TO Gap Text] + " left again)."
 ELSE
-    [TO Joined Text] + " joined " + [p_Group] + "; " + [TO Still Here Text] +
-    " were in it on " + [TT Close Day] + " (the Compensation Walk's Hires); the rest left or moved."
+    "Note: the Compensation Walk counts only people still here on " + [TT Close Day] + ": " + [TO Still Here Text] +
+    " of the " + [TO Joined Text] + " who joined " + [p_Group] + "."
 END
 ```
 
@@ -694,9 +694,9 @@ Caption layout: line 1 the existing moves sentence (`WF Caption`, edited: delete
 
 | Selection | Tie-out text |
 |---|---|
-| FY26, Company | 5,235 joined; 4,790 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 445 left again. |
-| FY26 Q4 (Mar 31 → Jun 30, 2026), Company | 1,330 joined; 1,317 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 13 left again. |
-| FY26, Function Commercial | 1,470 joined Commercial; 1,309 were in it on Jun 30, 2026 (the Compensation Walk's Hires); the rest left or moved. |
+| FY26, Company | Note: the Compensation Walk counts only people still here on Jun 30, 2026: 4,790 of the 5,235 who joined (445 left again). |
+| FY26 Q4 (Mar 31 → Jun 30, 2026), Company | Note: the Compensation Walk counts only people still here on Jun 30, 2026: 1,317 of the 1,330 who joined (13 left again). |
+| FY26, Function Commercial | Note: the Compensation Walk counts only people still here on Jun 30, 2026: 1,309 of the 1,470 who joined Commercial. |
 
 If the secondary number shows blank: the link is not active (click the link icon next to `Link` in the Region Walk pane) or a filter on the primary sheet removed `Link`.
 

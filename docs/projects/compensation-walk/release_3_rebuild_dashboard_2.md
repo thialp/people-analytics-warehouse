@@ -422,23 +422,23 @@ ELSE STR(INT([TO Joined])) END
 // TO Still Here Text   (same, with [RW Hires Still Here])
 // TO Gap Text          (same, with [TO Gap])
 
-// Tie-out Text
+// Tie-out Text   (starts with "Note:"; says why Hires is lower than "joined"; one line)
 IF [p_View] = "Office" THEN
-    [TO Still Here Text] + " people new to Arcadia were at " + [p_Group] + " on " + [TT To Day] +
-    ". Headcount & FTE Walk has no office view."
+    "Note: pay is priced for people here on " + [TT To Day] + ": " + [TO Still Here Text] +
+    " new to Arcadia at " + [p_Group] + ". Headcount & FTE Walk has no office view."
 ELSEIF [p_View] = "Company" THEN
-    [TO Joined Text] + " joined; " + [TO Still Here Text] + " still here on " + [TT To Day] +
-    " (the hires the Compensation Walk prices); " + [TO Gap Text] + " left again."
+    "Note: pay is priced for people here on " + [TT To Day] + ", so hires count " + [TO Still Here Text] +
+    " of the " + [TO Joined Text] + " who joined (" + [TO Gap Text] + " left again)."
 ELSE
-    [TO Joined Text] + " joined " + [p_Group] + "; " + [TO Still Here Text] +
-    " were in it on " + [TT To Day] + " (the Compensation Walk's Hires); the rest left or moved."
+    "Note: pay is priced for people here on " + [TT To Day] + ", so hires count " + [TO Still Here Text] +
+    " of the " + [TO Joined Text] + " who joined " + [p_Group] + "."
 END
 ```
-Dashboard #1 uses the same three text helpers in its section 9.
+Dashboard #1 uses the same helpers in its section 9, with the sentence seen from its side (it counts every hire; the Compensation Walk counts people still here).
 
 Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, alignment Left and Middle, one line, Entire View, title hidden, shading None, tooltip off, `zzTrue` and `zzFalse` on Detail, deselect action (5.4). **Remove any from/to/view filters left from testing**: the calc already reads the parameters.
 
-The sentence is written to fit **one line** (about 135 characters at 8 pt in 644 px; the longest, a function with a long name, is about 130). Wrapping text inside a floating item did not behave, so the sentence is short instead.
+The note is written to fit **one line** (about 135 characters at 8 pt in 644 px; the longest, a function with a long name, is about 130). Wrapping text inside a floating item did not behave, so the sentence is short instead.
 
 Placement on Summary (card x 246, y 190, 668 x 314, bottom 504). Reserve a thin strip with padding, not by resizing the sheet:
 
@@ -449,10 +449,10 @@ Check:
 
 | Selection | Tie-out text |
 |---|---|
-| FY26, Company | 5,235 joined; 4,790 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 445 left again. |
-| FY26 Q4, Company | 1,330 joined; 1,317 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 13 left again. |
-| FY26, Function Commercial | 1,470 joined Commercial; 1,309 were in it on Jun 30, 2026 (the Compensation Walk's Hires); the rest left or moved. |
-| FY26, Country India | 1,113 joined India; 1,038 were in it on Jun 30, 2026 (the Compensation Walk's Hires); the rest left or moved. |
+| FY26, Company | Note: pay is priced for people here on Jun 30, 2026, so hires count 4,790 of the 5,235 who joined (445 left again). |
+| FY26 Q4, Company | Note: pay is priced for people here on Jun 30, 2026, so hires count 1,317 of the 1,330 who joined (13 left again). |
+| FY26, Function Commercial | Note: pay is priced for people here on Jun 30, 2026, so hires count 1,309 of the 1,470 who joined Commercial. |
+| FY26, Country India | Note: pay is priced for people here on Jun 30, 2026, so hires count 1,038 of the 1,113 who joined India. |
 
 ---
 
