@@ -849,7 +849,30 @@ LEFT JOIN dw.CwIdentityResolution AS i ON i.BwWorkerID = t.BwWorkerID
 WHERE DATEFROMPARTS(YEAR(t.MonthEndDate), MONTH(t.MonthEndDate), 1) > r.AssignmentEndDate;
 
 /* one row per month-end, identity (or order / timesheet) and type: field groups merged.
-   FeedEventID is that of the oldest cause; the fields are listed once each, in order. */
+   FeedEventID is that of the oldest cause; the fields are listed once each, in order.
+   SQL Server allows two ordered STRING_AGGs in one SELECT only when they share an ordering
+   (Msg 8711), so the field list is aggregated in its own derived table and joined back. */
+DROP TABLE IF EXISTS #Ranked;
+SELECT f.*,
+       COALESCE(f.ServiceOrderID, '') AS OrderKey,
+       COALESCE(f.TimesheetID, '')    AS SheetKey,
+       ROW_NUMBER() OVER (PARTITION BY f.MonthEndDate, f.IdentityID, f.DiscrepancyCode, COALESCE(f.ServiceOrderID, ''),
+                                       COALESCE(f.TimesheetID, ''), f.Field ORDER BY f.Grp) AS FieldRank,
+       ROW_NUMBER() OVER (PARTITION BY f.MonthEndDate, f.IdentityID, f.DiscrepancyCode, COALESCE(f.ServiceOrderID, ''),
+                                       COALESCE(f.TimesheetID, '')
+                          ORDER BY CASE WHEN f.FeedEventID IS NULL OR f.SinceDate IS NULL THEN 1 ELSE 0 END,
+                                   f.SinceDate, f.FeedEventID) AS CauseRank
+INTO #Ranked
+FROM (
+    SELECT x.*,
+           CASE x.Grp WHEN 'contract' THEN 'Status and contract dates' WHEN 'cost_center' THEN 'Cost center'
+                      WHEN 'manager' THEN 'Manager' WHEN 'office' THEN 'Office' WHEN 'record' THEN 'Whole record'
+                      WHEN 'link' THEN 'Bridgeway worker ID' WHEN 'identity' THEN 'Bridgeway worker ID; Keystone person'
+                      WHEN 'engagement' THEN 'Engagement length' WHEN 'order' THEN 'Order status'
+                      ELSE 'Timesheet' END AS Field
+    FROM #Lines AS x
+) AS f;
+
 DROP TABLE IF EXISTS dw.CwDiscrepancy;
 SELECT
     l.MonthEndDate,
@@ -858,7 +881,7 @@ SELECT
     MIN(l.PersonID)                                                      AS PersonID,
     l.DiscrepancyCode,
     MIN(l.RootCauseCode)                                                 AS RootCauseCode,
-    STRING_AGG(CASE WHEN l.FieldRank = 1 THEN l.Field END, '; ') WITHIN GROUP (ORDER BY l.Field) AS FieldsAffected,
+    fa.FieldsAffected,
     MIN(l.SinceDate)                                                     AS SinceDate,
     DATEDIFF(DAY, MIN(l.SinceDate), l.MonthEndDate)                      AS AgeDays,
     MIN(l.ServiceOrderID)                                                AS ServiceOrderID,
@@ -866,31 +889,24 @@ SELECT
     MIN(l.TimesheetID)                                                   AS TimesheetID,
     STRING_AGG(l.Evidence, ' | ') WITHIN GROUP (ORDER BY l.Grp, l.Evidence) AS Evidence
 INTO dw.CwDiscrepancy
-FROM (
-    SELECT f.*,
-           ROW_NUMBER() OVER (PARTITION BY f.MonthEndDate, f.IdentityID, f.DiscrepancyCode, COALESCE(f.ServiceOrderID, ''),
-                                           COALESCE(f.TimesheetID, ''), f.Field ORDER BY f.Grp) AS FieldRank,
-           ROW_NUMBER() OVER (PARTITION BY f.MonthEndDate, f.IdentityID, f.DiscrepancyCode, COALESCE(f.ServiceOrderID, ''),
-                                           COALESCE(f.TimesheetID, '')
-                              ORDER BY CASE WHEN f.FeedEventID IS NULL OR f.SinceDate IS NULL THEN 1 ELSE 0 END,
-                                       f.SinceDate, f.FeedEventID) AS CauseRank
-    FROM (
-        SELECT x.*,
-               CASE x.Grp WHEN 'contract' THEN 'Status and contract dates' WHEN 'cost_center' THEN 'Cost center'
-                          WHEN 'manager' THEN 'Manager' WHEN 'office' THEN 'Office' WHEN 'record' THEN 'Whole record'
-                          WHEN 'link' THEN 'Bridgeway worker ID' WHEN 'identity' THEN 'Bridgeway worker ID; Keystone person'
-                          WHEN 'engagement' THEN 'Engagement length' WHEN 'order' THEN 'Order status'
-                          ELSE 'Timesheet' END AS Field
-        FROM #Lines AS x
-    ) AS f
-) AS l
-GROUP BY l.MonthEndDate, l.IdentityID, l.DiscrepancyCode, COALESCE(l.ServiceOrderID, ''), COALESCE(l.TimesheetID, '');
+FROM #Ranked AS l
+JOIN (
+    SELECT MonthEndDate, IdentityID, DiscrepancyCode, OrderKey, SheetKey,
+           STRING_AGG(Field, '; ') WITHIN GROUP (ORDER BY Field) AS FieldsAffected
+    FROM #Ranked
+    WHERE FieldRank = 1
+    GROUP BY MonthEndDate, IdentityID, DiscrepancyCode, OrderKey, SheetKey
+) AS fa
+  ON fa.MonthEndDate = l.MonthEndDate AND fa.IdentityID = l.IdentityID AND fa.DiscrepancyCode = l.DiscrepancyCode
+ AND fa.OrderKey = l.OrderKey AND fa.SheetKey = l.SheetKey
+GROUP BY l.MonthEndDate, l.IdentityID, l.DiscrepancyCode, l.OrderKey, l.SheetKey, fa.FieldsAffected;
 CREATE CLUSTERED INDEX CIX_CwDiscrepancy ON dw.CwDiscrepancy (MonthEndDate, IdentityID);
 DROP TABLE IF EXISTS #Events;
 DROP TABLE IF EXISTS #Edits;
 DROP TABLE IF EXISTS #Diffs;
 DROP TABLE IF EXISTS #Explained;
 DROP TABLE IF EXISTS #Lines;
+DROP TABLE IF EXISTS #Ranked;
 GO
 
 /* -------------------------------------------------------------------- summary */

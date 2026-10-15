@@ -1,6 +1,6 @@
 # Release 3 on SQL Server: run guide
 
-Rebuild the `ArcadiaHR` database on your Mac from branch `warehouse-release-3` and confirm it matches the DuckDB pipeline. About 20 minutes, most of it waiting. Arcadia Systems, Keystone HR and Bridgeway VMS are fictional; all data is synthetic.
+Rebuild the `ArcadiaHR` database on your Mac from `main` (release 3) and confirm it matches the DuckDB pipeline. About 20 minutes, most of it waiting. Arcadia Systems, Keystone HR and Bridgeway VMS are fictional; all data is synthetic.
 
 **Already checked before this run.** The same T-SQL, translated to DuckDB with `sqlglot`, built every table; every reporting view and every Tableau Custom SQL file matched the DuckDB marts row for row, to the cent, and every check in 05, 08, 10 and 12 passed (`python sqlserver/check_tsql_in_duckdb.py`). The contingent intermediates matched too, down to the text of each discrepancy's evidence. This run is the final check on SQL Server itself.
 
@@ -17,19 +17,18 @@ Rebuild the `ArcadiaHR` database on your Mac from branch `warehouse-release-3` a
 | `tableau/custom_sql_workforce_cost_bridge.sql` | `worker_type`; the contingent drivers and Conversions (driver 10) |
 | `tableau/custom_sql_plan_vs_actual.sql` | the five contingent columns |
 
-## Step 1. Switch the repo to the release branch
+## Step 1. Get the latest `main`
 
-In Terminal, in the folder SQL Server sees as `/repo` (Step 2 of the [setup guide](../../setup/sql_server_local_setup.md)):
+Release 3 is merged into `main` (PR #22). In Terminal, in the folder SQL Server sees as `/repo` (Step 2 of the [setup guide](../../setup/sql_server_local_setup.md)):
 
 ```bash
 cd ~/GitHub/people-analytics-warehouse
-git fetch origin
-git checkout warehouse-release-3
+git checkout main
 git pull
 git status
 ```
 
-Expected: `On branch warehouse-release-3` and `nothing to commit, working tree clean`. The container reads this folder directly, so SQL Server now sees the release 3 CSVs and scripts.
+Expected: `Fast-forward` (or `Already up to date.`), then `On branch main` and `nothing to commit, working tree clean`. The container reads this folder directly, so SQL Server now sees the release 3 CSVs and scripts.
 
 ## Step 2. Start SQL Server and load the password
 
@@ -90,6 +89,8 @@ Then the checks:
 | 12, section 5 (cost) | 6 rows, all `PASS`: the bridge closes everywhere; FY26 conversions −32,702,296 out of Contingent and +19,677,620 into Employee; growth mix closing cost 4,648,108,953, volume effect +307,094,838 |
 
 A whole-dollar check may differ by one: SQL Server rounds each group before adding.
+
+**First run, 2026-10-14:** 03c stopped at the last statement with `Msg 8711 … Multiple ordered aggregate functions in the same scope have mutually incompatible orderings`. DuckDB accepts two `STRING_AGG … WITHIN GROUP` with different orderings in one `SELECT`; SQL Server does not. Fixed by aggregating the field list in its own derived table, and the checker now flags the pattern. 10 passed on that run (597,097 rows in 14 seconds).
 
 **If 03c stops with "String or binary data would be truncated"**, send the message: it names the column. **If a discrepancy evidence line shows a month in another language** (CW11, "bills … units for June 2026"), the login's language is not English: `DATENAME(MONTH, …)` follows it. The `sa` login defaults to `us_english`.
 
