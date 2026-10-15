@@ -285,6 +285,10 @@ Why the two exclusions: in **Constant** currency every month uses one rate, so F
 
 **Hide the zero driver bars on the expanded waterfall:** calc `Driver Is Zero` = `([step] = "FX Translation" AND [p_Currency] = "Constant") OR ([step] = "Fringe Rate Changes" AND [p_Cost] = "Base")`; on the expanded waterfall sheet, Filters > `Driver Is Zero` = False. Do not put it on the compact sheet (the groups already sum to zero there).
 
+Check after applying it (Function Commercial, Loaded, Constant): 11 bars on the expanded waterfall, "Expand · 11 drivers", FX Translation absent; in Nominal it returns and the count reads 12. If the filter is missing you see one more bar than the label says.
+
+**Axis density on the expanded sheet.** Tableau picks tick spacing from the axis font size and the chart height; the expanded chart is shorter, so with a small font it labels every $1,000. Raise the axis font (Format > Scale) to Tableau Book 10 first. If it is still crowded, hide the axis header and set Grid Lines to None: every bar carries its value. Do not set a fixed tick interval: it only fits one scale, and Total payroll is in millions.
+
 Optional, same vocabulary as #1: rename the compact group "Hires & exits" to **"Joined & left"** (alias on the group field) and the Top drivers eyebrow `HIRES & EXITS` to `JOINED & LEFT`. In a group view this group also holds transfers in and out, which "Joined & left" describes better. Keep "Hires" and "Exits" as the expanded driver names.
 
 Check (FY26, Avg per FTE):
