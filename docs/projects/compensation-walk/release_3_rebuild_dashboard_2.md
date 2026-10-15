@@ -423,33 +423,32 @@ IF [p_View] = "Office" THEN
     [TO Still Here Text] + " people new to Arcadia were at " + [p_Group] + " on " + [TT To Day] +
     ". Headcount & FTE Walk has no office view."
 ELSEIF [p_View] = "Company" THEN
-    [TO Joined Text] + " joined; " + [TO Still Here Text] + " were still here on " + [TT To Day] +
-    ", the hires the Compensation Walk prices. The other " + [TO Gap Text] + " left again before the end."
+    [TO Joined Text] + " joined; " + [TO Still Here Text] + " still here on " + [TT To Day] +
+    " (the hires the Compensation Walk prices); " + [TO Gap Text] + " left again."
 ELSE
     [TO Joined Text] + " joined " + [p_Group] + "; " + [TO Still Here Text] +
-    " people new to Arcadia were in it on " + [TT To Day] +
-    " (the Compensation Walk's Hires). The rest left again or changed team."
+    " were in it on " + [TT To Day] + " (the Compensation Walk's Hires); the rest left or moved."
 END
 ```
 Dashboard #1 uses the same three text helpers in its section 9.
 
-Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, alignment Left and Top (the text wraps), Entire View, title hidden, shading None, tooltip off, `zzTrue` and `zzFalse` on Detail, deselect action (5.4). **Remove any from/to/view filters left from testing**: the calc already reads the parameters.
+Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, alignment Left and Middle, one line, Entire View, title hidden, shading None, tooltip off, `zzTrue` and `zzFalse` on Detail, deselect action (5.4). **Remove any from/to/view filters left from testing**: the calc already reads the parameters.
 
-Placement on Summary (card x 246, y 190, 668 x 314, bottom 504). Do not shrink the waterfall sheet by hand: reserve the strip with padding.
+The sentence is written to fit **one line** (about 135 characters at 8 pt in 644 px; the longest, a function with a long name, is about 130). Wrapping text inside a floating item did not behave, so the sentence is short instead.
 
-1. Item hierarchy > `Card Expanded` and `Card Compact` (they swap in the same slot): Layout > Inner Padding bottom **16 to 40**. The waterfall and its two-line axis labels lose 24 px and stay inside the card.
-2. `Tie-out`: **Floating**, X **258**, Y **468**, Width **644**, Height **28** (two lines at 8 pt; ends 8 px above the card edge). In front of the card, background None, no border, padding 0, title hidden.
+Placement on Summary (card x 246, y 190, 668 x 314, bottom 504). Reserve a thin strip with padding, not by resizing the sheet:
 
-Longest sentence (a Function group) wraps to two lines; the Company one fits on one line or wraps its last words.
+1. Item hierarchy > `Card Expanded` and `Card Compact` (they swap in the same slot): Layout > Inner Padding bottom **16 to 30**. The waterfall loses only 14 px (40 was too much: it squeezed the bars).
+2. `Tie-out`: **Floating**, X **258**, Y **478**, Width **644**, Height **18**. In front of the card, background None, no border, padding 0, title hidden. It ends at y 496, 8 px above the card edge.
 
 Check:
 
 | Selection | Tie-out text |
 |---|---|
-| FY26, Company | 5,235 joined; 4,790 were still here on Jun 30, 2026, the hires the Compensation Walk prices. The other 445 left again before the end. |
-| FY26 Q4, Company | 1,330 joined; 1,317 were still here on Jun 30, 2026, … The other 13 left again before the end. |
-| FY26, Function Commercial | 1,470 joined Commercial; 1,309 people new to Arcadia were in it on Jun 30, 2026 (the Compensation Walk's Hires). The rest left again or changed team. |
-| FY26, Country India | 1,113 joined India; 1,038 people new to Arcadia were in it on Jun 30, 2026 … |
+| FY26, Company | 5,235 joined; 4,790 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 445 left again. |
+| FY26 Q4, Company | 1,330 joined; 1,317 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 13 left again. |
+| FY26, Function Commercial | 1,470 joined Commercial; 1,309 were in it on Jun 30, 2026 (the Compensation Walk's Hires); the rest left or moved. |
+| FY26, Country India | 1,113 joined India; 1,038 were in it on Jun 30, 2026 (the Compensation Walk's Hires); the rest left or moved. |
 
 ---
 

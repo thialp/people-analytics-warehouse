@@ -682,13 +682,11 @@ ELSE STR(INT([TO Joined])) END
 // Tie-out Text   (one line)
 IF [p_Worker] <> "Employees" THEN "The Compensation Walk covers employees only."
 ELSEIF [p_View] = "Company" THEN
-    [TO Joined Text] + " joined; " + [TO Still Here Text] +
-    " were still here on " + [TT Close Day] + ", the hires the Compensation Walk prices. The other " +
-    [TO Gap Text] + " left again before the end."
+    [TO Joined Text] + " joined; " + [TO Still Here Text] + " still here on " + [TT Close Day] +
+    " (the hires the Compensation Walk prices); " + [TO Gap Text] + " left again."
 ELSE
     [TO Joined Text] + " joined " + [p_Group] + "; " + [TO Still Here Text] +
-    " people new to Arcadia were in it on " + [TT Close Day] +
-    " (the Compensation Walk's Hires). The rest left again or changed team."
+    " were in it on " + [TT Close Day] + " (the Compensation Walk's Hires); the rest left or moved."
 END
 ```
 
@@ -696,9 +694,9 @@ Caption layout: line 1 the existing moves sentence (`WF Caption`, edited: delete
 
 | Selection | Tie-out text |
 |---|---|
-| FY26, Company | 5,235 joined; 4,790 were still here on Jun 30, 2026, the hires the Compensation Walk prices. The other 445 left again before the end. |
-| FY26 Q4 (Mar 31 → Jun 30, 2026), Company | 1,330 joined; 1,317 were still here on Jun 30, 2026, … The other 13 left again before the end. |
-| FY26, Function Commercial | 1,470 joined Commercial; 1,309 people new to Arcadia were in it on Jun 30, 2026 (the Compensation Walk's Hires). The rest left again or changed team. |
+| FY26, Company | 5,235 joined; 4,790 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 445 left again. |
+| FY26 Q4 (Mar 31 → Jun 30, 2026), Company | 1,330 joined; 1,317 still here on Jun 30, 2026 (the hires the Compensation Walk prices); 13 left again. |
+| FY26, Function Commercial | 1,470 joined Commercial; 1,309 were in it on Jun 30, 2026 (the Compensation Walk's Hires); the rest left or moved. |
 
 If the secondary number shows blank: the link is not active (click the link icon next to `Link` in the Region Walk pane) or a filter on the primary sheet removed `Link`.
 
