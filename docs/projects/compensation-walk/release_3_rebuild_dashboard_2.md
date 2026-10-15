@@ -339,7 +339,8 @@ Dashboard > Actions. For each sheet below there must be one **Filter** action: S
 | Reset | Button | Reset to default view |
 | Info Button | Button | section 6 |
 | Btn Expand (text and icon), Btn Collapse (text and icon) | Buttons | off |
-| Group Heading, Group Heading 2, page title / subtitle sheet | Titles | off |
+| Group Heading, Group Heading 2 | Titles | off |
+| Title (page title / subtitle) | Title | "How to read this page", section 8 item 8 |
 | **Map headline sheet** ("725 people changed office…") and its subtitle | Titles ("Not selectable") | off |
 | Top Corridors title, Region Headcount title (if they are separate sheets) | Titles | off |
 | KPI cards | Cards | off |
@@ -487,6 +488,31 @@ Check:
 5. **Map headline share of headcount** (open since 2026-10-12, data ready since release 2): `open_headcount` on Office Moves = the group's opening. Headline: `"725 people changed office (2.5% of headcount); 83% stayed inside one country"`. Calc `Move Share` = `SUM(movers) / MIN([open_headcount])` (MIN because the column repeats on every row of the group).
 6. **Same period words on both dashboards**: the Period field reads `FY26 · Jun 25 → Jun 26` here and will on Dashboard #1; the turnover title there uses "FY26". Keep `Pair Name` as the single source of period text.
 7. **Hires & exits holds transfers in a group view** (Commercial: 77 in, 64 out). Its tooltip should say "hires, exits and transfers in and out of this group" when `p_View` is not Company.
+
+8. **Page subtitle tooltip.** The default tooltip on the `Title` sheet printed raw field names ("Page Subtitle:", "p_Lens:") and repeated the subtitle. Replace it with "How to read this page": what is shown, the measure definition for the current Cost and Lens, the currency rule, the two-snapshot rule and the population. Calcs on ArcadiaHR (`TT From Day` plus one text calc `Title Tip`; `TT To Day` already exists):
+
+```
+// TT From Day
+LEFT(DATENAME('month', [p_From]), 3) + " " + STR(DAY([p_From])) + ", " + STR(YEAR([p_From]))
+// Title Tip
+"Showing: " + (IF [p_View] = "Company" THEN "all of Arcadia" ELSE [p_View] + " · " + [p_Group] END) + CHAR(10) +
+(IF [Is FTE] THEN
+    (IF [p_Cost] = "Loaded"
+     THEN "Average pay per FTE = loaded cost ÷ FTE. Loaded cost is base pay plus employer fringe (benefits and payroll taxes)."
+     ELSE "Average pay per FTE = base pay ÷ FTE. Base is pay only, with no employer fringe." END)
+ELSE
+    (IF [p_Cost] = "Loaded"
+     THEN "Total payroll = total loaded cost: base pay plus employer fringe (benefits and payroll taxes)."
+     ELSE "Total payroll = total base pay, with no employer fringe." END)
+END) + CHAR(10) +
+(IF [p_Currency] = "Constant"
+ THEN "Constant currency: every month is converted at one fixed exchange rate, so currency moves do not count."
+ ELSE "Nominal currency: each month is converted at that month's rate, so currency moves appear as FX Translation." END) + CHAR(10) +
+"Compares two snapshots, " + [TT From Day] + " and " + [TT To Day] +
+". Each person is priced at their pay on that date; people who joined and left in between are in neither." + CHAR(10) +
+"Employees only, executive officers excluded; every employee counts as 1.0 FTE."
+```
+`Title` sheet: `Title Tip` on Detail (parameters only, adds no rows); Worksheet > Tooltip > Show tooltips (on hover, no command buttons): bold line **How to read this page**, then `<Title Tip>`, then "Click ⓘ in the left rail for the full definitions and limits." (Book 9, slate). Keep the deselect action (5.4); this replaces "off" for the page title sheet in that table. Dashboard #1 gets the same tooltip adapted to events (hires, leavers, movements) when it is rebuilt.
 
 ---
 
