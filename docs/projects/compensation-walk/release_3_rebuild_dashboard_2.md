@@ -213,8 +213,9 @@ IF [RW Open] = 0 THEN NULL ELSE ([RW Close] - [RW Open]) / [RW Open] END
 // RW Group Growth
 IF [RW Group Open] = 0 THEN 0 ELSE ([RW Group Close] - [RW Group Open]) / [RW Group Open] END
 // RW Share of Growth
-IF [RW Group Close] = [RW Group Open] THEN NULL
-ELSE [RW Net Change] / ([RW Group Close] - [RW Group Open]) END
+IF ATTR([RW Group Close]) = ATTR([RW Group Open]) THEN NULL
+ELSE [RW Net Change] / (ATTR([RW Group Close]) - ATTR([RW Group Open])) END
+// (ATTR is needed: a FIXED value is not an aggregate, and RW Net Change is a SUM; without it Tableau says "Cannot mix aggregate and non-aggregate arguments")
 
 // RW Open Text   (copy as RW Close Text, using [RW Group Close])
 IF [RW Group Open] >= 1000
