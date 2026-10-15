@@ -397,7 +397,19 @@ Source Headcount Walk.
 ```
 (Optional later: read the as-of date from Region Walk's `report_as_of_date` with the blend, as #2 does.)
 
-Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 9 `#C9D1DC`. Detail `zzTrue`, `zzFalse`. Shading None. Tooltip off. Dashboard item 372 × 58, Entire View.
+Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 9 `#C9D1DC`. Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 372 × 58, Entire View.
+
+**Tooltip "How to read this page"** (the default tooltip prints raw field names and repeats the subtitle; replace it). `TT Open Day` is defined in 8.2, `TT Close Day` in section 9:
+
+```
+// Title Tip
+"Showing: " + (IF [p_View] = "Company" THEN "all of Arcadia" ELSE [p_View] + " · " + [p_Group] END) + " · " + [Worker Words] + CHAR(10) +
+"Opening + joined − left ± moves = closing, reconciled to the month-end headcount." + CHAR(10) +
+"Compares " + [TT Open Day] + " and " + [TT Close Day] + ". Every joiner and every leaver in between is counted, month by month." + CHAR(10) +
+"Executive officers excluded." +
+(IF [p_Worker] = "Employees" THEN "" ELSE CHAR(10) + "Contingent workers are contractors held in the vendor system; a conversion moves one person from Contingent to Employees, so Total does not change." END)
+```
+Worksheet > Tooltip: bold line **How to read this page** (Semibold 10 navy), `<Title Tip>`, then "Click ⓘ in the top bar for the full definitions." (Book 9 slate). Keep the deselect action (7.4).
 
 ### 6.7 Headings over the fields
 
@@ -554,7 +566,7 @@ Sheet `Waterfall`:
 2. `Waterfall Position`: Edit Table Calculation > Specific Dimensions > `WF Bar` only.
 3. Filters: `WF Moves Hidden` = False (dimension filter), and a calc `WF Non Zero` = `SUM([Walk Value]) <> 0 OR ATTR([WF Bar]) = "Opening" OR ATTR([WF Bar]) = "Closing"` = True (drops the zero bars: Moved at Company, Converted in Total). A zero bar adds nothing to the running sum, so dropping it does not move the others.
 4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, Conversions → `From contingent` (Employees) — in Contingent it reads "Conversions" (−270), which is clear on its own.
-5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`.
+5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`. If the expanded chart shows too many labels, raise the axis font to Tableau Book 10 (Format > Scale) or hide the axis header: every bar has its value. Never set a fixed interval.
 6. Title line 2 (Book 9 slate): `Opening + joined − left ± moves = closing · axis starts at zero`.
 
 Expand / Collapse buttons: copy #2's construction (build_status.md, "Expand / Collapse look like buttons"): two horizontal containers `Btn Expand ALL` and `Btn Collapse ALL`, identical size **150 × 24**, each = a text sheet (`Expand Label` / `Collapse Label`, Semibold 9 navy) + an icon sheet (`btn_expand_icon` / `btn_collapse_icon`, 16 × 16). Calcs `Expand To` = TRUE and `Collapse To` = FALSE, on Detail with `zzTrue`, `zzFalse`; actions **Set expand** (`p_Expand` ← `Expand To`) from both Expand sheets and **Set collapse** (`p_Expand` ← `Collapse To`) from both Collapse sheets. Visibility, as on #2: `Btn Collapse ALL` > **Control visibility using value** = `p_Expand`; `Btn Expand ALL` > Control visibility using value = calc `Is Compact` (= `NOT [p_Expand]`). Both sit on the same spot at the waterfall card's top right (section 10).
@@ -689,6 +701,25 @@ ELSE
     " of the " + [TO Joined Text] + " who joined " + [p_Group] + "."
 END
 ```
+
+**Tooltip on the note** (the numbers in plain English; mirrors #2's). Extra calcs on Headcount Walk (`TT Open Day` from 8.2):
+
+```
+// TO Who   IF [p_View] = "Company" THEN "Arcadia" ELSE [p_Group] END
+// Tie-out Detail
+(IF [p_Worker] <> "Employees" THEN
+    "The Compensation Walk prices employees only, so there is nothing to compare for contingent workers."
+ELSE
+    [TO Joined Text] + " people joined " + [TO Who] + " between " + [TT Open Day] + " and " + [TT Close Day] +
+    " (hires plus people converted from contingent, counted month by month)." + CHAR(10) +
+    "In the Compensation Walk's Hires: " + [TO Still Here Text] + ", the ones still there on " + [TT Close Day] + "." + CHAR(10) +
+    "Not in that walk: " + [TO Gap Text] +
+    (IF [p_View] = "Company"
+     THEN ", who joined and left again before " + [TT Close Day] + "."
+     ELSE ", who left Arcadia or moved to another team before " + [TT Close Day] + "." END)
+END)
+```
+`Waterfall Caption`: `Tie-out Detail` on Detail; Worksheet > Tooltip: bold **Why the two dashboards count different hires**, `<AGG(Tie-out Detail)>`, then "The Compensation Walk compares two snapshots and prices people present on each date, so anyone who joined and left in between is in neither. This page counts every joiner and every leaver." (Book 9; no command buttons). FY26 Company: "5,235 people joined Arcadia between Jun 30, 2025 and Jun 30, 2026 … In the Compensation Walk's Hires: 4,790 … Not in that walk: 445, who joined and left again before Jun 30, 2026."
 
 Caption layout: line 1 the existing moves sentence (`WF Caption`, edited: delete the "FTE ... schedule changes" half), line 2 `<Tie-out Text>`. Tableau Book 8 slate, left. Same position as today (over the waterfall's bottom padding).
 
