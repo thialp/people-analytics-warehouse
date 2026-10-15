@@ -297,6 +297,10 @@ def main() -> int:
         custom_sql(con, "custom_sql_workforce_cost_bridge.sql", "workforce_cost_bridge")
         ok &= compare(con, "mart_workforce_cost_bridge", "cs.workforce_cost_bridge")
         con.execute("CREATE OR REPLACE VIEW cb AS SELECT * FROM cs.workforce_cost_bridge")   # #cb in 12_validate
+        for name in ("cw_spend", "workforce_cost_growth_mix", "cw_discrepancy_detail",   # thin reads of the views
+                     "cw_reconciliation", "cw_engagement_cap", "cw_detection_score"):
+            custom_sql(con, f"custom_sql_{name}.sql", name)
+            ok &= compare(con, f"mart_{name}", f"cs.{name}")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
