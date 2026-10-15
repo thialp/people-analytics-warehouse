@@ -72,10 +72,14 @@ FROM (
     UNION ALL SELECT 'spellings that map to no Bridgeway supplier', (SELECT COUNT(*) FROM dw.CwSupplierAlias WHERE SupplierID IS NULL), 0
     UNION ALL SELECT 'Bridgeway workers not listed exactly once',
                      (SELECT COUNT(*) FROM dw.BwContingentWorker AS w
-                      WHERE (SELECT COUNT(*) FROM dw.CwIdentityResolution AS i WHERE i.BwWorkerID = w.BwWorkerID) <> 1), 0
+                      LEFT JOIN (SELECT BwWorkerID, COUNT(*) AS n FROM dw.CwIdentityResolution
+                                 WHERE BwWorkerID IS NOT NULL GROUP BY BwWorkerID) AS i ON i.BwWorkerID = w.BwWorkerID
+                      WHERE ISNULL(i.n, 0) <> 1), 0
     UNION ALL SELECT 'Keystone people not listed exactly once',
                      (SELECT COUNT(*) FROM (SELECT DISTINCT PersonID FROM dw.KsContingentWorker) AS k
-                      WHERE (SELECT COUNT(*) FROM dw.CwIdentityResolution AS i WHERE i.PersonID = k.PersonID) <> 1), 0
+                      LEFT JOIN (SELECT PersonID, COUNT(*) AS n FROM dw.CwIdentityResolution
+                                 WHERE PersonID IS NOT NULL GROUP BY PersonID) AS i ON i.PersonID = k.PersonID
+                      WHERE ISNULL(i.n, 0) <> 1), 0
     UNION ALL SELECT 'tier 1 matches (High)',   (SELECT COUNT(*) FROM dw.CwIdentityResolution WHERE MatchTier = 1), 41900
     UNION ALL SELECT 'tier 2 matches (Medium)', (SELECT COUNT(*) FROM dw.CwIdentityResolution WHERE MatchTier = 2), 130
     UNION ALL SELECT 'tier 3 matches (Low)',    (SELECT COUNT(*) FROM dw.CwIdentityResolution WHERE MatchTier = 3), 0

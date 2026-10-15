@@ -17,8 +17,9 @@ What it runs
      compensation walk for the pairs that end in FY26 (the full walk needs more memory
      than a laptop-sized DuckDB run allows)
   4. the PASS/FAIL tables of 05, 08, 10 and 12 (the contingent workforce)
-  and, before all that, two SQL Server rules DuckDB does not enforce: primary-key columns
-  must be made NOT NULL first, and text must fit its declared VARCHAR length.
+  and, before all that, SQL Server rules DuckDB does not enforce: primary-key columns must be
+  made NOT NULL first, text must fit its declared VARCHAR length, PRINT takes no subquery, and
+  ordered STRING_AGGs in one SELECT must share one ordering (Msg 8711).
 
 Translation rules that make DuckDB behave like SQL Server: integers divide as integers,
 FLOAT is an 8-byte double, BIT is a 0/1 flag, OUTER/CROSS APPLY become LATERAL joins.
@@ -233,12 +234,23 @@ def static_checks() -> bool:
                 if longest > int(n):
                     ok = False
                     print(f"   FAIL  {name}: raw.{src.group(1)}.{raw_col} holds values of {longest} characters, cast to VARCHAR({n})")
+    for name in BUILD:   # ordered STRING_AGGs in one SELECT must share their ordering (Msg 8711)
+        for batch in batches(ROOT / "sqlserver" / name):
+            for stmt in sqlglot.parse(batch, read="tsql"):
+                for sel in (stmt.find_all(exp.Select) if stmt else []):
+                    orders = {tuple(o.sql("tsql") for o in g.this.expressions)
+                              for g in sel.find_all(exp.GroupConcat)
+                              if isinstance(g.this, exp.Order) and g.find_ancestor(exp.Select) is sel}
+                    if len(orders) > 1:
+                        ok = False
+                        print(f"   FAIL  {name}: STRING_AGGs in one SELECT with different orderings {sorted(orders)}")
     for path in sorted((ROOT / "sqlserver").glob("*.sql")):   # PRINT takes no subquery (Msg 1046)
         text = re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
         for line in re.findall(r"^\s*PRINT\b[^;]*\(\s*SELECT\b", text, flags=re.I | re.M):
             ok = False
             print(f"   FAIL  {path.name}: PRINT holds a subquery: {line.strip()[:60]}")
-    print("   primary keys, text lengths and PRINT: " + ("all fit SQL Server's rules" if ok else "see above"))
+    print("   primary keys, text lengths, PRINT and STRING_AGG orderings: "
+          + ("all fit SQL Server's rules" if ok else "see above"))
     return ok
 
 
