@@ -436,7 +436,7 @@ END
 ```
 Dashboard #1 uses the same helpers in its section 9, with the sentence seen from its side (it counts every hire; the Compensation Walk counts people still here).
 
-Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, alignment Left and Middle, one line, Entire View, title hidden, shading None, tooltip off, `zzTrue` and `zzFalse` on Detail, deselect action (5.4). **Remove any from/to/view filters left from testing**: the calc already reads the parameters.
+Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, alignment Left and Middle, one line, Entire View, title hidden, shading None, tooltip: see below, `zzTrue` and `zzFalse` on Detail, deselect action (5.4). **Remove any from/to/view filters left from testing**: the calc already reads the parameters.
 
 The note is written to fit **one line** (about 135 characters at 8 pt in 644 px; the longest, a function with a long name, is about 130). Wrapping text inside a floating item did not behave, so the sentence is short instead.
 
@@ -444,6 +444,28 @@ Placement on Summary (card x 246, y 190, 668 x 314, bottom 504). Reserve a thin 
 
 1. Item hierarchy > `Card Expanded` and `Card Compact` (they swap in the same slot): Layout > Inner Padding bottom **16 to 30**. The waterfall loses only 14 px (40 was too much: it squeezed the bars).
 2. `Tie-out`: **Floating**, X **258**, Y **478**, Width **644**, Height **18**. In front of the card, background None, no border, padding 0, title hidden. It ends at y 496, 8 px above the card edge.
+
+**Tooltip on the note (the numbers in plain English).** Calcs on Region Walk:
+
+```
+// TT From Day    LEFT(DATENAME('month', [p_From]), 3) + " " + STR(DAY([p_From])) + ", " + STR(YEAR([p_From]))
+// TO Who         IF [p_View] = "Company" THEN "Arcadia" ELSE [p_Group] END
+// Tie-out Detail
+(IF [p_View] = "Office" THEN
+    "The Headcount & FTE Walk has no office view, so there is no joined count to compare with." + CHAR(10) +
+    "In the Hires bar: " + [TO Still Here Text] + " people new to Arcadia who were at " + [p_Group] + " on " + [TT To Day] + "."
+ELSE
+    [TO Joined Text] + " people joined " + [TO Who] + " between " + [TT From Day] + " and " + [TT To Day] +
+    " (Headcount & FTE Walk, counted month by month)." + CHAR(10) +
+    "In the Hires bar: " + [TO Still Here Text] + ", the ones still there on " + [TT To Day] + "." + CHAR(10) +
+    "Not in the bar: " + [TO Gap Text] +
+    (IF [p_View] = "Company"
+     THEN ", who joined and left again before " + [TT To Day] + ". They are in neither snapshot, so there is no pay to price."
+     ELSE ", who left Arcadia or moved to another team before " + [TT To Day] + ". They are not in this group's closing snapshot."
+     END)
+END)
+```
+`Tie-out` sheet: `Tie-out Detail` on Detail; Worksheet > Tooltip > Show tooltips (on hover, no command buttons). Tooltip text: bold line **Why Hires counts fewer people than joined**, then `<AGG(Tie-out Detail)>`, then: "Avg per FTE: a hire moves the average only by how far their pay is from the opening average. New hires usually start below it, so the bar is negative. Total payroll: a hire adds their full pay." and "The Headcount & FTE Walk counts every joiner and leaver month by month, so its hires and leavers include these people." FY26 Company reads: "5,235 people joined Arcadia between Jun 30, 2025 and Jun 30, 2026 ... In the Hires bar: 4,790 ... Not in the bar: 445, who joined and left again before Jun 30, 2026."
 
 Check:
 
