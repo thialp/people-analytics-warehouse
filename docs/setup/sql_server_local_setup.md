@@ -158,6 +158,7 @@ dw.CwMovement                       616469
 dw.CwIdentityResolution              43552
 dw.CwReconciliationSnapshot         599228
 dw.CwDiscrepancy                     28586
+dw.WorkforceCostGrowthMix              1224
 Created views rpt.vw_workforce_cost_snapshot, rpt.vw_org_leader_summary, rpt.vw_fringe_rate,
               rpt.vw_position_fill, rpt.vw_vacancy_pool, rpt.vw_plan_vs_actual, rpt.vw_seat_corridors
 1. Row counts
