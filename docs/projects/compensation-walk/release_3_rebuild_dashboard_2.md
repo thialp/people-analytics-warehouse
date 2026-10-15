@@ -189,25 +189,67 @@ SUM(IF [HW In Selection] THEN [Headcount] END)
 
 **What was wrong.** With Commercial selected, the People card said 7,092 (from 6,943) and Growth by Region said "Arcadia overall +5.6% (28,436 | 30,015)". The sheet was built on the walk's Country rows, which have no region-by-group breakdown, and the guide said not to filter it by group. The Region Walk has the breakdown, and per group its regions add up exactly to the walk's opening and closing (test 57).
 
-**Rebuild `Region Headcount` on Region Walk** (build a copy on the new source, then swap it in):
+**Rebuild the region sheet on Region Walk.** In your workbook the sheet is called `Region Bars` (older notes call it `Region Headcount`; same sheet). It is on `ArcadiaHR`, and two of its pills are table calculations (the small triangle on `Growth Bar` and on the `Top group_parent` filter), which do not carry over to another source. So build a new sheet from scratch, copy only the look, and swap it in. Nothing on the new sheet is a table calculation, and it needs no Top-N filter (a group has at most five regions).
 
-1. Right-click the `Region Headcount` tab > **Duplicate**, rename the copy `Region Headcount RW`. On the copy, Data pane: select **Region Walk**, then clear every shelf (the old fields are from the walk).
-2. Calcs on Region Walk:
+### 3.1 Calcs (data source Region Walk, one calc per name)
 
 ```
-// RW Is Current
+// RW Is Current        (Boolean; this is the only place the selection enters)
 [from_month_end] = [p_From] AND [to_month_end] = [p_To] AND [view_name] = [p_View] AND [group_name] = [p_Group]
-// RW Open        SUM(IF [RW Is Current] THEN [opening_headcount] END)
-// RW Close       SUM(IF [RW Is Current] THEN [closing_headcount] END)
-// Region Growth  IF [RW Open] = 0 THEN NULL ELSE ([RW Close] - [RW Open]) / [RW Open] END
-// RW Group Open  { FIXED : SUM(IF [RW Is Current] THEN [opening_headcount] END) }
-// RW Group Close { FIXED : SUM(IF [RW Is Current] THEN [closing_headcount] END) }
-// RW Group Growth IF [RW Group Open] = 0 THEN 0 ELSE ([RW Group Close] - [RW Group Open]) / [RW Group Open] END
+
+// RW Open
+SUM(IF [RW Is Current] THEN [opening_headcount] END)
+// RW Close
+SUM(IF [RW Is Current] THEN [closing_headcount] END)
+// Region Growth
+IF [RW Open] = 0 THEN NULL ELSE ([RW Close] - [RW Open]) / [RW Open] END
+// RW Net Change
+[RW Close] - [RW Open]
+
+// RW Group Open        (the whole selection, all regions)
+{ FIXED : SUM(IF [RW Is Current] THEN [opening_headcount] END) }
+// RW Group Close
+{ FIXED : SUM(IF [RW Is Current] THEN [closing_headcount] END) }
+// RW Group Growth
+IF [RW Group Open] = 0 THEN 0 ELSE ([RW Group Close] - [RW Group Open]) / [RW Group Open] END
+// RW Share of Growth
+IF [RW Group Close] = [RW Group Open] THEN NULL
+ELSE [RW Net Change] / ([RW Group Close] - [RW Group Open]) END
+
+// RW Open Text   (copy as RW Close Text, using [RW Group Close])
+IF [RW Group Open] >= 1000
+THEN STR(INT([RW Group Open] / 1000)) + "," + RIGHT("00" + STR(INT([RW Group Open]) % 1000), 3)
+ELSE STR(INT([RW Group Open])) END
+
+// RW Subtitle    (title line 1 + line 2)
+(IF [p_View] = "Company" THEN "Arcadia Systems" ELSE [p_Group] END)
++ " " + (IF [RW Group Growth] >= 0 THEN "+" ELSE "−" END)
++ STR(ROUND(ABS(100 * [RW Group Growth]), 1)) + "% (" + [RW Open Text] + " | " + [RW Close Text] + ")"
++ CHAR(10) + "Region: opening | closing headcount · bar: growth"
 ```
-3. Rebuild the shelves with the same name-above-bar pattern as the old sheet (map guide, section 4): Rows `region` sorted by `Region Growth` descending; bar = `Region Growth` (amber `#D98E04`); name row `region   RW Open | RW Close`; tooltip: net change `[RW Close] − [RW Open]`, share of the group's growth `([RW Close] − [RW Open]) / ([RW Group Close] − [RW Group Open])`.
-4. Subtitle line 1 (the sheet title or its subtitle sheet): `[p_Group] + " " + sign + percent([RW Group Growth]) + " (" + comma([RW Group Open]) + " | " + comma([RW Group Close]) + ")"`. For Company it reads **Arcadia Systems +5.5% (28,438 | 30,005)**; for Commercial **Commercial +4.8% (7,441 | 7,795)**. Line 2 unchanged: "Region: opening | closing headcount · bar: growth".
-5. On the dashboard: select the old `Region Headcount` item > its menu > **Swap Sheets** > `Region Headcount RW`. Size and position stay. Then delete the old sheet and rename the new one `Region Headcount`.
-6. When the docs are updated, remove the "do not add `p_View` or `p_Group` filters" note from the map guide, section 4.
+
+Check before building the sheet: drag `region` to Rows and `RW Open`, `RW Close` to Text. Company, FY26 reads Latin America 2,225 / 2,356 ... North America 9,909 / 10,426; **Analysis > Totals > Show Row Grand Totals** gives 28,438 and 30,005. If a total is different, stop here: the problem is the calc or a parameter, not the shelves.
+
+### 3.2 Shelves (new sheet `Region Headcount RW`, data source Region Walk)
+
+1. **Filters:** drag `RW Is Current` to Filters, tick **True**, OK. (This removes the other 87 periods and the other groups; a region the group does not reach simply has no row.)
+2. **Rows:** `region`. **Columns:** `Region Growth`. Marks type **Bar**. Right-click `region` on Rows > **Sort** > Sort by **Field**, Descending, Field `Region Growth`, Aggregation Sum. Expected: five bars, Latin America first for Company.
+3. **The name row.** Double-click the empty space right of `Region Growth` on Columns, type `AVG(0)`, Enter. Right-click `AGG(AVG(0))` on Columns > **Dual Axis**. Do **not** synchronize the axes. Right-click the `AGG(AVG(0))` axis > **Edit Axis** > Fixed, Start 0, End 1 (so the names stay at the left edge even when a region shrinks).
+4. On the **All** tab, drag **Measure Names** from Color to **Rows**, right of `region`. Each region now has two rows. If the name row is below the bar: right-click **Measure Names** on Rows > Sort > Manual, `AGG(AVG(0))` first.
+5. **`AGG(AVG(0))` tab:** type **Gantt Bar**, Size to zero, Color opacity 0%. Drag `region`, `RW Open` and `RW Close` onto **Label**; edit the label to `<region>   <SUM(RW Open)> | <SUM(RW Close)>` (name Tableau Semibold 9 navy, numbers Book 9 gray, number format `#,##0`); Alignment **Left**, **Middle**; tick *Allow labels to overlap other marks*.
+6. **`Region Growth` tab:** Color amber `#D98E04`, Size about 40%. Label shows `Region Growth` only, format `+0.0%;−0.0%`, Alignment right of the bar end. Detail: `RW Open`, `RW Close`, `RW Net Change`, `RW Share of Growth`, `RW Subtitle`. Tooltip:
+
+```
+<region>
+Opening headcount: <SUM(RW Open)>
+Closing headcount: <SUM(RW Close)>
+Net change: <SUM(RW Net Change)> people (<AGG(Region Growth)>)
+<AGG(RW Share of Growth)> of the selection's net growth
+```
+7. Hide headers (right-click `region`, **Measure Names** and both axes > untick Show Header). Format > Lines: Row Divider, Grid Lines, Zero Lines **None**. Sheet background None. Fit **Entire View**.
+8. **Title:** double-click the title area: line 1 `Growth by Region` (11 pt bold navy), line 2 `<AGG(RW Subtitle)>` (9 pt gray). Easiest: on `Region Bars`, **Worksheet > Copy > Formatting**, then on the new sheet **Worksheet > Paste > Formatting**, then fix the fields. That brings the fonts, lines and sizes across; the pills you build yourself.
+9. Subtitle line 1 reads **Arcadia Systems +5.5% (28,438 | 30,005)** for Company and **Commercial +4.8% (7,441 | 7,795)** for Function > Commercial.
+10. On the dashboard: select the `Region Bars` item > its menu > **Swap Sheets** > `Region Headcount RW`. Position and size stay. Delete the old sheet, rename the new one `Region Bars`. When the docs are updated, remove the "do not add `p_View` or `p_Group` filters" note from the map guide, section 4.
 
 Check (FY26):
 
