@@ -72,6 +72,7 @@ dw.CwMovement                       616469
 dw.CwIdentityResolution              43552
 dw.CwReconciliationSnapshot         599228
 dw.CwDiscrepancy                     28586
+dw.WorkforceCostGrowthMix              1224
 ```
 
 Then the checks:
@@ -90,7 +91,7 @@ Then the checks:
 
 A whole-dollar check may differ by one: SQL Server rounds each group before adding.
 
-**First run, 2026-10-14:** 03c stopped at the last statement with `Msg 8711 … Multiple ordered aggregate functions in the same scope have mutually incompatible orderings`. DuckDB accepts two `STRING_AGG … WITHIN GROUP` with different orderings in one `SELECT`; SQL Server does not. Fixed by aggregating the field list in its own derived table, and the checker now flags the pattern. 10 passed on that run (597,097 rows in 14 seconds).
+**First run, 2026-10-14:** 03c stopped at the last statement with `Msg 8711 … Multiple ordered aggregate functions in the same scope have mutually incompatible orderings`. DuckDB accepts two `STRING_AGG … WITHIN GROUP` with different orderings in one `SELECT`; SQL Server does not. Fixed by aggregating the field list in its own derived table, and the checker now flags the pattern. 10 passed on that run (597,097 rows in 14 seconds). The second run passed 03c and sections 1–4 of 12, but section 5 ran for over 18 minutes: the growth mix was a view that recomputed 64 subsets over every worker on each of its three reads. It is now precomputed in `dw.WorkforceCostGrowthMix` (built once in 03c; the view reads it), with the population counted per quarter-end before the pairs are joined on equality.
 
 **If 03c stops with "String or binary data would be truncated"**, send the message: it names the column. **If a discrepancy evidence line shows a month in another language** (CW11, "bills … units for June 2026"), the login's language is not English: `DATENAME(MONTH, …)` follows it. The `sa` login defaults to `us_english`.
 
