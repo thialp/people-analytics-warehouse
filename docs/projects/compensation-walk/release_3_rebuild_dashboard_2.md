@@ -433,7 +433,14 @@ END
 ```
 Dashboard #1 uses the same three text helpers in its section 9.
 
-Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, left, one line, Entire View, shading None, tooltip off, deselect action (5.4). Dashboard: floating inside the waterfall card at its bottom (about x = card left + 12, y = card bottom − 22, width = card width − 24, height 18). Shrink the waterfall sheet's height by 18 so its axis labels stay clear.
+Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, alignment Left and Top (the text wraps), Entire View, title hidden, shading None, tooltip off, `zzTrue` and `zzFalse` on Detail, deselect action (5.4). **Remove any from/to/view filters left from testing**: the calc already reads the parameters.
+
+Placement on Summary (card x 246, y 190, 668 x 314, bottom 504). Do not shrink the waterfall sheet by hand: reserve the strip with padding.
+
+1. Item hierarchy > `Card Expanded` and `Card Compact` (they swap in the same slot): Layout > Inner Padding bottom **16 to 40**. The waterfall and its two-line axis labels lose 24 px and stay inside the card.
+2. `Tie-out`: **Floating**, X **258**, Y **468**, Width **644**, Height **28** (two lines at 8 pt; ends 8 px above the card edge). In front of the card, background None, no border, padding 0, title hidden.
+
+Longest sentence (a Function group) wraps to two lines; the Company one fits on one line or wraps its last words.
 
 Check:
 
