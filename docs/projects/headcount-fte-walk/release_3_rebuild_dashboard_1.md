@@ -165,13 +165,26 @@ The workbook is still on the six CSVs (the data source is named `mart_headcount_
 1. **Add the new source.** Data > New Data Source > **Microsoft SQL Server**: the same connection as Dashboard #2 (server `localhost`, database `ArcadiaHR`, user `sa`, the trust-certificate setting from `tableau/sqlserver_trust_local_certificate.tdc`). Drag **New Custom SQL** to the canvas, paste the whole of `custom_sql_headcount_fte_walk.sql`, OK. Rename the source **Headcount Walk**.
 2. **Check types** on the Data Source tab: `Month End Date` and `Prior Month End Date` **Date**; `Grade` and `Fiscal Year` **String**; `Headcount` whole number, default aggregation Sum. Two new fields arrive: **Worker Type** (Employee, Contingent) and **Walk Step** (Opening, Joined, Left, Moved out, Moved in, Converted, Closing).
 3. **Replace Data Source.** Data > **Replace Data Source...**: Current = `mart_headcount_fte_walk+`, Replacement = **Headcount Walk**, OK. Tableau moves every calc, parameter reference, alias and format to the new source and remaps fields by name.
-4. **Delete the calcs that no longer apply.** **Part Time Headcount turns red** (the column is gone in release 3). Delete these calcs (Data pane, right-click > Delete; Tableau lists anything still using them): `K Close PT`, `K Part Time Gap`, `K Gap T`, `KPI 2 Note`, `TT Part Time`, `TT Level PT`, `Show Category`, `WF FTE Chg`, `WF FTE Chg Str`, `WF FTE Open`, `WF FTE Close`, `WF FTE Hires`, `WF FTE Leavers`, `WF FTE Open Str`, `WF FTE Close Str`, `WF FTE Hires Str`, `WF FTE Leavers Str`, `WF FTE Net Str`, `TT Bar T`, `K FTE T`. Their sheets get rebuilt below. If Tableau says a field is still in use, find it with the Data pane search and delete it.
-5. **Month lists.** Parameters `Start Month` and `End Month` are replaced in section 3; leave them for now.
-6. **Extract.** Data Source tab > Connection **Extract**, Hide All Unused Fields, Extract Data. Expected about **597,097** rows (a minute or two).
-7. **Close the CSV source** only when no field shows a red **!** that you still need (right-click `mart_headcount_fte_walk+` > Close).
-8. **Scratch check** (new sheet, delete after): filter `Movement Category` = Closing, `Month End Date` = 6/30/2026, `Worker Type` = Employee: SUM(Headcount) **30,014**. Add `Department Id` ≠ D-901: **30,005**.
+4. **Replace References for the fields that stayed red.** Replace Data Source maps by name. If the new source shows its fields in snake_case (`headcount`, `fte`, `month_end_date`) while the old calcs point at `Headcount`, `Fte`, `Month End Date`, nothing remaps and the calcs that use them keep a red **!**. Do this **before** deleting anything. For each row: Data pane > right-click the **old red field** > **Replace References...** > pick the **new field** > OK.
 
-**Checkpoint 1 passes when:** the extract has 597,097 rows, the types match step 2, no calc from step 4 remains, and the scratch check gives 30,014 and then 30,005. Save the workbook (Cmd+S).
+   | Old red field | New field | Used by |
+   |---|---|---|
+   | Month End Date | `month_end_date` | `In Range`, every `K` and `WF` calc, the month lists, Trend |
+   | Movement Category | `movement_category` | every measure calc, the waterfall columns, Trend filter |
+   | Movement Order | `movement_order` | waterfall column sort |
+   | Movement Reason | `movement_reason` | `K Promotions`, `WF Promos` |
+   | Headcount | `headcount` | every headcount measure |
+   | Fte | `fte` | every FTE measure |
+   | Function Name | `function_name` | Turnover by function, `TO Top Function` |
+
+   Do **not** replace `Part Time Headcount`: it has no release 3 field. After the seven replacements the `K`, `WF` and other calcs that are not in step 5's list lose their red **!**. If one stays red, hover it: Tableau names the missing field; replace that one the same way (the full old-to-new list is in [release_2_replace_references.md](../workforce-planning/release_2_replace_references.md) section 1.3).
+5. **Delete the calcs that no longer apply.** **Part Time Headcount turns red** (the column is gone in release 3). Delete these calcs (Data pane, right-click > Delete; Tableau lists anything still using them): `K Close PT`, `K Part Time Gap`, `K Gap T`, `KPI 2 Note`, `TT Part Time`, `TT Level PT`, `Show Category`, `WF FTE Chg`, `WF FTE Chg Str`, `WF FTE Open`, `WF FTE Close`, `WF FTE Hires`, `WF FTE Leavers`, `WF FTE Open Str`, `WF FTE Close Str`, `WF FTE Hires Str`, `WF FTE Leavers Str`, `WF FTE Net Str`, `TT Bar T`, `K FTE T`. Their sheets get rebuilt below. If Tableau says a field is still in use, find it with the Data pane search and delete it.
+6. **Month lists.** Parameters `Start Month` and `End Month` are replaced in section 3; leave them for now.
+7. **Extract.** Data Source tab > Connection **Extract**, Hide All Unused Fields, Extract Data. Expected about **597,097** rows (a minute or two).
+8. **Close the CSV source** only when no field shows a red **!** that you still need (right-click `mart_headcount_fte_walk+` > Close).
+9. **Scratch check** (new sheet, delete after): filter `Movement Category` = Closing, `Month End Date` = 6/30/2026, `Worker Type` = Employee: SUM(Headcount) **30,014**. Add `Department Id` ≠ D-901: **30,005**.
+
+**Checkpoint 1 passes when:** the extract has 597,097 rows, the types match step 2, the seven fields in step 4 are replaced with no red **!** left on the calcs you keep, no calc from step 5 remains, and the scratch check gives 30,014 and then 30,005. Save the workbook (Cmd+S).
 
 ### 2.2 The Region Walk (pickers + tie-out)
 
