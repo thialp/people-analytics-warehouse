@@ -14,6 +14,19 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 | Waterfall | Opening, Hires, Voluntary, Involuntary, Closing | Compact and **Expand / Collapse** like #2, counted in **drivers** |
 | Population | Includes the 9 executive officers | **Excludes them, like #2**, so Opening, Closing and People match to the person |
 
+## Checkpoints
+
+Save the workbook and compare numbers at each checkpoint before going on. If a number is off, fix it there; later sections build on it.
+
+| # | Where | You have | Check |
+|---:|---|---|---|
+| 1 | Sections 1 and 2.1 | Files in place, backup made, Headcount Walk on release 3 Custom SQL, old calcs deleted | 597,097 rows; scratch check 30,014, then 30,005 |
+| 2 | Sections 2.2 and 2.3 | Region Walk source and the `Link` blend | 26,520 rows; blend shows the green link on `Link` only |
+| 3 | Sections 3 to 5 | Parameters, core calcs, picker calcs | FY26 Company: 28,438 to 30,005 people |
+| 4 | Sections 6 and 7 | Top bar, popovers, actions | Period, Group, Workforce and Reset change the page; no highlight on any click |
+| 5 | Section 8 | Waterfall, KPI cards, trend, turnover, info popover | Every figure in section 11 |
+| 6 | Sections 9 to 12 | Tie-out note, layout, test, publish | Section 11 table in full, then Tableau Public |
+
 ---
 
 ## 0. Shared rules for both dashboards (identical in the #2 guide)
@@ -111,6 +124,8 @@ Click flow after the fix: the click fires the parameter action, then the self fi
 
 ## 1. Before Tableau (Mac)
 
+### 1.1 Warehouse and validation
+
 ```bash
 cd ~/GitHub/people-analytics-warehouse
 git pull
@@ -121,28 +136,42 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 
 
 Expected: `Headcount & FTE walk Custom SQL returned 597097 rows in N seconds`, then every check **PASS** (full expected output: `docs/projects/contingent-workforce/sql_server_release_3_run.md`, step 4). The script reports FY26 opening **28,447** and closing **30,014**: it counts the 9 executive officers. The dashboard shows **28,438** and **30,005** after section 4 removes them, the same as Dashboard #2.
 
-Then:
+### 1.2 Files on the Mac
 
-1. Copy `tableau/custom_sql_headcount_fte_walk.sql` and `tableau/custom_sql_region_walk.sql` into `~/Documents/Tableau/Tableau Public/ArcadiaHR/Custom SQL - Release 3/02 Headcount FTE/`.
+Everything lives under `~/Documents/Tableau/Tableau Public/ArcadiaHR/`:
+
+```
+Arcadia Headcount/
+  Arcadia Headcount FTE Walk.twb                           <- the file you edit (Dashboard #1)
+  Arcadia Headcount FTE Walk - release 2 backup.twb        <- the backup; never open it to edit
+  Arcadia Headcount FTE Walk - published release 2.twbx    <- the packaged copy of what is on Tableau Public
+  Data Source CSV/  Images and Buttons/  KPI Cards/        <- leave where they are (the workbooks read them by relative path)
+  _archive/2026-10-15/                                     <- older dated versions
+Arcadia Compensation/  Arcadia Cost Bridge/  Reference/  Custom SQL - Release 3/  SQL/  Figma/
+```
+
+1. Copy `tableau/custom_sql_headcount_fte_walk.sql` and `tableau/custom_sql_region_walk.sql` into `Custom SQL - Release 3/02 Headcount & FTE Walk/`.
 2. Copy the 12 new PNGs from `arcadia_button_shapes.zip` (sent with this guide) into `~/Documents/My Tableau Repository/Shapes/Arcadia/`. Once they are in the repo, `python3 docs/brand/build/make_button_shapes.py` regenerates them (expected `wrote 12 files`).
-3. Open the Dashboard #1 workbook, **File > Save As** `arcadia_headcount_fte_walk_release1_backup`, close it, reopen the original. Every step below is on the original.
+3. The backup is the copy named `... - release 2 backup.twb`. If you ever need to redo it: close Tableau, copy `Arcadia Headcount FTE Walk.twb` in Finder to a new name, and open only the original. Every step below is on `Arcadia Headcount FTE Walk.twb`.
 
 ---
 
 ## 2. Data sources
 
-### 2.1 The walk: release 3 Custom SQL
+### 2.1 The walk: release 3 Custom SQL (Checkpoint 1)
 
-**If the workbook is still on the six CSVs:** follow [release_2_replace_references.md](../workforce-planning/release_2_replace_references.md) section 1.2 steps 1 to 7, but paste the **release 3** text of `custom_sql_headcount_fte_walk.sql`. Name the source `Headcount Walk`. Extract about **597,097** rows.
+The workbook is still on the six CSVs (the data source is named `mart_headcount_fte_walk+`), so add the new source first and then replace the old one. Close every other workbook first.
 
-**If it is already on Custom SQL:** Data Source tab > the Custom SQL table > right-click > **Edit Custom SQL Query** > select all, paste the release 3 file > OK > Extract > **Refresh**.
+1. **Add the new source.** Data > New Data Source > **Microsoft SQL Server**: the same connection as Dashboard #2 (server `localhost`, database `ArcadiaHR`, user `sa`, the trust-certificate setting from `tableau/sqlserver_trust_local_certificate.tdc`). Drag **New Custom SQL** to the canvas, paste the whole of `custom_sql_headcount_fte_walk.sql`, OK. Rename the source **Headcount Walk**.
+2. **Check types** on the Data Source tab: `Month End Date` and `Prior Month End Date` **Date**; `Grade` and `Fiscal Year` **String**; `Headcount` whole number, default aggregation Sum. Two new fields arrive: **Worker Type** (Employee, Contingent) and **Walk Step** (Opening, Joined, Left, Moved out, Moved in, Converted, Closing).
+3. **Replace Data Source.** Data > **Replace Data Source...**: Current = `mart_headcount_fte_walk+`, Replacement = **Headcount Walk**, OK. Tableau moves every calc, parameter reference, alias and format to the new source and remaps fields by name.
+4. **Delete the calcs that no longer apply.** **Part Time Headcount turns red** (the column is gone in release 3). Delete these calcs (Data pane, right-click > Delete; Tableau lists anything still using them): `K Close PT`, `K Part Time Gap`, `K Gap T`, `KPI 2 Note`, `TT Part Time`, `TT Level PT`, `Show Category`, `WF FTE Chg`, `WF FTE Chg Str`, `WF FTE Open`, `WF FTE Close`, `WF FTE Hires`, `WF FTE Leavers`, `WF FTE Open Str`, `WF FTE Close Str`, `WF FTE Hires Str`, `WF FTE Leavers Str`, `WF FTE Net Str`, `TT Bar T`, `K FTE T`. Their sheets get rebuilt below. If Tableau says a field is still in use, find it with the Data pane search and delete it.
+5. **Month lists.** Parameters `Start Month` and `End Month` are replaced in section 3; leave them for now.
+6. **Extract.** Data Source tab > Connection **Extract**, Hide All Unused Fields, Extract Data. Expected about **597,097** rows (a minute or two).
+7. **Close the CSV source** only when no field shows a red **!** that you still need (right-click `mart_headcount_fte_walk+` > Close).
+8. **Scratch check** (new sheet, delete after): filter `Movement Category` = Closing, `Month End Date` = 6/30/2026, `Worker Type` = Employee: SUM(Headcount) **30,014**. Add `Department Id` ≠ D-901: **30,005**.
 
-Either way, after it opens:
-
-1. On the Data Source tab check types: `Month End Date` and `Prior Month End Date` **Date**; `Grade` and `Fiscal Year` **String**; `Headcount` whole number, Sum.
-2. Two new fields arrive: **Worker Type** (Employee, Contingent) and **Walk Step** (Opening, Joined, Left, Moved out, Moved in, Converted, Closing).
-3. **Part Time Headcount turns red** (the column is gone in release 3). Delete these calcs now (Data pane, right-click > Delete; Tableau lists anything still using them): `K Close PT`, `K Part Time Gap`, `K Gap T`, `KPI 2 Note`, `TT Part Time`, `TT Level PT`, `Show Category`, `WF FTE Chg`, `WF FTE Chg Str`, `WF FTE Open`, `WF FTE Close`, `WF FTE Hires`, `WF FTE Leavers`, `WF FTE Open Str`, `WF FTE Close Str`, `WF FTE Hires Str`, `WF FTE Leavers Str`, `WF FTE Net Str`, `TT Bar T`, `K FTE T`. Their sheets get rebuilt below.
-4. Scratch check (new sheet, delete after): filter `Movement Category` = Closing, `Month End Date` = 6/30/2026, `Worker Type` = Employee: SUM(Headcount) **30,014**. Add `Department Id` ≠ D-901: **30,005**.
+**Checkpoint 1 passes when:** the extract has 597,097 rows, the types match step 2, no calc from step 4 remains, and the scratch check gives 30,014 and then 30,005. Save the workbook (Cmd+S).
 
 ### 2.2 The Region Walk (pickers + tie-out)
 
@@ -155,6 +184,8 @@ Either way, after it opens:
 1. In **Headcount Walk**: calc `Link` = `"Arcadia"`.
 2. In **Region Walk**: calc `Link` = `"Arcadia"`.
 3. **Data > Edit Blend Relationships...**: Primary `Headcount Walk`, Secondary `Region Walk`. Choose **Custom**, remove every pair Tableau proposes (for example `Region`, or the calc `Group Name` against `group_name`), and add only `Link` ↔ `Link`.
+
+**Checkpoint 2 passes when:** `Region Walk` extracts 26,520 rows and the blend has only the `Link` pair. Save (Cmd+S).
 
 ---
 
