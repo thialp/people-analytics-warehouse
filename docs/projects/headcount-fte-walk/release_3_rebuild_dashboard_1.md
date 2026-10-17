@@ -720,32 +720,76 @@ Dashboard: floating item `Detail Toggle`, **x 672, y 205, w 152, h 24** (12 px i
 
 ### 8.1b Waterfall caption (what is behind the bars)
 
-Done after 8.1. The tie-out line under it is section 9.
+The caption explains the bars on screen, with the same numbers, and changes with the Summary | By driver toggle, the workforce type and the view. Summary: it breaks Joined and Left into their parts. By driver: the bars already show the parts, so it says they add up to the net change. The tie-out line under it is section 9.
 
-`WF Caption` (rewritten; the old "FTE ... schedule changes" sentence is gone). New calcs on Headcount Walk, same FIXED pattern as `WF Hires`:
+New number calcs on Headcount Walk (FIXED pattern like `WF Hires`; they follow the toggle through `In Range`):
 ```
-// WF Conv In    ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Employee" THEN [Headcount] END) })
-// WF Conv Out   ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Contingent" THEN [Headcount] END) })
-// WF Moves Out  ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Internal Moves Out" THEN [Headcount] END) })
-// WF Moves In   ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Internal Moves In" THEN [Headcount] END) })
-// WF Conv In Str, WF Conv Out Str, WF Moves In Str, WF Moves Out Str: comma pattern on each
+// WF Vol         ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Voluntary Terminations" THEN [Headcount] END) })
+// WF Invol       ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Involuntary Terminations" THEN [Headcount] END) })
+// WF Starts      ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Starts" THEN [Headcount] END) })
+// WF Ends        ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Ends" THEN [Headcount] END) })
+// WF Conv In     ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Employee" THEN [Headcount] END) })
+// WF Conv Out    ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Contingent" THEN [Headcount] END) })
+// WF Moves In    ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Internal Moves In" THEN [Headcount] END) })
+// WF Moves Out   ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Internal Moves Out" THEN [Headcount] END) })
+// WF Moves Net   [WF Moves In] - [WF Moves Out]
+```
+Text twins, the comma pattern (WF Vol Str shown; make the same for `WF Invol Str`, `WF Starts Str`, `WF Ends Str`, `WF Conv In Str`, `WF Conv Out Str`, `WF Moves In Str`, `WF Moves Out Str`, changing the field in all three places):
+```
+// WF Vol Str
+IF [WF Vol] >= 1000 THEN STR(DIV(INT([WF Vol]), 1000)) + "," + RIGHT("00" + STR(INT([WF Vol]) % 1000), 3)
+ELSE STR(INT([WF Vol])) END
+```
+Signed net moves and net change (the only two with a sign):
+```
+// WF Moves Net Str
+IF [WF Moves Net] >= 0 THEN "+" ELSE "−" END +
+IF ABS([WF Moves Net]) >= 1000 THEN STR(DIV(INT(ABS([WF Moves Net])), 1000)) + "," + RIGHT("00" + STR(INT(ABS([WF Moves Net])) % 1000), 3)
+ELSE STR(INT(ABS([WF Moves Net]))) END
+// WF Net Signed
+IF [WF Close] >= [WF Open] THEN "+" ELSE "−" END + [WF Net Str]
+```
+Already existing and reused: `WF Hires Str`, `WF Joined Str`, `WF Left Str`, `WF Leavers Str`, `WF Net Str`.
+
+```
+// WF Moves Tail   (group views show the Moved (net) bar; at Company moves net to zero and there is no bar)
+IF [p_View] = "Company" THEN " · internal moves net to zero and are not shown."
+ELSE " · Moved (net) " + [WF Moves Net Str] + ": " + [WF Moves In Str] + " in, " + [WF Moves Out Str] + " out." END
 ```
 ```
 // WF Caption
 IF NOT [K Valid] THEN ""
-ELSEIF [p_Worker] = "Employees" AND [p_View] = "Company" THEN
-  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · the " + [WF Moves In Str] + " internal moves net to zero across the company."
-ELSEIF [p_Worker] = "Employees" THEN
-  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · internal moves: " + [WF Moves In Str] + " in, " + [WF Moves Out Str] + " out."
-ELSEIF [p_Worker] = "Contingent" THEN
-  "Conversions (" + [WF Conv Out Str] + ") are contingent workers who became employees; the Employees view counts them as joined."
+ELSEIF [p_Expand] THEN
+  IF [p_Worker] = "Employees" THEN
+    IF [p_View] = "Company"
+    THEN "Hires, conversions and leavers add up to the net change of " + [WF Net Signed] + " · internal moves net to zero and are not shown."
+    ELSE "Hires, conversions, leavers and moves add up to the net change of " + [WF Net Signed] + "." END
+  ELSEIF [p_Worker] = "Contingent" THEN
+    "Contingent joined, contingent left and conversions add up to the net change of " + [WF Net Signed] + "."
+  ELSE
+    "Hires, contingent joined, leavers and contingent left add up to the net change of " + [WF Net Signed] + " · conversions net to zero."
+  END
 ELSE
-  "Conversions (" + [WF Conv In Str] + " contingent workers became employees) are one out and one in, so they net to zero."
+  IF [p_Worker] = "Employees" THEN
+    "Joined " + [WF Joined Str] + " = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · Left " + [WF Left Str] +
+    " = " + [WF Vol Str] + " voluntary + " + [WF Invol Str] + " involuntary" + [WF Moves Tail]
+  ELSEIF [p_Worker] = "Contingent" THEN
+    "Joined " + [WF Joined Str] + " contingent workers · Left " + [WF Left Str] + " = " + [WF Ends Str] + " assignments ended + " + [WF Conv Out Str] + " became employees."
+  ELSE
+    "Joined " + [WF Joined Str] + " = " + [WF Hires Str] + " hires + " + [WF Starts Str] + " contingent joined · Left " + [WF Left Str] +
+    " = " + [WF Leavers Str] + " employees + " + [WF Ends Str] + " contingent left" + [WF Moves Tail]
+  END
 END
 ```
-Check FY26 Company: `Joined = 4,965 hires + 270 converted from contingent · the 3,633 internal moves net to zero across the company.` One line, Book 8 slate (about 150 characters fit in 782 px). Then delete `WF FTE Open Str` and `WF FTE Close Str`.
+Expected, FY26, All organizations:
 
-Sheet `Waterfall Caption`: `WF Caption` on Text, Tableau Book 8 slate, left; the tie-out line (section 9) is added later as line 2.
+| Workforce | Summary | By driver |
+|---|---|---|
+| Employees | `Joined 5,235 = 4,965 hires + 270 converted from contingent · Left 3,668 = 2,942 voluntary + 726 involuntary · internal moves net to zero and are not shown.` | `Hires, conversions and leavers add up to the net change of +1,567 · internal moves net to zero and are not shown.` |
+| Contingent | `Joined 7,033 contingent workers · Left 5,529 = ... assignments ended + 270 became employees.` | `Contingent joined, contingent left and conversions add up to the net change of +1,500.` |
+| Total | `Joined 11,998 = 4,965 hires + 7,033 contingent joined · Left 9,197 = 3,668 employees + 5,529 contingent left · internal moves net to zero and are not shown.` | `Hires, contingent joined, leavers and contingent left add up to the net change of +2,801 · conversions net to zero.` |
+
+Sheet `Waterfall Caption`: `WF Caption` on Text, Tableau Book 8 slate, left, **wrap on** (the Summary lines can need two lines; the item is 56 px tall and the tie-out line from section 9 is added later). Check each bar against the caption: every number in it is a bar or a sum of bars. Then delete `WF FTE Open Str` and `WF FTE Close Str`.
 
 ### 8.2 KPI cards
 
