@@ -844,8 +844,18 @@ ELSE "Employees only · " + [K Vol Emp Str] + " left by choice" END
 // KPI 4 Note
 IF NOT [K Valid] THEN ""
 ELSEIF [p_Worker] = "Contingent" THEN "between teams"
-ELSEIF [p_View] <> "Company" THEN [WF Moves In Str] + " in · " + [WF Moves Out Str] + " out"
-ELSE <the old KPI 5 Note formula: promotions · other moves> END
+ELSEIF [p_View] <> "Company" THEN ATTR([WF Moves In Str]) + " in · " + ATTR([WF Moves Out Str]) + " out"
+ELSE
+  IF [K Promotions] >= 1000
+  THEN STR(DIV(INT([K Promotions]), 1000)) + "," + RIGHT("00" + STR(INT([K Promotions]) % 1000), 3)
+  ELSE STR(INT([K Promotions])) END
+  + " promotions · " +
+  IF [K Other Moves] >= 1000
+  THEN STR(DIV(INT([K Other Moves]), 1000)) + "," + RIGHT("00" + STR(INT([K Other Moves]) % 1000), 3)
+  ELSE STR(INT([K Other Moves])) END
+  + " other moves"
+END
+// Why ATTR: [WF Moves In Str] is a FIXED calc (non-aggregate) and [K Promotions] is a SUM (aggregate); one IF cannot return both kinds, so the non-aggregate side is wrapped in ATTR(). Paste only the ELSE part of the old KPI 5 Note, not its own IF NOT [K Valid] line or its closing END.
 // KPI 5 Title   CASE [p_Worker] WHEN "Employees" THEN "Contingent workforce" WHEN "Contingent" THEN "Employees" ELSE "Contingent share" END
 // KPI 5 Value   IF NOT [K Valid] THEN "—" ELSE CASE [p_Worker] WHEN "Employees" THEN [K CW Close Str] WHEN "Contingent" THEN [K EE Close Str] ELSE [K CW Share Str] END END
 // KPI 5 Note
