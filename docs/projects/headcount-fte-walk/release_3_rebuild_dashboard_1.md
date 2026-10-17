@@ -440,14 +440,19 @@ Source Headcount Walk.
 
 ```
 // Worker Words   CASE [p_Worker] WHEN "Employees" THEN "employees" WHEN "Contingent" THEN "contingent workers" ELSE "employees and contingent workers" END
-// Page Subtitle  [p_Group] + " · " + [Worker Words] + " · data as of " + "Jun 30, 2026"
 // TT Open Day    LEFT(DATENAME('month',[p_From]),3) + " " + STR(DAY([p_From])) + ", " + STR(YEAR([p_From]))
 // TT Close Day   LEFT(DATENAME('month',[p_To]),3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
 ```
 `TT Open Day` and `TT Close Day` are used here, in 8.2 and in section 9; create them now (both on Headcount Walk) and skip them there.
+
+```
+// Page Subtitle  the two dates the whole page compares (the period is no longer named in the header)
+"Opening " + [TT Open Day] + " → Closing " + [TT Close Day]
+```
+The header carries the **dates**, not "data as of": every card, the waterfall and the charts use this period, so it belongs next to the Period field. "Data as of Jun 30, 2026" moves to the footnote (section 10, item 19). The group and the workforce type are already visible in the View field and the Workforce toggle, so the subtitle does not repeat them.
 (Optional later: read the as-of date from Region Walk's `report_as_of_date` with the blend, as #2 does.)
 
-Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 8 `#C9D1DC` (Book 9 clips at 275 px wide: "data as of Jun 3…"). Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Line 2 stays on one line at this width; a long group name wraps to a second line.
+Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 8 `#C9D1DC` (the longest text, "Opening Mar 31, 2024 → Closing Mar 31, 2025", fits at this width; anything longer, such as a "data as of" clause, clips). Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Two lines only (title 18 plus the dates line); a third line forces the title down to 14, which weakens the header.
 
 **Tooltip "How to read this page"** (the default tooltip prints raw field names and repeats the subtitle; replace it). `TT Open Day` and `TT Close Day` are the two calcs just above:
 
@@ -811,7 +816,7 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
 | 17 | Trend | 852 | 188 | 518 | 300 | unchanged |
 | 18 | Turnover | 852 | 500 | 518 | 312 | unchanged |
-| 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic." Book 8 slate |
+| 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Data as of Jun 30, 2026 · Arcadia Systems is a fictional company. All data is synthetic." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
 | 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
 
 Item order (Layout pane, bottom to top): background, cards, charts, buttons, header controls, popovers last.
@@ -858,7 +863,7 @@ Commercial turnover rows (one level below): Sales 14.9%, Client Services 14.8%. 
 | 2 | Click each toggle option, Expand, Collapse, a title, the KPI band | Nothing stays highlighted |
 | 3 | Open Period, then Group, then Info | Only the last one is open |
 | 4 | Period > Quarter > FY26 Q4 | Field "FY26 Q4", opening 29,618, closing 30,005 |
-| 5 | View > Function > Commercial | Title "Commercial · employees · data as of Jun 30, 2026"; numbers per section 11; turnover by sub-function |
+| 5 | View > Function > Commercial | Header subtitle shows the opening and closing dates of the period; numbers per section 11; turnover by sub-function |
 | 6 | Total | Card 1 41,946; waterfall Joined 11,998, Left 9,197; note "The Compensation Walk covers employees only." |
 | 7 | Reset | FY26, Company, Employees, compact, all popovers closed |
 | 8 | Same selections on Dashboard #2 | Same opening, closing and "still here" numbers |
