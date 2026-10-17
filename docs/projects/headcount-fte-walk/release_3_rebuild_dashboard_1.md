@@ -914,7 +914,7 @@ END
 6. Format: Shading > Worksheet None, Borders None, Grid lines None, Fit Entire View, Show Title off.
 7. Duplicate the sheet four times and swap the two fields for `KPI N Title` / `KPI N Tip` (and the tooltip text).
 
-**4. Dashboard.** Each sheet is a **Floating** item, Show title off, Background None, Border None, **Corner Radius 0**, above `KPI cards` in the item list:
+**4. Dashboard.** Each sheet is a **Floating** item, Show title off, Background None, Border None, **Corner Radius 5**, above `KPI cards` in the item list:
 
 | Item | x | y | w | h |
 |---|---|---|---|---|
@@ -926,7 +926,7 @@ END
 
 Add the deselect action for each hover sheet (7.4: Filter, source and target the same worksheet, Run on Select, Show all values, `zzTrue` → `zzFalse`), named `Deselect KPI Hover N`. Without it a click leaves a blue cover and a Keep Only / Exclude toolbar.
 
-**5. Hover outline.** Tableau draws a rectangular hover outline around the mark. A corner radius on the item clips that rectangle and the corners look cut, so the radius stays **0**; the outline is then a clean rectangle. (A mark colour matching the card was tried as a way to hide the outline; the chosen fix is radius 0.)
+**5. Hover outline.** Tableau draws a rectangular hover outline around the mark. A corner radius on the item clips that rectangle and the corners look cut, so keep it small: **5** looks clean (10 clips the outline, 0 is a plain rectangle). (Colouring the mark like the card was considered to hide the outline; the corner radius is the fix that was used.)
 
 **6. Check** in Presentation Mode: hover each card in Employees, Contingent and Total and read the sentence against the numbers on the card (Employees FY26: 30,005 versus 28,438; 5,235 = 4,965 + 270; 1.35 = 4,965 ÷ 3,668; 11,941 = 28.5% of 41,946). FY25 Q3 makes card 3 mention annualizing; FY26 says the period spans a full year. A click must not turn anything blue. Apply the same build to Dashboard #2.
 
