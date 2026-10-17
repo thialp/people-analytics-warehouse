@@ -807,8 +807,8 @@ Card set per toggle value. The map layers and 15 anchors stay as built; only the
 | 2 Note | 4,965 hires · 270 from contingent | 6,907 new · 126 returned | 4,965 hires · 7,033 starts |
 | 3 Title / value | Voluntary turnover (annualized) · 10.1% | same (employees) | same (employees) |
 | 3 Note | 2,942 left by choice · 726 involuntary | Employees; contingent ends: 5,529 | Employees; contingent ends: 5,529 |
-| 4 Title / value | Internal moves · 3,633 | Internal moves · 336 | Internal moves · 3,969 |
-| 4 Note | 2,015 promotions · 1,618 other moves | between teams | 2,015 promotions · 1,954 other |
+| 4 Title / value | Hires per leaver · 1.35 | Joined per leaver · 1.21 | Joined per leaver · 1.30 |
+| 4 Note | 4,965 hires ÷ 3,668 leavers | 7,033 joined ÷ 5,799 left | 11,998 joined ÷ 9,197 left |
 | 5 Title / value | Contingent workforce · 11,941 | Employees · 30,005 | Contingent share · 28.5% |
 | 5 Note | 28.5% of 41,946 in total | 71.5% of 41,946 in total | 11,941 of 41,946 |
 
@@ -825,7 +825,6 @@ ZN(SUM(IF [In Range] AND ([Walk Step] = "Joined"
 // K Starts New  ZN(SUM(IF [In Range] AND [Movement Category] = "Starts" AND [Movement Reason] = "New engagement" THEN [Headcount] END))
 // K Ends        ZN(-SUM(IF [In Period] AND [Officers Out] AND [In Group] AND [Movement Category] = "Ends" THEN [Headcount] END))
 // K Leavers Inv ZN([Involuntary Leavers])
-// K Moves       ZN(SUM(IF [In Range] AND [Movement Category] = "Internal Moves In" THEN [Headcount] END))
 ```
 ```
 // K CW Close    (contingent at close, whatever the toggle: card 5)
@@ -837,11 +836,28 @@ ZN(SUM(IF [In Period] AND [Officers Out] AND [In Group] AND [Worker Type] = "Con
 
 `KPI 2 Value`, `KPI 2 Note` and `KPI 5 ...` replace the old FTE card; `KPI 3 Title` becomes `"Voluntary turnover (annualized)"`, and cards 1 to 5 titles use `CASE [p_Worker]` per the table. `KPI 1 Note Rest` becomes `"from " + [K Open Str] + " on " + [TT Open Day]` where `TT Open Day` = `LEFT(DATENAME('month',[p_From]),3) + " " + STR(DAY([p_From])) + ", " + STR(YEAR([p_From]))`.
 
-Group view note: "Internal moves" in a group counts moves **into** its teams, from other teams inside or outside it (Commercial FY26: 948 in, 933 out). Card 4 note for a group: `"948 in · 933 out, including moves between its own teams"`.
+**KPI 4 = Hires per leaver.** Internal moves net to zero at Company and the page never explained them, so card 4 is now the waterfall title as one number. All pieces are FIXED helpers, so there is no aggregate/non-aggregate error.
+
+```
+// K HPL Num   IF [p_Worker] = "Employees" THEN [WF Hires] ELSE [WF Joined] END
+// K HPL Den   IF [p_Worker] = "Employees" THEN [WF Leavers] ELSE [WF Left] END
+// K HPL       IF [K HPL Den] = 0 THEN 0 ELSE [K HPL Num] / [K HPL Den] END
+// K HPL N     INT(ROUND([K HPL] * 100, 0))
+// K HPL Str   STR(DIV([K HPL N], 100)) + "." + RIGHT("0" + STR([K HPL N] % 100), 2)
+
+// KPI 4 Title  CASE [p_Worker] WHEN "Employees" THEN "Hires per leaver" ELSE "Joined per leaver" END
+// KPI 4 Value  IF NOT [K Valid] OR [K HPL Den] < 20 THEN "—" ELSE [K HPL Str] END
+// KPI 4 Note
+IF NOT [K Valid] THEN ""
+ELSEIF [p_Worker] = "Employees" THEN [WF Hires Str] + " hires ÷ " + [WF Leavers Str] + " leavers"
+ELSE [WF Joined Str] + " joined ÷ " + [WF Left Str] + " left" END
+```
+
+If `WF Leavers Str` or `WF Left Str` does not exist yet, build it with the comma pattern. Expected FY26: Employees 1.35, Contingent 1.21, Total 1.30. Afterwards delete `K Moves`, `K Promotions`, `K Other Moves`, `K Hires Show`.
+
+**KPI 3 title.** "Annualized" is there so a month, a quarter and a year compare on one scale (a quarter's 2.25% is shown as 9.0%). Make the title follow the period: `KPI 3 Title` = `IF DATEDIFF('month',[p_From],[p_To]) >= 11 THEN "Voluntary turnover" ELSE "Voluntary turnover (annualized)" END` (adjust the 11 if your To is the last day of the month).
 
 ### 8.3 Trend and Turnover
-
-**KPI 4 (Internal moves) is parked.** At Company the moves net to zero and are hidden on the waterfall, so "3,633 · 2,015 promotions · 1,618 other moves" is a number the page never explains. Candidate replacements that read as a story from a screenshot: **hires per leaver** (Employees 1.35 = 4,965 ÷ 3,668, the sentence in the waterfall title as a number) or a contingent **conversion** figure (270 contingent workers became employees). Decide after the Trend and Turnover are rebuilt.
 
 **8.3a Trend, step by step.**
 1. Calc `Trend Value` on Headcount Walk (below). It has no `In Period` test, so the line covers the whole history, and `Worker In Scope` makes it follow the Workforce toggle.
