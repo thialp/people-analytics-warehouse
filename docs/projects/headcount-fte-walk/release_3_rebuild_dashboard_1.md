@@ -651,6 +651,8 @@ Sheet `Waterfall`:
 4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, Conversions → `From contingent` (Employees) — in Contingent it reads "Conversions" (−270), which is clear on its own.
 5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`. If the expanded chart shows too many labels, raise the axis font to Tableau Book 10 (Format > Scale) or hide the axis header: every bar has its value. Never set a fixed interval.
 6. Title line 2 (Book 9 slate): `Opening + joined − left ± moves = closing · axis starts at zero`.
+7. Tooltip: `TT Unit`, `TT Context` and `Walk Value` must all sit on Detail or Tooltip (a pill that went red while editing is dropped silently; check the Marks card after the calcs turn green). Text: `<Movement Category>` Semibold 12 navy, `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy, `<AGG(TT Context)>` Book 9 slate. The bar name in the tooltip is `WF Bar` in compact mode (Joined, Left, Moved (net)).
+8. Axis format: Format > Axis > Numbers > Custom `#,##0` (not `#,##0,"k"`: a 849-person group would show a single "0k" tick).
 
 Expand / Collapse buttons: copy #2's construction (build_status.md, "Expand / Collapse look like buttons"): two horizontal containers `Btn Expand ALL` and `Btn Collapse ALL`, identical size **150 × 24**, each = a text sheet (`Expand Label` / `Collapse Label`, Semibold 9 navy) + an icon sheet (`btn_expand_icon` / `btn_collapse_icon`, 16 × 16). Calcs `Expand To` = TRUE and `Collapse To` = FALSE, on Detail with `zzTrue`, `zzFalse`; actions **Set expand** (`p_Expand` ← `Expand To`) from both Expand sheets and **Set collapse** (`p_Expand` ← `Collapse To`) from both Collapse sheets. Visibility, as on #2: `Btn Collapse ALL` > **Control visibility using value** = `p_Expand`; `Btn Expand ALL` > Control visibility using value = calc `Is Compact` (= `NOT [p_Expand]`). Both sit on the same spot at the waterfall card's top right (section 10).
 
@@ -778,13 +780,13 @@ ELSEIF [p_Worker] = "Employees" THEN
      [WF Period] + ": " + [WF Hires Str] + " hires " +
      IF [WF Hires] >= [WF Leavers] THEN "outpaced " ELSE "fell short of " END +
      [WF Leavers Str] + " leavers, " +
-     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + " people"
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " person", " people")
 ELSEIF [p_Worker] = "Contingent" THEN
      [WF Period] + ": " + [WF Joined Str] + " starts, " + [WF Left Str] + " ended or converted, " +
-     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + " contingent workers"
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " contingent worker", " contingent workers")
 ELSE
      [WF Period] + ": " + [WF Joined Str] + " joined, " + [WF Left Str] + " left, " +
-     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + " people"
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " person", " people")
 END
 ```
 `WF Net Str` (`ABS([WF Close] - [WF Open])`) already follows the toggle. Check: Employees FY26 Company reads the first row of the table below; Total reads 11,998 joined, 9,197 left, adding 2,801 people.
