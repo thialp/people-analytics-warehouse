@@ -716,7 +716,7 @@ On `Detail Toggle`: `Detail Tip` on Detail; Worksheet > Tooltip text `<Detail Ti
 
 Sheet `Detail Toggle`, built like `Workforce Toggle` (6.3): `Detail Option` on Columns (manual sort: summary, drivers), filter out Null, mark type Shape, `Detail Shape` on Shape (assign the four files), `Detail Pick`, `zzTrue`, `zzFalse` on Detail, tooltip off, Entire View, shading and borders None.
 
-Dashboard: floating item `Detail Toggle`, **x 672, y 205, w 152, h 24** (12 px inside the waterfall card's top-right corner at 836; y 205 centres it on the first title line), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
+Dashboard: floating item `Detail Toggle`, **x 663, y 205, w 152, h 24** (12 px inside the waterfall card's top-right corner at 827, the right edge of KPI card 3; y 205 centres it on the first title line), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
 
 ### 8.1b Waterfall caption (what is behind the bars)
 
@@ -1142,11 +1142,11 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 1–11 | Header (6.8) | | | | | |
 | 12 | KPI background image | 0 | 78 | 1400 | 110 | new wide image (8.2a) |
 | 13 | KPI cards | 0 | 78 | 1400 | 110 | geometry parameters per 8.2a |
-| 14 | Waterfall | 30 | 188 | 806 | 624 | unchanged; bottom padding 64 |
-| 15 | Detail Toggle (Summary \| By driver) | 672 | 205 | 152 | 24 | Background `#ECEBE5`, radius 12 |
-| 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
-| 17 | Trend | 852 | 188 | 518 | 296 | 16 px gap to Turnover, the same as between KPI cards |
-| 18 | Turnover | 852 | 500 | 518 | 312 | Bottom 812, level with the waterfall |
+| 14 | Waterfall | 30 | 188 | 797 | 624 | right edge 827 = right edge of KPI card 3; bottom padding 64 |
+| 15 | Detail Toggle (Summary \| By driver) | 663 | 205 | 152 | 24 | Background `#ECEBE5`, radius 12 |
+| 16 | Waterfall Caption | 42 | 750 | 773 | 56 | Two lines now |
+| 17 | Trend | 843 | 188 | 526 | 296 | left edge 843 = left edge of KPI card 4, right edge 1369 = KPI card 5; 16 px gap to Turnover; Inner Padding bottom 4 |
+| 18 | Turnover | 843 | 500 | 526 | 312 | Bottom 812, level with the waterfall; Inner Padding bottom 4 |
 | 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
 | 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
 
