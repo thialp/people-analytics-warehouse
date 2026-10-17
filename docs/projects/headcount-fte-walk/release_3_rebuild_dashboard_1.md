@@ -994,7 +994,26 @@ CASE [p_View]
     WHEN "Country"      THEN [Function Name]
 END
 ```
-Replace `Function Name` on Rows with `TO Dim`; `TO Top Function` → rename `TO Top`, `LOOKUP(ATTR([TO Dim]), FIRST())`, Compute Using `TO Dim`. Title: `[TO Top] + " has the highest turnover in " + [Period Name]` (see 8.5). Subtitle unchanged, plus "employees" when the toggle is not Employees: `Voluntary + Involuntary leavers ÷ average headcount, annualized · employees`.
+Replace `Function Name` on Rows with `TO Dim`; `TO Top Function` becomes `TO Top` = `LOOKUP(ATTR([TO Dim]), FIRST())` (Compute Using `TO Dim`). Sort `TO Dim` descending by `Total Rate Shown`. `Vol Rate Shown`, `Invol Rate Shown` and `Total Rate Shown` already return NULL under 20 average headcount, so small groups never appear.
+
+**Title and subtitle.** `TO Title` = `[TO Top] + " has the highest turnover, " + [Period Name]` (Semibold 12 navy). Subtitle (Book 9 slate `#5A6170`, except the words Voluntary and Involuntary in the two bar colours): `Voluntary + Involuntary leavers ÷ average headcount, annualized` followed by `<TO Suffix>`:
+
+```
+// TO Suffix
+IF [p_Worker] = "Employees" THEN "" ELSE " · employees only" END
+```
+
+**Fixed bar size (the department view has up to 22 countries).** Cap the list at 10 rows and fix the row height, so a 2-bar chart and an 8-bar chart look alike:
+
+1. `TO Rank` = `INDEX()`, on Filters, range 1 to 10, Compute Using `TO Dim`.
+2. Fit **Standard** on the sheet and on the dashboard item (toolbar dropdown with the item selected; the dashboard setting wins). Format > Cell Size > Taller or Shorter until the rows are about 22 px apart (Mac has no numeric height). Marks > Size about 75%.
+3. Row-label column: drag the edge to about 95 px, sized for the default view ("Legal & Compliance"). Longer labels end in "…" and the tooltip has the full name. A column left on auto moves the bars in every view.
+
+**Tooltip** (no command buttons): `<ATTR(TO Dim)>` Semibold 12 navy; `<AGG(Total Rate Shown)>` Semibold 16 navy then ` annualized turnover` Book 9 slate; `Voluntary <AGG(Vol Rate Shown)> · <AGG(Voluntary Leavers)> leavers`; `Involuntary <AGG(Invol Rate Shown)> · <AGG(Involuntary Leavers)> leavers`; `Average headcount: <AGG(Average Headcount)>` (Book 9 slate). Use `TO Dim` in line 1, not `function_name`.
+
+**Checks (FY26).** Company: Commercial 14.8%, Legal & Compliance 12.9%, Operations 11.9%, Technology 11.7%, Finance 11.7%, Product 11.6%, People 11.4%, Marketing 11.4%. Commercial: Sales 14.9%, Client Services 14.8%. Finance: Treasury & Tax 13.4%, FP&A 12.3%, Accounting & Controllership 10.3%.
+
+**One type rule for the three cards.** Title Semibold 12 navy `#13233A`; subtitle Book 9 slate `#5A6170`; caption and footnote Book 8 slate.
 
 ### 8.4 Info popover (replaces the white Info Panel)
 
