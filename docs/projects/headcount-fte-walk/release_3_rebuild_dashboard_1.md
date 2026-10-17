@@ -1,6 +1,6 @@
 # Release 3 rebuild: Dashboard #1, Headcount & FTE Walk
 
-Step-by-step rebuild of [arcadia_headcount_fte_walk](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary) on the release 3 data, so it works and reads like Dashboard #2 (Compensation Walk), keeps its own **top bar**, and shows **the same numbers** wherever the two dashboards show the same thing. Arcadia Systems is fictional and all data is synthetic.
+Step-by-step rebuild of [arcadia_headcount_fte_walk](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount) on the release 3 data, so it works and reads like Dashboard #2 (Compensation Walk), keeps its own **top bar**, and shows **the same numbers** wherever the two dashboards show the same thing. Arcadia Systems is fictional and all data is synthetic.
 
 Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_dashboard_2.md). Section 0 is identical in both; you can import sheets, calcs and parameters from one workbook to the other wherever a step says so.
 
@@ -16,9 +16,9 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 
 ## Where we are (updated Oct 17, 2026)
 
-**Done:** sections 1 to 7; 8.1 (compact and expanded waterfall, Summary | By driver toggle with tooltip, bar-explaining tooltip `TT What`, Contingent joined / left names, `WF Title`, `WF Subtitle`); 8.1b (waterfall caption); layout grid for the header, waterfall and right column (section 10 rows 14 to 19).
+**Dashboard #1 is rebuilt and published:** [https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount). Sections 1 to 8 and 10 are done: top bar and popovers, waterfall (Summary | By driver), five KPI cards with hover tooltips, Trend and Turnover, layout aligned to the KPI grid. The published page was checked against section 11 for Employees, Contingent and Total (FY26 and FY25 Q3), Commercial and Finance; every figure ties to the cards, waterfall, trend and Dashboard #2.
 
-**Continue tomorrow with 8.2 (KPI cards):** the five cards still show release 2 text ("Hires (FTE)", "Closing FTE", FTE twins). Rebuild them per workforce type (Employees, Contingent, Total) with the K* calcs, using the wide background and the 30 px grid (8.2a). Then 8.3 (Trend follows the selected group; Turnover follows the group and hides groups under 20 people, no 0.0% rows), then section 9 (tie-out line), cleanup (stale calcs, parameters, actions), section 11 check table and section 12 publish.
+**Open follow-ups (small):** (1) `Period Name` still prints "Jan 2025 – Mar 2025" for a quarter while the Period field says "FY25 Q3"; see 8.5 for the quarter branch. (2) Apply the same toggle, KPI hover tooltips and type rule to Dashboard #2. (3) Cleanup of leftover calcs, sheets and actions: see section 13.
 
 ## Checkpoints
 
@@ -77,7 +77,7 @@ Tableau runs a **parameter action only from a mark on a worksheet**. A dashboard
 |---|---|---|
 | Small square after "Commercial ▾" | The field is a **Text** mark. A text mark has no body, so Tableau draws its hover/selection indicator as a small square at the mark's anchor | Field = **Shape** mark drawing `fld_top.png` (#1) or `fld_rail.png` (#2), full size; the text is the mark's **label** laid on top. The hover indicator becomes the field's own outline |
 | "Total payroll" shown highlighted after a click | The clicked mark stays **selected** (and the others fade) when the sheet has no deselect action, or the action points at the dashboard instead of the worksheet | Every clickable sheet has `zzTrue` and `zzFalse` on Detail and a **Filter action from the sheet to the same worksheet** (`zzTrue` → `zzFalse`, Clearing: Show all values) |
-| A title could be selected | Titles drawn as **text sheets** have marks, so a click selects them | Same deselect action on **every** text sheet (titles, subtitles, captions, headings, KPI band); tooltips off |
+| A title could be selected | Titles drawn as **text sheets** have marks, so a click selects them | Same deselect action on **every** text sheet (titles, subtitles, captions, headings, KPI band); tooltips off on the sheets themselves; the KPI card tooltips come from the five `KPI Hover` sheets (8.2c) |
 
 Click flow after the fix: the click fires the parameter action, then the self filter action clears the selection in the same instant. On Tableau Public a brief flash can remain; nothing stays highlighted.
 
@@ -716,7 +716,7 @@ On `Detail Toggle`: `Detail Tip` on Detail; Worksheet > Tooltip text `<Detail Ti
 
 Sheet `Detail Toggle`, built like `Workforce Toggle` (6.3): `Detail Option` on Columns (manual sort: summary, drivers), filter out Null, mark type Shape, `Detail Shape` on Shape (assign the four files), `Detail Pick`, `zzTrue`, `zzFalse` on Detail, tooltip off, Entire View, shading and borders None.
 
-Dashboard: floating item `Detail Toggle`, **x 672, y 205, w 152, h 24** (12 px inside the waterfall card's top-right corner at 836; y 205 centres it on the first title line), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
+Dashboard: floating item `Detail Toggle`, **x 663, y 205, w 152, h 24** (12 px inside the waterfall card's top-right corner at 827, the right edge of KPI card 3; y 205 centres it on the first title line), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
 
 ### 8.1b Waterfall caption (what is behind the bars)
 
@@ -807,8 +807,8 @@ Card set per toggle value. The map layers and 15 anchors stay as built; only the
 | 2 Note | 4,965 hires · 270 from contingent | 6,907 new · 126 returned | 4,965 hires · 7,033 starts |
 | 3 Title / value | Voluntary turnover (annualized) · 10.1% | same (employees) | same (employees) |
 | 3 Note | 2,942 left by choice · 726 involuntary | Employees; contingent ends: 5,529 | Employees; contingent ends: 5,529 |
-| 4 Title / value | Internal moves · 3,633 | Internal moves · 336 | Internal moves · 3,969 |
-| 4 Note | 2,015 promotions · 1,618 other moves | between teams | 2,015 promotions · 1,954 other |
+| 4 Title / value | Hires per leaver · 1.35 | Joined per leaver · 1.21 | Joined per leaver · 1.30 |
+| 4 Note | 4,965 hires ÷ 3,668 leavers | 7,033 joined ÷ 5,799 left | 11,998 joined ÷ 9,197 left |
 | 5 Title / value | Contingent workforce · 11,941 | Employees · 30,005 | Contingent share · 28.5% |
 | 5 Note | 28.5% of 41,946 in total | 71.5% of 41,946 in total | 11,941 of 41,946 |
 
@@ -825,7 +825,6 @@ ZN(SUM(IF [In Range] AND ([Walk Step] = "Joined"
 // K Starts New  ZN(SUM(IF [In Range] AND [Movement Category] = "Starts" AND [Movement Reason] = "New engagement" THEN [Headcount] END))
 // K Ends        ZN(-SUM(IF [In Period] AND [Officers Out] AND [In Group] AND [Movement Category] = "Ends" THEN [Headcount] END))
 // K Leavers Inv ZN([Involuntary Leavers])
-// K Moves       ZN(SUM(IF [In Range] AND [Movement Category] = "Internal Moves In" THEN [Headcount] END))
 ```
 ```
 // K CW Close    (contingent at close, whatever the toggle: card 5)
@@ -837,11 +836,151 @@ ZN(SUM(IF [In Period] AND [Officers Out] AND [In Group] AND [Worker Type] = "Con
 
 `KPI 2 Value`, `KPI 2 Note` and `KPI 5 ...` replace the old FTE card; `KPI 3 Title` becomes `"Voluntary turnover (annualized)"`, and cards 1 to 5 titles use `CASE [p_Worker]` per the table. `KPI 1 Note Rest` becomes `"from " + [K Open Str] + " on " + [TT Open Day]` where `TT Open Day` = `LEFT(DATENAME('month',[p_From]),3) + " " + STR(DAY([p_From])) + ", " + STR(YEAR([p_From]))`.
 
-Group view note: "Internal moves" in a group counts moves **into** its teams, from other teams inside or outside it (Commercial FY26: 948 in, 933 out). Card 4 note for a group: `"948 in · 933 out, including moves between its own teams"`.
+**KPI 4 = Hires per leaver.** Internal moves net to zero at Company and the page never explained them, so card 4 is now the waterfall title as one number. All pieces are FIXED helpers, so there is no aggregate/non-aggregate error.
+
+```
+// K HPL Num   IF [p_Worker] = "Employees" THEN [WF Hires] ELSE [WF Joined] END
+// K HPL Den   IF [p_Worker] = "Employees" THEN [WF Leavers] ELSE [WF Left] END
+// K HPL       IF [K HPL Den] = 0 THEN 0 ELSE [K HPL Num] / [K HPL Den] END
+// K HPL N     INT(ROUND([K HPL] * 100, 0))
+// K HPL Str   STR(DIV([K HPL N], 100)) + "." + RIGHT("0" + STR([K HPL N] % 100), 2)
+
+// KPI 4 Title  CASE [p_Worker] WHEN "Employees" THEN "Hires per leaver" ELSE "Joined per leaver" END
+// KPI 4 Value  IF NOT [K Valid] OR [K HPL Den] < 20 THEN "—" ELSE [K HPL Str] END
+// KPI 4 Note
+IF NOT [K Valid] THEN ""
+ELSEIF [p_Worker] = "Employees" THEN [WF Hires Str] + " hires ÷ " + [WF Leavers Str] + " leavers"
+ELSE [WF Joined Str] + " joined ÷ " + [WF Left Str] + " left" END
+```
+
+If `WF Leavers Str` or `WF Left Str` does not exist yet, build it with the comma pattern. Expected FY26: Employees 1.35, Contingent 1.21, Total 1.30. Afterwards delete `K Moves`, `K Promotions`, `K Other Moves`, `K Hires Show`.
+
+**KPI 3 title.** "Annualized" is there so a month, a quarter and a year compare on one scale (a quarter's 2.25% is shown as 9.0%). Make the title follow the period: `KPI 3 Title` = `IF DATEDIFF('month',[p_From],[p_To]) >= 11 THEN "Voluntary turnover" ELSE "Voluntary turnover (annualized)" END` (adjust the 11 if your To is the last day of the month).
+
+#### 8.2c KPI card tooltips
+
+Every card gets a hover tooltip, so the five cards behave the same way. Cards 3 and 4 explain how the number is built; cards 1, 2 and 5 say plainly what is being counted and which selections it reflects. Tone: friendly and professional, one short paragraph per card.
+
+**1. Calcs** (all built from fields that already exist; if a `... Str` twin is missing, create it with the comma pattern):
+
+```
+// KPI 1 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "Employees on the books at the close of " + [TT Close Day] + ": " + [K EE Close Str] + ", compared with " + [K Open Str] + " on " + [TT Open Day] + ". Executive officers are not included."
+WHEN "Contingent" THEN "Contingent workers with an active assignment at the close of " + [TT Close Day] + ": " + [K CW Close Str] + ", compared with " + [K Open Str] + " on " + [TT Open Day] + "."
+ELSE "Employees plus contingent workers at the close of " + [TT Close Day] + ": " + [K All Close Str] + ", compared with " + [K Open Str] + " on " + [TT Open Day] + "."
+END + CHAR(10) + "Reflects the period, view and workforce you have selected."
+```
+```
+// KPI 2 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "People who joined the company during the period: " + [K Joined Str] + ". That is " + [WF Hires Str] + " new hires plus " + [WF Conv In Str] + " contingent workers who became employees. Moves between teams are not counted here."
+WHEN "Contingent" THEN "Contingent assignments that started during the period: " + [K Joined Str] + ". This includes new engagements and workers who returned."
+ELSE "Everyone who started during the period: " + [K Joined Str] + ", made up of employee hires and contingent starts."
+END + CHAR(10) + "Reflects the period, view and workforce you have selected."
+```
+```
+// KPI 3 Tip
+"Voluntary leavers divided by average headcount, expressed as a 12-month rate so that a month, a quarter and a year can be compared on the same scale."
++ CHAR(10) + IF DATEDIFF('month',[p_From],[p_To]) >= 11 THEN "This period spans a full year, so no scaling is needed. " ELSE "" END
++ [K Vol Emp Str] + " employees left by choice; the " + [K Invol Emp Str] + " involuntary exits are not included."
++ IF [p_Worker] <> "Employees" THEN CHAR(10) + "Employees only: contingent workers are not part of this rate." ELSE "" END
++ CHAR(10) + "Shown as a dash for groups with fewer than 20 people."
+```
+```
+// KPI 4 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "New hires divided by leavers. Above 1.00 means more people came in than left; below 1.00 means the workforce shrank. " + [WF Hires Str] + " hires ÷ " + [WF Leavers Str] + " leavers (voluntary and involuntary). Contingent conversions and moves between teams are not counted."
+ELSE "People who joined divided by people who left. Above 1.00 means more came in than left; below 1.00 means the workforce shrank. " + [WF Joined Str] + " joined ÷ " + [WF Left Str] + " left."
+END
+```
+```
+// KPI 5 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "Contingent workers (vendor-supplied, not on the payroll) with an active assignment at the close of " + [TT Close Day] + ": " + [K CW Close Str] + ", or " + [K CW Share Str] + " of the " + [K All Close Str] + " people working for the company."
+WHEN "Contingent" THEN "Employees at the close of " + [TT Close Day] + ": " + [K EE Close Str] + ", out of " + [K All Close Str] + " people working for the company (employees plus contingent workers)."
+ELSE "Contingent workers as a share of the whole workforce at the close of " + [TT Close Day] + ": " + [K CW Close Str] + " of " + [K All Close Str] + "."
+END
+```
+
+**2. Why not on the map layers.** Tooltips set on the 15 layers of `KPI cards` never showed in Dashboard #1 or #2, whatever the circle size, opacity or tooltip text (a plain "TEST" did not show either). Leave those layers as they are (tooltips off) and put the hover on five small ordinary sheets laid over the cards.
+
+**3. Build `KPI Hover N` (N = 1 to 5).**
+1. Calc `Hover Cell` = `"."`.
+2. New sheet `KPI Hover 1` on Headcount Walk. `Hover Cell` on Columns and on Rows (second copy); right-click each pill and untick Show Header.
+3. Marks type **Square**; Size all the way right (the square fills the pane); Color opacity **0%**.
+4. `KPI 1 Title` and `KPI 1 Tip` on **Tooltip** (Attribute). Tooltip text: line 1 `<ATTR(KPI 1 Title)>` (Semibold 10 navy), line 2 `<ATTR(KPI 1 Tip)>` (Book 9, `#4A5A73`). Show tooltips on, Include command buttons off.
+5. `zzTrue` and `zzFalse` on **Detail**.
+6. Format: Shading > Worksheet None, Borders None, Grid lines None, Fit Entire View, Show Title off.
+7. Duplicate the sheet four times and swap the two fields for `KPI N Title` / `KPI N Tip` (and the tooltip text).
+
+**4. Dashboard.** Each sheet is a **Floating** item, Show title off, Background None, Border None, **Corner Radius 5**, above `KPI cards` in the item list:
+
+| Item | x | y | w | h |
+|---|---|---|---|---|
+| KPI Hover 1 | 30 | 90 | 255 | 86 |
+| KPI Hover 2 | 301 | 90 | 255 | 86 |
+| KPI Hover 3 | 572 | 90 | 255 | 86 |
+| KPI Hover 4 | 843 | 90 | 255 | 86 |
+| KPI Hover 5 | 1114 | 90 | 255 | 86 |
+
+Add the deselect action for each hover sheet (7.4: Filter, source and target the same worksheet, Run on Select, Show all values, `zzTrue` → `zzFalse`), named `Deselect KPI Hover N`. Without it a click leaves a blue cover and a Keep Only / Exclude toolbar.
+
+**5. Hover outline.** Tableau draws a rectangular hover outline around the mark. A corner radius on the item clips that rectangle and the corners look cut, so keep it small: **5** looks clean (10 clips the outline, 0 is a plain rectangle). (Colouring the mark like the card was considered to hide the outline; the corner radius is the fix that was used.)
+
+**6. Check** in Presentation Mode: hover each card in Employees, Contingent and Total and read the sentence against the numbers on the card (Employees FY26: 30,005 versus 28,438; 5,235 = 4,965 + 270; 1.35 = 4,965 ÷ 3,668; 11,941 = 28.5% of 41,946). FY25 Q3 makes card 3 mention annualizing; FY26 says the period spans a full year. A click must not turn anything blue. Apply the same build to Dashboard #2.
 
 ### 8.3 Trend and Turnover
 
-**Trend:** add `Trend Value` = `IF [Officers Out] AND [In Group] AND [Worker In Scope] AND [Movement Category] = "Closing" THEN [Headcount] END` and put `SUM([Trend Value])` on Rows instead of `SUM([Selected Value])`. Band: `Band Start` = `[p_From]` (EDIT: the band now starts on the opening month-end). Title calc `Trend Title` = `"Closing " + CASE [p_Worker] WHEN "Employees" THEN "headcount" WHEN "Contingent" THEN "contingent workers" ELSE "workforce" END + " by month-end"`. Remove the hard-coded "FY24 restructuring" annotation or keep it only for Company (it marks a company event).
+**8.3a Trend, step by step.** The Trend answers "where does the selected period sit in the history?". It follows Workforce and View. The subtitle carries the dates, both values and the change (the same +498 and +1.3% as the waterfall title and card 1); the chart carries only the line, the shaded band, two unlabelled dots on the band edges and one grey label at the start of the history. (A first version labelled both band edges, the change and the last point; in the 518 px card the labels collided with each other and with the line, so they were dropped.)
+
+1. **Trend Value** (Headcount Walk). No `In Period` test, so the line covers the whole history; `Worker In Scope` and `In Group` make it follow the toggle and View.
+```
+IF [Officers Out] AND [In Group] AND [Worker In Scope] AND [Movement Category] = "Closing" THEN [Headcount] END
+```
+2. **Title and subtitle.** Use only `WF` fields here (non-aggregate); a `K` field is an aggregate and makes Tableau stop with "Cannot mix aggregate and non-aggregate arguments".
+```
+// Trend Title
+"Closing " + CASE [p_Worker] WHEN "Employees" THEN "headcount" WHEN "Contingent" THEN "contingent workers" ELSE "workforce" END + " by month-end"
+// Trend Open Str
+IF [WF Open] >= 1000 THEN STR(DIV(INT([WF Open]), 1000)) + "," + RIGHT("00" + STR(INT([WF Open]) % 1000), 3) ELSE STR(INT([WF Open])) END
+// Trend Close Str
+IF [WF Close] >= 1000 THEN STR(DIV(INT([WF Close]), 1000)) + "," + RIGHT("00" + STR(INT([WF Close]) % 1000), 3) ELSE STR(INT([WF Close])) END
+// Trend Pct
+IF [WF Open] = 0 THEN 0 ELSE ([WF Close] - [WF Open]) / [WF Open] END
+// Trend Chg Str
+IF [WF Close] >= [WF Open] THEN "+" ELSE "−" END + [WF Net Str]
+// Trend Pct Str
+IF [WF Close] >= [WF Open] THEN "+" ELSE "−" END
++ STR(DIV(INT(ROUND(ABS([Trend Pct]) * 1000, 0)), 10)) + "." + STR(INT(ROUND(ABS([Trend Pct]) * 1000, 0)) % 10) + "%"
+// Trend Subtitle
+IF NOT [K Valid] THEN "" ELSE
+[TT Open Day] + " → " + [TT Close Day] + " · " + [Trend Open Str] + " → " + [Trend Close Str]
++ " (" + [Trend Chg Str] + ", " + [Trend Pct Str] + ")" END
+```
+Put `Trend Title` and `Trend Subtitle` on Detail of the `Trend` sheet, then in the sheet title (Worksheet > Edit Title) Insert each: line 1 `Trend Title` (bold), line 2 `Trend Subtitle` (Book 9 slate). `Band Start` = `[p_From]`.
+
+3. **Dots and the start label.**
+```
+// Trend Pt     (the four points that get a dot)
+SUM(IF [month_end_date] = [p_From] OR [month_end_date] = [p_To]
+       OR [month_end_date] = { FIXED : MIN([month_end_date]) }
+       OR [month_end_date] = { FIXED : MAX([month_end_date]) } THEN [Trend Value] END)
+// Pt Role      (a dimension: drives the dot colour)
+IF [month_end_date] = [p_From] OR [month_end_date] = [p_To] THEN "Selected"
+ELSEIF [month_end_date] = { FIXED : MIN([month_end_date]) } OR [month_end_date] = { FIXED : MAX([month_end_date]) } THEN "Edge"
+ELSE "None" END
+// Trend Lbl    (the only dot label: the first month of the history)
+IF ATTR([month_end_date]) = ATTR({ FIXED : MIN([month_end_date]) }) THEN
+    IF SUM([Trend Value]) >= 1000 THEN STR(DIV(INT(SUM([Trend Value])), 1000)) + "," + RIGHT("00" + STR(INT(SUM([Trend Value])) % 1000), 3)
+    ELSE STR(INT(SUM([Trend Value]))) END
+ELSE "" END
+```
+4. **Layout.** Columns `month_end_date`. Rows `SUM(Trend Value)` then `AGG(Trend Pt)`; right-click the second pill > **Dual Axis**, then **Synchronize Axis** and untick **Show Header** on the right axis. Range Automatic, Include zero off. Right-click the "nulls" badge > Hide Indicator.
+   - `SUM(Trend Value)` card: line, teal, **no label**. Tooltip: line 1 `<month_end_date>` (Semibold 11 navy), line 2 `<SUM(Trend Value)>` (Book 10 navy); show tooltips, no command buttons. No table calcs: a month-over-month calc is split by `Pt Role` and shows the change versus the previous *labelled* point, so it was dropped.
+   - `AGG(Trend Pt)` card: **Circle**, small; `Pt Role` on **Color on this card only** (a pill on the `All` card would colour and split the line); Edit Colors: `Selected` `#13233A`, `Edge` `#8C8A84`, `None` any; hide the legend. **Label**: `Trend Lbl` only, Book 9, Match Mark Color, Top Center. Tooltip off.
+
+5. **Checks.** FY25 Q3, Total: subtitle `Dec 31, 2024 → Mar 31, 2025 · 37,836 → 38,334 (+498, +1.3%)` on one line, two navy dots on the band edges, grey `32,072` at the start, nothing touching the line. FY26: `Jun 30, 2025 → Jun 30, 2026 · …`. The last point on the line is the full-history end (Employees 30,005, Contingent 11,941, Total 41,946); the percentage matches card 1 in every workforce type. One teal line for all three workforce types: the title and subtitle carry the change (colour by workforce was considered and dropped, since the palette gives teal, coral and violet fixed meanings).
 
 **Turnover:** the rows become **one level below the selection**, so the chart always says something about what you picked:
 
@@ -855,7 +994,26 @@ CASE [p_View]
     WHEN "Country"      THEN [Function Name]
 END
 ```
-Replace `Function Name` on Rows with `TO Dim`; `TO Top Function` → rename `TO Top`, `LOOKUP(ATTR([TO Dim]), FIRST())`, Compute Using `TO Dim`. Title: `[TO Top] + " has the highest turnover in " + [Period Name]` (see 8.5). Subtitle unchanged, plus "employees" when the toggle is not Employees: `Voluntary + Involuntary leavers ÷ average headcount, annualized · employees`.
+Replace `Function Name` on Rows with `TO Dim`; `TO Top Function` becomes `TO Top` = `LOOKUP(ATTR([TO Dim]), FIRST())` (Compute Using `TO Dim`). Sort `TO Dim` descending by `Total Rate Shown`. `Vol Rate Shown`, `Invol Rate Shown` and `Total Rate Shown` already return NULL under 20 average headcount, so small groups never appear.
+
+**Title and subtitle.** `TO Title` = `[TO Top] + " has the highest turnover, " + [Period Name]` (Semibold 12 navy). Subtitle (Book 9 slate `#5A6170`, except the words Voluntary and Involuntary in the two bar colours): `Voluntary + Involuntary leavers ÷ average headcount, annualized` followed by `<TO Suffix>`:
+
+```
+// TO Suffix
+IF [p_Worker] = "Employees" THEN "" ELSE " · employees only" END
+```
+
+**Fixed bar size (the department view has up to 22 countries).** Cap the list at 10 rows and fix the row height, so a 2-bar chart and an 8-bar chart look alike:
+
+1. `TO Rank` = `INDEX()`, on Filters, range 1 to 10, Compute Using `TO Dim`.
+2. Fit **Standard** on the sheet and on the dashboard item (toolbar dropdown with the item selected; the dashboard setting wins). Format > Cell Size > Taller or Shorter until the rows are about 22 px apart (Mac has no numeric height). Marks > Size about 75%.
+3. Row-label column: drag the edge to about 95 px, sized for the default view ("Legal & Compliance"). Longer labels end in "…" and the tooltip has the full name. A column left on auto moves the bars in every view.
+
+**Tooltip** (no command buttons): `<ATTR(TO Dim)>` Semibold 12 navy; `<AGG(Total Rate Shown)>` Semibold 16 navy then ` annualized turnover` Book 9 slate; `Voluntary <AGG(Vol Rate Shown)> · <AGG(Voluntary Leavers)> leavers`; `Involuntary <AGG(Invol Rate Shown)> · <AGG(Involuntary Leavers)> leavers`; `Average headcount: <AGG(Average Headcount)>` (Book 9 slate). Use `TO Dim` in line 1, not `function_name`.
+
+**Checks (FY26).** Company: Commercial 14.8%, Legal & Compliance 12.9%, Operations 11.9%, Technology 11.7%, Finance 11.7%, Product 11.6%, People 11.4%, Marketing 11.4%. Commercial: Sales 14.9%, Client Services 14.8%. Finance: Treasury & Tax 13.4%, FP&A 12.3%, Accounting & Controllership 10.3%.
+
+**One type rule for the three cards.** Title Semibold 12 navy `#13233A`; subtitle Book 9 slate `#5A6170`; caption and footnote Book 8 slate.
 
 ### 8.4 Info popover (replaces the white Info Panel)
 
@@ -1003,11 +1161,11 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 1–11 | Header (6.8) | | | | | |
 | 12 | KPI background image | 0 | 78 | 1400 | 110 | new wide image (8.2a) |
 | 13 | KPI cards | 0 | 78 | 1400 | 110 | geometry parameters per 8.2a |
-| 14 | Waterfall | 30 | 188 | 806 | 624 | unchanged; bottom padding 64 |
-| 15 | Detail Toggle (Summary \| By driver) | 672 | 205 | 152 | 24 | Background `#ECEBE5`, radius 12 |
-| 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
-| 17 | Trend | 852 | 188 | 518 | 296 | 16 px gap to Turnover, the same as between KPI cards |
-| 18 | Turnover | 852 | 500 | 518 | 312 | Bottom 812, level with the waterfall |
+| 14 | Waterfall | 30 | 188 | 797 | 624 | right edge 827 = right edge of KPI card 3; bottom padding 64 |
+| 15 | Detail Toggle (Summary \| By driver) | 663 | 205 | 152 | 24 | Background `#ECEBE5`, radius 12 |
+| 16 | Waterfall Caption | 42 | 750 | 773 | 56 | Two lines now |
+| 17 | Trend | 843 | 188 | 526 | 296 | left edge 843 = left edge of KPI card 4, right edge 1369 = KPI card 5; 16 px gap to Turnover; Inner Padding bottom 4 |
+| 18 | Turnover | 843 | 500 | 526 | 312 | Bottom 812, level with the waterfall; Inner Padding bottom 4 |
 | 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
 | 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
 
@@ -1061,3 +1219,24 @@ Commercial turnover rows (one level below): Sales 14.9%, Client Services 14.8%. 
 | 8 | Same selections on Dashboard #2 | Same opening, closing and "still here" numbers |
 
 Publish: reset the dashboard, hide all sheets, **File > Save to Tableau Public As...** `arcadia_headcount_fte_walk` (same name keeps the URL), extracts only. Check the page in the browser with the test table, Tableau Public row by row.
+
+## 13. Wrap-up: cleanup, decisions and lessons
+
+**Cleanup rule (Tableau tells you what is live).** Right-click a calc > Delete. The dialog lists every field and sheet that depends on it. If it lists `KPI cards`, `Dashboard`, `Waterfall`, `Trend` or `Turnover by Function`, or a field you keep: **No**. If it lists nothing, only `CheckList`, or only other calcs on the delete list: **Yes**. This is more reliable than guessing from names: `K EE Share Str` (card 5) and `K Net Pct` / `K Net Pct Str` (the teal note on card 1) looked dead and are not; `Net Change %` is used only by the test sheet and goes.
+
+**Delete:** the FTE and part-time calcs (`K Close PT`, `K Part Time Gap`, `K Gap T`, `K FTE T`, `K Close FTE`, `K Hires FTE`, `K Hires FTE Str`, `K Leavers Vol FTE`, `K Vol FTE Str`, `TT Level FTE`), the Expand/Collapse calcs and the four Expand/Collapse sheets, `Measure Option`, `Option State`, the old `Measure` parameter, `Net Change %`, and the orphan action `Set collapse` (no source sheet). Keep every `kpi_` parameter, `p_Expand` (the Summary | By driver toggle runs on it) and all `Deselect ...` actions. Region Walk has nothing to delete.
+
+**Actions check.** `Close info on ✕` must have source `Popover Close Info`; `Close period on ✕` has source `Popover Close`. A wrong source sheet is the usual reason a ✕ does nothing.
+
+**Design decisions worth knowing**
+
+| Decision | Why |
+|---|---|
+| KPI tooltips are floating hover sheets | Tooltips do not fire on map-layer marks. Each hover sheet is transparent, sits over its card and carries the card's `KPI N Tip`; a `zzTrue`/`zzFalse` Deselect action stops the click highlight |
+| Trend shows four labels on dots, not a line label | A line label collides with the line; dual axis with small bordered dots keeps the numbers readable; a reference line (`Trend Top`) adds headroom |
+| Turnover is capped at 10 rows, Standard fit, fixed row height | The department view has 22 countries; Entire View made 2 bars huge and 8 bars thin. Fixed row height and a fixed label column keep every view alike |
+| Title 12 semibold navy, subtitle 9 book slate, caption 8 book slate | One type rule across the three cards |
+| Header secondary text `#B8C4D6`, footnote slate | The subtitle and the SELECT headings drifted apart before |
+| KPI 3 title follows the period | "Voluntary turnover" for 12 months or more, "(annualized)" below that, so a quarter and a year compare on one scale |
+| Hires per leaver replaces the old hires/FTE card | FTE equals headcount in release 3; the new ratio reads as a trend signal (1.35 FY26) |
+

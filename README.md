@@ -501,9 +501,9 @@ Dashboard #3 is in design. Four Tableau Custom SQL data sources are ready, one p
 
 ## Case study 2: Headcount & FTE Walk
 
-[![Headcount & FTE Walk: Executive Summary on Tableau Public](docs/images/executive_summary_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)
+[![Headcount & FTE Walk on Tableau Public](docs/images/headcount_fte_walk_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount)
 
-*The Executive Summary, shown here in FTE mode. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary)**: pick any From/To months and switch between headcount and FTE.*
+*FY26, all of Arcadia, employees. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount)**: pick any period (fiscal year, quarter, month), any group (company, function, sub-function, department, country) and any workforce (employees, contingent, total).*
 
 ### Business problem
 
@@ -584,17 +584,17 @@ The daily scaffold stores 30 times more rows than the month-end snapshot, is 12 
 
 ### Tableau
 
-**Published:** [Executive Summary on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary).
+**Published:** [Headcount & FTE Walk on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount) (release 3 data: one Custom SQL, 597,097 rows, plus the 26,520-row Region Walk for the pickers).
 
 | Part | What it does |
 |---|---|
-| Header | From / To month dropdowns, a Headcount \| FTE capsule toggle (parameter action on custom shapes), an info button that opens a definitions panel |
-| KPI band | Five cards drawn as text on map layers (`MAKEPOINT`), so one sheet and one query draw every title, value and note; cards beside the waterfall follow the toggle and name their unit |
-| Waterfall | A Gantt-bar walk whose title states the finding ("FY26: 5,235 hires outpaced 3,668 leavers, adding 1,567 people") and whose tooltip bridges people to FTE ("5,235 people = 5,187.8 FTE") |
-| Trend | Closing headcount or FTE for every month-end, with the selected period shaded |
-| Turnover by function | Voluntary + involuntary annualized turnover, groups under 20 people hidden, title naming the top function |
+| Header | Period, View and Workforce controls (image buttons on worksheets, popovers driven by parameter actions), Reset, and an info button; the subtitle states the opening and closing dates the whole page compares |
+| KPI band | Five cards drawn as text on map layers (`MAKEPOINT`): closing headcount, joined, voluntary turnover (annualized for periods under a year), hires per leaver, and the contingent share. Hover sheets give each card a tooltip, because tooltips do not fire on map layers |
+| Waterfall | Opening + joined − left ± moves = closing, with a Summary \| By driver toggle, a title that states the finding ("FY26: 4,965 hires outpaced 3,668 leavers, adding 1,567 people") and a caption that spells out what is behind the bars |
+| Trend | Closing headcount for every month-end, the selected period shaded, dual-axis dots with the start, end and history values; the subtitle carries both dates and the change |
+| Turnover | One level below the selection (functions at Company, sub-functions or departments below), top 10, groups under 20 people hidden, fixed bar size, title naming the top group |
 
-The dashboard reads the CSVs today and is moving to one SQL Server Custom SQL with the same field names ([`custom_sql_headcount_fte_walk.sql`](tableau/custom_sql_headcount_fte_walk.sql), identical to the CSVs row for row). How it was built, with every worksheet, calculated field, color, position, tooltip and design decision: [`docs/projects/headcount-fte-walk/executive_summary_build_book.md`](docs/projects/headcount-fte-walk/executive_summary_build_book.md). The check table for every number on the page is generated from the marts: [`expected_values.md`](docs/projects/headcount-fte-walk/expected_values.md). The map-layer KPI technique has its own guide ([`tableau_kpi_cards_guide.md`](docs/projects/headcount-fte-walk/tableau_kpi_cards_guide.md), also as a [PDF](docs/projects/headcount-fte-walk/tableau_kpi_cards_guide.pdf), with a [config workbook](docs/projects/headcount-fte-walk/Arcadia_KPI_Cards_Config.xlsx)).
+The numbers tie out: the waterfall, the cards, the trend and the Compensation Walk (Dashboard #2) show the same opening, closing and "still here" figures for the same selection. The dashboard reads one Custom SQL ([`custom_sql_headcount_fte_walk.sql`](tableau/custom_sql_headcount_fte_walk.sql), release 3, 597,097 rows). How it was built, with every worksheet, calculated field, color, position, tooltip and design decision: [`docs/projects/headcount-fte-walk/executive_summary_build_book.md`](docs/projects/headcount-fte-walk/executive_summary_build_book.md). The check table for every number on the page is generated from the marts: [`expected_values.md`](docs/projects/headcount-fte-walk/expected_values.md). The map-layer KPI technique has its own guide ([`tableau_kpi_cards_guide.md`](docs/projects/headcount-fte-walk/tableau_kpi_cards_guide.md), also as a [PDF](docs/projects/headcount-fte-walk/tableau_kpi_cards_guide.pdf), with a [config workbook](docs/projects/headcount-fte-walk/Arcadia_KPI_Cards_Config.xlsx)).
 
 ---
 
