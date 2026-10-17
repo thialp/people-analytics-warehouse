@@ -470,35 +470,7 @@ Three dashboard **Text** objects (static text is not selectable), Tableau Bold 1
 Every control is 32 high on the same baseline (y 30) and shaped as a capsule or circle, so the bar reads as one set.
 
 | Object | x | y | w | h |
-|---|---:|---:|---:|---:|
-| Header band (Blank, `#13233A`) | 0 | 0 | 1400 | 76 |
-| Logo | 30 | 14 | 177 | 48 |
-| Page Title | 223 | 9 | 275 | 58 |
-| SELECT PERIOD | 506 | 12 | 180 | 14 |
-| Period Field | 506 | 30 | 180 | 32 |
-| SELECT VIEW | 698 | 12 | 180 | 14 |
-| Group Field | 698 | 30 | 180 | 32 |
-| SHOW | 890 | 12 | 240 | 14 |
-| Workforce Toggle | 890 | 30 | 240 | 32 |
-| Reset | 1142 | 30 | 184 | 32 |
-| Info Button | 1338 | 30 | 32 | 32 |
-
-Gaps are 12 px between controls and 16 px between the logo/title and the fields; the logo sits on the left edge of the page grid (x 30) and Info on the right edge (1370). The whole page uses a **30 px margin** so the banner and the body are the same width. Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and shape legend (`Info Shape`) left on the dashboard: they are helpers for the actions, not part of the page. The Page Title text is **white**.
-
----|---:|---:|---:|---:|
-| Header band (Blank, `#13233A`) | 0 | 0 | 1400 | 76 |
-| Logo | 30 | 14 | 177 | 48 |
-| Page Title | 256 | 9 | 372 | 58 |
-| SELECT PERIOD | 640 | 12 | 180 | 14 |
-| Period Field | 640 | 30 | 180 | 32 |
-| SELECT VIEW | 832 | 12 | 180 | 14 |
-| Group Field | 832 | 30 | 180 | 32 |
-| SHOW | 1024 | 12 | 240 | 14 |
-| Workforce Toggle | 1024 | 30 | 240 | 32 |
-| Reset | 1272 | 30 | 32 | 32 |
-| Info Button | 1312 | 30 | 32 | 32 |
-
-Right edge 1344, the 56 px gutter of the page.
+|
 
 ---
 
