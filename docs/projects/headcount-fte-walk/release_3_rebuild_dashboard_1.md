@@ -77,7 +77,7 @@ Tableau runs a **parameter action only from a mark on a worksheet**. A dashboard
 |---|---|---|
 | Small square after "Commercial ▾" | The field is a **Text** mark. A text mark has no body, so Tableau draws its hover/selection indicator as a small square at the mark's anchor | Field = **Shape** mark drawing `fld_top.png` (#1) or `fld_rail.png` (#2), full size; the text is the mark's **label** laid on top. The hover indicator becomes the field's own outline |
 | "Total payroll" shown highlighted after a click | The clicked mark stays **selected** (and the others fade) when the sheet has no deselect action, or the action points at the dashboard instead of the worksheet | Every clickable sheet has `zzTrue` and `zzFalse` on Detail and a **Filter action from the sheet to the same worksheet** (`zzTrue` → `zzFalse`, Clearing: Show all values) |
-| A title could be selected | Titles drawn as **text sheets** have marks, so a click selects them | Same deselect action on **every** text sheet (titles, subtitles, captions, headings, KPI band); tooltips off |
+| A title could be selected | Titles drawn as **text sheets** have marks, so a click selects them | Same deselect action on **every** text sheet (titles, subtitles, captions, headings, KPI band); tooltips off, except the KPI cards (8.2c) |
 
 Click flow after the fix: the click fires the parameter action, then the self filter action clears the selection in the same instant. On Tableau Public a brief flash can remain; nothing stays highlighted.
 
@@ -856,6 +856,61 @@ ELSE [WF Joined Str] + " joined ÷ " + [WF Left Str] + " left" END
 If `WF Leavers Str` or `WF Left Str` does not exist yet, build it with the comma pattern. Expected FY26: Employees 1.35, Contingent 1.21, Total 1.30. Afterwards delete `K Moves`, `K Promotions`, `K Other Moves`, `K Hires Show`.
 
 **KPI 3 title.** "Annualized" is there so a month, a quarter and a year compare on one scale (a quarter's 2.25% is shown as 9.0%). Make the title follow the period: `KPI 3 Title` = `IF DATEDIFF('month',[p_From],[p_To]) >= 11 THEN "Voluntary turnover" ELSE "Voluntary turnover (annualized)" END` (adjust the 11 if your To is the last day of the month).
+
+#### 8.2c KPI card tooltips
+
+Every card gets a hover tooltip, so the five cards behave the same way. Cards 3 and 4 explain how the number is built; cards 1, 2 and 5 say plainly what is being counted and which selections it reflects. Tone: friendly and professional, one short paragraph per card.
+
+**1. Calcs** (all built from fields that already exist; if a `... Str` twin is missing, create it with the comma pattern):
+
+```
+// KPI 1 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "Employees on the books at the close of " + [TT Close Day] + ": " + [K EE Close Str] + ", compared with " + [K Open Str] + " on " + [TT Open Day] + ". Executive officers are not included."
+WHEN "Contingent" THEN "Contingent workers with an active assignment at the close of " + [TT Close Day] + ": " + [K CW Close Str] + ", compared with " + [K Open Str] + " on " + [TT Open Day] + "."
+ELSE "Employees plus contingent workers at the close of " + [TT Close Day] + ": " + [K All Close Str] + ", compared with " + [K Open Str] + " on " + [TT Open Day] + "."
+END + CHAR(10) + "Reflects the period, view and workforce you have selected."
+```
+```
+// KPI 2 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "People who joined the company during the period: " + [K Joined Str] + ". That is " + [WF Hires Str] + " new hires plus " + [WF Conv In Str] + " contingent workers who became employees. Moves between teams are not counted here."
+WHEN "Contingent" THEN "Contingent assignments that started during the period: " + [K Joined Str] + ". This includes new engagements and workers who returned."
+ELSE "Everyone who started during the period: " + [K Joined Str] + ", made up of employee hires and contingent starts."
+END + CHAR(10) + "Reflects the period, view and workforce you have selected."
+```
+```
+// KPI 3 Tip
+"Voluntary leavers divided by average headcount, expressed as a 12-month rate so that a month, a quarter and a year can be compared on the same scale."
++ CHAR(10) + IF DATEDIFF('month',[p_From],[p_To]) >= 11 THEN "This period spans a full year, so no scaling is needed. " ELSE "" END
++ [K Vol Emp Str] + " employees left by choice; the " + [K Invol Emp Str] + " involuntary exits are not included."
++ IF [p_Worker] <> "Employees" THEN CHAR(10) + "Employees only: contingent workers are not part of this rate." ELSE "" END
++ CHAR(10) + "Shown as a dash for groups with fewer than 20 people."
+```
+```
+// KPI 4 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "New hires divided by leavers. Above 1.00 means more people came in than left; below 1.00 means the workforce shrank. " + [WF Hires Str] + " hires ÷ " + [WF Leavers Str] + " leavers (voluntary and involuntary). Contingent conversions and moves between teams are not counted."
+ELSE "People who joined divided by people who left. Above 1.00 means more came in than left; below 1.00 means the workforce shrank. " + [WF Joined Str] + " joined ÷ " + [WF Left Str] + " left."
+END
+```
+```
+// KPI 5 Tip
+CASE [p_Worker]
+WHEN "Employees" THEN "Contingent workers (vendor-supplied, not on the payroll) with an active assignment at the close of " + [TT Close Day] + ": " + [K CW Close Str] + ", or " + [K CW Share Str] + " of the " + [K All Close Str] + " people working for the company."
+WHEN "Contingent" THEN "Employees at the close of " + [TT Close Day] + ": " + [K EE Close Str] + ", out of " + [K All Close Str] + " people working for the company (employees plus contingent workers)."
+ELSE "Contingent workers as a share of the whole workforce at the close of " + [TT Close Day] + ": " + [K CW Close Str] + " of " + [K All Close Str] + "."
+END
+```
+
+**2. Attach them.** Open `KPI cards`. For each card there are three layers (title, value, note). On **all three** layers of the card: drag `KPI N Tip` and `KPI N Title` onto **Tooltip** (if a pill is not already an attribute, right-click > Attribute, as on the note layers), then click Tooltip and set:
+- Line 1 (Semibold 10 navy): `<ATTR(KPI N Title)>` (for card 3 type "Voluntary turnover" instead)
+- Line 2 (Book 9 slate): `<ATTR(KPI N Tip)>`
+- Tick **Show tooltips**, untick Include command buttons, Responsive off.
+
+Hovering anywhere over a card's text then shows its tooltip. The empty card background shows nothing, which is normal (it is a picture).
+
+**3. Check.** Hover each card in Employees, Contingent and Total and read the sentence against the numbers on the card (for example Employees: 30,005, 28,438, 5,235, 4,965 + 270, 1.35 = 4,965 ÷ 3,668, 11,941 = 28.5% of 41,946). Change the period to FY25 Q3 and confirm card 3 mentions annualizing; pick FY26 and it says the period spans a full year.
 
 ### 8.3 Trend and Turnover
 
