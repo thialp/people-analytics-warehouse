@@ -440,14 +440,14 @@ Source Headcount Walk.
 
 ```
 // Worker Words   CASE [p_Worker] WHEN "Employees" THEN "employees" WHEN "Contingent" THEN "contingent workers" ELSE "employees and contingent workers" END
-// Page Subtitle  [p_Group] + " · " + [Worker Words] + " · data as of " + "Jun 30, 2026"
+// Page Subtitle  "Data as of Jun 30, 2026"   (what is shown is already in the fields and the tooltip)
 // TT Open Day    LEFT(DATENAME('month',[p_From]),3) + " " + STR(DAY([p_From])) + ", " + STR(YEAR([p_From]))
 // TT Close Day   LEFT(DATENAME('month',[p_To]),3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
 ```
 `TT Open Day` and `TT Close Day` are used here, in 8.2 and in section 9; create them now (both on Headcount Walk) and skip them there.
 (Optional later: read the as-of date from Region Walk's `report_as_of_date` with the blend, as #2 does.)
 
-Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 8 `#C9D1DC` (Book 9 clips at 275 px wide: "data as of Jun 3…"). Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Line 2 stays on one line at this width; a long group name wraps to a second line.
+Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 9 `#C9D1DC`. The short text fits the 275 px item on one line; the selection (group, worker type) is already visible in the fields and in the tooltip below. Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View.
 
 **Tooltip "How to read this page"** (the default tooltip prints raw field names and repeats the subtitle; replace it). `TT Open Day` and `TT Close Day` are the two calcs just above:
 
@@ -463,7 +463,7 @@ Worksheet > Tooltip: bold line **How to read this page** (Semibold 10 navy), `<T
 
 ### 6.7 Headings over the fields
 
-Three dashboard **Text** objects (static text is not selectable), Tableau Bold 10, `#B8C4D6`, 180 × 14: `SELECT PERIOD`, `SELECT VIEW`, `SHOW`. Same words as #2's rail headings.
+Three dashboard **Text** objects (static text is not selectable), Tableau Bold 10, `#B8C4D6`, 180 × 14: `SELECT PERIOD`, `SELECT VIEW`, `SELECT WORKFORCE` (the Employees / Contingent / Total toggle). Same words as #2's rail headings.
 
 ### 6.8 Header layout (1400 wide, band 76 high)
 
@@ -479,7 +479,7 @@ Every control is 32 high on the same baseline (y 30) and shaped as a capsule or 
 | Period Field | 506 | 30 | 180 | 32 |
 | SELECT VIEW | 698 | 12 | 180 | 14 |
 | Group Field | 698 | 30 | 180 | 32 |
-| SHOW | 890 | 12 | 240 | 14 |
+| SELECT WORKFORCE | 890 | 12 | 240 | 14 |
 | Workforce Toggle | 890 | 30 | 240 | 32 |
 | Reset | 1142 | 30 | 184 | 32 |
 | Info Button | 1338 | 30 | 32 | 32 |
