@@ -469,8 +469,22 @@ Three dashboard **Text** objects (static text is not selectable), Tableau Bold 1
 
 Every control is 32 high on the same baseline (y 30) and shaped as a capsule or circle, so the bar reads as one set.
 
+
 | Object | x | y | w | h |
-|
+|---|---:|---:|---:|---:|
+| Header band (Blank, `#13233A`) | 0 | 0 | 1400 | 76 |
+| Logo | 30 | 14 | 177 | 48 |
+| Page Title | 223 | 9 | 275 | 58 |
+| SELECT PERIOD | 506 | 12 | 180 | 14 |
+| Period Field | 506 | 30 | 180 | 32 |
+| SELECT VIEW | 698 | 12 | 180 | 14 |
+| Group Field | 698 | 30 | 180 | 32 |
+| SHOW | 890 | 12 | 240 | 14 |
+| Workforce Toggle | 890 | 30 | 240 | 32 |
+| Reset | 1142 | 30 | 184 | 32 |
+| Info Button | 1338 | 30 | 32 | 32 |
+
+Gaps are 12 px between controls and 16 px between the logo/title and the fields; the logo sits on the left edge of the page grid (x 30) and Info on the right edge (1370). The whole page uses a **30 px margin** so the banner and the body are the same width. Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and shape legend (`Info Shape`) left on the dashboard: they are helpers for the actions, not part of the page. The Page Title text is **white**.
 
 ---
 
@@ -480,7 +494,7 @@ Every control is 32 high on the same baseline (y 30) and shaped as a capsule or 
 
 Sheets on **Region Walk**, built exactly as [rail_controls_build.md](../compensation-walk/rail_controls_build.md) Part 4.3: `Span List`, `Period Panel`, `Popover Close` (shape `btn_close_light`, Detail `Close Panel`, `zzTrue`, `zzFalse`, tooltip `Close`). Title text object "Select a period"; note line 9 pt `#8FA0B8`: "Fiscal year runs July to June. Each option compares two month-ends. Data through Jun 30, 2026."
 
-Container `Period Popover`: floating, navy style of 0.5, **x 624, y 76, w 720, h 330** (right edge 1344), visibility `p_PeriodOpen`. Inside: header row (title + ✕), note, then a horizontal container with `Span List` (120 wide) and `Period Panel`.
+Container `Period Popover`: floating, navy style of 0.5, **x 650, y 76, w 720, h 330** (right edge 1370), visibility `p_PeriodOpen`. Inside: header row (title + ✕), note, then a horizontal container with `Span List` (120 wide) and `Period Panel`.
 
 Period actions (Dashboard > Actions, all Run on **Select**, Clearing **Keep current value**):
 
@@ -502,7 +516,7 @@ The top bar has no room for #2's six-row view list, so the view list moves into 
 1. Sheet `View List` (Region Walk): Marks **Text**. Rows: `view_name`, sorted by `view_order` (Field, Minimum). Text: `View Display`. Filter `View Offered` = True and `Period Is Current` = True. Detail: `view_name`, `Default Group`, `zzTrue`, `zzFalse`. Font Tableau Book 10 `#B8C0CC`; the current row Semibold white (Color: `ATTR([view_name] = [p_View])`, True white, False `#B8C0CC`). Headers hidden, shading None, tooltip off.
 2. Sheet `Group Panel`: copy #2's ([rail_group_picker_build.md](../compensation-walk/rail_group_picker_build.md) 2.4) on Region Walk. Filters `Group In View` = True and `Period Is Current` = True. Detail `group_name`, `Close Panel`, `zzTrue`, `zzFalse`. Colors on navy: current white Semibold, others `#B8C0CC`.
 3. Sheet `Group Heading 2`: Text `<Panel Title>`, Bold 12 white.
-4. Container `Group Popover`: **x 724, y 76, w 620, h 330** (right edge 1344), navy style, visibility `p_GroupOpen`. Header row (`Group Heading 2` + ✕ sheet), then a horizontal container: `View List` (140 wide) and `Group Panel`.
+4. Container `Group Popover`: **x 750, y 76, w 620, h 330** (right edge 1370), navy style, visibility `p_GroupOpen`. Header row (`Group Heading 2` + ✕ sheet), then a horizontal container: `View List` (140 wide) and `Group Panel`.
 
 | Name | Source | Target | Field |
 |---|---|---|---|
@@ -678,7 +692,7 @@ Replace `Function Name` on Rows with `TO Dim`; `TO Top Function` → rename `TO 
 
 ### 8.4 Info popover (replaces the white Info Panel)
 
-Container `Info Popover`, navy style (0.5), **x 964, y 76, w 380, h 470**, visibility `p_InfoOpen`, front. Header row: title "How to read this page" + ✕ (`Popover Close` for info). Body (one Text object, 10 pt):
+Container `Info Popover`, navy style (0.5), **x 990, y 76, w 380, h 470**, visibility `p_InfoOpen`, front. Header row: title "How to read this page" + ✕ (`Popover Close` for info). Body (one Text object, 10 pt):
 
 > **Period.** Every number compares two month-ends: the walk opens on the first and closes on the second. Arcadia's fiscal year runs July to June.
 >
