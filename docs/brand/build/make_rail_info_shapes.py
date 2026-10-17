@@ -5,10 +5,11 @@ Light slate on the navy rail (matches the 9 pt headings, a little brighter so it
 Usage: python3 make_rail_info_shapes.py"""
 import os
 from PIL import Image, ImageDraw
+from shape_quality import SS, finish, out_size
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "shapes", "Arcadia")
 os.makedirs(OUT, exist_ok=True)
-S, N = 4, 64
+S, N = SS, 64
 COL = (184, 192, 204, 255)  # #B8C0CC
 
 def shape(path, closed):
@@ -21,7 +22,7 @@ def shape(path, closed):
     else:
         d.ellipse((28 * S, 15 * S, 36 * S, 23 * S), fill=COL)
         d.rounded_rectangle((28 * S, 28 * S, 36 * S, 49 * S), radius=3 * S, fill=COL)
-    im.resize((N, N), Image.LANCZOS).save(path)
+    finish(im, N, N).save(path)
 
 shape(os.path.join(OUT, "rail_info_open.png"), False)
 shape(os.path.join(OUT, "rail_info_close.png"), True)

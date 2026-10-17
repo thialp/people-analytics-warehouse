@@ -4,12 +4,13 @@ dashboard item's own background (#ECEBE5, corner radius 12), so the shapes only 
 Usage: python3 make_detail_toggle_shapes.py"""
 from PIL import Image, ImageDraw, ImageFont
 import os
+from shape_quality import SS, finish, out_size
 OUT = os.path.join(os.path.dirname(__file__), "..", "shapes", "Arcadia")
 os.makedirs(OUT, exist_ok=True)
 FONT = "/usr/share/fonts/opentype/inter/Inter-SemiBold.otf"
 if not os.path.exists(FONT):
     FONT = "/usr/share/fonts/opentype/inter/Inter-Bold.otf"
-S, W, H = 4, 304, 96
+S, W, H = SS, 304, 96
 NAVY, WHITE, SLATE = (19, 35, 58, 255), (255, 255, 255, 255), (91, 107, 128, 255)
 OPTIONS = {"summary": "Summary", "drivers": "By driver"}
 
@@ -20,7 +21,7 @@ def segment(label, on, path):
         d.rounded_rectangle((6*S, 6*S, (W-6)*S, (H-6)*S), radius=((H-12)//2)*S, fill=NAVY)
     f = ImageFont.truetype(FONT, 36*S)
     d.text((W*S//2, H*S//2), label, font=f, fill=WHITE if on else SLATE, anchor="mm")
-    im.resize((W, H), Image.LANCZOS).save(path)
+    finish(im, W, H).save(path)
 
 for key, lab in OPTIONS.items():
     for on in (True, False):

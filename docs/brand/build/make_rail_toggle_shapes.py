@@ -3,12 +3,13 @@ Usage: python3 make_rail_toggle_shapes.py [capsule_hex] [pill_hex]
   capsule_hex: only used for the preview. pill_hex: fill of the selected option (default E4E3DD, the brand border/wash)"""
 from PIL import Image, ImageDraw, ImageFont
 import os, sys
+from shape_quality import SS, finish, out_size
 OUT = os.path.join(os.path.dirname(__file__), "..", "shapes", "Arcadia")
 os.makedirs(OUT, exist_ok=True)
 FONT = "/usr/share/fonts/opentype/inter/Inter-SemiBold.otf"
 if not os.path.exists(FONT):
     FONT = "/usr/share/fonts/opentype/inter/Inter-Bold.otf"
-S, W, H = 4, 352, 120
+S, W, H = SS, 352, 120
 NAVY, MIST = (19, 35, 58, 255), (201, 209, 220, 255)
 CAP = sys.argv[1].lstrip("#") if len(sys.argv) > 1 else "1D3150"
 CAP = tuple(int(CAP[i:i+2], 16) for i in (0, 2, 4)) + (255,)
@@ -28,7 +29,7 @@ def segment(label, on, path):
         d.rounded_rectangle((8*S, 8*S, (W-8)*S, (H-8)*S), radius=14*S, fill=WHITE)
     f = ImageFont.truetype(FONT, 40*S)
     d.text((W*S//2, H*S//2), label, font=f, fill=NAVY if on else MIST, anchor="mm")
-    im.resize((W, H), Image.LANCZOS).save(path)
+    finish(im, W, H).save(path)
 
 for key, lab in OPTIONS.items():
     for on in (True, False):
