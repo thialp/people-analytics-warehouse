@@ -14,6 +14,12 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 | Waterfall | Opening, Hires, Voluntary, Involuntary, Closing | Compact and **Expand / Collapse** like #2, counted in **drivers** |
 | Population | Includes the 9 executive officers | **Excludes them, like #2**, so Opening, Closing and People match to the person |
 
+## Where we are (updated Oct 17, 2026)
+
+**Done:** sections 1 to 7; 8.1 (compact and expanded waterfall, Summary | By driver toggle with tooltip, bar-explaining tooltip `TT What`, Contingent joined / left names, `WF Title`, `WF Subtitle`); 8.1b (waterfall caption); layout grid for the header, waterfall and right column (section 10 rows 14 to 19).
+
+**Continue tomorrow with 8.2 (KPI cards):** the five cards still show release 2 text ("Hires (FTE)", "Closing FTE", FTE twins). Rebuild them per workforce type (Employees, Contingent, Total) with the K* calcs, using the wide background and the 30 px grid (8.2a). Then 8.3 (Trend follows the selected group; Turnover follows the group and hides groups under 20 people, no 0.0% rows), then section 9 (tie-out line), cleanup (stale calcs, parameters, actions), section 11 check table and section 12 publish.
+
 ## Checkpoints
 
 Save the workbook and compare numbers at each checkpoint before going on. If a number is off, fix it there; later sections build on it.
@@ -644,11 +650,45 @@ Sheet `Waterfall`:
 1. Columns: replace `Movement Category` with `WF Bar`; sort **Field** `WF Order`, Minimum, Ascending.
 2. `Waterfall Position`: Edit Table Calculation > Specific Dimensions > `WF Bar` only.
 3. Filters: `WF Moves Hidden` = False (dimension filter), and a calc `WF Non Zero` = `SUM([Walk Value]) <> 0 OR ATTR([WF Bar]) = "Opening" OR ATTR([WF Bar]) = "Closing"` = True (drops the zero bars: Moved at Company, Converted in Total). A zero bar adds nothing to the running sum, so dropping it does not move the others.
-4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, do **not** alias Conversions: the same bar is +270 in Employees (people from contingent) and −270 in Contingent (people who became employees), and an alias cannot change with the workforce type. It stays "Conversions".
+4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, Starts → `Contingent joined`, Ends → `Contingent left` ("Starts" and "Ends" read like Opening and Closing, but those two are snapshots of everyone on a date and these two are movements in the period), do **not** alias Conversions: the same bar is +270 in Employees (people from contingent) and −270 in Contingent (people who became employees), and an alias cannot change with the workforce type. It stays "Conversions".
 5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`. If the expanded chart shows too many labels, raise the axis font to Tableau Book 10 (Format > Scale) or hide the axis header: every bar has its value. Never set a fixed interval.
 6. Title line 2 (Book 9 slate): the dynamic `<WF Subtitle>` (calc below), inserted with Title > Insert > `WF Subtitle`; it changes with the Summary | By driver toggle.
 7. Tooltip: `TT Unit`, `TT Context` and `Walk Value` must all sit on Detail or Tooltip (a pill that went red while editing is dropped silently; check the Marks card after the calcs turn green). Text: `<Movement Category>` Semibold 12 navy, `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy, `<AGG(TT Context)>` Book 9 slate. The bar name in the tooltip is `WF Bar` in compact mode (Joined, Left, Moved (net)).
 8. Axis format: Format > Axis > Numbers > Custom `#,##0` (not `#,##0,"k"`: a 849-person group would show a single "0k" tick).
+
+**Tooltip that explains each bar** (replaces step 7's text; hover on any bar says what it is, how it is counted and the numbers). Calc on Headcount Walk (`TT Open Day`, `TT Close Day` from 8.2 and 9):
+```
+// TT What
+CASE ATTR([WF Bar])
+WHEN "Opening" THEN "Everyone active on " + [TT Open Day] + ". A snapshot of people on one date, not a movement."
+WHEN "Closing" THEN "Everyone active on " + [TT Close Day] + ". Opening, plus everything that joined, minus everything that left, plus or minus internal moves."
+WHEN "Hires" THEN "People new to Arcadia who started as employees during the period."
+WHEN "Conversions" THEN IIF([p_Worker] = "Contingent",
+    "Contingent workers who became Arcadia employees. They leave the contingent workforce here; the Employees view counts them as joined.",
+    "Contingent workers who became employees during the period. They were already working at Arcadia, so they add to employees.")
+WHEN "Starts" THEN "Contingent workers who began an assignment during the period."
+WHEN "Ends" THEN "Contingent assignments that ended during the period."
+WHEN "Voluntary Terminations" THEN "Employees who chose to leave Arcadia during the period."
+WHEN "Involuntary Terminations" THEN "Employees whose employment Arcadia ended during the period."
+WHEN "Internal Moves In" THEN "People who moved into this group from elsewhere in Arcadia (transfers and promotions)."
+WHEN "Internal Moves Out" THEN "People who moved out of this group to elsewhere in Arcadia (transfers and promotions)."
+WHEN "Joined" THEN CASE [p_Worker]
+    WHEN "Employees" THEN "New hires plus contingent workers who became employees."
+    WHEN "Contingent" THEN "Contingent workers who began an assignment."
+    ELSE "New hires plus contingent workers who began an assignment." END
+WHEN "Left" THEN CASE [p_Worker]
+    WHEN "Employees" THEN "Employees who left, by choice or not."
+    WHEN "Contingent" THEN "Contingent assignments that ended, plus workers who became employees."
+    ELSE "Employees who left plus contingent assignments that ended." END
+WHEN "Moved (net)" THEN "People moving in minus people moving out of this group. Across the whole company these cancel out."
+WHEN "Converted" THEN "Contingent workers who became employees."
+ELSE "" END
+```
+Tooltip text on the `Waterfall` sheet (Worksheet > Tooltip, on hover, no command buttons), with `TT What` added to Detail:
+- `<WF Bar>` Semibold 12 navy
+- `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy
+- `<AGG(TT Context)>` Book 9 slate (share of opening and per month)
+- a blank line, then **What it is** (Semibold 9 navy) and `<AGG(TT What)>` Book 9 slate.
 
 Summary | By driver toggle (replaces the Expand / Collapse buttons: both states are always visible, so a screenshot explains itself).
 
@@ -664,9 +704,48 @@ ELSE "Opening + joined − left ± moves = closing · grouped view; By driver sh
 ```
 Shapes: `seg_detail_summary_on/off.png` and `seg_detail_drivers_on/off.png` (generator `docs/brand/build/make_detail_toggle_shapes.py`), copied to `~/Documents/My Tableau Repository/Shapes/Arcadia`.
 
+Tooltip calc (so a reader can hover to learn what a driver is):
+```
+// Detail Tip
+CASE [Detail Option]
+WHEN "summary" THEN "Summary" + CHAR(10) + "Groups the changes into Joined, Left and Moved (net), so the walk reads in one glance."
+WHEN "drivers" THEN "By driver" + CHAR(10) + "A driver is one reason the headcount changed: hires, conversions, voluntary or involuntary leavers, internal moves. This view shows each of the " + STR([WF Driver Count]) + " drivers as its own bar."
+END
+```
+On `Detail Toggle`: `Detail Tip` on Detail; Worksheet > Tooltip text `<Detail Tip>` (Book 9 navy; first line Semibold), no command buttons.
+
 Sheet `Detail Toggle`, built like `Workforce Toggle` (6.3): `Detail Option` on Columns (manual sort: summary, drivers), filter out Null, mark type Shape, `Detail Shape` on Shape (assign the four files), `Detail Pick`, `zzTrue`, `zzFalse` on Detail, tooltip off, Entire View, shading and borders None.
 
-Dashboard: floating item `Detail Toggle`, **x 672, y 198, w 152, h 24** (12 px inside the waterfall card's top-right corner at 836), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
+Dashboard: floating item `Detail Toggle`, **x 672, y 205, w 152, h 24** (12 px inside the waterfall card's top-right corner at 836; y 205 centres it on the first title line), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
+
+### 8.1b Waterfall caption (what is behind the bars)
+
+Done after 8.1. The tie-out line under it is section 9.
+
+`WF Caption` (rewritten; the old "FTE ... schedule changes" sentence is gone). New calcs on Headcount Walk, same FIXED pattern as `WF Hires`:
+```
+// WF Conv In    ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Employee" THEN [Headcount] END) })
+// WF Conv Out   ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Contingent" THEN [Headcount] END) })
+// WF Moves Out  ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Internal Moves Out" THEN [Headcount] END) })
+// WF Moves In   ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Internal Moves In" THEN [Headcount] END) })
+// WF Conv In Str, WF Conv Out Str, WF Moves In Str, WF Moves Out Str: comma pattern on each
+```
+```
+// WF Caption
+IF NOT [K Valid] THEN ""
+ELSEIF [p_Worker] = "Employees" AND [p_View] = "Company" THEN
+  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · the " + [WF Moves In Str] + " internal moves net to zero across the company."
+ELSEIF [p_Worker] = "Employees" THEN
+  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · internal moves: " + [WF Moves In Str] + " in, " + [WF Moves Out Str] + " out."
+ELSEIF [p_Worker] = "Contingent" THEN
+  "Conversions (" + [WF Conv Out Str] + ") are contingent workers who became employees; the Employees view counts them as joined."
+ELSE
+  "Conversions (" + [WF Conv In Str] + " contingent workers became employees) are one out and one in, so they net to zero."
+END
+```
+Check FY26 Company: `Joined = 4,965 hires + 270 converted from contingent · the 3,633 internal moves net to zero across the company.` One line, Book 8 slate (about 150 characters fit in 782 px). Then delete `WF FTE Open Str` and `WF FTE Close Str`.
+
+Sheet `Waterfall Caption`: `WF Caption` on Text, Tableau Book 8 slate, left; the tie-out line (section 9) is added later as line 2.
 
 ### 8.2 KPI cards
 
@@ -794,7 +873,7 @@ ELSEIF [p_Worker] = "Employees" THEN
      [WF Leavers Str] + " leavers, " +
      IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " person", " people")
 ELSEIF [p_Worker] = "Contingent" THEN
-     [WF Period] + ": " + [WF Joined Str] + " starts, " + [WF Left Str] + " ended or converted, " +
+     [WF Period] + ": " + [WF Joined Str] + " joined, " + [WF Left Str] + " left, " +
      IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " contingent worker", " contingent workers")
 ELSE
      [WF Period] + ": " + [WF Joined Str] + " joined, " + [WF Left Str] + " left, " +
@@ -861,29 +940,7 @@ END)
 ```
 `Waterfall Caption`: `Tie-out Detail` on Detail; Worksheet > Tooltip: bold **Why the two dashboards count different hires**, `<AGG(Tie-out Detail)>`, then "The Compensation Walk compares two snapshots and prices people present on each date, so anyone who joined and left in between is in neither. This page counts every joiner and every leaver." (Book 9; no command buttons). FY26 Company: "5,235 people joined Arcadia between Jun 30, 2025 and Jun 30, 2026 … In the Compensation Walk's Hires: 4,790 … Not in that walk: 445, who joined and left again before Jun 30, 2026."
 
-**Line 1: what is behind the bars** (`WF Caption`, rewritten; the old "FTE ... schedule changes" sentence is gone). New calcs on Headcount Walk, same FIXED pattern as `WF Hires`:
-```
-// WF Conv In    ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Employee" THEN [Headcount] END) })
-// WF Conv Out   ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Contingent" THEN [Headcount] END) })
-// WF Moves Out  ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Internal Moves Out" THEN [Headcount] END) })
-// WF Moves Out Str   comma pattern on [WF Moves Out]; WF Conv In Str likewise on [WF Conv In]
-```
-```
-// WF Caption
-IF NOT [K Valid] THEN ""
-ELSEIF [p_Worker] = "Employees" AND [p_View] = "Company" THEN
-  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · the " + [WF Moves Str] + " internal moves net to zero across the company."
-ELSEIF [p_Worker] = "Employees" THEN
-  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · internal moves: " + [WF Moves Str] + " in, " + [WF Moves Out Str] + " out."
-ELSEIF [p_Worker] = "Contingent" THEN
-  "Conversions (" + [WF Conv In Str] + ") are contingent workers who became employees; the Employees view counts them as joined."
-ELSE
-  "Conversions (" + [WF Conv In Str] + " contingent workers became employees) are one out and one in, so they net to zero."
-END
-```
-Check FY26 Company: `Joined = 4,965 hires + 270 converted from contingent · the 3,633 internal moves net to zero across the company.` One line, Book 8 slate (about 150 characters fit in 782 px). Then delete `WF FTE Open Str` and `WF FTE Close Str`.
-
-Caption layout: line 1 `<WF Caption>`, line 2 `<Tie-out Text>`. Tableau Book 8 slate, left.
+Caption layout: line 1 `<WF Caption>` (built in 8.1b), line 2 `<Tie-out Text>`. Tableau Book 8 slate, left.
 
 | Selection | Tie-out text |
 |---|---|
@@ -903,10 +960,10 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 12 | KPI background image | 0 | 78 | 1400 | 110 | new wide image (8.2a) |
 | 13 | KPI cards | 0 | 78 | 1400 | 110 | geometry parameters per 8.2a |
 | 14 | Waterfall | 30 | 188 | 806 | 624 | unchanged; bottom padding 64 |
-| 15 | Detail Toggle (Summary \| By driver) | 672 | 198 | 152 | 24 | Background `#ECEBE5`, radius 12 |
+| 15 | Detail Toggle (Summary \| By driver) | 672 | 205 | 152 | 24 | Background `#ECEBE5`, radius 12 |
 | 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
-| 17 | Trend | 852 | 188 | 518 | 300 | unchanged |
-| 18 | Turnover | 852 | 500 | 518 | 312 | unchanged |
+| 17 | Trend | 852 | 188 | 518 | 296 | 16 px gap to Turnover, the same as between KPI cards |
+| 18 | Turnover | 852 | 500 | 518 | 312 | Bottom 812, level with the waterfall |
 | 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
 | 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
 
