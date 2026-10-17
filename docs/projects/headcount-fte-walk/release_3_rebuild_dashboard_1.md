@@ -77,7 +77,7 @@ Tableau runs a **parameter action only from a mark on a worksheet**. A dashboard
 |---|---|---|
 | Small square after "Commercial ▾" | The field is a **Text** mark. A text mark has no body, so Tableau draws its hover/selection indicator as a small square at the mark's anchor | Field = **Shape** mark drawing `fld_top.png` (#1) or `fld_rail.png` (#2), full size; the text is the mark's **label** laid on top. The hover indicator becomes the field's own outline |
 | "Total payroll" shown highlighted after a click | The clicked mark stays **selected** (and the others fade) when the sheet has no deselect action, or the action points at the dashboard instead of the worksheet | Every clickable sheet has `zzTrue` and `zzFalse` on Detail and a **Filter action from the sheet to the same worksheet** (`zzTrue` → `zzFalse`, Clearing: Show all values) |
-| A title could be selected | Titles drawn as **text sheets** have marks, so a click selects them | Same deselect action on **every** text sheet (titles, subtitles, captions, headings, KPI band); tooltips off, except the KPI cards (8.2c) |
+| A title could be selected | Titles drawn as **text sheets** have marks, so a click selects them | Same deselect action on **every** text sheet (titles, subtitles, captions, headings, KPI band); tooltips off on the sheets themselves; the KPI card tooltips come from the five `KPI Hover` sheets (8.2c) |
 
 Click flow after the fix: the click fires the parameter action, then the self filter action clears the selection in the same instant. On Tableau Public a brief flash can remain; nothing stays highlighted.
 
@@ -903,14 +903,32 @@ ELSE "Contingent workers as a share of the whole workforce at the close of " + [
 END
 ```
 
-**2. Attach them.** Open `KPI cards`. For each card there are three layers (title, value, note). On **all three** layers of the card: drag `KPI N Tip` and `KPI N Title` onto **Tooltip** (if a pill is not already an attribute, right-click > Attribute, as on the note layers), then click Tooltip and set:
-- Line 1 (Semibold 10 navy): `<ATTR(KPI N Title)>` (for card 3 type "Voluntary turnover" instead)
-- Line 2 (Book 9 slate): `<ATTR(KPI N Tip)>`
-- Tick **Show tooltips**, untick Include command buttons, Responsive off.
+**2. Why not on the map layers.** Tooltips set on the 15 layers of `KPI cards` never showed in Dashboard #1 or #2, whatever the circle size, opacity or tooltip text (a plain "TEST" did not show either). Leave those layers as they are (tooltips off) and put the hover on five small ordinary sheets laid over the cards.
 
-Hovering anywhere over a card's text then shows its tooltip. The empty card background shows nothing, which is normal (it is a picture).
+**3. Build `KPI Hover N` (N = 1 to 5).**
+1. Calc `Hover Cell` = `"."`.
+2. New sheet `KPI Hover 1` on Headcount Walk. `Hover Cell` on Columns and on Rows (second copy); right-click each pill and untick Show Header.
+3. Marks type **Square**; Size all the way right (the square fills the pane); Color opacity **0%**.
+4. `KPI 1 Title` and `KPI 1 Tip` on **Tooltip** (Attribute). Tooltip text: line 1 `<ATTR(KPI 1 Title)>` (Semibold 10 navy), line 2 `<ATTR(KPI 1 Tip)>` (Book 9, `#4A5A73`). Show tooltips on, Include command buttons off.
+5. `zzTrue` and `zzFalse` on **Detail**.
+6. Format: Shading > Worksheet None, Borders None, Grid lines None, Fit Entire View, Show Title off.
+7. Duplicate the sheet four times and swap the two fields for `KPI N Title` / `KPI N Tip` (and the tooltip text).
 
-**3. Check.** Hover each card in Employees, Contingent and Total and read the sentence against the numbers on the card (for example Employees: 30,005, 28,438, 5,235, 4,965 + 270, 1.35 = 4,965 ÷ 3,668, 11,941 = 28.5% of 41,946). Change the period to FY25 Q3 and confirm card 3 mentions annualizing; pick FY26 and it says the period spans a full year.
+**4. Dashboard.** Each sheet is a **Floating** item, Show title off, Background None, Border None, **Corner Radius 0**, above `KPI cards` in the item list:
+
+| Item | x | y | w | h |
+|---|---|---|---|---|
+| KPI Hover 1 | 30 | 90 | 255 | 86 |
+| KPI Hover 2 | 301 | 90 | 255 | 86 |
+| KPI Hover 3 | 572 | 90 | 255 | 86 |
+| KPI Hover 4 | 843 | 90 | 255 | 86 |
+| KPI Hover 5 | 1114 | 90 | 255 | 86 |
+
+Add the deselect action for each hover sheet (7.4: Filter, source and target the same worksheet, Run on Select, Show all values, `zzTrue` → `zzFalse`), named `Deselect KPI Hover N`. Without it a click leaves a blue cover and a Keep Only / Exclude toolbar.
+
+**5. Hover outline.** Tableau draws a rectangular hover outline around the mark. A corner radius on the item clips that rectangle and the corners look cut, so the radius stays **0**; the outline is then a clean rectangle. (A mark colour matching the card was tried as a way to hide the outline; the chosen fix is radius 0.)
+
+**6. Check** in Presentation Mode: hover each card in Employees, Contingent and Total and read the sentence against the numbers on the card (Employees FY26: 30,005 versus 28,438; 5,235 = 4,965 + 270; 1.35 = 4,965 ÷ 3,668; 11,941 = 28.5% of 41,946). FY25 Q3 makes card 3 mention annualizing; FY26 says the period spans a full year. A click must not turn anything blue. Apply the same build to Dashboard #2.
 
 ### 8.3 Trend and Turnover
 
