@@ -644,11 +644,45 @@ Sheet `Waterfall`:
 1. Columns: replace `Movement Category` with `WF Bar`; sort **Field** `WF Order`, Minimum, Ascending.
 2. `Waterfall Position`: Edit Table Calculation > Specific Dimensions > `WF Bar` only.
 3. Filters: `WF Moves Hidden` = False (dimension filter), and a calc `WF Non Zero` = `SUM([Walk Value]) <> 0 OR ATTR([WF Bar]) = "Opening" OR ATTR([WF Bar]) = "Closing"` = True (drops the zero bars: Moved at Company, Converted in Total). A zero bar adds nothing to the running sum, so dropping it does not move the others.
-4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, do **not** alias Conversions: the same bar is +270 in Employees (people from contingent) and −270 in Contingent (people who became employees), and an alias cannot change with the workforce type. It stays "Conversions".
+4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, Starts → `Contingent joined`, Ends → `Contingent left` ("Starts" and "Ends" read like Opening and Closing, but those two are snapshots of everyone on a date and these two are movements in the period), do **not** alias Conversions: the same bar is +270 in Employees (people from contingent) and −270 in Contingent (people who became employees), and an alias cannot change with the workforce type. It stays "Conversions".
 5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`. If the expanded chart shows too many labels, raise the axis font to Tableau Book 10 (Format > Scale) or hide the axis header: every bar has its value. Never set a fixed interval.
 6. Title line 2 (Book 9 slate): the dynamic `<WF Subtitle>` (calc below), inserted with Title > Insert > `WF Subtitle`; it changes with the Summary | By driver toggle.
 7. Tooltip: `TT Unit`, `TT Context` and `Walk Value` must all sit on Detail or Tooltip (a pill that went red while editing is dropped silently; check the Marks card after the calcs turn green). Text: `<Movement Category>` Semibold 12 navy, `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy, `<AGG(TT Context)>` Book 9 slate. The bar name in the tooltip is `WF Bar` in compact mode (Joined, Left, Moved (net)).
 8. Axis format: Format > Axis > Numbers > Custom `#,##0` (not `#,##0,"k"`: a 849-person group would show a single "0k" tick).
+
+**Tooltip that explains each bar** (replaces step 7's text; hover on any bar says what it is, how it is counted and the numbers). Calc on Headcount Walk (`TT Open Day`, `TT Close Day` from 8.2 and 9):
+```
+// TT What
+CASE ATTR([WF Bar])
+WHEN "Opening" THEN "Everyone active on " + [TT Open Day] + ". A snapshot of people on one date, not a movement."
+WHEN "Closing" THEN "Everyone active on " + [TT Close Day] + ". Opening, plus everything that joined, minus everything that left, plus or minus internal moves."
+WHEN "Hires" THEN "People new to Arcadia who started as employees during the period."
+WHEN "Conversions" THEN IIF([p_Worker] = "Contingent",
+    "Contingent workers who became Arcadia employees. They leave the contingent workforce here; the Employees view counts them as joined.",
+    "Contingent workers who became employees during the period. They were already working at Arcadia, so they add to employees.")
+WHEN "Starts" THEN "Contingent workers who began an assignment during the period."
+WHEN "Ends" THEN "Contingent assignments that ended during the period."
+WHEN "Voluntary Terminations" THEN "Employees who chose to leave Arcadia during the period."
+WHEN "Involuntary Terminations" THEN "Employees whose employment Arcadia ended during the period."
+WHEN "Internal Moves In" THEN "People who moved into this group from elsewhere in Arcadia (transfers and promotions)."
+WHEN "Internal Moves Out" THEN "People who moved out of this group to elsewhere in Arcadia (transfers and promotions)."
+WHEN "Joined" THEN CASE [p_Worker]
+    WHEN "Employees" THEN "New hires plus contingent workers who became employees."
+    WHEN "Contingent" THEN "Contingent workers who began an assignment."
+    ELSE "New hires plus contingent workers who began an assignment." END
+WHEN "Left" THEN CASE [p_Worker]
+    WHEN "Employees" THEN "Employees who left, by choice or not."
+    WHEN "Contingent" THEN "Contingent assignments that ended, plus workers who became employees."
+    ELSE "Employees who left plus contingent assignments that ended." END
+WHEN "Moved (net)" THEN "People moving in minus people moving out of this group. Across the whole company these cancel out."
+WHEN "Converted" THEN "Contingent workers who became employees."
+ELSE "" END
+```
+Tooltip text on the `Waterfall` sheet (Worksheet > Tooltip, on hover, no command buttons), with `TT What` added to Detail:
+- `<WF Bar>` Semibold 12 navy
+- `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy
+- `<AGG(TT Context)>` Book 9 slate (share of opening and per month)
+- a blank line, then **What it is** (Semibold 9 navy) and `<AGG(TT What)>` Book 9 slate.
 
 Summary | By driver toggle (replaces the Expand / Collapse buttons: both states are always visible, so a screenshot explains itself).
 
@@ -804,7 +838,7 @@ ELSEIF [p_Worker] = "Employees" THEN
      [WF Leavers Str] + " leavers, " +
      IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " person", " people")
 ELSEIF [p_Worker] = "Contingent" THEN
-     [WF Period] + ": " + [WF Joined Str] + " starts, " + [WF Left Str] + " ended or converted, " +
+     [WF Period] + ": " + [WF Joined Str] + " joined, " + [WF Left Str] + " left, " +
      IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " contingent worker", " contingent workers")
 ELSE
      [WF Period] + ": " + [WF Joined Str] + " joined, " + [WF Left Str] + " left, " +
