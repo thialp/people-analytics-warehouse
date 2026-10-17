@@ -732,7 +732,46 @@ ELSE LEFT(DATENAME('month', DATEADD('day', 1, [p_From])), 3) + " " + STR(YEAR(DA
      LEFT(DATENAME('month', [p_To]), 3) + " " + STR(YEAR([p_To]))
 END
 ```
-`WF Period` → replace its formula with `[Period Name]`. `WF Title` for Employees stays the published sentence; for Contingent: `[Period Name] + ": " + starts + " starts, " + ends + " ends, net " + ...`; for Total: `[Period Name] + ": " + joined + " joined, " + left + " left, adding " + net + " people"`.
+`WF Period` → replace its formula with `[Period Name]` (create `Period Name` first).
+
+**Why the title currently reads "+30005 FTE net".** The release 2 `WF Title` tests `[Measure] = "Headcount"`. After `Measure` became `p_Worker` that test is never true, so the title falls to its FTE branch, where `WF FTE Open` is 0 (it still looks for the old start month) and the net is the whole closing figure. Rewrite the calc as below; the FTE branch and the FTE helpers then go away.
+
+Two new helpers (Headcount Walk), scoped by the toggle automatically because `In Range` already contains `Worker In Scope`:
+```
+// WF Joined   (Employees: hires · Contingent: starts · Total: both; a conversion nets to zero in Total)
+ZN({ FIXED : SUM(IF [In Range] AND ([Movement Category] = "Hires" OR [Movement Category] = "Starts") THEN [Headcount] END) })
+```
+```
+// WF Left     (leavers, ends; for Contingent a conversion to employee counts as a leaver, as the compact waterfall does)
+ZN({ FIXED : -SUM(IF [In Range] AND ([Movement Category] = "Voluntary Terminations" OR [Movement Category] = "Involuntary Terminations"
+                                      OR [Movement Category] = "Ends"
+                                      OR ([p_Worker] = "Contingent" AND [Movement Category] = "Conversions")) THEN [Headcount] END) })
+```
+Their text twins, same comma pattern as `WF Hires Str` (create `WF Joined Str` on `[WF Joined]` and `WF Left Str` on `[WF Left]`):
+```
+// WF Joined Str
+IF [WF Joined] >= 1000
+THEN STR(DIV(INT([WF Joined]), 1000)) + "," + RIGHT("00" + STR(INT([WF Joined]) % 1000), 3)
+ELSE STR(INT([WF Joined])) END
+```
+Then **edit** `WF Title` (replace the whole formula):
+```
+// WF Title
+IF NOT [K Valid] THEN "Choose a start month on or before the end month"
+ELSEIF [p_Worker] = "Employees" THEN
+     [WF Period] + ": " + [WF Hires Str] + " hires " +
+     IF [WF Hires] >= [WF Leavers] THEN "outpaced " ELSE "fell short of " END +
+     [WF Leavers Str] + " leavers, " +
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + " people"
+ELSEIF [p_Worker] = "Contingent" THEN
+     [WF Period] + ": " + [WF Joined Str] + " starts, " + [WF Left Str] + " ended or converted, " +
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + " contingent workers"
+ELSE
+     [WF Period] + ": " + [WF Joined Str] + " joined, " + [WF Left Str] + " left, " +
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + " people"
+END
+```
+`WF Net Str` (`ABS([WF Close] - [WF Open])`) already follows the toggle. Check: Employees FY26 Company reads the first row of the table below; Total reads 11,998 joined, 9,197 left, adding 2,801 people.
 
 | Selection | Waterfall title |
 |---|---|
