@@ -876,17 +876,18 @@ END)
 // WF Conv In    ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Employee" THEN [Headcount] END) })
 // WF Conv Out   ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Contingent" THEN [Headcount] END) })
 // WF Moves Out  ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Internal Moves Out" THEN [Headcount] END) })
-// WF Moves Out Str   comma pattern on [WF Moves Out]; WF Conv In Str likewise on [WF Conv In]
+// WF Moves In   ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Internal Moves In" THEN [Headcount] END) })
+// WF Conv In Str, WF Conv Out Str, WF Moves In Str, WF Moves Out Str: comma pattern on each
 ```
 ```
 // WF Caption
 IF NOT [K Valid] THEN ""
 ELSEIF [p_Worker] = "Employees" AND [p_View] = "Company" THEN
-  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · the " + [WF Moves Str] + " internal moves net to zero across the company."
+  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · the " + [WF Moves In Str] + " internal moves net to zero across the company."
 ELSEIF [p_Worker] = "Employees" THEN
-  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · internal moves: " + [WF Moves Str] + " in, " + [WF Moves Out Str] + " out."
+  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · internal moves: " + [WF Moves In Str] + " in, " + [WF Moves Out Str] + " out."
 ELSEIF [p_Worker] = "Contingent" THEN
-  "Conversions (" + [WF Conv In Str] + ") are contingent workers who became employees; the Employees view counts them as joined."
+  "Conversions (" + [WF Conv Out Str] + ") are contingent workers who became employees; the Employees view counts them as joined."
 ELSE
   "Conversions (" + [WF Conv In Str] + " contingent workers became employees) are one out and one in, so they net to zero."
 END
