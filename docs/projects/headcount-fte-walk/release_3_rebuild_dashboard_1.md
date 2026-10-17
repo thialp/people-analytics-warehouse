@@ -534,6 +534,8 @@ The top bar has no room for #2's six-row view list, so the view list moves into 
 | Close on group pick | Group Panel | `p_GroupOpen` | `Close Panel` |
 | Close group on ✕ | Popover Close (group) | `p_GroupOpen` | `Close Panel` |
 
+`Group Panel` filters on calc `Panel Shows Groups` = `[Group In View] AND [p_View] <> "Company"` (True) instead of `Group In View`, so with All selected the right-hand list is empty (it would only repeat "All organizations"); `Group Field` keeps `Group In View`.
+
 Calc `Keep Group Panel Open` = `[view_name] <> "Company"` (add it to `View List` Detail): picking **All** applies at once and closes the popover (there is nothing else to choose); every other view keeps it open for the group pick.
 
 Picking a view keeps the popover open and pre-selects the first group (alphabetical), so the cards are never blank; picking Company sets `Arcadia Systems`, which the lists show as **All organizations**: on `Group Panel` and `View List` right-click the `group_name` field (Region Walk) > **Aliases...** > `Arcadia Systems` = `All organizations` (close the popover with ✕ or pick again). 
