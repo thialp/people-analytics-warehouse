@@ -1,6 +1,6 @@
 """Rail toggle shapes for the Compensation Walk (transparent PNGs, 4x of an 88x30 cell).
 Usage: python3 make_rail_toggle_shapes.py [capsule_hex] [pill_hex]
-  capsule_hex: only used for the preview. pill_hex: fill of the selected option (default E4E3DD, the brand border/wash)"""
+  capsule_hex: only used for the preview. pill_hex: fill of the selected option (default FFFFFF, the same white pill as the #1 toggles)"""
 from PIL import Image, ImageDraw, ImageFont
 import os, sys
 from shape_quality import SS, finish, out_size
@@ -11,9 +11,9 @@ if not os.path.exists(FONT):
     FONT = "/usr/share/fonts/opentype/inter/Inter-Bold.otf"
 S, W, H = SS, 352, 120
 NAVY, MIST = (19, 35, 58, 255), (201, 209, 220, 255)
-CAP = sys.argv[1].lstrip("#") if len(sys.argv) > 1 else "1D3150"
+CAP = sys.argv[1].lstrip("#") if len(sys.argv) > 1 else "243A57"
 CAP = tuple(int(CAP[i:i+2], 16) for i in (0, 2, 4)) + (255,)
-PILL = sys.argv[2].lstrip("#") if len(sys.argv) > 2 else "E4E3DD"
+PILL = sys.argv[2].lstrip("#") if len(sys.argv) > 2 else "FFFFFF"
 WHITE = tuple(int(PILL[i:i+2], 16) for i in (0, 2, 4)) + (255,)
 
 OPTIONS = {
@@ -26,8 +26,8 @@ def segment(label, on, path):
     im = Image.new("RGBA", (W*S, H*S), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     if on:
-        d.rounded_rectangle((8*S, 8*S, (W-8)*S, (H-8)*S), radius=14*S, fill=WHITE)
-    f = ImageFont.truetype(FONT, 40*S)
+        d.rounded_rectangle((8*S, 8*S, (W-8)*S, (H-8)*S), radius=((H-16)//2)*S, fill=WHITE)
+    f = ImageFont.truetype(FONT, 44*S)
     d.text((W*S//2, H*S//2), label, font=f, fill=NAVY if on else MIST, anchor="mm")
     finish(im, W, H).save(path)
 
