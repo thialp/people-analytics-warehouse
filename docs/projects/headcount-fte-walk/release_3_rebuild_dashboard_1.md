@@ -625,7 +625,23 @@ END
 // Collapse Label   "Collapse · " + STR([WF Group Count]) + IIF([WF Group Count] = 1, " group", " groups")
 ```
 
-Edit the existing waterfall calcs: in `Waterfall Position`, `Bar Type`, `Move Label`, `Level Label` and `TT Context`, replace `ATTR([Movement Category])` by `ATTR([WF Bar])`. Delete `Show Category`.
+Edit the existing waterfall calcs: in `Waterfall Position`, `Bar Type`, `Move Label` and `Level Label`, replace `ATTR([Movement Category])` by `ATTR([WF Bar])`. Delete `Show Category`.
+
+**Tooltip calcs: fix them from the bottom of the chain up.** `TT Context` reads `TT Net Str`, `TT Share Str` and `TT Noun`; those read `TT Open Ref` and `TT Close Ref`; and the two Refs still read the release 2 `WF FTE Open` / `WF FTE Close`, which is why they are red and why Tableau will not let you delete the FTE calcs yet. In this order:
+1. `TT Unit` = `"people"` and `TT Noun` = `"headcount"` (constants: every employee is 1.0 FTE).
+2. `TT Open Ref` = `[WF Open]` and `TT Close Ref` = `[WF Close]`. `TT Net Str`, `TT Share Str` and `TT Context` stop being red as soon as these two are saved.
+3. `TT Context`, replacing the whole formula (the `FTE Changes` branch is gone, as that category no longer exists):
+```
+// TT Context
+CASE ATTR([WF Bar])
+WHEN "Opening" THEN "Active at the end of " + [TT Open Month]
+WHEN "Closing" THEN "Active at the end of " + [TT Close Month] + " · " + [TT Net Str] + " vs opening"
+ELSE [TT Share Str] + " of opening " + [TT Noun] + " · about " +
+     STR(INT(ROUND(ABS(SUM([Walk Value])) / MAX([TT Months]), 0))) + " per month"
+END
+```
+4. Check `TT Open Month` and `TT Close Month` read `[p_From]` and `[p_To]` (month and year of each), not the old `[Start Month]` / `[End Month]`.
+5. Delete `TT Level PT`, `TT Part Time` and `TT Bar T` (Part Time and the FTE-in-tenths helper do not exist in release 3). Then the `WF FTE ...` calcs delete without a warning, except `WF FTE Open Str` and `WF FTE Close Str`, which `WF Caption` still uses until section 10.
 
 Sheet `Waterfall`:
 
