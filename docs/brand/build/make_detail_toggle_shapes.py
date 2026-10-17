@@ -19,7 +19,7 @@ def segment(label, on, path):
     d = ImageDraw.Draw(im)
     if on:  # navy pill inset inside the grey capsule
         d.rounded_rectangle((6*S, 6*S, (W-6)*S, (H-6)*S), radius=((H-12)//2)*S, fill=NAVY)
-    f = ImageFont.truetype(FONT, 36*S)
+    f = ImageFont.truetype(FONT, 40*S)
     d.text((W*S//2, H*S//2), label, font=f, fill=WHITE if on else SLATE, anchor="mm")
     finish(im, W, H).save(path)
 
