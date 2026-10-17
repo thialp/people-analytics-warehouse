@@ -932,13 +932,54 @@ Add the deselect action for each hover sheet (7.4: Filter, source and target the
 
 ### 8.3 Trend and Turnover
 
-**8.3a Trend, step by step.**
-1. Calc `Trend Value` on Headcount Walk (below). It has no `In Period` test, so the line covers the whole history, and `Worker In Scope` makes it follow the Workforce toggle.
-2. On the `Trend` sheet replace `SUM([Selected Value])` on Rows with `SUM([Trend Value])`; do the same on the Label (last-point value) and in the tooltip.
-3. Calc `Trend Title`; on the dashboard item `Trend` edit the sheet title: delete the typed text and Insert > `Trend Title`.
-4. Checks: the last point equals Closing headcount on card 1 for Employees (30,005), Contingent (11,941) and Total (41,946); with the officers excluded the Employees line no longer ends at 41,955. Pick Commercial in View and the line drops to that group's size.
+**8.3a Trend, step by step.** The Trend answers "where does the selected period sit in the history?". It follows Workforce and View, labels the shaded period's opening and closing values, and says in the subtitle what changed (the same +498 and +1.3% as the waterfall title and card 1).
 
-**Trend:** add `Trend Value` = `IF [Officers Out] AND [In Group] AND [Worker In Scope] AND [Movement Category] = "Closing" THEN [Headcount] END` and put `SUM([Trend Value])` on Rows instead of `SUM([Selected Value])`. Band: `Band Start` = `[p_From]` (EDIT: the band now starts on the opening month-end). Title calc `Trend Title` = `"Closing " + CASE [p_Worker] WHEN "Employees" THEN "headcount" WHEN "Contingent" THEN "contingent workers" ELSE "workforce" END + " by month-end"`. Remove the hard-coded "FY24 restructuring" annotation or keep it only for Company (it marks a company event).
+1. **Trend Value** (Headcount Walk). No `In Period` test, so the line covers the whole history; `Worker In Scope` and `In Group` make it follow the toggle and View.
+```
+IF [Officers Out] AND [In Group] AND [Worker In Scope] AND [Movement Category] = "Closing" THEN [Headcount] END
+```
+2. **Title and subtitle.**
+```
+// Trend Title
+"Closing " + CASE [p_Worker] WHEN "Employees" THEN "headcount" WHEN "Contingent" THEN "contingent workers" ELSE "workforce" END + " by month-end"
+// Trend Pct
+IF [WF Open] = 0 THEN 0 ELSE ([WF Close] - [WF Open]) / [WF Open] END
+// Trend Chg Str
+IF [WF Close] >= [WF Open] THEN "+" ELSE "−" END + [WF Net Str]
+// Trend Pct Str
+IF [WF Close] >= [WF Open] THEN "+" ELSE "−" END
++ STR(DIV(INT(ROUND(ABS([Trend Pct]) * 1000, 0)), 10)) + "." + STR(INT(ROUND(ABS([Trend Pct]) * 1000, 0)) % 10) + "%"
+// Trend Subtitle
+IF NOT [K Valid] THEN "" ELSE
+"Shaded: " + [TT Open Day] + " → " + [TT Close Day] + " · " + [Trend Chg Str] + " (" + [Trend Pct Str] + ")" END
+```
+Put `Trend Title` and `Trend Subtitle` on Detail of the `Trend` sheet, then in the sheet title (Worksheet > Edit Title) use Insert for each: line 1 `Trend Title` (bold), line 2 `Trend Subtitle` (Book 9 slate). `Band Start` = `[p_From]`.
+
+3. **Labelled points** (a dimension and a measure).
+```
+// Trend Pt
+SUM(IF [month_end_date] = [p_From] OR [month_end_date] = [p_To]
+       OR [month_end_date] = { FIXED : MIN([month_end_date]) }
+       OR [month_end_date] = { FIXED : MAX([month_end_date]) } THEN [Trend Value] END)
+// Pt Role
+IF [month_end_date] = [p_From] OR [month_end_date] = [p_To] THEN "Selected"
+ELSEIF [month_end_date] = { FIXED : MIN([month_end_date]) } OR [month_end_date] = { FIXED : MAX([month_end_date]) } THEN "Edge"
+ELSE "None" END
+```
+`Selected` is tested first, so when the period ends on the last month the closing point is labelled once.
+
+4. **Layout.** Columns `month_end_date`. Rows `SUM(Trend Value)` then `AGG(Trend Pt)`; right-click the second pill > **Dual Axis**, then **Synchronize Axis** and untick **Show Header** on the right axis. Range Automatic, Include zero off.
+   - `SUM(Trend Value)` card: line, teal, **no label**.
+   - `AGG(Trend Pt)` card: **Circle**, small; `Pt Role` on **Color on this card only** (a pill on the `All` card would colour and split the line); Edit Colors: `Selected` `#13233A`, `Edge` `#8C8A84`, `None` any (it draws nothing); hide the legend. **Label**: show, Marks to Label **All**, Semibold 10, font colour Match Mark Color, alignment Top Center, Allow labels to overlap. Tooltip off.
+   - Right-click the "nulls" badge > Hide Indicator.
+
+5. **Tooltip** (on the `SUM(Trend Value)` card only). Calcs: `Trend MoM` = `SUM([Trend Value]) - LOOKUP(SUM([Trend Value]), -1)` and `Trend MoM Pct` = `[Trend MoM] / LOOKUP(SUM([Trend Value]), -1)`, both Compute Using `month_end_date`; number formats `+#,##0;−#,##0;0` and `+0.0%;−0.0%;0.0%`. Text: line 1 `<month_end_date>` (Semibold 11 navy); line 2 `<SUM(Trend Value)>` (Book 10 navy); line 3 `<Trend MoM> (<Trend MoM Pct>) vs the previous month` (Book 9 slate). Remove `zzTrue`, `zzFalse`, `p_From`, `p_To` from the text.
+
+6. **Optional: what drove the month.** `Trend Joined` = `SUM(IF [Officers Out] AND [In Group] AND [Worker In Scope] AND ([Movement Category] = "Hires" OR [Movement Category] = "Starts" OR ([p_Worker] = "Employees" AND [Movement Category] = "Conversions")) THEN [Headcount] END)`; `Trend Left` = `-SUM(IF [Officers Out] AND [In Group] AND [Worker In Scope] AND ([Movement Category] = "Voluntary Terminations" OR [Movement Category] = "Involuntary Terminations" OR [Movement Category] = "Ends" OR ([p_Worker] = "Contingent" AND [Movement Category] = "Conversions")) THEN [Headcount] END)`. Fourth tooltip line: `Joined <Trend Joined> · Left <Trend Left>` (formats `+#,##0`, `−#,##0`). With a group selected the remainder is moves between teams.
+
+7. **Checks.** The line has one colour (teal) for every workforce type; the title and subtitle carry the change. FY25 Q3, Total: subtitle `Shaded: Dec 31, 2024 → Mar 31, 2025 · +498 (+1.3%)`; navy labels 37,836 and 38,334; grey labels at the first month and 41,946. Last point: Employees 30,005, Contingent 11,941, Total 41,946 (card 1). FY26 shows no duplicate grey label at the right end. Step 6: the monthly Joined and Left over Jan to Mar 2025 add up to 2,467 and 1,969, and Employees FY26 Joined adds up to 5,235.
+
+*Colour by workforce (teal / violet / navy for the line) was considered and dropped: the palette gives teal, coral and violet fixed meanings (growth, decline, movement), and the title and subtitle already show the toggle changed.*
 
 **Turnover:** the rows become **one level below the selection**, so the chart always says something about what you picked:
 
