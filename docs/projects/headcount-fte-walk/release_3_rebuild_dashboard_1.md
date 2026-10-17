@@ -79,10 +79,10 @@ Click flow after the fix: the click fires the parameter action, then the self fi
 
 | File | Size on the dashboard | Used for |
 |---|---|---|
-| `fld_top.png` | 164 × 32 | #1 Period and Group fields (white capsule, same radius as the toggle) |
+| `fld_top.png` | 180 × 32 | #1 Period and Group fields (white capsule, same radius as the toggle) |
 | `fld_rail.png` | 200 × 30 | #2 Period and Group fields (`#E4E3DD`, rounded like the toggles) |
 | `seg_worker_employees_on/off`, `seg_worker_contingent_on/off`, `seg_worker_total_on/off` | 80 × 32 each | #1 Workforce toggle (capsule `#243A57`) |
-| `btn_reset_top_label.png` | 150 × 32 | #1 Reset (outlined capsule: arrow + "Reset to default view") |
+| `btn_reset_top_label.png` | 184 × 32 | #1 Reset (outlined capsule: arrow + "Reset to default view") |
 | `btn_reset_top.png` | 32 × 32 | Spare: arrow only, for a narrow header |
 | `btn_reset_rail.png` | 188 × 30 | #2 Reset (outlined button, as published) |
 | `btn_close.png` / `btn_close_light.png` | 16 × 16 | The ✕ on every popover (slate on white / mist on navy) |
@@ -364,7 +364,7 @@ Sheet `Period Field`, source **Region Walk**:
 7. Tooltip: `Choose the period` (Tableau Book 9), uncheck Include command buttons.
 8. Dashboard item: floating, **Entire View**, background None, inner padding 0.
 
-Test: the field shows `FY26 · Jun 25 → Jun 26  ▾` on a white capsule filling 164 × 32. Hover: a thin outline around the box, **no square**. If the shape will not fill the cell, set the item to Fit **Standard** on the dashboard and widen the sheet's cell (Format > Cell size > Taller/Wider); if it still will not, use the fallback in 0.4 and tell me what you see.
+Test: the field shows `FY26 · Jun 25 → Jun 26  ▾` on a white capsule filling 180 × 32. Hover: a thin outline around the box, **no square**. If the shape will not fill the cell, set the item to Fit **Standard** on the dashboard and widen the sheet's cell (Format > Cell size > Taller/Wider); if it still will not, use the fallback in 0.4 and tell me what you see.
 
 ### 6.2 Group Field
 
@@ -405,7 +405,7 @@ Sheet `Reset`, source **Region Walk** (any one row):
 1. Marks **Shape** = `btn_reset_top_label` (the wide capsule with the words; not `btn_reset_rail`, which is #2's, and not `btn_reset_top`, the arrow-only spare); size max; filter `Period Is Current` = True and `view_name` = "Company" (one mark).
 2. Detail: every `Default ...` calc, `Close Panel`, `zzTrue`, `zzFalse`.
 3. Tooltip: `Reset to default view` (Semibold 9).
-4. Shading None; item **150 × 32**.
+4. Shading None; item **184 × 32**.
 
 ### 6.5 Info Button
 
@@ -445,7 +445,7 @@ Worksheet > Tooltip: bold line **How to read this page** (Semibold 10 navy), `<T
 
 ### 6.7 Headings over the fields
 
-Three dashboard **Text** objects (static text is not selectable), Tableau Bold 8, `#8FA0B8`, 180 × 14: `SELECT PERIOD`, `SELECT VIEW`, `SHOW`. Same words as #2's rail headings.
+Three dashboard **Text** objects (static text is not selectable), Tableau Bold 10, `#B8C4D6`, 180 × 14: `SELECT PERIOD`, `SELECT VIEW`, `SHOW`. Same words as #2's rail headings.
 
 ### 6.8 Header layout (1400 wide, band 76 high)
 
@@ -454,22 +454,22 @@ Every control is 32 high on the same baseline (y 30) and shaped as a capsule or 
 | Object | x | y | w | h |
 |---|---:|---:|---:|---:|
 | Header band (Blank, `#13233A`) | 0 | 0 | 1400 | 76 |
-| Logo | 56 | 14 | 177 | 48 |
-| Page Title | 249 | 9 | 285 | 58 |
-| SELECT PERIOD | 546 | 12 | 164 | 14 |
-| Period Field | 546 | 30 | 164 | 32 |
-| SELECT VIEW | 722 | 12 | 164 | 14 |
-| Group Field | 722 | 30 | 164 | 32 |
-| SHOW | 898 | 12 | 240 | 14 |
-| Workforce Toggle | 898 | 30 | 240 | 32 |
-| Reset | 1150 | 30 | 150 | 32 |
-| Info Button | 1312 | 30 | 32 | 32 |
+| Logo | 30 | 14 | 177 | 48 |
+| Page Title | 223 | 9 | 275 | 58 |
+| SELECT PERIOD | 506 | 12 | 180 | 14 |
+| Period Field | 506 | 30 | 180 | 32 |
+| SELECT VIEW | 698 | 12 | 180 | 14 |
+| Group Field | 698 | 30 | 180 | 32 |
+| SHOW | 890 | 12 | 240 | 14 |
+| Workforce Toggle | 890 | 30 | 240 | 32 |
+| Reset | 1142 | 30 | 184 | 32 |
+| Info Button | 1338 | 30 | 32 | 32 |
 
-Gaps are 12 px between controls; the right edge is 1344, the 56 px gutter of the page. Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and shape legend (`Info Shape`) left on the dashboard: they are helpers for the actions, not part of the page. The Page Title text is **white**.
+Gaps are 12 px between controls and 16 px between the logo/title and the fields; the logo sits on the left edge of the page grid (x 30) and Info on the right edge (1370). The whole page uses a **30 px margin** so the banner and the body are the same width. Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and shape legend (`Info Shape`) left on the dashboard: they are helpers for the actions, not part of the page. The Page Title text is **white**.
 
 ---|---:|---:|---:|---:|
 | Header band (Blank, `#13233A`) | 0 | 0 | 1400 | 76 |
-| Logo | 56 | 14 | 177 | 48 |
+| Logo | 30 | 14 | 177 | 48 |
 | Page Title | 256 | 9 | 372 | 58 |
 | SELECT PERIOD | 640 | 12 | 180 | 14 |
 | Period Field | 640 | 30 | 180 | 32 |
@@ -622,7 +622,11 @@ Expand / Collapse buttons: copy #2's construction (build_status.md, "Expand / Co
 
 ### 8.2 KPI cards
 
-Card set per toggle value. The geometry (map layers, 15 anchors) stays as built; only the text calcs change.
+#### 8.2a Wider cards (30 px margin)
+
+The cards now span the full page grid (x 30 to 1370): five cards 255 wide with 16 gaps. Use the new background `docs/brand/arcadia_kpi_cards_bg_wide.png` (2800 × 220; generated with `make_kpi_cards_bg.py --left 30 --top 12 --card-w 255 --card-h 86 --gap 16 --radius 10`) as the background image item (0, 78, 1400 × 110). Set the KPI parameters: `kpi_GridLeft` 30, `kpi_CardW` 255, `kpi_GapX` 16 (others unchanged: GridTop 12, CardH 86, PadX 16). Tableau pads the map extent, so check that each title starts 16 px inside its card; if all five drift the same way nudge `kpi_FitX` by 0.01 (and `kpi_ShiftX` for a constant offset), as in the KPI guide, section 6.
+
+Card set per toggle value. The map layers and 15 anchors stay as built; only the text calcs change.
 
 | Card | Employees | Contingent | Total |
 |---|---|---|---|
@@ -787,14 +791,14 @@ If the secondary number shows blank: the link is not active (click the link icon
 | # | Object | x | y | w | h | Note |
 |---|---|---:|---:|---:|---:|---|
 | 1–11 | Header (6.8) | | | | | |
-| 12 | KPI background image | 0 | 78 | 1400 | 110 | unchanged |
-| 13 | KPI cards | 0 | 78 | 1400 | 110 | unchanged |
-| 14 | Waterfall | 56 | 188 | 780 | 624 | unchanged; bottom padding 64 |
-| 15 | Btn Expand ALL / Btn Collapse ALL | 674 | 198 | 150 | 24 | Same spot; one visible at a time |
-| 16 | Waterfall Caption | 68 | 750 | 756 | 56 | Two lines now |
-| 17 | Trend | 848 | 188 | 496 | 300 | unchanged |
-| 18 | Turnover | 848 | 500 | 496 | 312 | unchanged |
-| 19 | Footnote (Text object) | 56 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic." Book 8 slate |
+| 12 | KPI background image | 0 | 78 | 1400 | 110 | new wide image (8.2a) |
+| 13 | KPI cards | 0 | 78 | 1400 | 110 | geometry parameters per 8.2a |
+| 14 | Waterfall | 30 | 188 | 806 | 624 | unchanged; bottom padding 64 |
+| 15 | Btn Expand ALL / Btn Collapse ALL | 686 | 198 | 150 | 24 | Same spot; one visible at a time |
+| 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
+| 17 | Trend | 852 | 188 | 518 | 300 | unchanged |
+| 18 | Turnover | 852 | 500 | 518 | 312 | unchanged |
+| 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic." Book 8 slate |
 | 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
 
 Item order (Layout pane, bottom to top): background, cards, charts, buttons, header controls, popovers last.

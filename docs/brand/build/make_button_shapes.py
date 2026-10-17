@@ -9,10 +9,10 @@ Writes to docs/brand/shapes/Arcadia/ and a preview to docs/brand/build/button_pr
 
 | File | Cell on the dashboard | Drawn at | Used by |
 |---|---|---|---|
-| seg_worker_{employees,contingent,total}_{on,off} | 80 x 32 | 320 x 128 | #1 top bar, Worker toggle (capsule #243A57) |
-| fld_top | 164 x 32 | 656 x 128 | #1 top bar, Period Field and Group Field (white capsule, same radius as the toggle and Reset) |
+| seg_worker_{employees,contingent,total}_{on,off} | 80 x 32 | 320 x 128 (label 12 px) | #1 top bar, Worker toggle (capsule #243A57) |
+| fld_top | 180 x 32 | 720 x 128 | #1 top bar, Period Field and Group Field (white capsule, same radius as the toggle and Reset) |
 | fld_rail | 200 x 30 | 800 x 120 | #2 rail, Period Field and Group Field (#E4E3DD, radius as the toggles) |
-| btn_reset_top_label | 150 x 32 | 600 x 128 | #1 top bar, Reset (outlined capsule: arrow + "Reset to default view") |
+| btn_reset_top_label | 184 x 32 | 736 x 128 | #1 top bar, Reset (outlined capsule: arrow + "Reset to default view") |
 | btn_reset_top | 32 x 32 | 128 x 128 | Spare: arrow only, for a narrow header |
 | btn_reset_rail | 188 x 30 | 752 x 120 | #2 rail, Reset (outlined button, as published) |
 | btn_close | 16 x 16 | 64 x 64 | Both, the x on every popover (slate) |
@@ -52,7 +52,7 @@ def segment(label, on, name, w=320, h=128):
     im, d = canvas(w, h)
     if on:
         d.rounded_rectangle((10 * S, 10 * S, (w - 10) * S, (h - 10) * S), radius=((h - 20) // 2) * S, fill=WHITE)
-    f = ImageFont.truetype(FONT, 40 * S)
+    f = ImageFont.truetype(FONT, 47 * S)
     d.text((w * S // 2, h * S // 2), label, font=f, fill=NAVY if on else MIST, anchor="mm")
     save(im, w, h, name)
 
@@ -69,7 +69,7 @@ def field(name, w, h, fill, radius):
     save(im, w, h, name)
 
 
-field("fld_top", 656, 128, WHITE, 64)
+field("fld_top", 720, 128, WHITE, 64)
 field("fld_rail", 800, 120, WASH, 14)
 
 
@@ -92,12 +92,12 @@ reset_arrow(d, 64 * S, 66 * S, 38 * S, 9 * S, WHITE)
 save(im, 128, 128, "btn_reset_top")
 
 # #1 top bar: a capsule, arrow + words, so it reads as a button and not as a loading spinner
-w, h = 600, 128
+w, h = 736, 128
 im, d = canvas(w, h)
-d.rounded_rectangle((3 * S, 3 * S, (w - 3) * S, (h - 3) * S), radius=((h - 6) // 2) * S, outline=(255, 255, 255, 110), width=4 * S)
-reset_arrow(d, 62 * S, 66 * S, 20 * S, 6 * S, WHITE)
-f = ImageFont.truetype(FONT, 36 * S)
-d.text((98 * S, h * S // 2), "Reset to default view", font=f, fill=WHITE, anchor="lm")
+d.rounded_rectangle((3 * S, 3 * S, (w - 3) * S, (h - 3) * S), radius=((h - 6) // 2) * S, outline=(255, 255, 255, 120), width=4 * S)
+reset_arrow(d, 66 * S, 66 * S, 21 * S, 6 * S, WHITE)
+f = ImageFont.truetype(FONT, 45 * S)
+d.text((106 * S, h * S // 2), "Reset to default view", font=f, fill=WHITE, anchor="lm")
 save(im, w, h, "btn_reset_top_label")
 
 w, h = 752, 120
