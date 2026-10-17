@@ -79,10 +79,11 @@ Click flow after the fix: the click fires the parameter action, then the self fi
 
 | File | Size on the dashboard | Used for |
 |---|---|---|
-| `fld_top.png` | 180 × 32 | #1 Period and Group fields (white, square: inputs stay square) |
+| `fld_top.png` | 164 × 32 | #1 Period and Group fields (white capsule, same radius as the toggle) |
 | `fld_rail.png` | 200 × 30 | #2 Period and Group fields (`#E4E3DD`, rounded like the toggles) |
 | `seg_worker_employees_on/off`, `seg_worker_contingent_on/off`, `seg_worker_total_on/off` | 80 × 32 each | #1 Workforce toggle (capsule `#243A57`) |
-| `btn_reset_top.png` | 32 × 32 | #1 Reset (white arrow on navy) |
+| `btn_reset_top_label.png` | 150 × 32 | #1 Reset (outlined capsule: arrow + "Reset to default view") |
+| `btn_reset_top.png` | 32 × 32 | Spare: arrow only, for a narrow header |
 | `btn_reset_rail.png` | 188 × 30 | #2 Reset (outlined button, as published) |
 | `btn_close.png` / `btn_close_light.png` | 16 × 16 | The ✕ on every popover (slate on white / mist on navy) |
 | `info_open`, `info_close` (existing) | 32 × 32 | #1 info button |
@@ -363,7 +364,7 @@ Sheet `Period Field`, source **Region Walk**:
 7. Tooltip: `Choose the period` (Tableau Book 9), uncheck Include command buttons.
 8. Dashboard item: floating, **Entire View**, background None, inner padding 0.
 
-Test: the field shows `FY26 · Jun 25 → Jun 26  ▾` on a white box filling 180 × 32. Hover: a thin outline around the box, **no square**. If the shape will not fill the cell, set the item to Fit **Standard** on the dashboard and widen the sheet's cell (Format > Cell size > Taller/Wider); if it still will not, use the fallback in 0.4 and tell me what you see.
+Test: the field shows `FY26 · Jun 25 → Jun 26  ▾` on a white capsule filling 164 × 32. Hover: a thin outline around the box, **no square**. If the shape will not fill the cell, set the item to Fit **Standard** on the dashboard and widen the sheet's cell (Format > Cell size > Taller/Wider); if it still will not, use the fallback in 0.4 and tell me what you see.
 
 ### 6.2 Group Field
 
@@ -401,10 +402,10 @@ Sheet `Reset`, source **Region Walk** (any one row):
 | `Default Worker` | `"Employees"` |
 | `Default Expand` | `FALSE` |
 
-1. Marks **Shape** = `btn_reset_top`; size max; filter `Period Is Current` = True and `view_name` = "Company" (one mark).
+1. Marks **Shape** = `btn_reset_top_label` (the wide capsule with the words; not `btn_reset_rail`, which is #2's, and not `btn_reset_top`, the arrow-only spare); size max; filter `Period Is Current` = True and `view_name` = "Company" (one mark).
 2. Detail: every `Default ...` calc, `Close Panel`, `zzTrue`, `zzFalse`.
 3. Tooltip: `Reset to default view` (Semibold 9).
-4. Shading None; item 32 × 32.
+4. Shading None; item **150 × 32**.
 
 ### 6.5 Info Button
 
@@ -428,7 +429,7 @@ Source Headcount Walk.
 ```
 (Optional later: read the as-of date from Region Walk's `report_as_of_date` with the blend, as #2 does.)
 
-Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 9 `#C9D1DC`. Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 372 × 58, Entire View.
+Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 9 `#C9D1DC`. Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Line 2 stays on one line at this width; a long group name wraps to a second line.
 
 **Tooltip "How to read this page"** (the default tooltip prints raw field names and repeats the subtitle; replace it). `TT Open Day` is defined in 8.2, `TT Close Day` in section 9:
 
@@ -448,8 +449,25 @@ Three dashboard **Text** objects (static text is not selectable), Tableau Bold 8
 
 ### 6.8 Header layout (1400 wide, band 76 high)
 
+Every control is 32 high on the same baseline (y 30) and shaped as a capsule or circle, so the bar reads as one set.
+
 | Object | x | y | w | h |
 |---|---:|---:|---:|---:|
+| Header band (Blank, `#13233A`) | 0 | 0 | 1400 | 76 |
+| Logo | 56 | 14 | 177 | 48 |
+| Page Title | 249 | 9 | 285 | 58 |
+| SELECT PERIOD | 546 | 12 | 164 | 14 |
+| Period Field | 546 | 30 | 164 | 32 |
+| SELECT VIEW | 722 | 12 | 164 | 14 |
+| Group Field | 722 | 30 | 164 | 32 |
+| SHOW | 898 | 12 | 240 | 14 |
+| Workforce Toggle | 898 | 30 | 240 | 32 |
+| Reset | 1150 | 30 | 150 | 32 |
+| Info Button | 1312 | 30 | 32 | 32 |
+
+Gaps are 12 px between controls; the right edge is 1344, the 56 px gutter of the page. Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and shape legend (`Info Shape`) left on the dashboard: they are helpers for the actions, not part of the page. The Page Title text is **white**.
+
+---|---:|---:|---:|---:|
 | Header band (Blank, `#13233A`) | 0 | 0 | 1400 | 76 |
 | Logo | 56 | 14 | 177 | 48 |
 | Page Title | 256 | 9 | 372 | 58 |
