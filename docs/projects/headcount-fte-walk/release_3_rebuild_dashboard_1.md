@@ -1,6 +1,6 @@
 # Release 3 rebuild: Dashboard #1, Headcount & FTE Walk
 
-Step-by-step rebuild of [arcadia_headcount_fte_walk](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ExecutiveSummary) on the release 3 data, so it works and reads like Dashboard #2 (Compensation Walk), keeps its own **top bar**, and shows **the same numbers** wherever the two dashboards show the same thing. Arcadia Systems is fictional and all data is synthetic.
+Step-by-step rebuild of [arcadia_headcount_fte_walk](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount) on the release 3 data, so it works and reads like Dashboard #2 (Compensation Walk), keeps its own **top bar**, and shows **the same numbers** wherever the two dashboards show the same thing. Arcadia Systems is fictional and all data is synthetic.
 
 Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_dashboard_2.md). Section 0 is identical in both; you can import sheets, calcs and parameters from one workbook to the other wherever a step says so.
 
@@ -16,9 +16,9 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 
 ## Where we are (updated Oct 17, 2026)
 
-**Done:** sections 1 to 7; 8.1 (compact and expanded waterfall, Summary | By driver toggle with tooltip, bar-explaining tooltip `TT What`, Contingent joined / left names, `WF Title`, `WF Subtitle`); 8.1b (waterfall caption); layout grid for the header, waterfall and right column (section 10 rows 14 to 19).
+**Dashboard #1 is rebuilt and published:** [https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount). Sections 1 to 8 and 10 are done: top bar and popovers, waterfall (Summary | By driver), five KPI cards with hover tooltips, Trend and Turnover, layout aligned to the KPI grid. The published page was checked against section 11 for Employees, Contingent and Total (FY26 and FY25 Q3), Commercial and Finance; every figure ties to the cards, waterfall, trend and Dashboard #2.
 
-**Continue tomorrow with 8.2 (KPI cards):** the five cards still show release 2 text ("Hires (FTE)", "Closing FTE", FTE twins). Rebuild them per workforce type (Employees, Contingent, Total) with the K* calcs, using the wide background and the 30 px grid (8.2a). Then 8.3 (Trend follows the selected group; Turnover follows the group and hides groups under 20 people, no 0.0% rows), then section 9 (tie-out line), cleanup (stale calcs, parameters, actions), section 11 check table and section 12 publish.
+**Open follow-ups (small):** (1) `Period Name` still prints "Jan 2025 – Mar 2025" for a quarter while the Period field says "FY25 Q3"; see 8.5 for the quarter branch. (2) Apply the same toggle, KPI hover tooltips and type rule to Dashboard #2. (3) Cleanup of leftover calcs, sheets and actions: see section 13.
 
 ## Checkpoints
 
@@ -1219,3 +1219,24 @@ Commercial turnover rows (one level below): Sales 14.9%, Client Services 14.8%. 
 | 8 | Same selections on Dashboard #2 | Same opening, closing and "still here" numbers |
 
 Publish: reset the dashboard, hide all sheets, **File > Save to Tableau Public As...** `arcadia_headcount_fte_walk` (same name keeps the URL), extracts only. Check the page in the browser with the test table, Tableau Public row by row.
+
+## 13. Wrap-up: cleanup, decisions and lessons
+
+**Cleanup rule (Tableau tells you what is live).** Right-click a calc > Delete. The dialog lists every field and sheet that depends on it. If it lists `KPI cards`, `Dashboard`, `Waterfall`, `Trend` or `Turnover by Function`, or a field you keep: **No**. If it lists nothing, only `CheckList`, or only other calcs on the delete list: **Yes**. This is more reliable than guessing from names: `K EE Share Str` (card 5) and `K Net Pct` / `K Net Pct Str` (the teal note on card 1) looked dead and are not; `Net Change %` is used only by the test sheet and goes.
+
+**Delete:** the FTE and part-time calcs (`K Close PT`, `K Part Time Gap`, `K Gap T`, `K FTE T`, `K Close FTE`, `K Hires FTE`, `K Hires FTE Str`, `K Leavers Vol FTE`, `K Vol FTE Str`, `TT Level FTE`), the Expand/Collapse calcs and the four Expand/Collapse sheets, `Measure Option`, `Option State`, the old `Measure` parameter, `Net Change %`, and the orphan action `Set collapse` (no source sheet). Keep every `kpi_` parameter, `p_Expand` (the Summary | By driver toggle runs on it) and all `Deselect ...` actions. Region Walk has nothing to delete.
+
+**Actions check.** `Close info on ✕` must have source `Popover Close Info`; `Close period on ✕` has source `Popover Close`. A wrong source sheet is the usual reason a ✕ does nothing.
+
+**Design decisions worth knowing**
+
+| Decision | Why |
+|---|---|
+| KPI tooltips are floating hover sheets | Tooltips do not fire on map-layer marks. Each hover sheet is transparent, sits over its card and carries the card's `KPI N Tip`; a `zzTrue`/`zzFalse` Deselect action stops the click highlight |
+| Trend shows four labels on dots, not a line label | A line label collides with the line; dual axis with small bordered dots keeps the numbers readable; a reference line (`Trend Top`) adds headroom |
+| Turnover is capped at 10 rows, Standard fit, fixed row height | The department view has 22 countries; Entire View made 2 bars huge and 8 bars thin. Fixed row height and a fixed label column keep every view alike |
+| Title 12 semibold navy, subtitle 9 book slate, caption 8 book slate | One type rule across the three cards |
+| Header secondary text `#B8C4D6`, footnote slate | The subtitle and the SELECT headings drifted apart before |
+| KPI 3 title follows the period | "Voluntary turnover" for 12 months or more, "(annualized)" below that, so a quarter and a year compare on one scale |
+| Hires per leaver replaces the old hires/FTE card | FTE equals headcount in release 3; the new ratio reads as a trend signal (1.35 FY26) |
+
