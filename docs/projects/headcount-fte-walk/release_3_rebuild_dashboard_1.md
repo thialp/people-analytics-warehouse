@@ -520,7 +520,7 @@ The top bar has no room for #2's six-row view list, so the view list moves into 
 1. Sheet `View List` (Region Walk): Marks **Text**. Rows: `view_name`, sorted by `view_order` (Field, Minimum). Text: `View Display`. Filter `View Offered` = True and `Period Is Current` = True. Detail: `view_name`, `Default Group`, `zzTrue`, `zzFalse`. Font Tableau Book 10 `#B8C0CC`; the current row Semibold white (Color: `ATTR([view_name] = [p_View])`, True white, False `#B8C0CC`). Headers hidden, shading None, tooltip off.
 2. Sheet `Group Panel`: copy #2's ([rail_group_picker_build.md](../compensation-walk/rail_group_picker_build.md) 2.4) on Region Walk. Filters `Group In View` = True and `Period Is Current` = True. Detail `group_name`, `Close Panel`, `zzTrue`, `zzFalse`. Colors on navy: current white Semibold, others `#B8C0CC`.
 3. Sheet `Group Heading 2`: Text `<Panel Title>`, Bold 12 white.
-4. Container `Group Popover`: **x 698, y 76, w 620, h 330** (left edge under the Group field), navy style, visibility `p_GroupOpen`. Header row (`Group Heading 2` + ✕ sheet), then a horizontal container: `View List` (140 wide) and `Group Panel`.
+4. Container `Group Popover`: **x 610, y 76, w 760, h 330** (right edge 1370; wide enough for 3 columns of long department names), navy style, visibility `p_GroupOpen`. Header row (`Group Heading 2` + ✕ sheet), then a horizontal container: `View List` (140 wide) and `Group Panel`.
 
 | Name | Source | Target | Field |
 |---|---|---|---|
@@ -529,9 +529,12 @@ The top bar has no room for #2's six-row view list, so the view list moves into 
 | Group opens, info closes | Group Field | `p_InfoOpen` | `Close Panel` |
 | Set view | View List | `p_View` | `view_name` |
 | Set group from view | View List | `p_Group` | `Default Group` |
+| Keep panel open unless All | View List | `p_GroupOpen` | `Keep Group Panel Open` |
 | Set group | Group Panel | `p_Group` | `group_name` |
 | Close on group pick | Group Panel | `p_GroupOpen` | `Close Panel` |
 | Close group on ✕ | Popover Close (group) | `p_GroupOpen` | `Close Panel` |
+
+Calc `Keep Group Panel Open` = `[view_name] <> "Company"` (add it to `View List` Detail): picking **All** applies at once and closes the popover (there is nothing else to choose); every other view keeps it open for the group pick.
 
 Picking a view keeps the popover open and pre-selects the first group (alphabetical), so the cards are never blank; picking Company sets `Arcadia Systems`, which the lists show as **All organizations**: on `Group Panel` and `View List` right-click the `group_name` field (Region Walk) > **Aliases...** > `Arcadia Systems` = `All organizations` (close the popover with ✕ or pick again). 
 
