@@ -664,9 +664,19 @@ ELSE "Opening + joined − left ± moves = closing · grouped view; By driver sh
 ```
 Shapes: `seg_detail_summary_on/off.png` and `seg_detail_drivers_on/off.png` (generator `docs/brand/build/make_detail_toggle_shapes.py`), copied to `~/Documents/My Tableau Repository/Shapes/Arcadia`.
 
+Tooltip calc (so a reader can hover to learn what a driver is):
+```
+// Detail Tip
+CASE [Detail Option]
+WHEN "summary" THEN "Summary" + CHAR(10) + "Groups the changes into Joined, Left and Moved (net), so the walk reads in one glance."
+WHEN "drivers" THEN "By driver" + CHAR(10) + "A driver is one reason the headcount changed: hires, conversions, voluntary or involuntary leavers, internal moves. This view shows each of the " + STR([WF Driver Count]) + " drivers as its own bar."
+END
+```
+On `Detail Toggle`: `Detail Tip` on Detail; Worksheet > Tooltip text `<Detail Tip>` (Book 9 navy; first line Semibold), no command buttons.
+
 Sheet `Detail Toggle`, built like `Workforce Toggle` (6.3): `Detail Option` on Columns (manual sort: summary, drivers), filter out Null, mark type Shape, `Detail Shape` on Shape (assign the four files), `Detail Pick`, `zzTrue`, `zzFalse` on Detail, tooltip off, Entire View, shading and borders None.
 
-Dashboard: floating item `Detail Toggle`, **x 672, y 198, w 152, h 24** (12 px inside the waterfall card's top-right corner at 836), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
+Dashboard: floating item `Detail Toggle`, **x 672, y 205, w 152, h 24** (12 px inside the waterfall card's top-right corner at 836; y 205 centres it on the first title line), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
 
 ### 8.2 KPI cards
 
@@ -903,7 +913,7 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 12 | KPI background image | 0 | 78 | 1400 | 110 | new wide image (8.2a) |
 | 13 | KPI cards | 0 | 78 | 1400 | 110 | geometry parameters per 8.2a |
 | 14 | Waterfall | 30 | 188 | 806 | 624 | unchanged; bottom padding 64 |
-| 15 | Detail Toggle (Summary \| By driver) | 672 | 198 | 152 | 24 | Background `#ECEBE5`, radius 12 |
+| 15 | Detail Toggle (Summary \| By driver) | 672 | 205 | 152 | 24 | Background `#ECEBE5`, radius 12 |
 | 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
 | 17 | Trend | 852 | 188 | 518 | 300 | unchanged |
 | 18 | Turnover | 852 | 500 | 518 | 312 | unchanged |
