@@ -440,14 +440,19 @@ Source Headcount Walk.
 
 ```
 // Worker Words   CASE [p_Worker] WHEN "Employees" THEN "employees" WHEN "Contingent" THEN "contingent workers" ELSE "employees and contingent workers" END
-// Page Subtitle  [p_Group] + " · " + [Worker Words] + " · data as of " + "Jun 30, 2026"
 // TT Open Day    LEFT(DATENAME('month',[p_From]),3) + " " + STR(DAY([p_From])) + ", " + STR(YEAR([p_From]))
 // TT Close Day   LEFT(DATENAME('month',[p_To]),3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
 ```
 `TT Open Day` and `TT Close Day` are used here, in 8.2 and in section 9; create them now (both on Headcount Walk) and skip them there.
+
+```
+// Page Subtitle  the two dates the whole page compares (the period is no longer named in the header)
+"Opening " + [TT Open Day] + " → Closing " + [TT Close Day]
+```
+The header carries the **dates**, not "data as of": every card, the waterfall and the charts use this period, so it belongs next to the Period field. "Data as of Jun 30, 2026" moves to the footnote (section 10, item 19). The group and the workforce type are already visible in the View field and the Workforce toggle, so the subtitle does not repeat them.
 (Optional later: read the as-of date from Region Walk's `report_as_of_date` with the blend, as #2 does.)
 
-Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 8 `#C9D1DC` (Book 9 clips at 275 px wide: "data as of Jun 3…"). Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Line 2 stays on one line at this width; a long group name wraps to a second line.
+Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 8 `#C9D1DC` (the longest text, "Opening Mar 31, 2024 → Closing Mar 31, 2025", fits at this width; anything longer, such as a "data as of" clause, clips). Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Two lines only (title 18 plus the dates line); a third line forces the title down to 14, which weakens the header.
 
 **Tooltip "How to read this page"** (the default tooltip prints raw field names and repeats the subtitle; replace it). `TT Open Day` and `TT Close Day` are the two calcs just above:
 
@@ -494,7 +499,7 @@ Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and sh
 
 ### 7.1 Period popover (copy of #2's)
 
-Each popover opens directly under its own control (left edge aligned with the field, top at y 76, the bottom of the band); the Info panel is right-aligned to the page margin (x 990, right edge 1370).
+Each popover opens directly under its own control (left edge aligned with the field, top at y 76, the bottom of the band); the Info panel is right-aligned to the page margin (x 960, w 410, right edge 1370).
 
 Sheets on **Region Walk**, built exactly as [rail_controls_build.md](../compensation-walk/rail_controls_build.md) Part 4.3: `Span List`, `Period Panel`, `Popover Close` (shape `btn_close_light`, Detail `Close Panel`, `zzTrue`, `zzFalse`, tooltip `Close`). Title text object "Select a period"; note line 9 pt `#8FA0B8`: "Fiscal year runs July to June. Each option compares two month-ends. Data through Jun 30, 2026."
 
@@ -517,10 +522,10 @@ Period actions (Dashboard > Actions, all Run on **Select**, Clearing **Keep curr
 
 The top bar has no room for #2's six-row view list, so the view list moves into the popover, laid out like the period popover (choice of kind on the left, options on the right).
 
-1. Sheet `View List` (Region Walk): Marks **Text**. Rows: `view_name`, sorted by `view_order` (Field, Minimum). Text: `View Display`. Filter `View Offered` = True and `Period Is Current` = True. Detail: `view_name`, `Default Group`, `zzTrue`, `zzFalse`. Font Tableau Book 10 `#B8C0CC`; the current row Semibold white (Color: `ATTR([view_name] = [p_View])`, True white, False `#B8C0CC`). Headers hidden, shading None, tooltip off.
+1. Sheet `View List` (Region Walk): Marks **Text**. Rows: `view_name`, sorted by `view_order` (Field, Minimum). Text: `View Display`. Filter `View Offered` = True and `Period Is Current` = True. Detail: `view_name`, `Default Group`, `zzTrue`, `zzFalse`. **No Color field**, like `Span List`: the current view is shown by the `›` that `View Label` puts in front of it. Set the look in the label, not in Format: Marks > **Text** > **...** (Edit Label) > Tableau Book 10, colour `#B8C0CC`; leave Format > Font at its defaults (a Format override beats the label and blocks the change). Why no Color: Tableau draws the hover outline in the mark's colour, so a grey or white Color field gives a bright outline on the navy popover, while no Color gives the default black, which disappears on navy (as on `Span List`). Headers hidden, shading None, tooltip off.
 2. Sheet `Group Panel`: copy #2's ([rail_group_picker_build.md](../compensation-walk/rail_group_picker_build.md) 2.4) on Region Walk. Filters `Group In View` = True and `Period Is Current` = True. Detail `group_name`, `Close Panel`, `zzTrue`, `zzFalse`. Colors on navy: current white Semibold, others `#B8C0CC`.
 3. Sheet `Group Heading 2`: Text `<Panel Title>`, Bold 12 white.
-4. Container `Group Popover`: **x 698, y 76, w 620, h 330** (left edge under the Group field), navy style, visibility `p_GroupOpen`. Header row (`Group Heading 2` + ✕ sheet), then a horizontal container: `View List` (140 wide) and `Group Panel`.
+4. Container `Group Popover`: **x 610, y 76, w 760, h 330** (right edge 1370; wide enough for 3 columns of long department names), navy style, visibility `p_GroupOpen`. Header row (`Group Heading 2` + ✕ sheet), then a horizontal container: `View List` (140 wide) and `Group Panel`.
 
 | Name | Source | Target | Field |
 |---|---|---|---|
@@ -529,9 +534,14 @@ The top bar has no room for #2's six-row view list, so the view list moves into 
 | Group opens, info closes | Group Field | `p_InfoOpen` | `Close Panel` |
 | Set view | View List | `p_View` | `view_name` |
 | Set group from view | View List | `p_Group` | `Default Group` |
+| Keep panel open unless All | View List | `p_GroupOpen` | `Keep Group Panel Open` |
 | Set group | Group Panel | `p_Group` | `group_name` |
 | Close on group pick | Group Panel | `p_GroupOpen` | `Close Panel` |
 | Close group on ✕ | Popover Close (group) | `p_GroupOpen` | `Close Panel` |
+
+`Group Panel` filters on calc `Panel Shows Groups` = `[Group In View] AND [p_View] <> "Company"` (True) instead of `Group In View`, so with All selected the right-hand list is empty (it would only repeat "All organizations"); `Group Field` keeps `Group In View`.
+
+Calc `Keep Group Panel Open` = `[view_name] <> "Company"` (add it to `View List` Detail): picking **All** applies at once and closes the popover (there is nothing else to choose); every other view keeps it open for the group pick.
 
 Picking a view keeps the popover open and pre-selects the first group (alphabetical), so the cards are never blank; picking Company sets `Arcadia Systems`, which the lists show as **All organizations**: on `Group Panel` and `View List` right-click the `group_name` field (Region Walk) > **Aliases...** > `Arcadia Systems` = `All organizations` (close the popover with ✕ or pick again). 
 
@@ -615,18 +625,56 @@ END
 // Collapse Label   "Collapse · " + STR([WF Group Count]) + IIF([WF Group Count] = 1, " group", " groups")
 ```
 
-Edit the existing waterfall calcs: in `Waterfall Position`, `Bar Type`, `Move Label`, `Level Label` and `TT Context`, replace `ATTR([Movement Category])` by `ATTR([WF Bar])`. Delete `Show Category`.
+Edit the existing waterfall calcs: in `Waterfall Position`, `Bar Type`, `Move Label` and `Level Label`, replace `ATTR([Movement Category])` by `ATTR([WF Bar])`. Delete `Show Category`.
+
+**Tooltip calcs: fix them from the bottom of the chain up.** `TT Context` reads `TT Net Str`, `TT Share Str` and `TT Noun`; those read `TT Open Ref` and `TT Close Ref`; and the two Refs still read the release 2 `WF FTE Open` / `WF FTE Close`, which is why they are red and why Tableau will not let you delete the FTE calcs yet. In this order:
+1. `TT Unit` = `"people"` and `TT Noun` = `"headcount"` (constants: every employee is 1.0 FTE).
+2. `TT Open Ref` = `[WF Open]` and `TT Close Ref` = `[WF Close]`. `TT Net Str`, `TT Share Str` and `TT Context` stop being red as soon as these two are saved.
+3. `TT Context`, replacing the whole formula (the `FTE Changes` branch is gone, as that category no longer exists):
+```
+// TT Context
+CASE ATTR([WF Bar])
+WHEN "Opening" THEN "Active at the end of " + [TT Open Month]
+WHEN "Closing" THEN "Active at the end of " + [TT Close Month] + " · " + [TT Net Str] + " vs opening"
+ELSE [TT Share Str] + " of opening " + [TT Noun] + " · about " +
+     STR(INT(ROUND(ABS(SUM([Walk Value])) / MAX([TT Months]), 0))) + " per month"
+END
+```
+4. Check `TT Open Month` and `TT Close Month` read `[p_From]` and `[p_To]` (month and year of each), not the old `[Start Month]` / `[End Month]`.
+5. Delete `TT Level PT`, `TT Part Time` and `TT Bar T` (Part Time and the FTE-in-tenths helper do not exist in release 3). Then the `WF FTE ...` calcs delete without a warning, except `WF FTE Open Str` and `WF FTE Close Str`, which `WF Caption` still uses until section 10.
 
 Sheet `Waterfall`:
 
 1. Columns: replace `Movement Category` with `WF Bar`; sort **Field** `WF Order`, Minimum, Ascending.
 2. `Waterfall Position`: Edit Table Calculation > Specific Dimensions > `WF Bar` only.
 3. Filters: `WF Moves Hidden` = False (dimension filter), and a calc `WF Non Zero` = `SUM([Walk Value]) <> 0 OR ATTR([WF Bar]) = "Opening" OR ATTR([WF Bar]) = "Closing"` = True (drops the zero bars: Moved at Company, Converted in Total). A zero bar adds nothing to the running sum, so dropping it does not move the others.
-4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, Conversions → `From contingent` (Employees) — in Contingent it reads "Conversions" (−270), which is clear on its own.
+4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, do **not** alias Conversions: the same bar is +270 in Employees (people from contingent) and −270 in Contingent (people who became employees), and an alias cannot change with the workforce type. It stays "Conversions".
 5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`. If the expanded chart shows too many labels, raise the axis font to Tableau Book 10 (Format > Scale) or hide the axis header: every bar has its value. Never set a fixed interval.
 6. Title line 2 (Book 9 slate): `Opening + joined − left ± moves = closing · axis starts at zero`.
+7. Tooltip: `TT Unit`, `TT Context` and `Walk Value` must all sit on Detail or Tooltip (a pill that went red while editing is dropped silently; check the Marks card after the calcs turn green). Text: `<Movement Category>` Semibold 12 navy, `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy, `<AGG(TT Context)>` Book 9 slate. The bar name in the tooltip is `WF Bar` in compact mode (Joined, Left, Moved (net)).
+8. Axis format: Format > Axis > Numbers > Custom `#,##0` (not `#,##0,"k"`: a 849-person group would show a single "0k" tick).
 
-Expand / Collapse buttons: copy #2's construction (build_status.md, "Expand / Collapse look like buttons"): two horizontal containers `Btn Expand ALL` and `Btn Collapse ALL`, identical size **150 × 24**, each = a text sheet (`Expand Label` / `Collapse Label`, Semibold 9 navy) + an icon sheet (`btn_expand_icon` / `btn_collapse_icon`, 16 × 16). Calcs `Expand To` = TRUE and `Collapse To` = FALSE, on Detail with `zzTrue`, `zzFalse`; actions **Set expand** (`p_Expand` ← `Expand To`) from both Expand sheets and **Set collapse** (`p_Expand` ← `Collapse To`) from both Collapse sheets. Visibility, as on #2: `Btn Collapse ALL` > **Control visibility using value** = `p_Expand`; `Btn Expand ALL` > Control visibility using value = calc `Is Compact` (= `NOT [p_Expand]`). Both sit on the same spot at the waterfall card's top right (section 10).
+Expand / Collapse buttons (same construction as #2: a text sheet and a 16 px icon sheet side by side in one container, identical sizes so nothing jumps).
+
+Calcs (Headcount Walk):
+```
+// Expand Label     "Expand · " + STR([WF Driver Count]) + " drivers"
+// Collapse Label   "Collapse · " + STR([WF Group Count]) + IIF([WF Group Count] = 1, " group", " groups")
+// Expand To        TRUE
+// Collapse To      FALSE
+// Is Compact       NOT [p_Expand]
+// Expand Icon      "btn_expand_icon"
+// Collapse Icon    "btn_collapse_icon"
+```
+Four sheets, each with one mark (constants on Detail collapse to one mark), Entire View, shading None, borders None, tooltip off:
+| Sheet | Mark | Marks card | Detail |
+|---|---|---|---|
+| `Expand Text` | Text | `Expand Label` on Text, Tableau Semibold 9 navy | `Expand To`, `zzTrue`, `zzFalse` |
+| `Expand Icon` | Shape | `Expand Icon` on Shape (assign `btn_expand_icon`, palette Arcadia), Size max | `Expand To`, `zzTrue`, `zzFalse` |
+| `Collapse Text` | Text | `Collapse Label` on Text, same font | `Collapse To`, `zzTrue`, `zzFalse` |
+| `Collapse Icon` | Shape | `Collapse Icon` on Shape (assign `btn_collapse_icon`), Size max | `Collapse To`, `zzTrue`, `zzFalse` |
+
+Dashboard: two floating horizontal containers `Btn Expand ALL` and `Btn Collapse ALL`, each **x 686, y 198, w 150, h 24** (the same spot): text sheet (about 126 wide) then icon sheet (24 wide, the icon 16 × 16), a soft border and corner radius on the container, like #2. Visibility (container dropdown > **Control visibility using value**): `Btn Collapse ALL` = `p_Expand`; `Btn Expand ALL` = `Is Compact`. Actions (Change Parameter, Run on Select, Keep current value): **Set expand** (sources `Expand Text` and `Expand Icon`; `p_Expand` ← `Expand To`) and **Set collapse** (sources `Collapse Text` and `Collapse Icon`; `p_Expand` ← `Collapse To`); then one Deselect filter action for each of the four sheets (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
 
 ### 8.2 KPI cards
 
@@ -696,7 +744,7 @@ Replace `Function Name` on Rows with `TO Dim`; `TO Top Function` → rename `TO 
 
 ### 8.4 Info popover (replaces the white Info Panel)
 
-Container `Info Popover`, navy style (0.5), **x 990, y 76, w 380, h 470**, visibility `p_InfoOpen`, front. Header row: title "How to read this page" + ✕ (`Popover Close` for info). Body (one Text object, 10 pt):
+Container `Info Popover`, navy style (0.5), **x 960, y 76, w 410, h 571** (as built: 410 wide so the paragraphs wrap in fewer lines; right edge 1370 = page margin), visibility `p_InfoOpen`, front. Item hierarchy: `Info Popover` > `Info Popover Header` (title text + `Popover Close Info`, a duplicate of `Popover Close Group`) and `Info Popover Panel` (the body text). Header row: title "How to read this page" + ✕ (`Popover Close Info`; action `Close info on ✕` and `Deselect Popover Close Info` use it). Body (one Text object, 10 pt):
 
 > **Period.** Every number compares two month-ends: the walk opens on the first and closes on the second. Arcadia's fiscal year runs July to June.
 >
@@ -722,7 +770,46 @@ ELSE LEFT(DATENAME('month', DATEADD('day', 1, [p_From])), 3) + " " + STR(YEAR(DA
      LEFT(DATENAME('month', [p_To]), 3) + " " + STR(YEAR([p_To]))
 END
 ```
-`WF Period` → replace its formula with `[Period Name]`. `WF Title` for Employees stays the published sentence; for Contingent: `[Period Name] + ": " + starts + " starts, " + ends + " ends, net " + ...`; for Total: `[Period Name] + ": " + joined + " joined, " + left + " left, adding " + net + " people"`.
+`WF Period` → replace its formula with `[Period Name]` (create `Period Name` first).
+
+**Why the title currently reads "+30005 FTE net".** The release 2 `WF Title` tests `[Measure] = "Headcount"`. After `Measure` became `p_Worker` that test is never true, so the title falls to its FTE branch, where `WF FTE Open` is 0 (it still looks for the old start month) and the net is the whole closing figure. Rewrite the calc as below; the FTE branch and the FTE helpers then go away.
+
+Two new helpers (Headcount Walk), scoped by the toggle automatically because `In Range` already contains `Worker In Scope`:
+```
+// WF Joined   (Employees: hires · Contingent: starts · Total: both; a conversion nets to zero in Total)
+ZN({ FIXED : SUM(IF [In Range] AND ([Movement Category] = "Hires" OR [Movement Category] = "Starts") THEN [Headcount] END) })
+```
+```
+// WF Left     (leavers, ends; for Contingent a conversion to employee counts as a leaver, as the compact waterfall does)
+ZN({ FIXED : -SUM(IF [In Range] AND ([Movement Category] = "Voluntary Terminations" OR [Movement Category] = "Involuntary Terminations"
+                                      OR [Movement Category] = "Ends"
+                                      OR ([p_Worker] = "Contingent" AND [Movement Category] = "Conversions")) THEN [Headcount] END) })
+```
+Their text twins, same comma pattern as `WF Hires Str` (create `WF Joined Str` on `[WF Joined]` and `WF Left Str` on `[WF Left]`):
+```
+// WF Joined Str
+IF [WF Joined] >= 1000
+THEN STR(DIV(INT([WF Joined]), 1000)) + "," + RIGHT("00" + STR(INT([WF Joined]) % 1000), 3)
+ELSE STR(INT([WF Joined])) END
+```
+Then **edit** `WF Title` (replace the whole formula):
+```
+// WF Title
+IF NOT [K Valid] THEN "Choose a start month on or before the end month"
+ELSEIF [p_Worker] = "Employees" THEN
+     [WF Period] + ": " + [WF Hires Str] + " hires " +
+     IF [WF Hires] >= [WF Leavers] THEN "outpaced " ELSE "fell short of " END +
+     [WF Leavers Str] + " leavers, " +
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " person", " people")
+ELSEIF [p_Worker] = "Contingent" THEN
+     [WF Period] + ": " + [WF Joined Str] + " starts, " + [WF Left Str] + " ended or converted, " +
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " contingent worker", " contingent workers")
+ELSE
+     [WF Period] + ": " + [WF Joined Str] + " joined, " + [WF Left Str] + " left, " +
+     IF [WF Close] >= [WF Open] THEN "adding " ELSE "removing " END + [WF Net Str] + IIF([WF Net Str] = "1", " person", " people")
+END
+```
+`WF Net Str` (`ABS([WF Close] - [WF Open])`) already follows the toggle. Check: Employees FY26 Company reads the first row of the table below; Total reads 11,998 joined, 9,197 left, adding 2,801 people.
 
 | Selection | Waterfall title |
 |---|---|
@@ -806,7 +893,7 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
 | 17 | Trend | 852 | 188 | 518 | 300 | unchanged |
 | 18 | Turnover | 852 | 500 | 518 | 312 | unchanged |
-| 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic." Book 8 slate |
+| 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Data as of Jun 30, 2026 · Arcadia Systems is a fictional company. All data is synthetic." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
 | 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
 
 Item order (Layout pane, bottom to top): background, cards, charts, buttons, header controls, popovers last.
@@ -853,7 +940,7 @@ Commercial turnover rows (one level below): Sales 14.9%, Client Services 14.8%. 
 | 2 | Click each toggle option, Expand, Collapse, a title, the KPI band | Nothing stays highlighted |
 | 3 | Open Period, then Group, then Info | Only the last one is open |
 | 4 | Period > Quarter > FY26 Q4 | Field "FY26 Q4", opening 29,618, closing 30,005 |
-| 5 | View > Function > Commercial | Title "Commercial · employees · data as of Jun 30, 2026"; numbers per section 11; turnover by sub-function |
+| 5 | View > Function > Commercial | Header subtitle shows the opening and closing dates of the period; numbers per section 11; turnover by sub-function |
 | 6 | Total | Card 1 41,946; waterfall Joined 11,998, Left 9,197; note "The Compensation Walk covers employees only." |
 | 7 | Reset | FY26, Company, Employees, compact, all popovers closed |
 | 8 | Same selections on Dashboard #2 | Same opening, closing and "still here" numbers |
