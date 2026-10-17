@@ -10,7 +10,7 @@ Writes to docs/brand/shapes/Arcadia/ and a preview to docs/brand/build/button_pr
 | File | Cell on the dashboard | Drawn at | Used by |
 |---|---|---|---|
 | seg_worker_{employees,contingent,total}_{on,off} | 80 x 32 | 320 x 128 (label 12 px) | #1 top bar, Worker toggle (capsule #243A57) |
-| fld_top | 180 x 32 | 720 x 128 | #1 top bar, Period Field and Group Field (white capsule, same radius as the toggle and Reset) |
+| fld_top | 180 x 36 | 720 x 144 (box 128 tall, 16 transparent rows on top so the label rides 2 px higher) | #1 top bar, Period Field and Group Field (white capsule, same radius as the toggle and Reset) |
 | fld_rail | 200 x 30 | 800 x 120 | #2 rail, Period Field and Group Field (#E4E3DD, radius as the toggles) |
 | btn_reset_top_label | 184 x 32 | 736 x 128 | #1 top bar, Reset (outlined capsule: arrow + "Reset to default view") |
 | btn_reset_top | 32 x 32 | 128 x 128 | Spare: arrow only, for a narrow header |
@@ -64,13 +64,15 @@ for key, label in (("employees", "Employees"), ("contingent", "Contingent"), ("t
 
 
 # 2. Field backgrounds (the text is the mark's label, laid over the image)
-def field(name, w, h, fill, radius):
-    im, d = canvas(w, h)
-    d.rounded_rectangle((0, 0, w * S - 1, h * S - 1), radius=radius * S, fill=fill)
-    save(im, w, h, name)
+def field(name, w, h, fill, radius, drop=0):
+    """drop = extra transparent rows above the box (4x grid px). Tableau centres the label on the image,
+    so drawing the box lower moves the text up inside it."""
+    im, d = canvas(w, h + drop)
+    d.rounded_rectangle((0, drop * S, w * S - 1, (h + drop) * S - 1), radius=radius * S, fill=fill)
+    save(im, w, h + drop, name)
 
 
-field("fld_top", 720, 128, WHITE, 64)
+field("fld_top", 720, 128, WHITE, 64, drop=16)  # 16 grid px of padding above = box sits 2 dashboard px below the canvas centre, so the label rides 2 px higher in it
 field("fld_rail", 800, 120, WASH, 14)
 
 

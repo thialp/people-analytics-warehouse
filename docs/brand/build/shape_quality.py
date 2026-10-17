@@ -24,11 +24,15 @@ def out_size(w, h):
 
 
 def finish(im, w, h):
-    """Shrink a supersampled canvas to the delivered size and sharpen lightly (alpha untouched)."""
+    """Shrink a supersampled canvas to the delivered size and sharpen the edges lightly.
+
+    Sharpening is applied to the alpha channel (the edge coverage) and never to the colour channels.
+    Colour channels under transparent pixels are black, so sharpening them draws a dark fringe around
+    white text on a navy bar and makes it look thinner and softer."""
     ow, oh = out_size(w, h)
     im = im.resize((ow, oh), Image.LANCZOS)
     if SHARPEN:
         r, g, b, a = im.split()
-        rgb = Image.merge("RGB", (r, g, b)).filter(ImageFilter.UnsharpMask(radius=0.6, percent=60, threshold=0))
-        im = Image.merge("RGBA", (*rgb.split(), a))
+        a = a.filter(ImageFilter.UnsharpMask(radius=0.7, percent=90, threshold=0))
+        im = Image.merge("RGBA", (r, g, b, a))
     return im

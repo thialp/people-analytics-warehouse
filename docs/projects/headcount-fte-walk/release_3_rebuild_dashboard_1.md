@@ -85,7 +85,7 @@ Click flow after the fix: the click fires the parameter action, then the self fi
 
 | File | Size on the dashboard | Used for |
 |---|---|---|
-| `fld_top.png` | 180 × 32 | #1 Period and Group fields (white capsule, same radius as the toggle) |
+| `fld_top.png` | 180 × 36 | #1 Period and Group fields (white capsule, 32 tall, drawn 2 px below the centre so the label sits optically centred) |
 | `fld_rail.png` | 200 × 30 | #2 Period and Group fields (`#E4E3DD`, rounded like the toggles) |
 | `seg_worker_employees_on/off`, `seg_worker_contingent_on/off`, `seg_worker_total_on/off` | 80 × 32 each | #1 Workforce toggle (capsule `#243A57`) |
 | `btn_reset_top_label.png` | 184 × 32 | #1 Reset (outlined capsule: arrow + "Reset to default view") |
