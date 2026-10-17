@@ -29,7 +29,8 @@ def info(path, closed):
     N = 128
     im = Image.new("RGBA", (N*S, N*S), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.ellipse((8*S, 8*S, (N-8)*S, (N-8)*S), outline=WHITE, width=7*S)
+    RING = (255, 255, 255, 120)  # same outline weight/tone as the Reset capsule
+    d.ellipse((3*S, 3*S, (N-3)*S, (N-3)*S), outline=RING, width=4*S)
     if closed:  # "X" when the panel is open
         for a, b in (((40, 40), (88, 88)), ((88, 40), (40, 88))):
             d.line([(a[0]*S, a[1]*S), (b[0]*S, b[1]*S)], fill=WHITE, width=8*S)
