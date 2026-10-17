@@ -648,13 +648,33 @@ Sheet `Waterfall`:
 1. Columns: replace `Movement Category` with `WF Bar`; sort **Field** `WF Order`, Minimum, Ascending.
 2. `Waterfall Position`: Edit Table Calculation > Specific Dimensions > `WF Bar` only.
 3. Filters: `WF Moves Hidden` = False (dimension filter), and a calc `WF Non Zero` = `SUM([Walk Value]) <> 0 OR ATTR([WF Bar]) = "Opening" OR ATTR([WF Bar]) = "Closing"` = True (drops the zero bars: Moved at Company, Converted in Total). A zero bar adds nothing to the running sum, so dropping it does not move the others.
-4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, Conversions → `From contingent` (Employees) — in Contingent it reads "Conversions" (−270), which is clear on its own.
+4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, do **not** alias Conversions: the same bar is +270 in Employees (people from contingent) and −270 in Contingent (people who became employees), and an alias cannot change with the workforce type. It stays "Conversions".
 5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`. If the expanded chart shows too many labels, raise the axis font to Tableau Book 10 (Format > Scale) or hide the axis header: every bar has its value. Never set a fixed interval.
 6. Title line 2 (Book 9 slate): `Opening + joined − left ± moves = closing · axis starts at zero`.
 7. Tooltip: `TT Unit`, `TT Context` and `Walk Value` must all sit on Detail or Tooltip (a pill that went red while editing is dropped silently; check the Marks card after the calcs turn green). Text: `<Movement Category>` Semibold 12 navy, `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy, `<AGG(TT Context)>` Book 9 slate. The bar name in the tooltip is `WF Bar` in compact mode (Joined, Left, Moved (net)).
 8. Axis format: Format > Axis > Numbers > Custom `#,##0` (not `#,##0,"k"`: a 849-person group would show a single "0k" tick).
 
-Expand / Collapse buttons: copy #2's construction (build_status.md, "Expand / Collapse look like buttons"): two horizontal containers `Btn Expand ALL` and `Btn Collapse ALL`, identical size **150 × 24**, each = a text sheet (`Expand Label` / `Collapse Label`, Semibold 9 navy) + an icon sheet (`btn_expand_icon` / `btn_collapse_icon`, 16 × 16). Calcs `Expand To` = TRUE and `Collapse To` = FALSE, on Detail with `zzTrue`, `zzFalse`; actions **Set expand** (`p_Expand` ← `Expand To`) from both Expand sheets and **Set collapse** (`p_Expand` ← `Collapse To`) from both Collapse sheets. Visibility, as on #2: `Btn Collapse ALL` > **Control visibility using value** = `p_Expand`; `Btn Expand ALL` > Control visibility using value = calc `Is Compact` (= `NOT [p_Expand]`). Both sit on the same spot at the waterfall card's top right (section 10).
+Expand / Collapse buttons (same construction as #2: a text sheet and a 16 px icon sheet side by side in one container, identical sizes so nothing jumps).
+
+Calcs (Headcount Walk):
+```
+// Expand Label     "Expand · " + STR([WF Driver Count]) + " drivers"
+// Collapse Label   "Collapse · " + STR([WF Group Count]) + IIF([WF Group Count] = 1, " group", " groups")
+// Expand To        TRUE
+// Collapse To      FALSE
+// Is Compact       NOT [p_Expand]
+// Expand Icon      "btn_expand_icon"
+// Collapse Icon    "btn_collapse_icon"
+```
+Four sheets, each with one mark (constants on Detail collapse to one mark), Entire View, shading None, borders None, tooltip off:
+| Sheet | Mark | Marks card | Detail |
+|---|---|---|---|
+| `Expand Text` | Text | `Expand Label` on Text, Tableau Semibold 9 navy | `Expand To`, `zzTrue`, `zzFalse` |
+| `Expand Icon` | Shape | `Expand Icon` on Shape (assign `btn_expand_icon`, palette Arcadia), Size max | `Expand To`, `zzTrue`, `zzFalse` |
+| `Collapse Text` | Text | `Collapse Label` on Text, same font | `Collapse To`, `zzTrue`, `zzFalse` |
+| `Collapse Icon` | Shape | `Collapse Icon` on Shape (assign `btn_collapse_icon`), Size max | `Collapse To`, `zzTrue`, `zzFalse` |
+
+Dashboard: two floating horizontal containers `Btn Expand ALL` and `Btn Collapse ALL`, each **x 686, y 198, w 150, h 24** (the same spot): text sheet (about 126 wide) then icon sheet (24 wide, the icon 16 × 16), a soft border and corner radius on the container, like #2. Visibility (container dropdown > **Control visibility using value**): `Btn Collapse ALL` = `p_Expand`; `Btn Expand ALL` = `Is Compact`. Actions (Change Parameter, Run on Select, Keep current value): **Set expand** (sources `Expand Text` and `Expand Icon`; `p_Expand` ← `Expand To`) and **Set collapse** (sources `Collapse Text` and `Collapse Icon`; `p_Expand` ← `Collapse To`); then one Deselect filter action for each of the four sheets (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
 
 ### 8.2 KPI cards
 
