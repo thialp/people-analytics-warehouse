@@ -973,7 +973,14 @@ ELSE "None" END
    - `AGG(Trend Pt)` card: **Circle**, small; `Pt Role` on **Color on this card only** (a pill on the `All` card would colour and split the line); Edit Colors: `Selected` `#13233A`, `Edge` `#8C8A84`, `None` any (it draws nothing); hide the legend. **Label**: show, Marks to Label **All**, Semibold 10, font colour Match Mark Color, alignment Top Center, Allow labels to overlap. Tooltip off.
    - Right-click the "nulls" badge > Hide Indicator.
 
-5. **Tooltip** (on the `SUM(Trend Value)` card only). Calcs: `Trend MoM` = `SUM([Trend Value]) - LOOKUP(SUM([Trend Value]), -1)` and `Trend MoM Pct` = `[Trend MoM] / LOOKUP(SUM([Trend Value]), -1)`, both Compute Using `month_end_date`; number formats `+#,##0;−#,##0;0` and `+0.0%;−0.0%;0.0%`. Text: line 1 `<month_end_date>` (Semibold 11 navy); line 2 `<SUM(Trend Value)>` (Book 10 navy); line 3 `<Trend MoM> (<Trend MoM Pct>) vs the previous month` (Book 9 slate). Remove `zzTrue`, `zzFalse`, `p_From`, `p_To` from the text.
+5. **Tooltip** (on the `SUM(Trend Value)` card only). Calcs (table calculations; the first month has no previous month, so it shows 0):
+```
+// Trend MoM
+IF ISNULL(LOOKUP(SUM([Trend Value]), -1)) THEN 0 ELSE SUM([Trend Value]) - LOOKUP(SUM([Trend Value]), -1) END
+// Trend MoM Pct
+IF ISNULL(LOOKUP(SUM([Trend Value]), -1)) THEN 0 ELSE ([Trend MoM]) / LOOKUP(SUM([Trend Value]), -1) END
+```
+**Compute Using (important).** Right-click each pill > Edit Table Calculation > **Specific Dimensions**, tick **`month_end_date` first, then `Pt Role`**, leave the rest unticked. With the default setting `Pt Role` splits the line into three groups and "previous month" means the previous *labelled* point: Mar 2025 showed +498 (the period change, vs Dec 2024) and Jun 2026 showed +9,874 (+30.8%, vs Jul 2021). Number formats `+#,##0;−#,##0;0` and `+0.0%;−0.0%;0.0%`. Text: line 1 `<month_end_date>` (Semibold 11 navy); line 2 `<SUM(Trend Value)>` (Book 10 navy); line 3 `<Trend MoM> (<Trend MoM Pct>) vs the previous month` (Book 9 slate). Remove `zzTrue`, `zzFalse`, `p_From`, `p_To` from the text. Check: Mar 2025 shows the change versus Feb 2025 (not +498), and Jun 2026 the change versus May 2026.
 
 6. **Optional: what drove the month.** `Trend Joined` = `SUM(IF [Officers Out] AND [In Group] AND [Worker In Scope] AND ([Movement Category] = "Hires" OR [Movement Category] = "Starts" OR ([p_Worker] = "Employees" AND [Movement Category] = "Conversions")) THEN [Headcount] END)`; `Trend Left` = `-SUM(IF [Officers Out] AND [In Group] AND [Worker In Scope] AND ([Movement Category] = "Voluntary Terminations" OR [Movement Category] = "Involuntary Terminations" OR [Movement Category] = "Ends" OR ([p_Worker] = "Contingent" AND [Movement Category] = "Conversions")) THEN [Headcount] END)`. Fourth tooltip line: `Joined <Trend Joined> · Left <Trend Left>` (formats `+#,##0`, `−#,##0`). With a group selected the remainder is moves between teams.
 
