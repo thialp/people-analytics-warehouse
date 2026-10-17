@@ -841,6 +841,14 @@ Group view note: "Internal moves" in a group counts moves **into** its teams, fr
 
 ### 8.3 Trend and Turnover
 
+**KPI 4 (Internal moves) is parked.** At Company the moves net to zero and are hidden on the waterfall, so "3,633 · 2,015 promotions · 1,618 other moves" is a number the page never explains. Candidate replacements that read as a story from a screenshot: **hires per leaver** (Employees 1.35 = 4,965 ÷ 3,668, the sentence in the waterfall title as a number) or a contingent **conversion** figure (270 contingent workers became employees). Decide after the Trend and Turnover are rebuilt.
+
+**8.3a Trend, step by step.**
+1. Calc `Trend Value` on Headcount Walk (below). It has no `In Period` test, so the line covers the whole history, and `Worker In Scope` makes it follow the Workforce toggle.
+2. On the `Trend` sheet replace `SUM([Selected Value])` on Rows with `SUM([Trend Value])`; do the same on the Label (last-point value) and in the tooltip.
+3. Calc `Trend Title`; on the dashboard item `Trend` edit the sheet title: delete the typed text and Insert > `Trend Title`.
+4. Checks: the last point equals Closing headcount on card 1 for Employees (30,005), Contingent (11,941) and Total (41,946); with the officers excluded the Employees line no longer ends at 41,955. Pick Commercial in View and the line drops to that group's size.
+
 **Trend:** add `Trend Value` = `IF [Officers Out] AND [In Group] AND [Worker In Scope] AND [Movement Category] = "Closing" THEN [Headcount] END` and put `SUM([Trend Value])` on Rows instead of `SUM([Selected Value])`. Band: `Band Start` = `[p_From]` (EDIT: the band now starts on the opening month-end). Title calc `Trend Title` = `"Closing " + CASE [p_Worker] WHEN "Employees" THEN "headcount" WHEN "Contingent" THEN "contingent workers" ELSE "workforce" END + " by month-end"`. Remove the hard-coded "FY24 restructuring" annotation or keep it only for Company (it marks a company event).
 
 **Turnover:** the rows become **one level below the selection**, so the chart always says something about what you picked:
