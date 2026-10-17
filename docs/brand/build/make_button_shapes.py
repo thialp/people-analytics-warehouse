@@ -95,9 +95,14 @@ save(im, 128, 128, "btn_reset_top")
 w, h = 736, 128
 im, d = canvas(w, h)
 d.rounded_rectangle((3 * S, 3 * S, (w - 3) * S, (h - 3) * S), radius=((h - 6) // 2) * S, outline=(255, 255, 255, 120), width=4 * S)
-reset_arrow(d, 66 * S, 66 * S, 21 * S, 6 * S, WHITE)
-f = ImageFont.truetype(FONT, 45 * S)
-d.text((106 * S, h * S // 2), "Reset to default view", font=f, fill=WHITE, anchor="lm")
+f = ImageFont.truetype(FONT, 52 * S)
+label = "Reset to default view"
+ar, gap = 22, 18                      # arrow radius and gap, px at 4x scale
+tw = d.textlength(label, font=f) / S
+group = 2 * ar + gap + tw
+x0 = (w - group) / 2                  # centre arrow + words as one group
+reset_arrow(d, int((x0 + ar) * S), 66 * S, ar * S, 6 * S, WHITE)
+d.text((int((x0 + 2 * ar + gap) * S), h * S // 2), label, font=f, fill=WHITE, anchor="lm")
 save(im, w, h, "btn_reset_top_label")
 
 w, h = 752, 120

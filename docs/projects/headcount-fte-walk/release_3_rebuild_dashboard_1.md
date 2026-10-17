@@ -447,7 +447,7 @@ Source Headcount Walk.
 `TT Open Day` and `TT Close Day` are used here, in 8.2 and in section 9; create them now (both on Headcount Walk) and skip them there.
 (Optional later: read the as-of date from Region Walk's `report_as_of_date` with the blend, as #2 does.)
 
-Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 9 `#C9D1DC`. Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Line 2 stays on one line at this width; a long group name wraps to a second line.
+Text mark; Text: line 1 `Headcount & FTE Walk` Tableau Bold 18 white; line 2 `<Page Subtitle>` Tableau Book 8 `#C9D1DC` (Book 9 clips at 275 px wide: "data as of Jun 3…"). Detail `zzTrue`, `zzFalse`, `Title Tip`. Shading None. Dashboard item 285 × 58, Entire View. Line 2 stays on one line at this width; a long group name wraps to a second line.
 
 **Tooltip "How to read this page"** (the default tooltip prints raw field names and repeats the subtitle; replace it). `TT Open Day` and `TT Close Day` are the two calcs just above:
 
@@ -484,7 +484,9 @@ Every control is 32 high on the same baseline (y 30) and shaped as a capsule or 
 | Reset | 1142 | 30 | 184 | 32 |
 | Info Button | 1338 | 30 | 32 | 32 |
 
-Gaps are 12 px between controls and 16 px between the logo/title and the fields; the logo sits on the left edge of the page grid (x 30) and Info on the right edge (1370). The whole page uses a **30 px margin** so the banner and the body are the same width. Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and shape legend (`Info Shape`) left on the dashboard: they are helpers for the actions, not part of the page. The Page Title text is **white**.
+Gaps are 12 px between controls and 16 px between the logo/title and the fields; the logo sits on the left edge of the page grid (x 30) and Info on the right edge (1370). The whole page uses a **30 px margin** so the banner and the body are the same width. **Corners and borders.** The capsules only look round if nothing square sits behind them. For `Period Field`, `Group Field`, `Workforce Toggle`, `Reset` and `Info Button`: Worksheet > Format > Shading > **Worksheet: None** (and Row/Column bands None), Format > Borders > all **None**; on the dashboard select the item > Layout pane > **Border: None**, **Background: None**. The toggle's dark capsule comes from the shape itself, so it needs no border or fill from Tableau. Info shares the Reset's thin translucent outline so the two read as one family.
+
+Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and shape legend (`Info Shape`) left on the dashboard: they are helpers for the actions, not part of the page. The Page Title text is **white**.
 
 ---
 
