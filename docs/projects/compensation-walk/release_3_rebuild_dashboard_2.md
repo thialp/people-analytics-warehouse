@@ -555,3 +555,26 @@ FY26 (Jun 30, 2025 → Jun 30, 2026), Loaded, Constant. Company values are also 
 | 9 | Same selections on Dashboard #1 | Same opening, closing, still here, joined |
 
 Publish: Reset, close popovers, Compact waterfall, hide all sheets, **File > Save to Tableau Public As...** `Arcadia Compensation Walk` (same name, same URL), extracts only. Check the published page with this table.
+
+## 11. Align the rail with Dashboard #1 (white pill toggles, capsule fields)
+
+The #1 look is now the base: a translucent navy capsule behind the toggle, a white pill for the selected option, white capsule fields, an outlined capsule Reset. The images keep their file names, so **nothing is re-assigned** in Tableau; only the images and the dashboard items change.
+
+What changed in the PNGs (all regenerated from `docs/brand/build`, at 3x, alpha-only sharpening):
+
+| Image | Before | Now |
+|---|---|---|
+| `seg_lens_*`, `seg_cost_*`, `seg_currency_*` (88 × 30 cell) | `#E4E3DD` pill, small corner radius, 10 px label | White pill, full capsule radius, navy label, 11 px (same as #1) |
+| `fld_rail.png` | 200 × 30, `#E4E3DD` rectangle | 200 × 32, white capsule, box drawn 1 px low so the label sits optically centred |
+| `btn_reset_rail.png` | outlined rectangle | outlined capsule, same 120-alpha line as #1 |
+
+In Tableau (Mac), after `git pull` and copying `docs/brand/shapes/Arcadia/*.png` into `~/Documents/My Tableau Repository/Shapes/Arcadia/`:
+
+1. Reopen the workbook and **Reload Shapes** (Shape card, any sheet). Confirm `Lens Toggle`, `Cost Toggle`, `Currency Toggle`, `Period Field`, `Group Field` and `Reset` show the new images.
+2. For each of the three toggle items (`Lens Toggle`, `Cost Toggle`, `Currency Toggle`): Layout > **Background** `#243A57`, **corner radius 15**, padding 0, border none. Keep the current width and height (two cells, 30 tall). This capsule is what shows behind the unselected option, exactly as in #1.
+3. `Period Field` and `Group Field` items: height **32** (was 30), move Y up by 1 so the box does not shift. Background stays None.
+4. `Reset` item: no change (the capsule is in the image).
+5. Check the three ✕ and Info shapes are still `rail_info_open/close` (they were regenerated, same names).
+6. Hover: the hover outline is rectangular; if it shows square corners on a capsule, set the item corner radius to 15 on the toggles (as above) and 16 on the fields.
+
+Check on the published page: selected option is a white pill with navy text, unselected is light slate on the capsule, text in the Period and Group fields has equal space above and below, Reset has a rounded outline.

@@ -11,7 +11,7 @@ Writes to docs/brand/shapes/Arcadia/ and a preview to docs/brand/build/button_pr
 |---|---|---|---|
 | seg_worker_{employees,contingent,total}_{on,off} | 80 x 32 | 320 x 128 (label 12 px) | #1 top bar, Worker toggle (capsule #243A57) |
 | fld_top | 180 x 36 | 720 x 144 (box 128 tall, 16 transparent rows on top so the label rides 2 px higher) | #1 top bar, Period Field and Group Field (white capsule, same radius as the toggle and Reset) |
-| fld_rail | 200 x 30 | 800 x 120 | #2 rail, Period Field and Group Field (#E4E3DD, radius as the toggles) |
+| fld_rail | 200 x 32 | 800 x 128 (box 120 tall, 8 transparent rows on top) | #2 rail, Period Field and Group Field (white capsule like fld_top) |
 | btn_reset_top_label | 184 x 32 | 736 x 128 | #1 top bar, Reset (outlined capsule: arrow + "Reset to default view") |
 | btn_reset_top | 32 x 32 | 128 x 128 | Spare: arrow only, for a narrow header |
 | btn_reset_rail | 188 x 30 | 752 x 120 | #2 rail, Reset (outlined button, as published) |
@@ -73,7 +73,7 @@ def field(name, w, h, fill, radius, drop=0):
 
 
 field("fld_top", 720, 128, WHITE, 64, drop=16)  # 16 grid px of padding above = box sits 2 dashboard px below the canvas centre, so the label rides 2 px higher in it
-field("fld_rail", 800, 120, WASH, 14)
+field("fld_rail", 800, 120, WHITE, 60, drop=8)  # white capsule like fld_top; 8 grid px above = label rides 1 px higher
 
 
 # 3. Reset: a circular arrow
@@ -110,7 +110,7 @@ save(im, w, h, "btn_reset_top_label")
 
 w, h = 752, 120
 im, d = canvas(w, h)
-d.rounded_rectangle((4 * S, 4 * S, (w - 4) * S, (h - 4) * S), radius=14 * S, outline=(255, 255, 255, 90), width=4 * S)
+d.rounded_rectangle((4 * S, 4 * S, (w - 4) * S, (h - 4) * S), radius=((h - 8) // 2) * S, outline=(255, 255, 255, 120), width=4 * S)
 reset_arrow(d, 150 * S, 61 * S, 17 * S, 5 * S, WHITE)
 f = ImageFont.truetype(FONT, 40 * S)
 d.text((190 * S, h * S // 2), "Reset to default view", font=f, fill=WHITE, anchor="lm")
