@@ -346,7 +346,7 @@ Group calcs (from [rail_group_picker_build.md](../compensation-walk/rail_group_p
     WHEN "Department" THEN "a department" WHEN "Country" THEN "a country"
     ELSE "a view" END
 // Period Field Text    [Pair Name]                    (the chevron is in the label, below)
-// Group Field Text     [p_Group]
+// Group Field Text     IF [p_View] = "Company" THEN "All organizations" ELSE [p_Group] END   (display only; p_Group keeps the value "Arcadia Systems")
 ```
 
 Note `group_name` and `view_name` here are Region Walk's own columns (`group_name`, `view_name`), not the Headcount Walk calc of the same caption.
@@ -383,7 +383,7 @@ Test: the field shows `FY26 · Jun 25 → Jun 26  ▾` on a white capsule fillin
 
 ### 6.2 Group Field
 
-Same as 6.1 with `Group Field Text`, Detail `Toggle Group Panel`, `Close Panel`, `zzTrue`, `zzFalse`; filter `Group Is Current` = True **and** `Group In View` = True. Tooltip `Choose who to look at`. When the view is Company it reads `Arcadia Systems  ▾` (it never disappears, so the bar never jumps).
+Same as 6.1 with `Group Field Text`, Detail `Toggle Group Panel`, `Close Panel`, `zzTrue`, `zzFalse`; filter `Group Is Current` = True **and** `Group In View` = True. Tooltip `Choose who to look at`. When the view is Company it reads `All organizations  ▾` (a visitor who has never heard of Arcadia gets a clear label; the stored value stays `Arcadia Systems` so no calc changes) (it never disappears, so the bar never jumps).
 
 ### 6.3 Workforce Toggle (replaces Measure Toggle)
 
@@ -531,7 +531,7 @@ The top bar has no room for #2's six-row view list, so the view list moves into 
 | Close on group pick | Group Panel | `p_GroupOpen` | `Close Panel` |
 | Close group on ✕ | Popover Close (group) | `p_GroupOpen` | `Close Panel` |
 
-Picking a view keeps the popover open and pre-selects the first group (alphabetical), so the cards are never blank; picking Company sets Arcadia Systems (close the popover with ✕ or pick again). 
+Picking a view keeps the popover open and pre-selects the first group (alphabetical), so the cards are never blank; picking Company sets `Arcadia Systems`, which the lists show as **All organizations**: on `Group Panel` and `View List` right-click the `group_name` field (Region Walk) > **Aliases...** > `Arcadia Systems` = `All organizations` (close the popover with ✕ or pick again). 
 
 ### 7.3 Reset, toggle and info actions
 
@@ -764,7 +764,7 @@ END
 **Tooltip on the note** (the numbers in plain English; mirrors #2's). Extra calcs on Headcount Walk (`TT Open Day` from 8.2):
 
 ```
-// TO Who   IF [p_View] = "Company" THEN "Arcadia" ELSE [p_Group] END
+// TO Who   IF [p_View] = "Company" THEN "the whole company" ELSE [p_Group] END
 // Tie-out Detail
 (IF [p_Worker] <> "Employees" THEN
     "The Compensation Walk prices employees only, so there is nothing to compare for contingent workers."
