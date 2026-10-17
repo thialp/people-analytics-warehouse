@@ -67,10 +67,11 @@ Click flow after the fix: the click fires the parameter action, then the self fi
 
 | File | Size on the dashboard | Used for |
 |---|---|---|
-| `fld_top.png` | 180 × 32 | #1 Period and Group fields (white, square: inputs stay square) |
+| `fld_top.png` | 164 × 32 | #1 Period and Group fields (white capsule, same radius as the toggle) |
 | `fld_rail.png` | 200 × 30 | #2 Period and Group fields (`#E4E3DD`, rounded like the toggles) |
 | `seg_worker_employees_on/off`, `seg_worker_contingent_on/off`, `seg_worker_total_on/off` | 80 × 32 each | #1 Workforce toggle (capsule `#243A57`) |
-| `btn_reset_top.png` | 32 × 32 | #1 Reset (white arrow on navy) |
+| `btn_reset_top_label.png` | 150 × 32 | #1 Reset (outlined capsule: arrow + "Reset to default view") |
+| `btn_reset_top.png` | 32 × 32 | Spare: arrow only, for a narrow header |
 | `btn_reset_rail.png` | 188 × 30 | #2 Reset (outlined button, as published) |
 | `btn_close.png` / `btn_close_light.png` | 16 × 16 | The ✕ on every popover (slate on white / mist on navy) |
 | `info_open`, `info_close` (existing) | 32 × 32 | #1 info button |
