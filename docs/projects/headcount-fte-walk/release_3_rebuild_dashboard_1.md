@@ -18,7 +18,7 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 
 **Done:** sections 1 to 7; 8.1 (compact and expanded waterfall, Summary | By driver toggle with tooltip, bar-explaining tooltip `TT What`, Contingent joined / left names, `WF Title`, `WF Subtitle`); 8.1b (waterfall caption); layout grid for the header, waterfall and right column (section 10 rows 14 to 19).
 
-**Continue tomorrow with 8.2 (KPI cards):** the five cards still show release 2 text ("Hires (FTE)", "Closing FTE", FTE twins). Rebuild them per workforce type (Employees, Contingent, Total) with the K* calcs, using the wide background and the 30 px grid (8.2a). Then 8.3 (Trend follows the selected group; Turnover follows the group and hides groups under 20 people, no 0.0% rows), then section 9 (tie-out line), cleanup (stale calcs, parameters, actions), section 11 check table and section 12 publish.
+**Continue with 8.2 (KPI cards); 8.2a geometry done, 8.2b text calcs built:** the five cards still show release 2 text ("Hires (FTE)", "Closing FTE", FTE twins). Rebuild them per workforce type (Employees, Contingent, Total) with the K* calcs, using the wide background and the 30 px grid (8.2a). Then 8.3 (Trend follows the selected group; Turnover follows the group and hides groups under 20 people, no 0.0% rows), then section 9 (tie-out line), cleanup (stale calcs, parameters, actions), section 11 check table and section 12 publish.
 
 ## Checkpoints
 
@@ -795,7 +795,7 @@ Sheet `Waterfall Caption`: `WF Caption` on Text, Tableau Book 8 slate, left, **w
 
 #### 8.2a Wider cards (30 px margin)
 
-The cards now span the full page grid (x 30 to 1370): five cards 255 wide with 16 gaps. Use the new background `docs/brand/arcadia_kpi_cards_bg_wide.png` (2800 × 220; generated with `make_kpi_cards_bg.py --left 30 --top 12 --card-w 255 --card-h 86 --gap 16 --radius 10`) as the background image item (0, 78, 1400 × 110). Set the KPI parameters: `kpi_GridLeft` 30, `kpi_CardW` 255, `kpi_GapX` 16 (others unchanged: GridTop 12, CardH 86, PadX 16). Tableau pads the map extent, so check that each title starts 16 px inside its card; if all five drift the same way nudge `kpi_FitX` by 0.01 (and `kpi_ShiftX` for a constant offset), as in the KPI guide, section 6.
+The cards now span the full page grid (x 30 to 1370): five cards 255 wide with 16 gaps. Use the new background `docs/brand/arcadia_kpi_cards_bg_wide.png` (2800 × 220; generated with `make_kpi_cards_bg.py --left 30 --top 12 --card-w 255 --card-h 86 --gap 16 --radius 10`) as the background image item (0, 78, 1400 × 110). Set the KPI parameters (calibrated on the real dashboard): `kpi_GridLeft` 30, `kpi_CardW` 255, `kpi_GapX` 16, `kpi_GridTop` 12, `kpi_CardH` 86, `kpi_SheetW` 1400, `kpi_SheetH` 110, **`kpi_FitX` 1.082**, **`kpi_ShiftX` −12**, **`kpi_PadX` 127.5** (half of CardW: the anchors sit at each card's centre). The text is **centred**: in all 15 mark layers of the `KPI cards` sheet (Title 1 to 5, Value 1 to 5, Note 1 to 5) open Label > Alignment and set Horizontal to Center. Expected anchor centres on the page: 157.5, 428.5, 699.5, 970.5, 1241.5. If the five cards drift the same way nudge `kpi_ShiftX`; if card 1 and card 5 drift in opposite directions nudge `kpi_FitX` by 0.005 (the map re-fits, so a change in FitX moves the text more than its size suggests), as in the KPI guide, section 6. Remove the parameter controls from the dashboard when done.
 
 #### 8.2b Build the cards (rewrite the text calcs in place; no layer changes)
 
