@@ -494,7 +494,7 @@ Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and sh
 
 ### 7.1 Period popover (copy of #2's)
 
-Each popover opens directly under its own control (left edge aligned with the field, top at y 76, the bottom of the band); the Info panel is right-aligned to the page margin (x 990, right edge 1370).
+Each popover opens directly under its own control (left edge aligned with the field, top at y 76, the bottom of the band); the Info panel is right-aligned to the page margin (x 960, w 410, right edge 1370).
 
 Sheets on **Region Walk**, built exactly as [rail_controls_build.md](../compensation-walk/rail_controls_build.md) Part 4.3: `Span List`, `Period Panel`, `Popover Close` (shape `btn_close_light`, Detail `Close Panel`, `zzTrue`, `zzFalse`, tooltip `Close`). Title text object "Select a period"; note line 9 pt `#8FA0B8`: "Fiscal year runs July to June. Each option compares two month-ends. Data through Jun 30, 2026."
 
@@ -701,7 +701,7 @@ Replace `Function Name` on Rows with `TO Dim`; `TO Top Function` → rename `TO 
 
 ### 8.4 Info popover (replaces the white Info Panel)
 
-Container `Info Popover`, navy style (0.5), **x 990, y 76, w 380, h 470**, visibility `p_InfoOpen`, front. Header row: title "How to read this page" + ✕ (`Popover Close` for info). Body (one Text object, 10 pt):
+Container `Info Popover`, navy style (0.5), **x 960, y 76, w 410, h 571** (as built: 410 wide so the paragraphs wrap in fewer lines; right edge 1370 = page margin), visibility `p_InfoOpen`, front. Item hierarchy: `Info Popover` > `Info Popover Header` (title text + `Popover Close Info`, a duplicate of `Popover Close Group`) and `Info Popover Panel` (the body text). Header row: title "How to read this page" + ✕ (`Popover Close Info`; action `Close info on ✕` and `Deselect Popover Close Info` use it). Body (one Text object, 10 pt):
 
 > **Period.** Every number compares two month-ends: the walk opens on the first and closes on the second. Arcadia's fiscal year runs July to June.
 >
