@@ -56,8 +56,8 @@ Checked in DuckDB on the release 3 warehouse: for **all 88 periods × every grou
 
 | Concept | Word on both dashboards | Not |
 |---|---|---|
-| The bars between Opening and Closing | **drivers** ("Expand · 4 drivers", "Largest of the 9 drivers behind the waterfall") | steps |
-| The compact bars | **groups** ("Collapse · 2 groups") | |
+| The bars between Opening and Closing | **drivers** ("By driver", "Largest of the 9 drivers behind the waterfall") | steps |
+| The compact bars | **groups** (the Summary view) | |
 | Two month-ends compared | **period** ("FY26 · Jun 25 → Jun 26") | range, window |
 | People who arrived | **joined** (hires + conversions); expanded: Hires, Conversions | |
 | People who left | **left**; expanded: Voluntary leavers, Involuntary leavers | terminations |
@@ -560,7 +560,7 @@ Picking a view keeps the popover open and pre-selects the first group (alphabeti
 
 Dashboard > Actions > Add Action > **Filter**. Source = the sheet, Run on **Select**, Target = **the same worksheet** (pick the sheet under its own name, not under the dashboard), Clearing **Show all values**, Target filters **Selected fields**: `zzTrue` → `zzFalse`.
 
-One per sheet: `Period Field`, `Group Field`, `Workforce Toggle`, `Reset`, `Info Button`, `Span List`, `Period Panel`, `View List`, `Group Panel`, each `Popover Close`, `Btn Expand Text`, `Btn Expand Icon`, `Btn Collapse Text`, `Btn Collapse Icon`, `Page Title`, `KPI cards`, `Waterfall Caption`, `Group Heading 2`. Add `zzTrue` and `zzFalse` to each sheet's Detail first. The charts (Waterfall, Trend, Turnover) keep normal selection: clicking a bar to highlight it is useful there.
+One per sheet: `Period Field`, `Group Field`, `Workforce Toggle`, `Reset`, `Info Button`, `Span List`, `Period Panel`, `View List`, `Group Panel`, each `Popover Close`, `Detail Toggle`, `Page Title`, `KPI cards`, `Waterfall Caption`, `Group Heading 2`. Add `zzTrue` and `zzFalse` to each sheet's Detail first. The charts (Waterfall, Trend, Turnover) keep normal selection: clicking a bar to highlight it is useful there.
 
 ---
 
@@ -620,10 +620,6 @@ END
     THEN IIF([Walk Step] = "Moved in" OR [Walk Step] = "Moved out", "Moved",
              IIF([Walk Step] = "Converted", IIF([Worker Type] = "Employee", "Joined", "Left"), [Walk Step])) END) }
 ```
-```
-// Expand Label     "Expand · " + STR([WF Driver Count]) + " drivers"
-// Collapse Label   "Collapse · " + STR([WF Group Count]) + IIF([WF Group Count] = 1, " group", " groups")
-```
 
 Edit the existing waterfall calcs: in `Waterfall Position`, `Bar Type`, `Move Label` and `Level Label`, replace `ATTR([Movement Category])` by `ATTR([WF Bar])`. Delete `Show Category`.
 
@@ -650,31 +646,27 @@ Sheet `Waterfall`:
 3. Filters: `WF Moves Hidden` = False (dimension filter), and a calc `WF Non Zero` = `SUM([Walk Value]) <> 0 OR ATTR([WF Bar]) = "Opening" OR ATTR([WF Bar]) = "Closing"` = True (drops the zero bars: Moved at Company, Converted in Total). A zero bar adds nothing to the running sum, so dropping it does not move the others.
 4. Aliases on `WF Bar` (right-click > Aliases): Voluntary Terminations → `Voluntary leavers`, Involuntary Terminations → `Involuntary leavers`, Internal Moves In → `Moved in`, Internal Moves Out → `Moved out`, do **not** alias Conversions: the same bar is +270 in Employees (people from contingent) and −270 in Contingent (people who became employees), and an alias cannot change with the workforce type. It stays "Conversions".
 5. Axis: Include zero (headcount waterfalls start at zero; keep the published choice), ticks Automatic (a fixed 5,000 tick is wrong for a 543-person department), format `#,##0`. If the expanded chart shows too many labels, raise the axis font to Tableau Book 10 (Format > Scale) or hide the axis header: every bar has its value. Never set a fixed interval.
-6. Title line 2 (Book 9 slate): `Opening + joined − left ± moves = closing · axis starts at zero`.
+6. Title line 2 (Book 9 slate): the dynamic `<WF Subtitle>` (calc below), inserted with Title > Insert > `WF Subtitle`; it changes with the Summary | By driver toggle.
 7. Tooltip: `TT Unit`, `TT Context` and `Walk Value` must all sit on Detail or Tooltip (a pill that went red while editing is dropped silently; check the Marks card after the calcs turn green). Text: `<Movement Category>` Semibold 12 navy, `<SUM(Walk Value)> <TT Unit>` Semibold 16 navy, `<AGG(TT Context)>` Book 9 slate. The bar name in the tooltip is `WF Bar` in compact mode (Joined, Left, Moved (net)).
 8. Axis format: Format > Axis > Numbers > Custom `#,##0` (not `#,##0,"k"`: a 849-person group would show a single "0k" tick).
 
-Expand / Collapse buttons (same construction as #2: a text sheet and a 16 px icon sheet side by side in one container, identical sizes so nothing jumps).
+Summary | By driver toggle (replaces the Expand / Collapse buttons: both states are always visible, so a screenshot explains itself).
 
-Calcs (Headcount Walk):
+Calcs (Headcount Walk). The source rows come from `Walk Step`: "Opening" gives the Summary option, "Left" gives the By driver option (any two steps present in every view work):
 ```
-// Expand Label     "Expand · " + STR([WF Driver Count]) + " drivers"
-// Collapse Label   "Collapse · " + STR([WF Group Count]) + IIF([WF Group Count] = 1, " group", " groups")
-// Expand To        TRUE
-// Collapse To      FALSE
-// Is Compact       NOT [p_Expand]
-// Expand Icon      "btn_expand_icon"
-// Collapse Icon    "btn_collapse_icon"
+// Detail Option   CASE [Walk Step] WHEN "Opening" THEN "summary" WHEN "Left" THEN "drivers" END
+// Detail Pick     CASE [Detail Option] WHEN "summary" THEN FALSE WHEN "drivers" THEN TRUE END
+// Detail State    IF [Detail Pick] = [p_Expand] THEN "on" ELSE "off" END
+// Detail Shape    "seg_detail_" + [Detail Option] + "_" + [Detail State]
+// WF Subtitle
+IF [p_Expand] THEN "Opening + each driver = closing · all " + STR([WF Driver Count]) + " drivers shown · axis starts at zero"
+ELSE "Opening + joined − left ± moves = closing · grouped view; By driver shows all " + STR([WF Driver Count]) + " drivers · axis starts at zero" END
 ```
-Four sheets, each with one mark (constants on Detail collapse to one mark), Entire View, shading None, borders None, tooltip off:
-| Sheet | Mark | Marks card | Detail |
-|---|---|---|---|
-| `Expand Text` | Text | `Expand Label` on Text, Tableau Semibold 9 navy | `Expand To`, `zzTrue`, `zzFalse` |
-| `Expand Icon` | Shape | `Expand Icon` on Shape (assign `btn_expand_icon`, palette Arcadia), Size max | `Expand To`, `zzTrue`, `zzFalse` |
-| `Collapse Text` | Text | `Collapse Label` on Text, same font | `Collapse To`, `zzTrue`, `zzFalse` |
-| `Collapse Icon` | Shape | `Collapse Icon` on Shape (assign `btn_collapse_icon`), Size max | `Collapse To`, `zzTrue`, `zzFalse` |
+Shapes: `seg_detail_summary_on/off.png` and `seg_detail_drivers_on/off.png` (generator `docs/brand/build/make_detail_toggle_shapes.py`), copied to `~/Documents/My Tableau Repository/Shapes/Arcadia`.
 
-Dashboard: two floating horizontal containers `Btn Expand ALL` and `Btn Collapse ALL`, each **x 686, y 198, w 150, h 24** (the same spot): text sheet (about 126 wide) then icon sheet (24 wide, the icon 16 × 16), a soft border and corner radius on the container, like #2. Visibility (container dropdown > **Control visibility using value**): `Btn Collapse ALL` = `p_Expand`; `Btn Expand ALL` = `Is Compact`. Actions (Change Parameter, Run on Select, Keep current value): **Set expand** (sources `Expand Text` and `Expand Icon`; `p_Expand` ← `Expand To`) and **Set collapse** (sources `Collapse Text` and `Collapse Icon`; `p_Expand` ← `Collapse To`); then one Deselect filter action for each of the four sheets (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
+Sheet `Detail Toggle`, built like `Workforce Toggle` (6.3): `Detail Option` on Columns (manual sort: summary, drivers), filter out Null, mark type Shape, `Detail Shape` on Shape (assign the four files), `Detail Pick`, `zzTrue`, `zzFalse` on Detail, tooltip off, Entire View, shading and borders None.
+
+Dashboard: floating item `Detail Toggle`, **x 672, y 198, w 152, h 24** (12 px inside the waterfall card's top-right corner at 836), Background `#ECEBE5`, corner radius 12, padding 0, border none. Action **Set detail** (Change Parameter, Run on Select, Keep current value): source `Detail Toggle`, `p_Expand` ← `Detail Pick`; plus one Deselect filter action for `Detail Toggle` (7.4). Before leaving 8.1, make sure `p_Expand` is back to False (Reset sets it from `Default Expand`).
 
 ### 8.2 KPI cards
 
@@ -869,7 +861,29 @@ END)
 ```
 `Waterfall Caption`: `Tie-out Detail` on Detail; Worksheet > Tooltip: bold **Why the two dashboards count different hires**, `<AGG(Tie-out Detail)>`, then "The Compensation Walk compares two snapshots and prices people present on each date, so anyone who joined and left in between is in neither. This page counts every joiner and every leaver." (Book 9; no command buttons). FY26 Company: "5,235 people joined Arcadia between Jun 30, 2025 and Jun 30, 2026 … In the Compensation Walk's Hires: 4,790 … Not in that walk: 445, who joined and left again before Jun 30, 2026."
 
-Caption layout: line 1 the existing moves sentence (`WF Caption`, edited: delete the "FTE ... schedule changes" half), line 2 `<Tie-out Text>`. Tableau Book 8 slate, left. Same position as today (over the waterfall's bottom padding).
+**Line 1: what is behind the bars** (`WF Caption`, rewritten; the old "FTE ... schedule changes" sentence is gone). New calcs on Headcount Walk, same FIXED pattern as `WF Hires`:
+```
+// WF Conv In    ZN({ FIXED : SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Employee" THEN [Headcount] END) })
+// WF Conv Out   ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Conversions" AND [Worker Type] = "Contingent" THEN [Headcount] END) })
+// WF Moves Out  ZN({ FIXED : -SUM(IF [In Range] AND [Movement Category] = "Internal Moves Out" THEN [Headcount] END) })
+// WF Moves Out Str   comma pattern on [WF Moves Out]; WF Conv In Str likewise on [WF Conv In]
+```
+```
+// WF Caption
+IF NOT [K Valid] THEN ""
+ELSEIF [p_Worker] = "Employees" AND [p_View] = "Company" THEN
+  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · the " + [WF Moves Str] + " internal moves net to zero across the company."
+ELSEIF [p_Worker] = "Employees" THEN
+  "Joined = " + [WF Hires Str] + " hires + " + [WF Conv In Str] + " converted from contingent · internal moves: " + [WF Moves Str] + " in, " + [WF Moves Out Str] + " out."
+ELSEIF [p_Worker] = "Contingent" THEN
+  "Conversions (" + [WF Conv In Str] + ") are contingent workers who became employees; the Employees view counts them as joined."
+ELSE
+  "Conversions (" + [WF Conv In Str] + " contingent workers became employees) are one out and one in, so they net to zero."
+END
+```
+Check FY26 Company: `Joined = 4,965 hires + 270 converted from contingent · the 3,633 internal moves net to zero across the company.` One line, Book 8 slate (about 150 characters fit in 782 px). Then delete `WF FTE Open Str` and `WF FTE Close Str`.
+
+Caption layout: line 1 `<WF Caption>`, line 2 `<Tie-out Text>`. Tableau Book 8 slate, left.
 
 | Selection | Tie-out text |
 |---|---|
@@ -889,11 +903,11 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 12 | KPI background image | 0 | 78 | 1400 | 110 | new wide image (8.2a) |
 | 13 | KPI cards | 0 | 78 | 1400 | 110 | geometry parameters per 8.2a |
 | 14 | Waterfall | 30 | 188 | 806 | 624 | unchanged; bottom padding 64 |
-| 15 | Btn Expand ALL / Btn Collapse ALL | 686 | 198 | 150 | 24 | Same spot; one visible at a time |
+| 15 | Detail Toggle (Summary \| By driver) | 672 | 198 | 152 | 24 | Background `#ECEBE5`, radius 12 |
 | 16 | Waterfall Caption | 42 | 750 | 782 | 56 | Two lines now |
 | 17 | Trend | 852 | 188 | 518 | 300 | unchanged |
 | 18 | Turnover | 852 | 500 | 518 | 312 | unchanged |
-| 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Data as of Jun 30, 2026 · Arcadia Systems is a fictional company. All data is synthetic." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
+| 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
 | 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
 
 Item order (Layout pane, bottom to top): background, cards, charts, buttons, header controls, popovers last.
@@ -911,7 +925,7 @@ Default state: FY26 (Jun 30, 2025 → Jun 30, 2026), Company, Employees, compact
 | Card 3 | 10.1% · 2,942 left by choice · 726 involuntary |
 | Card 4 | 3,633 · 2,015 promotions · 1,618 other moves |
 | Card 5 | 11,941 · 28.5% of 41,946 in total |
-| Waterfall compact | Opening 28,438 · Joined +5,235 · Left −3,668 · Closing 30,005 · "Expand · 4 drivers" · "Collapse · 2 groups" |
+| Waterfall compact | Opening 28,438 · Joined +5,235 · Left −3,668 · Closing 30,005 · toggle Summary | By driver |
 | Waterfall expanded | Hires +4,965 · From contingent +270 · Voluntary −2,942 · Involuntary −726 |
 | Turnover by function | Commercial 14.8% (12.2 + 2.6), Legal & Compliance 12.9%, Operations 11.9%, Technology 11.7%, Finance 11.7%, Product 11.6%, People 11.4%, Marketing 11.4%; no Executive row |
 
