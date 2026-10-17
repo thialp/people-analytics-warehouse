@@ -21,6 +21,7 @@ Writes to docs/brand/shapes/Arcadia/ and a preview to docs/brand/build/button_pr
 from PIL import Image, ImageDraw, ImageFont
 import math
 import os
+from shape_quality import SS, finish, out_size
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "shapes", "Arcadia")
@@ -28,7 +29,7 @@ os.makedirs(OUT, exist_ok=True)
 FONT = "/usr/share/fonts/opentype/inter/Inter-SemiBold.otf"
 if not os.path.exists(FONT):
     FONT = "/usr/share/fonts/opentype/inter/Inter-Bold.otf"
-S = 4  # supersample, then shrink with LANCZOS
+S = SS  # supersample (shape_quality.py), then shrink once with LANCZOS and sharpen lightly
 
 NAVY = (19, 35, 58, 255)
 WHITE = (255, 255, 255, 255)
@@ -44,7 +45,7 @@ def canvas(w, h):
 
 
 def save(im, w, h, name):
-    im.resize((w, h), Image.LANCZOS).save(os.path.join(OUT, name + ".png"))
+    finish(im, w, h).save(os.path.join(OUT, name + ".png"))
 
 
 # 1. Worker toggle segments (same look as seg_headcount_* on Dashboard #1)
@@ -94,7 +95,7 @@ save(im, 128, 128, "btn_reset_top")
 # #1 top bar: a capsule, arrow + words, so it reads as a button and not as a loading spinner
 w, h = 736, 128
 im, d = canvas(w, h)
-d.rounded_rectangle((3 * S, 3 * S, (w - 3) * S, (h - 3) * S), radius=((h - 6) // 2) * S, outline=(255, 255, 255, 120), width=4 * S)
+d.rounded_rectangle((4 * S, 4 * S, (w - 4) * S, (h - 4) * S), radius=((h - 8) // 2) * S, outline=(255, 255, 255, 120), width=4 * S)
 f = ImageFont.truetype(FONT, 52 * S)
 label = "Reset to default view"
 ar, gap = 22, 18                      # arrow radius and gap, px at 4x scale
@@ -107,7 +108,7 @@ save(im, w, h, "btn_reset_top_label")
 
 w, h = 752, 120
 im, d = canvas(w, h)
-d.rounded_rectangle((3 * S, 3 * S, (w - 3) * S, (h - 3) * S), radius=14 * S, outline=(255, 255, 255, 90), width=3 * S)
+d.rounded_rectangle((4 * S, 4 * S, (w - 4) * S, (h - 4) * S), radius=14 * S, outline=(255, 255, 255, 90), width=4 * S)
 reset_arrow(d, 150 * S, 61 * S, 17 * S, 5 * S, WHITE)
 f = ImageFont.truetype(FONT, 40 * S)
 d.text((190 * S, h * S // 2), "Reset to default view", font=f, fill=WHITE, anchor="lm")

@@ -2,12 +2,13 @@
 Segment cell = 75x32 px on the dashboard, drawn at 300x128 so it stays crisp."""
 from PIL import Image, ImageDraw, ImageFont
 import os
+from shape_quality import SS, finish, out_size
 OUT = os.path.join(os.path.dirname(__file__), "..", "shapes", "Arcadia")
 os.makedirs(OUT, exist_ok=True)
 FONT = "/usr/share/fonts/opentype/inter/Inter-SemiBold.otf"
 if not os.path.exists(FONT):
     FONT = "/usr/share/fonts/opentype/inter/Inter-Bold.otf"
-S = 4  # supersample
+S = SS  # supersample
 W, H = 300, 128
 NAVY, WHITE, MIST = (19, 35, 58, 255), (255, 255, 255, 255), (201, 209, 220, 255)
 
@@ -19,7 +20,7 @@ def segment(label, on, path):
     f = ImageFont.truetype(FONT, 46*S)
     col = NAVY if on else MIST
     d.text((W*S//2, H*S//2), label, font=f, fill=col, anchor="mm")
-    im.resize((W, H), Image.LANCZOS).save(path)
+    finish(im, W, H).save(path)
 
 for lab in ("Headcount", "FTE"):
     for on in (True, False):
@@ -30,14 +31,14 @@ def info(path, closed):
     im = Image.new("RGBA", (N*S, N*S), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     RING = (255, 255, 255, 120)  # same outline weight/tone as the Reset capsule
-    d.ellipse((3*S, 3*S, (N-3)*S, (N-3)*S), outline=RING, width=4*S)
+    d.ellipse((4*S, 4*S, (N-4)*S, (N-4)*S), outline=RING, width=4*S)
     if closed:  # "X" when the panel is open
         for a, b in (((40, 40), (88, 88)), ((88, 40), (40, 88))):
             d.line([(a[0]*S, a[1]*S), (b[0]*S, b[1]*S)], fill=WHITE, width=8*S)
     else:       # "i"
         d.ellipse((57*S, 30*S, 71*S, 44*S), fill=WHITE)
         d.rounded_rectangle((57*S, 54*S, 71*S, 98*S), radius=5*S, fill=WHITE)
-    im.resize((N, N), Image.LANCZOS).save(path)
+    finish(im, N, N).save(path)
 info(f"{OUT}/info_open.png", False)
 info(f"{OUT}/info_close.png", True)
 

@@ -96,6 +96,8 @@ Click flow after the fix: the click fires the parameter action, then the self fi
 | `rail_info_open`, `rail_info_close` (existing) | 16 × 16 | #2 info button |
 | `btn_expand_icon`, `btn_collapse_icon` (existing) | 16 × 16 | Expand / Collapse on both |
 
+**Image quality (rebuilt Oct 17, 2026).** Every generator now draws at 8x supersampling, shrinks once with LANCZOS and applies a light unsharp mask, and the delivered size is set in one place, `docs/brand/build/shape_quality.py` (`SHAPE_SCALE`, default **3**: an 80 × 32 cell is delivered 240 × 96, the 180 × 32 field 540 × 96). Dashboard sizes do not change. Why 3 and not "as big as possible": Tableau scales a shape to the mark size with a plain bilinear resample, so a source much larger than the screen size aliases (jagged edges, uneven letters). A test that mimics that resample, on the real header shapes, gave the lowest error at 3x across the screen sizes people use (1x to 3x device scale); 2x was best only on a 1x screen, 8x was worst. To try another size: `SHAPE_SCALE=2 python3 docs/brand/build/make_button_shapes.py` (also `make_toggle_shapes.py`, `make_detail_toggle_shapes.py`, `make_rail_toggle_shapes.py`, `make_rail_info_shapes.py`), then re-copy the PNGs. Outlines are drawn on whole pixels so thin lines stay sharp.
+
 **Test the field pattern first** (Dashboard #1: section 6.1; Dashboard #2: section 5.1) before converting the others. If the label will not sit on the shape at full size, the fallback is the published pattern (Text mark, sheet shading as the box) plus the deselect action, which removes the selection highlight but not the hover square.
 
 ### 0.5 Popovers and the info panel: one style
