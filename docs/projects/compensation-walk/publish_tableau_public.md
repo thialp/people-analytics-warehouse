@@ -1,6 +1,6 @@
 # Publishing the Compensation Walk to Tableau Public
 
-Published 2026-10-12: [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary) (profile: [thialp](https://public.tableau.com/app/profile/thialp)). Workbook `custom_sql_compensation_walk_20261011`, dashboard `Summary` (1400 x 850). The company is fictional and all data is synthetic.
+Published 2026-10-12: [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard) (profile: [thialp](https://public.tableau.com/app/profile/thialp)). Workbook `custom_sql_compensation_walk_20261011`, dashboard `Dashboard` (1400 x 850; republished 2026-10-17 with the aligned layout). The company is fictional and all data is synthetic.
 
 ## Why it is published as extracts
 
