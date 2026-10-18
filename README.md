@@ -50,7 +50,7 @@ flowchart LR
     KS["🔵 <b>Keystone HR</b><br/>the HR system<br/>employees, pay, jobs, hiring"]
     BW["🟠 <b>Bridgeway VMS</b><br/>the supplier system<br/>contractors, orders, rates, timesheets"]
     PUB["🟢 <b>Public data</b><br/>exchange rates, employer costs,<br/>postal codes"]
-    WH["🟣 <b>The warehouse</b><br/>cleans, connects, checks<br/>78 automated tests"]
+    WH["🟣 <b>The warehouse</b><br/>cleans, connects, checks<br/>79 automated tests"]
     DASH["🔷 <b>Dashboards</b><br/>Tableau"]
     DEC["⭐ <b>Decisions</b><br/>hiring, budget, risk"]
 
@@ -119,7 +119,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 
 | Principle | What it means here |
 |---|---|
-| ✅ **Every number reconciles** | Start + changes = end, for every team, month and currency, checked by 78 automated tests on every change |
+| ✅ **Every number reconciles** | Start + changes = end, for every team, month and currency, checked by 79 automated tests on every change |
 | 🔁 **One company, many questions** | All six case studies read the same people, the same history and the same month-end snapshots, so two dashboards never tell different stories |
 | 🏢 **Built like an enterprise stack** | The same model runs on DuckDB (for Tableau Public) and SQL Server (for a live Tableau connection), and is proven identical row for row |
 | 🧭 **Explain, don't just report** | Every case study answers *why*, not only *how much* |
@@ -129,7 +129,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 46,980 employees and 43,484 contractors over five years · 61 month-ends · 33,359 seats · 31,323 requisitions · 188,982 applicants · 58,276 supplier orders · 632,504 timesheets |
 | **Output** | 21 Tableau-ready marts and 7 dimension files in [`data/marts/`](data/marts/); 17 Tableau Custom SQL queries and 13 reporting views on SQL Server |
-| **Controls** | 78 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
+| **Controls** | 79 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
 
 ---
 
@@ -162,7 +162,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain<br/>identity resolution · discrepancy rules"]
         MART["marts<br/>walks · fills · plan vs actual · cost · reconciliation"]
-        TEST{{"78 data tests"}}
+        TEST{{"79 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -319,7 +319,7 @@ Full column definitions: [`docs/warehouse/data_dictionary.md`](docs/warehouse/da
 
 ### Validation strategy
 
-Every test is a SQL query that returns the rows breaking a rule. The pipeline runs all 78 after every build and refuses to export if any returns rows.
+Every test is a SQL query that returns the rows breaking a rule. The pipeline runs all 79 after every build and refuses to export if any returns rows.
 
 | # | Test | Guards against |
 |---|---|---|
@@ -401,6 +401,7 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 76 | The plan's contingent line covers every cost center with contingent workers, in every version, within 20% of the actual | A plan that silently leaves out where contractors work |
 | 77 | A conversion to employee agrees across Keystone, recruiting and Bridgeway: same person, hire date, same month as the last contingent day | A conversion counted twice, or a hire claimed as one when it was not |
 | 78 | The growth-mix factors (Shapley and sequential) add up to the change in total workforce cost exactly, and tie to both snapshots | An attribution that explains more, or less, than what happened |
+| 79 | Hires that joined a group and are still in it never exceed the people who joined that group; the walk and the region walk agree on who joined elsewhere and moved in | A tie-out note reading "73 of the 72 who joined" |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -901,7 +902,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 78 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 79 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)
@@ -955,7 +956,7 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 │                         mobility flows, compensation walk, region walk, career moves, cost bridge,
 │                         growth mix, contingent spend, discrepancy work list, reconciliation trend,
 │                         engagement cap, detection score, cost snapshot, org chart, fringe, dimensions
-├── tests/                78 data-quality and reconciliation tests (SQL)
+├── tests/                79 data-quality and reconciliation tests (SQL)
 ├── pipeline/             build runner, control totals, org chart and dashboard check-table writers
 ├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, validation, and the DuckDB checker

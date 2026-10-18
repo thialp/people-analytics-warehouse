@@ -47,6 +47,9 @@ worker_pair AS (
         CASE WHEN c.worker_id IS NULL THEN w.termination_type END              AS exit_reason,
         o.department_id AS o_dept, o.location_id AS o_loc,
         c.department_id AS c_dept, c.location_id AS c_loc,
+        -- a hire's department and office on their hire month-end: the group they joined
+        CASE WHEN o.worker_id IS NULL THEN h.department_id END AS h_dept,
+        CASE WHEN o.worker_id IS NULL THEN h.location_id   END AS h_loc,
         CASE WHEN o.department_id <> c.department_id THEN c.org_move_reason END      AS org_move_reason,
         CASE WHEN o.location_id   <> c.location_id   THEN c.location_move_reason END AS location_move_reason,
         -- every amount becomes an exact decimal here, so all later sums are exact and
@@ -104,13 +107,15 @@ worker_pair AS (
      AND NOT w.is_executive_officer
     LEFT JOIN snap AS o ON o.month_end_date = g.from_date AND o.worker_id = w.worker_id
     LEFT JOIN snap AS c ON c.month_end_date = g.to_date   AND c.worker_id = w.worker_id
+    LEFT JOIN intermediate.int_worker_month_end_snapshot AS h
+           ON h.month_end_date = last_day(w.original_hire_date) AND h.worker_id = w.worker_id
     WHERE o.worker_id IS NOT NULL OR c.worker_id IS NOT NULL
 ),
 
 -- 2. aggregate early: workers with the same dates, groups and reasons become one row
 pair_group AS MATERIALIZED (
     SELECT
-        from_date, to_date, worker_class, exit_reason, o_dept, o_loc, c_dept, c_loc,
+        from_date, to_date, worker_class, exit_reason, o_dept, o_loc, c_dept, c_loc, h_dept, h_loc,
         org_move_reason, location_move_reason,
         COUNT(*) AS n, SUM(f0) AS f0, SUM(f1) AS f1,
         SUM(bn0) AS bn0, SUM(bc0) AS bc0, SUM(ln0) AS ln0, SUM(lc0) AS lc0,
@@ -153,13 +158,18 @@ view_row AS MATERIALIZED (
                           WHEN 4 THEN pg.o_dept WHEN 5 THEN pg.o_loc   WHEN 6 THEN ol.country_code END AS open_key,
         CASE v.view_order WHEN 1 THEN 'ORG-000' WHEN 2 THEN cd.function_id WHEN 3 THEN cd.leader_org_id
                           WHEN 4 THEN pg.c_dept WHEN 5 THEN pg.c_loc   WHEN 6 THEN cl.country_code END AS close_key,
+        -- hires only: the group they joined, in this view
+        CASE v.view_order WHEN 1 THEN 'ORG-000' WHEN 2 THEN hd.function_id WHEN 3 THEN hd.leader_org_id
+                          WHEN 4 THEN pg.h_dept WHEN 5 THEN pg.h_loc   WHEN 6 THEN hl.country_code END AS hire_key,
         CASE WHEN v.view_order IN (2, 3, 4) THEN pg.org_move_reason
              WHEN v.view_order IN (5, 6)    THEN pg.location_move_reason END                      AS move_reason
     FROM pair_group AS pg
     LEFT JOIN dept_map AS od ON od.department_id = pg.o_dept
     LEFT JOIN dept_map AS cd ON cd.department_id = pg.c_dept
+    LEFT JOIN dept_map AS hd ON hd.department_id = pg.h_dept
     LEFT JOIN staging.stg_location AS ol ON ol.location_id = pg.o_loc
     LEFT JOIN staging.stg_location AS cl ON cl.location_id = pg.c_loc
+    LEFT JOIN staging.stg_location AS hl ON hl.location_id = pg.h_loc
     CROSS JOIN (VALUES (1, 'Company'), (2, 'Function'), (3, 'Sub-function'),
                        (4, 'Department'), (5, 'Office'), (6, 'Country')) AS v(view_order, view_name)
 ),
@@ -170,7 +180,10 @@ walk_line AS (
            CAST(NULL AS VARCHAR) AS movement_reason, n AS people, n AS hc, f0 AS fte, bn0 AS bn, bc0 AS bc, ln0 AS ln, lc0 AS lc
     FROM view_row WHERE worker_class <> 'Hire'
     UNION ALL
-    SELECT from_date, to_date, view_order, view_name, close_key, 2, 'Hires', 'Headcount', 'New Hire', n, n, f1, bn1, bc1, ln1, lc1
+    -- Hires are grouped as at the To date. 'Joined Elsewhere': hired into another group of this
+    -- view and moved in before the To date, so they are not among the people who joined this group
+    SELECT from_date, to_date, view_order, view_name, close_key, 2, 'Hires', 'Headcount',
+           CASE WHEN hire_key <> close_key THEN 'Joined Elsewhere' ELSE 'New Hire' END, n, n, f1, bn1, bc1, ln1, lc1
     FROM view_row WHERE worker_class = 'Hire'
     UNION ALL
     SELECT from_date, to_date, view_order, view_name, open_key, 3, 'Exits', 'Headcount', exit_reason, n, -n, -f0, -bn0, -bc0, -ln0, -lc0

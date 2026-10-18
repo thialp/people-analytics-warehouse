@@ -155,7 +155,7 @@ Every month-end to every later one would be 1,830 pairs (61 month-ends): replace
 | `group_id`, `group_name`, `group_parent`, `group_leader` | text | See §4 |
 | `step_order`, `step` | integer, text | Walk step, 1 (Opening) to 15 (Closing). Sort `step` by `step_order`. |
 | `step_group` | text | Balance, Headcount, Career, Pay Rate, Location, Workforce Rate, Statutory, Currency |
-| `movement_reason` | text | Hires: `New Hire`. Exits: `Voluntary` / `Involuntary`. Transfers in org views: `Transfer` / `Reorganization`. Transfers in Office and Country: `Relocation` / `International Transfer`. Other steps: empty. |
+| `movement_reason` | text | Hires: `New Hire` (joined this group in the period and still in it at the To date) or `Joined Elsewhere` (joined another group of this view, then moved in before the To date; never in the Company view). The group a hire joined is their snapshot on the month-end of their hire date. Only `New Hire` people are a subset of the Headcount & FTE Walk's joined for the group (test 79). Exits: `Voluntary` / `Involuntary`. Transfers in org views: `Transfer` / `Reorganization`. Transfers in Office and Country: `Relocation` / `International Transfer`. Other steps: empty. |
 
 ### Measures
 
