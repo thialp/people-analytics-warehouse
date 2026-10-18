@@ -17,6 +17,12 @@
 -- by the office they are in at each end of the pair; someone hired and gone between the
 -- two dates is in neither snapshot. Summed over regions, each group's opening, hires,
 -- exits, transfers and closing equal the walk's headcount lines (test 57).
+--
+--   hires_joined_elsewhere  of the hires, those who joined another group of this view and
+--                           moved in before the To date (the walk's Hires with reason
+--                           'Joined Elsewhere'). hires - hires_joined_elsewhere are the people
+--                           who joined THIS group and are still in it, a subset of the
+--                           Headcount & FTE Walk's joined count (test 79).
 CREATE OR REPLACE TABLE marts.mart_region_walk AS
 WITH grid AS (
     -- === GRID === same rule as mart_compensation_walk (88 pairs)
@@ -37,6 +43,9 @@ pair_group AS (
         CASE WHEN o.worker_id IS NULL THEN 'Hire' WHEN c.worker_id IS NULL THEN 'Exit' ELSE 'Continuing' END AS worker_class,
         o.department_id AS o_dept, o.location_id AS o_loc,
         c.department_id AS c_dept, c.location_id AS c_loc,
+        -- hires: the group they joined (department and office on their hire month-end)
+        CASE WHEN o.worker_id IS NULL THEN h.department_id END AS h_dept,
+        CASE WHEN o.worker_id IS NULL THEN h.location_id   END AS h_loc,
         COUNT(*) AS n
     FROM grid AS g
     JOIN staging.stg_worker AS w
@@ -45,6 +54,8 @@ pair_group AS (
      AND NOT w.is_executive_officer
     LEFT JOIN intermediate.int_worker_month_end_snapshot AS o ON o.month_end_date = g.from_date AND o.worker_id = w.worker_id
     LEFT JOIN intermediate.int_worker_month_end_snapshot AS c ON c.month_end_date = g.to_date   AND c.worker_id = w.worker_id
+    LEFT JOIN intermediate.int_worker_month_end_snapshot AS h
+           ON h.month_end_date = last_day(w.original_hire_date) AND h.worker_id = w.worker_id
     WHERE o.worker_id IS NOT NULL OR c.worker_id IS NOT NULL
     GROUP BY ALL
 ),
@@ -64,12 +75,16 @@ view_row AS (
         CASE v.view_order WHEN 1 THEN 'ORG-000' WHEN 2 THEN od.function_id WHEN 3 THEN od.leader_org_id
                           WHEN 4 THEN pg.o_dept WHEN 5 THEN pg.o_loc   WHEN 6 THEN ol.country_code END AS open_key,
         CASE v.view_order WHEN 1 THEN 'ORG-000' WHEN 2 THEN cd.function_id WHEN 3 THEN cd.leader_org_id
-                          WHEN 4 THEN pg.c_dept WHEN 5 THEN pg.c_loc   WHEN 6 THEN cl.country_code END AS close_key
+                          WHEN 4 THEN pg.c_dept WHEN 5 THEN pg.c_loc   WHEN 6 THEN cl.country_code END AS close_key,
+        CASE v.view_order WHEN 1 THEN 'ORG-000' WHEN 2 THEN hd.function_id WHEN 3 THEN hd.leader_org_id
+                          WHEN 4 THEN pg.h_dept WHEN 5 THEN pg.h_loc   WHEN 6 THEN hl.country_code END AS hire_key
     FROM pair_group AS pg
     LEFT JOIN dept_map AS od ON od.department_id = pg.o_dept
     LEFT JOIN dept_map AS cd ON cd.department_id = pg.c_dept
+    LEFT JOIN dept_map AS hd ON hd.department_id = pg.h_dept
     LEFT JOIN staging.stg_location AS ol ON ol.location_id = pg.o_loc
     LEFT JOIN staging.stg_location AS cl ON cl.location_id = pg.c_loc
+    LEFT JOIN staging.stg_location AS hl ON hl.location_id = pg.h_loc
     CROSS JOIN (VALUES (1, 'Company'), (2, 'Function'), (3, 'Sub-function'),
                        (4, 'Department'), (5, 'Office'), (6, 'Country')) AS v(view_order, view_name)
 ),
@@ -79,6 +94,7 @@ line AS (
     SELECT from_date, to_date, view_order, view_name, open_key AS group_id, o_region AS region,
            CASE WHEN worker_class <> 'Hire' THEN n ELSE 0 END                                         AS opening,
            0                                                                                           AS hires,
+           0                                                                                           AS hires_joined_elsewhere,
            CASE WHEN worker_class = 'Exit' THEN n ELSE 0 END                                          AS exits,
            0                                                                                           AS transfers_in,
            CASE WHEN worker_class = 'Continuing' AND open_key <> close_key THEN n ELSE 0 END          AS transfers_out,
@@ -90,6 +106,7 @@ line AS (
     SELECT from_date, to_date, view_order, view_name, close_key, c_region,
            0,
            CASE WHEN worker_class = 'Hire' THEN n ELSE 0 END,
+           CASE WHEN worker_class = 'Hire' AND hire_key <> close_key THEN n ELSE 0 END,
            0,
            CASE WHEN worker_class = 'Continuing' AND open_key <> close_key THEN n ELSE 0 END,
            0,
@@ -101,7 +118,7 @@ line AS (
 
 walk AS (
     SELECT from_date, to_date, view_order, view_name, group_id, region,
-           SUM(opening) AS opening, SUM(hires) AS hires, SUM(exits) AS exits,
+           SUM(opening) AS opening, SUM(hires) AS hires, SUM(hires_joined_elsewhere) AS hires_joined_elsewhere, SUM(exits) AS exits,
            SUM(transfers_in) AS transfers_in, SUM(transfers_out) AS transfers_out,
            SUM(moves_in) AS moves_in, SUM(moves_out) AS moves_out, SUM(closing) AS closing
     FROM line
@@ -129,6 +146,7 @@ SELECT
     t.region,
     CAST(t.opening       AS INTEGER)                                    AS opening_headcount,
     CAST(t.hires         AS INTEGER)                                    AS hires,
+    CAST(t.hires_joined_elsewhere AS INTEGER)                           AS hires_joined_elsewhere,
     CAST(t.exits         AS INTEGER)                                    AS exits,
     CAST(t.transfers_in  AS INTEGER)                                    AS transfers_in,
     CAST(t.transfers_out AS INTEGER)                                    AS transfers_out,

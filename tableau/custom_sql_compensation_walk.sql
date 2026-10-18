@@ -75,6 +75,17 @@
   other cost reporting. Pay is the annualized run-rate at each month-end
   (annual base x FTE); loaded adds the employer fringe rate. Someone hired and
   gone between the two dates is in neither snapshot, so not in the walk.
+
+  HIRES: JOINED HERE OR ELSEWHERE
+  Hires are grouped as at the To date (that is where their pay is priced), so
+  in a group view they include people hired into ANOTHER group who moved in
+  before the To date. Their movement_reason tells the two apart:
+      New Hire           joined this group and is still in it on the To date
+      Joined Elsewhere   joined another group of this view, then moved in
+  The group a hire joined is their snapshot on the month-end of their hire
+  date (one more equality join). Only 'New Hire' people are a subset of the
+  Headcount & FTE Walk's joined count for the same group, so the tie-out note
+  compares those two (test 79). In the Company view every hire is a New Hire.
 */
 SELECT
     t.from_date                                                                  AS from_month_end,
@@ -183,14 +194,17 @@ FROM (
                 pg.from_date, pg.to_date, v.view_order, v.view_name,
                 CASE WHEN st.side = 'open' THEN v.open_key ELSE v.close_key END                 AS group_id,
                 st.step_order, st.step, st.step_group,
-                CASE WHEN st.step_order IN (4, 5) THEN v.move_reason ELSE st.reason END          AS movement_reason,
+                CASE WHEN st.step_order IN (4, 5) THEN v.move_reason
+                     WHEN st.step_order = 2 AND v.hire_key <> v.close_key THEN 'Joined Elsewhere'
+                     ELSE st.reason END                                                           AS movement_reason,
                 st.people, st.hc, st.fte, st.bn, st.bc, st.ln, st.lc
             FROM (
                 /* 2. pre-aggregate: one row per date pair x opening and closing
                       department and office x worker class x reasons */
                 SELECT
                     wp.from_date, wp.to_date, wp.worker_class, wp.exit_reason,
-                    wp.o_dept, wp.o_loc, wp.c_dept, wp.c_loc, wp.org_move_reason, wp.location_move_reason,
+                    wp.o_dept, wp.o_loc, wp.c_dept, wp.c_loc, wp.h_dept, wp.h_loc,
+                    wp.org_move_reason, wp.location_move_reason,
                     COUNT(*)            AS n,
                     SUM(wp.f0)          AS f0,        SUM(wp.f1)          AS f1,
                     SUM(wp.bn0)         AS bn0,       SUM(wp.bc0)         AS bc0,
@@ -226,6 +240,9 @@ FROM (
                         CASE WHEN c.WorkerID IS NULL THEN w.TerminationType END                   AS exit_reason,
                         o.DepartmentID AS o_dept, o.LocationID AS o_loc,
                         c.DepartmentID AS c_dept, c.LocationID AS c_loc,
+                        /* a hire's department and office on their hire month-end: the group they joined */
+                        CASE WHEN o.WorkerID IS NULL THEN h.DepartmentID END AS h_dept,
+                        CASE WHEN o.WorkerID IS NULL THEN h.LocationID   END AS h_loc,
                         CASE WHEN o.DepartmentID <> c.DepartmentID THEN lc.OrgMoveReason END      AS org_move_reason,
                         CASE WHEN o.LocationID   <> c.LocationID   THEN lc.LocationMoveReason END AS location_move_reason,
                         /* every amount becomes an exact decimal here, so all later sums are exact */
@@ -294,10 +311,13 @@ FROM (
                     LEFT JOIN dw.WorkerPayLedger        AS lo ON lo.MonthEndDate = g.from_date AND lo.WorkerID = w.WorkerID
                     LEFT JOIN dw.WorkerMonthEndSnapshot AS c  ON c.MonthEndDate  = g.to_date   AND c.WorkerID  = w.WorkerID
                     LEFT JOIN dw.WorkerPayLedger        AS lc ON lc.MonthEndDate = g.to_date   AND lc.WorkerID = w.WorkerID
+                    LEFT JOIN dw.WorkerMonthEndSnapshot AS h
+                           ON h.MonthEndDate = EOMONTH(w.OriginalHireDate) AND h.WorkerID = w.WorkerID
                     WHERE o.WorkerID IS NOT NULL OR c.WorkerID IS NOT NULL
                 ) AS wp
                 GROUP BY wp.from_date, wp.to_date, wp.worker_class, wp.exit_reason,
-                         wp.o_dept, wp.o_loc, wp.c_dept, wp.c_loc, wp.org_move_reason, wp.location_move_reason
+                         wp.o_dept, wp.o_loc, wp.c_dept, wp.c_loc, wp.h_dept, wp.h_loc,
+                         wp.org_move_reason, wp.location_move_reason
             ) AS pg
             /* the function and leader organization each department rolls up to,
                and the country of each office, on both sides of the pair */
@@ -315,18 +335,26 @@ FROM (
                 FROM dw.DimDepartment AS d
                 JOIN dw.DimOrgUnit AS p ON p.OrgUnitID = d.ParentOrgUnitID
             ) AS cd ON cd.DepartmentID = pg.c_dept
+            LEFT JOIN (
+                SELECT d.DepartmentID,
+                       CASE WHEN p.OrgUnitType = 'Sub-function' THEN p.ParentOrgUnitID ELSE p.OrgUnitID END AS FunctionID,
+                       d.ParentOrgUnitID AS LeaderOrgID
+                FROM dw.DimDepartment AS d
+                JOIN dw.DimOrgUnit AS p ON p.OrgUnitID = d.ParentOrgUnitID
+            ) AS hd ON hd.DepartmentID = pg.h_dept
             LEFT JOIN dw.DimLocation AS ol ON ol.LocationID = pg.o_loc
             LEFT JOIN dw.DimLocation AS cl ON cl.LocationID = pg.c_loc
+            LEFT JOIN dw.DimLocation AS hl ON hl.LocationID = pg.h_loc
             /* the six views: the group a row belongs to at each end of the pair,
-               and the reason to show when those two groups differ */
+               the group a hire joined, and the reason to show when the groups differ */
             CROSS APPLY (VALUES
-                (1, 'Company',    CAST('ORG-000' AS VARCHAR(15)),   CAST('ORG-000' AS VARCHAR(15)),   CAST(NULL AS VARCHAR(30))),
-                (2, 'Function',   CAST(od.FunctionID AS VARCHAR(15)),  CAST(cd.FunctionID AS VARCHAR(15)),  pg.org_move_reason),
-                (3, 'Sub-function', CAST(od.LeaderOrgID AS VARCHAR(15)), CAST(cd.LeaderOrgID AS VARCHAR(15)), pg.org_move_reason),
-                (4, 'Department', CAST(pg.o_dept AS VARCHAR(15)),      CAST(pg.c_dept AS VARCHAR(15)),      pg.org_move_reason),
-                (5, 'Office',     CAST(pg.o_loc AS VARCHAR(15)),       CAST(pg.c_loc AS VARCHAR(15)),       pg.location_move_reason),
-                (6, 'Country',    CAST(ol.CountryCode AS VARCHAR(15)), CAST(cl.CountryCode AS VARCHAR(15)), pg.location_move_reason)
-            ) AS v (view_order, view_name, open_key, close_key, move_reason)
+                (1, 'Company',    CAST('ORG-000' AS VARCHAR(15)),   CAST('ORG-000' AS VARCHAR(15)),   CAST('ORG-000' AS VARCHAR(15)),   CAST(NULL AS VARCHAR(30))),
+                (2, 'Function',   CAST(od.FunctionID AS VARCHAR(15)),  CAST(cd.FunctionID AS VARCHAR(15)),  CAST(hd.FunctionID AS VARCHAR(15)),  pg.org_move_reason),
+                (3, 'Sub-function', CAST(od.LeaderOrgID AS VARCHAR(15)), CAST(cd.LeaderOrgID AS VARCHAR(15)), CAST(hd.LeaderOrgID AS VARCHAR(15)), pg.org_move_reason),
+                (4, 'Department', CAST(pg.o_dept AS VARCHAR(15)),      CAST(pg.c_dept AS VARCHAR(15)),      CAST(pg.h_dept AS VARCHAR(15)),      pg.org_move_reason),
+                (5, 'Office',     CAST(pg.o_loc AS VARCHAR(15)),       CAST(pg.c_loc AS VARCHAR(15)),       CAST(pg.h_loc AS VARCHAR(15)),       pg.location_move_reason),
+                (6, 'Country',    CAST(ol.CountryCode AS VARCHAR(15)), CAST(cl.CountryCode AS VARCHAR(15)), CAST(hl.CountryCode AS VARCHAR(15)), pg.location_move_reason)
+            ) AS v (view_order, view_name, open_key, close_key, hire_key, move_reason)
             /* the walk steps: which side prices the line, whether it applies to this
                row, and its signed people, headcount, FTE and four dollar amounts */
             CROSS APPLY (VALUES

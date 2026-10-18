@@ -26,6 +26,7 @@ opening + hires - exits + transfers_in - transfers_out + region_moves_in - regio
 | `region` | The region of the person's office at that end of the pair |
 | `opening_headcount`, `closing_headcount` | People in the group and region at the From and To month-ends |
 | `hires`, `exits` | People hired into, or who left the company from, the group and region |
+| `hires_joined_elsewhere` | Of the `hires`, those who joined another group of this view and moved in before the To date (the walk's Hires with reason `Joined Elsewhere`; 0 in the Company view). `hires - hires_joined_elsewhere` joined this group and are still in it: the "still here" of the dashboards' tie-out note, never more than the Headcount & FTE Walk's joined (test 79) |
 | `transfers_in`, `transfers_out` | People who joined or left the **group** (the walk's Transfers In and Out), counted in the region of their office at the end where they were in the group |
 | `region_moves_in`, `region_moves_out` | People who stayed in the group but moved to an office in another region |
 

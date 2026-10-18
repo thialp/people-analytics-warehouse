@@ -8,7 +8,7 @@ Default state: **FY26** (Jun 30, 2025 to Jun 30, 2026), view **Company**, cost *
 
 | Custom SQL | Mart it matches | Rows |
 |---|---|---:|
-| `custom_sql_compensation_walk.sql` | `mart_compensation_walk` | 108,918 |
+| `custom_sql_compensation_walk.sql` | `mart_compensation_walk` | 110,498 |
 | `custom_sql_office_moves.sql` | `mart_office_moves` | 89,611 |
 | `custom_sql_region_walk.sql` (new) | `mart_region_walk` | 26,520 |
 | `custom_sql_career_moves.sql` (new) | `mart_career_moves` | 34,532 |
