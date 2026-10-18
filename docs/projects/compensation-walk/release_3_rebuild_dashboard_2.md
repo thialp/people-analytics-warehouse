@@ -515,6 +515,8 @@ END) + CHAR(10) +
 ```
 `Title` sheet: `Title Tip` on Detail (parameters only, adds no rows); Worksheet > Tooltip > Show tooltips (on hover, no command buttons): bold line **How to read this page**, then `<Title Tip>`, then "Click ⓘ in the left rail for the full definitions and limits." (Book 9, slate). Keep the deselect action (5.4); this replaces "off" for the page title sheet in that table. Dashboard #1 gets the same tooltip adapted to events (hires, leavers, movements) when it is rebuilt.
 
+9. **SQL check, open: "73 of the 72 who joined".** In a group view the tie-out note under the waterfall once read "hires count 73 of the 72 who joined", which cannot be true (hires still here can never exceed everyone who joined). Company FY26 is consistent (4,790 still here + 445 left again = 5,235 joined), so this looks like a definition mismatch between the two counts in a group view, not wording. Likely cause to test first: "still here" is counted by position or group *at the closing date* (so transfers into the group are included, see item 7), while "joined" is counted by hire date *inside the group*. To run, for the group where it showed and FY26: (a) count distinct workers with a hire date in the period and the group at hire; (b) count distinct workers who are active at the closing date, hired in the period, with the group at close; (c) list the difference by worker id. Fix by using one population for both numbers (hired in the period, grouped as at the closing date), or reword the note when they differ. Not a blocker for the Dashboard #2 publish.
+
 ---
 
 ## 9. Check table (release 3, run on DuckDB 2026-10-15)
