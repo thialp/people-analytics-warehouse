@@ -45,10 +45,10 @@ Checked in DuckDB on the release 3 warehouse: for **all 88 periods × every grou
 |---|---|---|---|
 | Opening, closing, net change, % change | KPI card 1, waterfall levels | People card, Growth by Region headline | **Identical** |
 | Joined in the period | KPI card 2 (5,235 = 4,965 hires + 270 conversions) | Tie-out note under the waterfall | **Identical** (same sentence in both) |
-| Hires still here at the end | Tie-out note under the waterfall | Hires driver (4,790), Top drivers | **Identical** (same sentence in both) |
+| Hires still here at the end | Tie-out note under the waterfall | Hires driver (4,790), Top drivers | **Identical** (same sentence in both). In a group view the note counts the hires who joined **this** group (Hires reason `New Hire`) and names the ones who joined elsewhere and moved in separately (Dashboard #2 guide section 8 item 9) |
 | Leavers | Every leaver (3,668) | Exits from the opening team (3,223) | Different by definition, explained in both info panels |
 
-**Why the hire counts differ, and why both are right.** Dashboard #1 counts **events** month by month: everyone who joined. Dashboard #2 compares **two snapshots**: pay can only be priced for someone present on a date, so a person hired in October who left in March is in neither snapshot. FY26, Company: 5,235 joined, 445 of them left again before Jun 30, 2026, so 4,790 were still here. The same 445 explain the leavers: 3,668 − 445 = 3,223 exits. For a group (a function, a country) the gap also includes people who joined and then changed team. Neither dashboard is changed to the other's definition: turnover needs every leaver, and a pay walk can only price people it can see. Instead **both show both numbers in one identical sentence** (Dashboard #1 guide section 9, Dashboard #2 guide section 7), so a reader never sees two unexplained hire counts.
+**Why the hire counts differ, and why both are right.** Dashboard #1 counts **events** month by month: everyone who joined. Dashboard #2 compares **two snapshots**: pay can only be priced for someone present on a date, so a person hired in October who left in March is in neither snapshot. FY26, Company: 5,235 joined, 445 of them left again before Jun 30, 2026, so 4,790 were still here. The same 445 explain the leavers: 3,668 − 445 = 3,223 exits. For a group (a function, a country) the gap also includes people who joined and then changed team; and the Hires bar also holds people who joined **another** team and moved in (grouped where they are on the closing date), which the note counts separately so its two numbers are one population (Dashboard #2 guide section 8 item 9). Neither dashboard is changed to the other's definition: turnover needs every leaver, and a pay walk can only price people it can see. Instead **both show both numbers in one identical sentence** (Dashboard #1 guide section 9, Dashboard #2 guide section 7), so a reader never sees two unexplained hire counts.
 
 ### 0.2 Population
 
@@ -368,6 +368,14 @@ Note `group_name` and `view_name` here are Region Walk's own columns (`group_nam
 ```
 // RW Hires Still Here   (= Dashboard #2's Hires for the same period and group)
 SUM(IF [RW Is Current] THEN [hires] END)
+```
+```
+// RW Hires Moved In     (of those, hired into another group of this view and moved in; 0 for Company)
+SUM(IF [RW Is Current] THEN [hires_joined_elsewhere] END)
+```
+```
+// RW Hires Joined Here  (joined this group and still in it: never more than TO Joined, test 79)
+[RW Hires Still Here] - [RW Hires Moved In]
 ```
 
 ---
@@ -1100,8 +1108,10 @@ Sheet `Waterfall Caption` (rebuild; primary **Headcount Walk**, secondary **Regi
 
 ```
 // TO Joined      ZN(SUM(IF [In Range] AND [Worker Type] = "Employee" AND ([Movement Category] = "Hires" OR [Movement Category] = "Conversions") THEN [Headcount] END))
-// TO Still Here  ZN([Region Walk].[RW Hires Still Here])
-// TO Gap         [TO Joined] - [TO Still Here]
+// TO Still Here  ZN([Region Walk].[RW Hires Still Here])      (the Compensation Walk's Hires bar)
+// TO Here        ZN([Region Walk].[RW Hires Joined Here])     (the part of it that joined this group)
+// TO Moved In    ZN([Region Walk].[RW Hires Moved In])
+// TO Gap         [TO Joined] - [TO Here]                      (never negative)
 ```
 Tableau has no comma function, so each number gets a text calc (same pattern each time):
 
@@ -1110,7 +1120,9 @@ Tableau has no comma function, so each number gets a text calc (same pattern eac
 IF [TO Joined] >= 1000 THEN STR(INT([TO Joined] / 1000)) + "," + RIGHT("00" + STR(INT([TO Joined]) % 1000), 3)
 ELSE STR(INT([TO Joined])) END
 // TO Still Here Text   (same, with [TO Still Here])
+// TO Here Text         (same, with [TO Here])
 // TO Gap Text          (same, with [TO Gap])
+// TO Moved In Clause   IF [TO Moved In] > 0 THEN ", plus " + STR([TO Moved In]) + " who moved in" ELSE "" END
 // TT Close Day         LEFT(DATENAME('month',[p_To]),3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
 ```
 ```
@@ -1120,8 +1132,8 @@ ELSEIF [p_View] = "Company" THEN
     "Note: the Compensation Walk counts only people still here on " + [TT Close Day] + ": " + [TO Still Here Text] +
     " of the " + [TO Joined Text] + " who joined (" + [TO Gap Text] + " left again)."
 ELSE
-    "Note: the Compensation Walk counts only people still here on " + [TT Close Day] + ": " + [TO Still Here Text] +
-    " of the " + [TO Joined Text] + " who joined " + [p_Group] + "."
+    "Note: the Compensation Walk counts people here on " + [TT Close Day] + ": " + [TO Here Text] +
+    " of the " + [TO Joined Text] + " who joined " + [p_Group] + [TO Moved In Clause] + "."
 END
 ```
 
@@ -1135,7 +1147,10 @@ END
 ELSE
     [TO Joined Text] + " people joined " + [TO Who] + " between " + [TT Open Day] + " and " + [TT Close Day] +
     " (hires plus people converted from contingent, counted month by month)." + CHAR(10) +
-    "In the Compensation Walk's Hires: " + [TO Still Here Text] + ", the ones still there on " + [TT Close Day] + "." + CHAR(10) +
+    "In the Compensation Walk's Hires: " + [TO Here Text] + ", the ones still there on " + [TT Close Day] + "." + CHAR(10) +
+    (IF [TO Moved In] > 0
+     THEN "Also in its Hires: " + STR([TO Moved In]) + " who joined another team and moved in (" + [TO Still Here Text] + " in all)." + CHAR(10)
+     ELSE "" END) +
     "Not in that walk: " + [TO Gap Text] +
     (IF [p_View] = "Company"
      THEN ", who joined and left again before " + [TT Close Day] + "."
@@ -1150,7 +1165,8 @@ Caption layout: line 1 `<WF Caption>` (built in 8.1b), line 2 `<Tie-out Text>`. 
 |---|---|
 | FY26, Company | Note: the Compensation Walk counts only people still here on Jun 30, 2026: 4,790 of the 5,235 who joined (445 left again). |
 | FY26 Q4 (Mar 31 → Jun 30, 2026), Company | Note: the Compensation Walk counts only people still here on Jun 30, 2026: 1,317 of the 1,330 who joined (13 left again). |
-| FY26, Function Commercial | Note: the Compensation Walk counts only people still here on Jun 30, 2026: 1,309 of the 1,470 who joined Commercial. |
+| FY26, Function Commercial | Note: the Compensation Walk counts people here on Jun 30, 2026: 1,305 of the 1,470 who joined Commercial, plus 4 who moved in. |
+| FY26, Department Accounting & Controllership | Note: the Compensation Walk counts people here on Jun 30, 2026: 68 of the 72 who joined Accounting & Controllership, plus 5 who moved in. |
 
 If the secondary number shows blank: the link is not active (click the link icon next to `Link` in the Region Walk pane) or a filter on the primary sheet removed `Link`.
 
@@ -1203,7 +1219,7 @@ Default state: FY26 (Jun 30, 2025 → Jun 30, 2026), Company, Employees, compact
 
 Commercial turnover rows (one level below): Sales 14.9%, Client Services 14.8%. Title: "Sales has the highest turnover in FY26".
 
-**Cross-check with Dashboard #2 (must be identical):** FY26 Company 28,438 → 30,005; Commercial 7,441 → 7,795; Accounting & Controllership 543 → 560; India 6,672 → 6,967; Q4 29,618 → 30,005. Hires still here: Company 4,790, Commercial 1,309, Accounting & Controllership 73, India 1,038, Q4 1,317.
+**Cross-check with Dashboard #2 (must be identical):** FY26 Company 28,438 → 30,005; Commercial 7,441 → 7,795; Accounting & Controllership 543 → 560; India 6,672 → 6,967; Q4 29,618 → 30,005. Hires still here (the Compensation Walk's Hires bar): Company 4,790, Commercial 1,309, Accounting & Controllership 73, India 1,038, Q4 1,317. In the tie-out, joined this group + moved in: Company 4,790 + 0, Commercial 1,305 + 4, Accounting & Controllership 68 + 5, India 1,033 + 5, Q4 1,317 + 0.
 
 ---
 

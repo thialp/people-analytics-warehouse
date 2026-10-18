@@ -27,10 +27,10 @@ Checked in DuckDB on the release 3 warehouse: for **all 88 periods × every grou
 |---|---|---|---|
 | Opening, closing, net change, % change | KPI card 1, waterfall levels | People card, Growth by Region headline | **Identical** |
 | Joined in the period | KPI card 2 (5,235 = 4,965 hires + 270 conversions) | Tie-out note under the waterfall | **Identical** (same sentence in both) |
-| Hires still here at the end | Tie-out note under the waterfall | Hires driver (4,790), Top drivers | **Identical** (same sentence in both) |
+| Hires still here at the end | Tie-out note under the waterfall | Hires driver (4,790), Top drivers | **Identical** (same sentence in both). In a group view the note counts the hires who joined **this** group (Hires reason `New Hire`) and names the ones who joined elsewhere and moved in separately (section 8 item 9) |
 | Leavers | Every leaver (3,668) | Exits from the opening team (3,223) | Different by definition, explained in both info panels |
 
-**Why the hire counts differ, and why both are right.** Dashboard #1 counts **events** month by month: everyone who joined. Dashboard #2 compares **two snapshots**: pay can only be priced for someone present on a date, so a person hired in October who left in March is in neither snapshot. FY26, Company: 5,235 joined, 445 of them left again before Jun 30, 2026, so 4,790 were still here. The same 445 explain the leavers: 3,668 − 445 = 3,223 exits. For a group (a function, a country) the gap also includes people who joined and then changed team. Neither dashboard is changed to the other's definition: turnover needs every leaver, and a pay walk can only price people it can see. Instead **both show both numbers in one identical sentence** (Dashboard #1 guide section 9, Dashboard #2 guide section 7), so a reader never sees two unexplained hire counts.
+**Why the hire counts differ, and why both are right.** Dashboard #1 counts **events** month by month: everyone who joined. Dashboard #2 compares **two snapshots**: pay can only be priced for someone present on a date, so a person hired in October who left in March is in neither snapshot. FY26, Company: 5,235 joined, 445 of them left again before Jun 30, 2026, so 4,790 were still here. The same 445 explain the leavers: 3,668 − 445 = 3,223 exits. For a group (a function, a country) the gap also includes people who joined and then changed team; and the Hires bar also holds people who joined **another** team and moved in (grouped where they are on the closing date), which the note counts separately so its two numbers are one population (section 8 item 9). Neither dashboard is changed to the other's definition: turnover needs every leaver, and a pay walk can only price people it can see. Instead **both show both numbers in one identical sentence** (Dashboard #1 guide section 9, Dashboard #2 guide section 7), so a reader never sees two unexplained hire counts.
 
 ### 0.2 Population
 
@@ -121,7 +121,7 @@ docker compose up -d
 docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -i /repo/sqlserver/06_validate_compensation_walk.sql
 ```
 
-Expected: the walk returns **108,918** rows and every check **PASS** (release 3 values; full expected output for `06`, `07`, `09` in `docs/projects/contingent-workforce/sql_server_release_3_run.md`). If the file name differs on your Mac, `ls sqlserver/0*validate*` lists them.
+Expected: the walk returns **110,498** rows and every check **PASS** (release 3 values; full expected output for `06`, `07`, `09` in `docs/projects/contingent-workforce/sql_server_release_3_run.md`). If the file name differs on your Mac, `ls sqlserver/0*validate*` lists them.
 
 Then:
 
@@ -139,7 +139,7 @@ For each of the two sources: Data Source tab > right-click the Custom SQL table 
 
 | Source | File | Rows after refresh |
 |---|---|---:|
-| `ArcadiaHR` (the walk) | `custom_sql_compensation_walk.sql` | 108,918 |
+| `ArcadiaHR` (the walk) | `custom_sql_compensation_walk.sql` | 110,498 |
 | `Office Moves` | `custom_sql_office_moves.sql` | 89,611 |
 
 Nothing turns red: release 3 removed no column. What changes:
@@ -415,16 +415,22 @@ Tableau has no `comma()` function, so each number gets its own text calc (the sa
 LEFT(DATENAME('month', [p_To]), 3) + " " + STR(DAY([p_To])) + ", " + STR(YEAR([p_To]))
 
 // RW Hires Still Here   SUM(IF [RW Is Current] THEN [hires] END)            (= the Hires driver's people)
+// RW Hires Moved In     SUM(IF [RW Is Current] THEN [hires_joined_elsewhere] END)
+//                       (hired into another group of this view, moved in before the closing date; 0 for Company)
+// RW Hires Joined Here  [RW Hires Still Here] - [RW Hires Moved In]          (a subset of TO Joined: test 79)
 // TO Joined             ZN([Headcount Walk].[HW Joined])
-// TO Gap                [TO Joined] - [RW Hires Still Here]
+// TO Gap                [TO Joined] - [RW Hires Joined Here]                 (never negative)
 
 // TO Joined Text
 IF [TO Joined] >= 1000 THEN STR(INT([TO Joined] / 1000)) + "," + RIGHT("00" + STR(INT([TO Joined]) % 1000), 3)
 ELSE STR(INT([TO Joined])) END
 // TO Still Here Text   (same, with [RW Hires Still Here])
+// TO Here Text         (same, with [RW Hires Joined Here])
 // TO Gap Text          (same, with [TO Gap])
+// TO Moved In Clause   (empty when nobody moved in; the count is below 1,000 in every group, so STR is enough)
+IF [RW Hires Moved In] > 0 THEN ", plus " + STR([RW Hires Moved In]) + " who moved in" ELSE "" END
 
-// Tie-out Text   (starts with "Note:"; says why Hires is lower than "joined"; one line)
+// Tie-out Text   (starts with "Note:"; says why Hires differs from "joined"; one line)
 IF [p_View] = "Office" THEN
     "Note: pay is priced for people here on " + [TT To Day] + ": " + [TO Still Here Text] +
     " new to Arcadia at " + [p_Group] + ". Headcount & FTE Walk has no office view."
@@ -432,15 +438,15 @@ ELSEIF [p_View] = "Company" THEN
     "Note: pay is priced for people here on " + [TT To Day] + ", so hires count " + [TO Still Here Text] +
     " of the " + [TO Joined Text] + " who joined (" + [TO Gap Text] + " left again)."
 ELSE
-    "Note: pay is priced for people here on " + [TT To Day] + ", so hires count " + [TO Still Here Text] +
-    " of the " + [TO Joined Text] + " who joined " + [p_Group] + "."
+    "Note: Hires counts people here on " + [TT To Day] + ": " + [TO Here Text] +
+    " of the " + [TO Joined Text] + " who joined " + [p_Group] + [TO Moved In Clause] + "."
 END
 ```
 Dashboard #1 uses the same helpers in its section 9, with the sentence seen from its side (it counts every hire; the Compensation Walk counts people still here).
 
 Sheet: Text mark, Text `<Tie-out Text>`, Tableau Book 8, slate `#5A6170`, alignment Left and Middle, one line, Entire View, title hidden, shading None, tooltip: see below, `zzTrue` and `zzFalse` on Detail, deselect action (5.4). **Remove any from/to/view filters left from testing**: the calc already reads the parameters.
 
-The note is written to fit **one line** (about 135 characters at 8 pt in 644 px; the longest, a function with a long name, is about 130). Wrapping text inside a floating item did not behave, so the sentence is short instead.
+The note is written to fit **one line** (about 135 characters at 8 pt in 644 px; the longest group sentence, a department with a long name and four-digit counts, is 129). Wrapping text inside a floating item did not behave, so the sentence is short instead.
 
 Placement on Summary (card x 246, y 190, 668 x 314, bottom 504). Reserve a thin strip with padding, not by resizing the sheet:
 
@@ -459,7 +465,11 @@ Placement on Summary (card x 246, y 190, 668 x 314, bottom 504). Reserve a thin 
 ELSE
     [TO Joined Text] + " people joined " + [TO Who] + " between " + [TT From Day] + " and " + [TT To Day] +
     " (Headcount & FTE Walk, counted month by month)." + CHAR(10) +
-    "In the Hires bar: " + [TO Still Here Text] + ", the ones still there on " + [TT To Day] + "." + CHAR(10) +
+    "In the Hires bar: " + [TO Here Text] + ", the ones still there on " + [TT To Day] + "." + CHAR(10) +
+    (IF [RW Hires Moved In] > 0
+     THEN "Also in the bar: " + STR([RW Hires Moved In]) + " who joined another team and moved in before " + [TT To Day] +
+          " (" + [TO Still Here Text] + " in all)." + CHAR(10)
+     ELSE "" END) +
     "Not in the bar: " + [TO Gap Text] +
     (IF [p_View] = "Company"
      THEN ", who joined and left again before " + [TT To Day] + ". They are in neither snapshot, so there is no pay to price."
@@ -467,7 +477,7 @@ ELSE
      END)
 END)
 ```
-`Tie-out` sheet: `Tie-out Detail` on Detail; Worksheet > Tooltip > Show tooltips (on hover, no command buttons). Tooltip text: bold line **Why Hires counts fewer people than joined**, then `<AGG(Tie-out Detail)>`, then: "Avg per FTE: a hire moves the average only by how far their pay is from the opening average. New hires usually start below it, so the bar is negative. Total payroll: a hire adds their full pay." and "The Headcount & FTE Walk counts every joiner and leaver month by month, so its hires and leavers include these people." FY26 Company reads: "5,235 people joined Arcadia between Jun 30, 2025 and Jun 30, 2026 ... In the Hires bar: 4,790 ... Not in the bar: 445, who joined and left again before Jun 30, 2026."
+`Tie-out` sheet: `Tie-out Detail` on Detail; Worksheet > Tooltip > Show tooltips (on hover, no command buttons). Tooltip text: bold line **Why Hires counts fewer people than joined**, then `<AGG(Tie-out Detail)>`, then: "Avg per FTE: a hire moves the average only by how far their pay is from the opening average. New hires usually start below it, so the bar is negative. Total payroll: a hire adds their full pay." and "The Headcount & FTE Walk counts every joiner and leaver month by month, so its hires and leavers include these people." FY26 Company reads: "5,235 people joined Arcadia between Jun 30, 2025 and Jun 30, 2026 ... In the Hires bar: 4,790 ... Not in the bar: 445, who joined and left again before Jun 30, 2026." FY26 Department Accounting & Controllership reads: "72 people joined Accounting & Controllership ... In the Hires bar: 68 ... Also in the bar: 5 who joined another team and moved in before Jun 30, 2026 (73 in all). Not in the bar: 4, who left Arcadia or moved to another team before Jun 30, 2026."
 
 Check:
 
@@ -475,8 +485,9 @@ Check:
 |---|---|
 | FY26, Company | Note: pay is priced for people here on Jun 30, 2026, so hires count 4,790 of the 5,235 who joined (445 left again). |
 | FY26 Q4, Company | Note: pay is priced for people here on Jun 30, 2026, so hires count 1,317 of the 1,330 who joined (13 left again). |
-| FY26, Function Commercial | Note: pay is priced for people here on Jun 30, 2026, so hires count 1,309 of the 1,470 who joined Commercial. |
-| FY26, Country India | Note: pay is priced for people here on Jun 30, 2026, so hires count 1,038 of the 1,113 who joined India. |
+| FY26, Function Commercial | Note: Hires counts people here on Jun 30, 2026: 1,305 of the 1,470 who joined Commercial, plus 4 who moved in. |
+| FY26, Country India | Note: Hires counts people here on Jun 30, 2026: 1,033 of the 1,113 who joined India, plus 5 who moved in. |
+| FY26, Department Accounting & Controllership | Note: Hires counts people here on Jun 30, 2026: 68 of the 72 who joined Accounting & Controllership, plus 5 who moved in. |
 
 ---
 
@@ -515,7 +526,21 @@ END) + CHAR(10) +
 ```
 `Title` sheet: `Title Tip` on Detail (parameters only, adds no rows); Worksheet > Tooltip > Show tooltips (on hover, no command buttons): bold line **How to read this page**, then `<Title Tip>`, then "Click ⓘ in the left rail for the full definitions and limits." (Book 9, slate). Keep the deselect action (5.4); this replaces "off" for the page title sheet in that table. Dashboard #1 gets the same tooltip adapted to events (hires, leavers, movements) when it is rebuilt.
 
-9. **SQL check, open: "73 of the 72 who joined".** In a group view the tie-out note under the waterfall once read "hires count 73 of the 72 who joined", which cannot be true (hires still here can never exceed everyone who joined). Company FY26 is consistent (4,790 still here + 445 left again = 5,235 joined), so this looks like a definition mismatch between the two counts in a group view, not wording. Likely cause to test first: "still here" is counted by position or group *at the closing date* (so transfers into the group are included, see item 7), while "joined" is counted by hire date *inside the group*. To run, for the group where it showed and FY26: (a) count distinct workers with a hire date in the period and the group at hire; (b) count distinct workers who are active at the closing date, hired in the period, with the group at close; (c) list the difference by worker id. Fix by using one population for both numbers (hired in the period, grouped as at the closing date), or reword the note when they differ. Not a blocker for the Dashboard #2 publish.
+9. **SQL check, done 2026-10-18: "73 of the 72 who joined".** The note read "hires count 73 of the 72 who joined" for **FY26, Department Accounting & Controllership** (`D-502`). Run on the release 3 warehouse (SQL Server build translated to DuckDB):
+
+   | Query | Population | Result |
+   |---|---|---:|
+   | (a) joined | first month-end in the snapshot between Jun 30, 2025 and Jun 30, 2026, department `D-502` on that month-end (Dashboard #1's Joined) | 72 |
+   | (b) still here | not in the Jun 30, 2025 snapshot, in the Jun 30, 2026 snapshot, department `D-502` on Jun 30, 2026 (the Hires bar) | 73 |
+   | (c) in one only | 4 joined A&C and left Arcadia (W142918, W143054, W143684, W146048); 5 joined another department (3 in FP&A, 1 in Product Engineering, 1 in Mobile & Web Engineering) and moved into A&C | 9 |
+
+   (c) in full: W142918 (Sep 2025), W143054 (Oct 2025), W143684 (Nov 2025), W146048 (Apr 2026) joined A&C and were gone by Jun 30, 2026; W142677 (Sep 2025, `D-501`), W143776 (Nov 2025, `D-501`), W143958 (Dec 2025, `D-501`), W145500 (Mar 2026, `D-103`), W145594 (Mar 2026, `D-102`) joined elsewhere and moved into A&C. 72 − 4 + 5 = 73. Nobody joined A&C and moved out.
+
+   **Cause:** the two numbers were different populations. Hires are grouped as at the closing date, because that is where their pay is priced, so in a group view they include people who joined another team and moved in; "joined" books each hire to the team they joined. Across all 88 periods, 73 period × group combinations showed still here > joined (Department 59, Sub-function 5, Country 5, Function 4, Company 0).
+
+   **One population for both numbers: people who joined *this* group in the period.** Dashboard #1's joined already is that (it is a flow in a walk that must close, so it cannot be regrouped at the closing date). The Hires bar keeps its closing-date grouping (the pay walk closes on it); the walk now tags each hire with the group they joined: `movement_reason` on the Hires line is `New Hire` (joined this group, still in it) or `Joined Elsewhere` (joined another group of this view, moved in). The region walk carries the same split as `hires_joined_elsewhere`. The note compares `New Hire` people with joined and names the movers separately: "68 of the 72 who joined Accounting & Controllership, plus 5 who moved in" (68 + 5 = the bar's 73). After the change, still here > joined in **0** combinations; test 79 keeps it that way. Every line other than Hires is unchanged to the cent; the Hires bar keeps its people exactly and its dollars to within $0.01 (each reason is rounded to the cent separately). The walk has 1,580 more rows (110,498), the region walk the same 26,520 with one new column.
+
+   Tableau: section 7.3 (calcs `RW Hires Moved In`, `RW Hires Joined Here`, `TO Here Text`, `TO Moved In Clause`; the group branch of `Tie-out Text`; the tooltip's "Also in the bar" line), and Dashboard #1 guide section 9. Refresh both extracts (Walk and Region Walk) after pasting the new Custom SQL. Optional: the Hires bar tooltip (7.1) can add a line from `SUM(IF [movement_reason] = "Joined Elsewhere" THEN [worker_count] END)`, e.g. "5 of them joined another team and moved in".
 
 ---
 
@@ -532,7 +557,8 @@ FY26 (Jun 30, 2025 → Jun 30, 2026), Loaded, Constant. Company values are also 
 | Total payroll | $3,130.0M → $3,410.5M | $868.5M → $940.1M |
 | Compact: Hires & exits · Promotions · Raises · Fringe & other | −$997 · +$695 · +$3,654 · +$250 | −$1,020 · +$746 · +$3,926 · +$228 |
 | Top drivers (per FTE) | Tenure raises +$3,602 (25,189) · Hires −$1,201 (4,790) · Promotions +$722 (1,824) · Fringe rates +$284 (11,312) | Tenure raises +$3,863 (6,478) · Hires −$1,466 (1,309) · Promotions +$771 (495) · Exits +$449 (968) |
-| Hires still here (tooltip, tie-out) | 4,790 | 1,309 |
+| Hires still here (Hires bar, tooltip) | 4,790 | 1,309 |
+| In the tie-out: joined this group and still here · moved in | 4,790 · 0 | 1,305 · 4 |
 | Joined (from Headcount Walk) | 5,235 | 1,470 |
 | Expand label | Expand · 9 drivers | Expand · 11 drivers |
 | Growth by Region headline | Arcadia Systems +5.5% (28,438 \| 30,005) | Commercial +4.8% (7,441 \| 7,795) |
@@ -548,7 +574,7 @@ FY26 (Jun 30, 2025 → Jun 30, 2026), Loaded, Constant. Company values are also 
 |---|---|---|
 | 1 | Hover Period, Group, Reset, Info, ✕ | Outline or nothing, never a square; tooltips as in 5 and 6 |
 | 2 | Click Total payroll, Base, Nominal, a View row, Expand, Collapse, the map headline, a KPI card | Nothing stays highlighted; titles cannot be selected |
-| 3 | Function > Commercial | People 7,795 from 7,441; Growth by Region "Commercial +4.8% (7,441 \| 7,795)"; tie-out "1,470 joined Commercial; 1,309 …" |
+| 3 | Function > Commercial | People 7,795 from 7,441; Growth by Region "Commercial +4.8% (7,441 \| 7,795)"; tie-out "1,305 of the 1,470 who joined Commercial, plus 4 who moved in"; Hires bar 1,309 people |
 | 4 | Expand, Constant | "Expand · 11 drivers", no FX bar; Nominal: FX bar back, 12 |
 | 5 | Hover the Hires bar (expanded) | "1,309 people still here on Jun 30, 2026" |
 | 6 | Office > any office | Tie-out uses the office sentence |

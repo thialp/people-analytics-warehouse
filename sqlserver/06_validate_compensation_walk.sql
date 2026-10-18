@@ -31,7 +31,7 @@ PRINT '1. Shape';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #walk) AS actual, 108918 AS expected
+              SELECT 'rows'       AS check_name, (SELECT COUNT(*) FROM #walk) AS actual, 110498 AS expected
     UNION ALL SELECT 'date pairs', (SELECT COUNT(*) FROM (SELECT DISTINCT from_month_end, to_month_end FROM #walk) AS p), 88
     UNION ALL SELECT 'views',      (SELECT COUNT(DISTINCT view_name) FROM #walk), 6
 ) AS c;
