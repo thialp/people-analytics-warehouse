@@ -39,7 +39,7 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 | 🪑 **1. [Workforce Planning](#case-study-1-workforce-planning)** | *Are we hiring into the seats we planned?* | Every hire tied to the seat it filled, who sat there before, and the plan versus what happened | *in design* |
 | 📈 **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* | Start + hires − leavers ± moves = end, for employees, contractors and both, for any team | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount)** |
 | 🗺️ **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
-| 💵 **4. [Compensation Walk](#case-study-4-compensation-walk)** | *Why did pay in this group change?* | Each dollar of change traced to hires, exits, promotions, raises, employer costs or currency | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary)** |
+| 💵 **4. [Compensation Walk](#case-study-4-compensation-walk)** | *Why did pay in this group change?* | Each dollar of change traced to hires, exits, promotions, raises, employer costs or currency | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)** |
 | 🧮 **5. [Workforce Cost Bridge](#case-study-5-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | *coming soon* |
 | 🔍 **6. [Contingent Workforce](#case-study-6-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | *coming soon* |
 
@@ -602,7 +602,7 @@ The numbers tie out: the waterfall, the cards, the trend and the Compensation Wa
 
 ![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
 
-*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary).*
+*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard).*
 
 ### Business problem
 
@@ -638,7 +638,11 @@ Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_gu
 
 ## Case study 4: Compensation Walk
 
-**Published:** [Compensation Walk on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary) (interactive; every control drives every card).
+**Published:** [Compensation Walk on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard) (interactive; every control drives every card).
+
+[![Compensation Walk on Tableau Public](docs/images/compensation_walk_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)
+
+*FY26, all of Arcadia, loaded cost, constant currency. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)**: pick any period, any group, average per FTE or total payroll, loaded or base cost, constant or nominal currency.*
 
 ### Business problem
 
@@ -674,7 +678,7 @@ Ten tests (34 to 40 and 57 to 59) prove the ledger explains every worker's chang
 
 ### Tableau
 
-One dashboard, **1400 x 850**, built on Custom SQL data sources and published as extracts to **[Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary)**:
+One dashboard, **1400 x 850**, built on Custom SQL data sources and published as extracts to **[Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)**:
 
 | Card | What it does |
 |---|---|

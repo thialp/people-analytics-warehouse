@@ -4,7 +4,7 @@ Where the Tableau build stands, and what is still open. Updated 2026-10-12 (nigh
 
 ## Published (2026-10-12)
 
-- **Live:** https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Summary (profile: https://public.tableau.com/app/profile/thialp). Extracts of both data sources (271,219 and 260,464 rows). Steps, description text and decisions: [publish_tableau_public.md](publish_tableau_public.md).
+- **Live:** https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard (profile: https://public.tableau.com/app/profile/thialp). Extracts of both data sources (271,219 and 260,464 rows). Steps, description text and decisions: [publish_tableau_public.md](publish_tableau_public.md).
 - **Done in this stretch:** the rail (period, view, group, lens, cost, currency, reset, info panel and footnote), the Top drivers card (individual steps only), the Expand/Collapse buttons (text plus icon sheets in one container), amber Growth by Region, page subtitle with "Data as of".
 - **Still to do on the published page:** the interaction checks listed in the publishing notes (rail, popovers, Expand/Collapse, Reset, hover). Anything that differs from Desktop goes below.
 
