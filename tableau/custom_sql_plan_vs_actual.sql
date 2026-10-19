@@ -1,7 +1,7 @@
 /*
   custom_sql_plan_vs_actual.sql
   Tableau Custom SQL for Dashboard #3, Workforce Planning (SQL Server, database ArcadiaHR).
-  Plan vs actual: one row per plan version x cost center x fiscal quarter, 29,415 rows (615 of them
+  Plan vs actual: one row per plan version x cost center x fiscal quarter, 29,365 rows (615 of them
   are cost centers with contingent workers only: zero on every employee measure).
 
   Reads the reporting view rpt.vw_plan_vs_actual (built by sqlserver/04_create_reporting_views.sql
@@ -19,6 +19,10 @@
   workers Bridgeway counted on the quarter-end; actual_cw_spend_usd_plan_fx their annualized bill
   run-rate at the plan's FX rates (compare with planned_cw_spend_usd), _constant at the constant
   rate set. Like headcount, these are levels.
+
+  Executive officers excluded (department D-901, the CEO and the eight function heads), as on
+  Dashboards #1 and #2 and in custom_sql_wfp_summary.sql, so every Arcadia dashboard counts the
+  same people. The plan carries 50 such rows; fills and the vacancy pool have none.
 
   Checked row for row against the DuckDB mart by sqlserver/check_tsql_in_duckdb.py.
   Tableau rules: one SELECT, no CTEs, no ORDER BY, block comments only.
@@ -64,3 +68,4 @@ SELECT
     v.actual_cw_spend_usd_constant,
     v.plan_fx_rate_date
 FROM rpt.vw_plan_vs_actual AS v
+WHERE v.department_id <> 'D-901'

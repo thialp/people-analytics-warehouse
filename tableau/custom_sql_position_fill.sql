@@ -13,6 +13,10 @@
   Backfill columns (prior_*, level_change, location_change, pay walk) are NULL on net-new
   fills; reuse_candidate is TRUE only on net-new fills.
 
+  Executive officers excluded (department D-901, the CEO and the eight function heads), as on
+  Dashboards #1 and #2 and in custom_sql_wfp_summary.sql, so every Arcadia dashboard counts the
+  same people. This view has no rows for them; the filter states the rule.
+
   Checked row for row against the DuckDB mart by sqlserver/check_tsql_in_duckdb.py.
   Tableau rules: one SELECT, no CTEs, no ORDER BY, block comments only.
   Arcadia Systems is fictional and all data is synthetic.
@@ -88,3 +92,4 @@ SELECT
     v.chain_length,
     v.chain_trigger
 FROM rpt.vw_position_fill AS v
+WHERE v.department_id <> 'D-901'
