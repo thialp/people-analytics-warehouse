@@ -117,9 +117,10 @@ CROSS JOIN (
     FROM (
         SELECT gv.view_name, gv.view_order, gv.group_name,
                SUM(CASE WHEN p.version_type = 'Budget'
-                         AND p.quarter_end_date = (SELECT MAX(quarter_end_date) FROM rpt.vw_plan_vs_actual)
+                         AND p.quarter_end_date = mx.last_quarter_end
                         THEN p.actual_ending_headcount ELSE 0 END)                       AS year_end_headcount
         FROM rpt.vw_plan_vs_actual AS p
+        CROSS JOIN (SELECT MAX(quarter_end_date) AS last_quarter_end FROM rpt.vw_plan_vs_actual) AS mx
         CROSS APPLY (VALUES (N'Company', 1, N'Arcadia Systems'), (N'Function', 2, p.function_name),
                             (N'Sub-function', 3, p.sub_function), (N'Department', 4, p.department_name),
                             (N'Country', 5, p.country_name)) AS gv(view_name, view_order, group_name)
