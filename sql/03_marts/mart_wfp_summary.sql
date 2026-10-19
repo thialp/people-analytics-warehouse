@@ -17,6 +17,7 @@
 --
 -- Population: the 9 executive officers (department D-901) are excluded, as on Dashboards #1 and
 -- #2, so FY26 year-end employees read 30,005 here and there.
+CREATE OR REPLACE TABLE marts.mart_wfp_summary AS
 WITH fy AS (
     SELECT DISTINCT fiscal_year FROM marts.mart_plan_vs_actual
 ),
