@@ -13,10 +13,10 @@ What it runs
      (index, constraint and ALTER COLUMN statements are skipped: DuckDB does not need them)
   2. every rpt view against its mart (numbers to the cent, flags as 0/1, the rest as text)
   3. the Tableau Custom SQL: the headcount & FTE walk (against its six CSVs), office moves,
-     region walk, career moves, workforce planning and the workforce cost bridge in full, the
+     region walk, career moves, workforce planning (with its summary) and the workforce cost bridge in full, the
      compensation walk for the pairs that end in FY26 (the full walk needs more memory
      than a laptop-sized DuckDB run allows)
-  4. the PASS/FAIL tables of 05, 08, 10 and 12 (the contingent workforce)
+  4. the PASS/FAIL tables of 05, 08, 10, 12 (the contingent workforce) and 14 (Dashboard #3)
   and, before all that, SQL Server rules DuckDB does not enforce: primary-key columns must be
   made NOT NULL first, text must fit its declared VARCHAR length, PRINT takes no subquery, and
   ordered STRING_AGGs in one SELECT must share one ordering (Msg 8711).
@@ -293,7 +293,14 @@ def main() -> int:
         con.execute("CREATE OR REPLACE VIEW hc AS SELECT * FROM tmp_hc")
         for name in ("position_fill", "vacancy_pool", "plan_vs_actual", "seat_corridors"):   # Dashboard #3
             custom_sql(con, f"custom_sql_{name}.sql", name)
-            ok &= compare(con, f"mart_{name}", f"cs.{name}")
+            ok &= compare(con, f"mart_{name}", f"cs.{name}",
+                          "" if name == "seat_corridors" else "WHERE department_id <> 'D-901'")
+        custom_sql(con, "custom_sql_wfp_summary.sql", "wfp_summary")   # Dashboard #3 KPI band and rail
+        ok &= compare(con, "mart_wfp_summary", "cs.wfp_summary")
+        for tmp, src in (("tmp_wfp", "cs.wfp_summary"), ("tmp_pva", "cs.plan_vs_actual"),   # #wfp, #pva, #fill in 14_validate
+                         ("tmp_fill", "cs.position_fill")):
+            con.execute(f"CREATE OR REPLACE TABLE {tmp} AS SELECT * FROM {src}")
+            con.execute(f"CREATE OR REPLACE VIEW {tmp[4:]} AS SELECT * FROM {tmp}")
         custom_sql(con, "custom_sql_workforce_cost_bridge.sql", "workforce_cost_bridge")
         ok &= compare(con, "mart_workforce_cost_bridge", "cs.workforce_cost_bridge")
         con.execute("CREATE OR REPLACE VIEW cb AS SELECT * FROM cs.workforce_cost_bridge")   # #cb in 12_validate
@@ -308,6 +315,7 @@ def main() -> int:
         ok &= validation(con, "08_validate_workforce_planning.sql")
         ok &= validation(con, "10_validate_headcount_fte_walk.sql")
         ok &= validation(con, "12_validate_contingent_workforce.sql")
+        ok &= validation(con, "14_validate_workforce_planning_dashboard.sql")
         con.close()
     ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")

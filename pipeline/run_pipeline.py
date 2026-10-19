@@ -66,6 +66,7 @@ EXPORTS = [
     "mart_seat_corridors",
     "mart_region_walk",
     "mart_career_moves",
+    "mart_wfp_summary",
 ]
 
 
