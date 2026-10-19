@@ -176,3 +176,4 @@ LEFT JOIN plan_agg AS p
 LEFT JOIN fill_agg AS f
   ON f.fiscal_year = g.fiscal_year AND f.pair_code = g.pair_code AND f.version_type = g.version_type
  AND f.view_name = l.view_name AND f.group_name = l.group_name
+ORDER BY g.fiscal_year, g.pair_order, g.version_order, l.view_order, l.group_name;
