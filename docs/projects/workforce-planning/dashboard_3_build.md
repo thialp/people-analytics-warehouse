@@ -161,7 +161,7 @@ The first run of `14_validate_workforce_planning_dashboard.sql` failed with Msg 
 
 Part A builds the workbook shell, the parameters, the rail's lists (with the greying that stops an empty page) and the KPI band. Each step says what to see. Part B (plan vs actual panel, seat fills, vacancy pool, map, check sheets) follows once part A matches.
 
-**Field names.** Tableau shows each SQL column with capitals and spaces: `fiscal_year` is `[Fiscal Year]`, `has_plan` is `[Has Plan]`, `actual_cw_spend_usd_plan_fx` is `[Actual Cw Spend Usd Plan Fx]`. The formulas below use those names.
+**Field names.** Tableau shows the SQL columns exactly as written, lowercase with underscores: `fiscal_year`, `has_plan`, `actual_cw_spend_usd_plan_fx`. The formulas below use those names, so they paste as they are. Fields you create (`K Close HC`, `Why Off`, `Row Is Current`) keep their capitalised names, and parameters start with `p_`.
 
 ### 3.0 The workbook and the five sources
 
@@ -172,7 +172,7 @@ Part A builds the workbook shell, the parameters, the rail's lists (with the gre
 
 Expected: on the WFP Summary data source page, **10,080 rows** (View Data shows them); Plan vs Actual 29,365; Position Fill 30,575; Vacancy Pool 62,055; Seat Corridors 821.
 
-**Types (WFP Summary).** Right-click each and choose **Convert to Dimension**: `Fiscal Year`, `Pair Order`, `Version Order`, `View Order`, `Quarters In Pair`, `Eff First Quarter`, `Eff Last Quarter`, `Quarters Covered`. They are labels, not amounts. `Has Plan`, `Is Covered` and `Is View Default` arrive as True/False.
+**Types (WFP Summary).** Right-click each and choose **Convert to Dimension** (they arrive as measures, with the `#` icon): `fiscal_year`, `pair_order`, `version_order`, `view_order`, `quarters_in_pair`, `eff_first_quarter`, `eff_last_quarter`, `quarters_covered`. They are labels, not amounts. `has_plan`, `is_covered` and `is_view_default` arrive as True/False.
 
 ### 3.1 Parameters (all in the workbook, not shown on the dashboard)
 
@@ -192,38 +192,38 @@ Expected: on the WFP Summary data source page, **10,080 rows** (View Data shows 
 
 ```
 // Pick Context FY       (the other four choices; the FY list shows only rows that match them)
-[Pair Code] = [p_Period] AND [Version Type] = [p_Version]
-AND [View Name] = [p_View] AND [Group Name] = [p_Group]
+[pair_code] = [p_Period] AND [version_type] = [p_Version]
+AND [view_name] = [p_View] AND [group_name] = [p_Group]
 
 // Pick Context Period
-[Fiscal Year] = [p_FY] AND [Version Type] = [p_Version]
-AND [View Name] = [p_View] AND [Group Name] = [p_Group]
+[fiscal_year] = [p_FY] AND [version_type] = [p_Version]
+AND [view_name] = [p_View] AND [group_name] = [p_Group]
 
 // Pick Context Version
-[Fiscal Year] = [p_FY] AND [Pair Code] = [p_Period]
-AND [View Name] = [p_View] AND [Group Name] = [p_Group]
+[fiscal_year] = [p_FY] AND [pair_code] = [p_Period]
+AND [view_name] = [p_View] AND [group_name] = [p_Group]
 
 // Pick Context Group
-[Fiscal Year] = [p_FY] AND [Pair Code] = [p_Period]
-AND [Version Type] = [p_Version] AND [View Name] = [p_View]
+[fiscal_year] = [p_FY] AND [pair_code] = [p_Period]
+AND [version_type] = [p_Version] AND [view_name] = [p_View]
 
 // Row Is Current        (all five: exactly one row of the summary; the KPI band and subtitle use it)
-[Fiscal Year] = [p_FY] AND [Pair Code] = [p_Period] AND [Version Type] = [p_Version]
-AND [View Name] = [p_View] AND [Group Name] = [p_Group]
+[fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [version_type] = [p_Version]
+AND [view_name] = [p_View] AND [group_name] = [p_Group]
 ```
 
-What each list sheet shows is therefore the **row for every option of that list, with the other four choices held at their current values**. Because the summary has a row for every combination, that row's `Has Plan` already says whether the option leads to data. No lookup, no LOD.
+What each list sheet shows is therefore the **row for every option of that list, with the other four choices held at their current values**. Because the summary has a row for every combination, that row's `has_plan` already says whether the option leads to data. No lookup, no LOD.
 
 ```
 // Version Plans         (which quarters each version plans; used in the "why" tooltip)
-CASE [Version Type] WHEN "Budget" THEN "Q1–Q4" WHEN "RF1" THEN "Q2–Q4"
+CASE [version_type] WHEN "Budget" THEN "Q1–Q4" WHEN "RF1" THEN "Q2–Q4"
                     WHEN "RF2" THEN "Q3–Q4" ELSE "Q4" END
 
 // Why Off               (tooltip text of a greyed option; empty when the option works)
-IF [Has Plan] THEN ""
-ELSEIF NOT [Is Covered]
-THEN [Version Type] + " plans " + [Version Plans] + " only, so it has nothing for " + [Pair Name] + "."
-ELSE [Group Name] + " had no plan seats in " + [Pair Name] + " (" + [Version Type] + ")." END
+IF [has_plan] THEN ""
+ELSEIF NOT [is_covered]
+THEN [version_type] + " plans " + [Version Plans] + " only, so it has nothing for " + [pair_name] + "."
+ELSE [group_name] + " had no plan seats in " + [pair_name] + " (" + [version_type] + ")." END
 
 // Option Color          (one calc per list; see 3.3 for the compared field)
 // "off" greyed and unclickable · "current" the active choice · "on" a working choice
@@ -231,42 +231,49 @@ ELSE [Group Name] + " had no plan seats in " + [Pair Name] + " (" + [Version Typ
 
 ### 3.3 The rail lists (one sheet each)
 
-All five are the **Rail View** pattern from Dashboard #2 ([rail_controls_build.md](../compensation-walk/rail_controls_build.md)): Square marks, one row per option, Text = the display calc, Color = the state calc, header hidden, Entire View, Detail = the pick field + `Why Off` + `zzTrue` + `zzFalse`. Colors: **current** the active color of Rail View's selected row, **on** its inactive color, **off** a light gray (`#B5B4AE`). Tooltip = `<Why Off>` only (empty tooltips show nothing for working options).
+All five follow Dashboard #2's `Rail View` pattern, with one difference. Dashboard #2's `Rail View` is a **Text** mark with no Color pill (white words on the dark rail; the active row is shown only by the "›" marker). Here a list must also show an option that cannot be chosen, so each sheet adds one Color pill, the `… State` calc, and nothing else changes:
+
+- **Marks: Text** (Tableau Book, 9, Middle Left on the Text card). **Do not set a font color** there: a fixed font color overrides the Color shelf and the dimming never shows.
+- **Format > Shading:** Worksheet and Pane = the dark blue of Dashboard #2's Rail View.
+- **Color = the state calc:** **current** and **on** `#FFFFFF`, **off** `#6E7B93` (about 3 to 1 against the navy: clearly dimmer than white, still legible).
+- Header hidden, Entire View, tooltip = `<Why Off>` only. Detail = the pick field, `Why Off`, `zzTrue`, `zzFalse`, `Close Panel`.
+- Any pick field that returns a number (`FY Pick`) must be a **dimension** (Convert to Dimension); otherwise Detail shows `SUM(...)`.
+- Copy `zzTrue`, `zzFalse` and `Close Panel` from Dashboard #2's workbook (Ctrl+C, then Ctrl+V on WFP Summary) so the deselect trick is identical.
 
 | Sheet | Filter (True) | Rows | Text | Color | Pick (Detail; the action uses it) |
 |---|---|---|---|---|---|
-| `Rail FY` | `Pick Context FY` | `Fiscal Year` | `FY Display` | `FY State` | `FY Pick` |
-| `Rail Period` | `Pick Context Period` | `Pair Order`, `Pair Code` | `Period Display` | `Period State` | `Period Pick` |
-| `Rail Version` | `Pick Context Version` | `Version Order`, `Version Type` | `Version Display` | `Version State` | `Version Pick` |
-| `Rail View` | `Pick View Rows` (below) | `View Order`, `View Name` | `View Display` | `View State` | `View Pick` |
-| `Rail Group` | `Pick Context Group` | `Group Name` (sorted by `Group Name`) | `Group Display` | `Group State` | `Group Pick` |
+| `Rail FY` | `Pick Context FY` | `fiscal_year` | `FY Display` | `FY State` | `FY Pick` |
+| `Rail Period` | `Pick Context Period` | `pair_order`, `pair_code` | `Period Display` | `Period State` | `Period Pick` |
+| `Rail Version` | `Pick Context Version` | `version_order`, `version_type` | `Version Display` | `Version State` | `Version Pick` |
+| `Rail View` | `Pick View Rows` (below) | `view_order`, `view_name` | `View Display` | `View State` | `View Pick` |
+| `Rail Group` | `Pick Context Group` | `group_name` (sorted by `group_name`) | `Group Display` | `Group State` | `Group Pick` |
 
-`Rail View` shows one row per view: the view's default group (always planned) in the current year, period and version. Its filter is one Boolean calc, `Pick View Rows` = `[Fiscal Year] = [p_FY] AND [Pair Code] = [p_Period] AND [Version Type] = [p_Version] AND [Is View Default]`, set to True. Expected: 5 rows (Company, Function, Sub-function, Department, Country), all "on". Calcs (the first block is complete; the other lists change only the compared field):
+`Rail View` shows one row per view: the view's default group (always planned) in the current year, period and version. Its filter is one Boolean calc, `Pick View Rows` = `[fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [version_type] = [p_Version] AND [is_view_default]`, set to True. Expected: 5 rows (Company, Function, Sub-function, Department, Country), all "on". Calcs (the first block is complete; the other lists change only the compared field):
 
 ```
-// FY Display      [Fiscal Year Label]  with the marker on the current one
-IF [Fiscal Year] = [p_FY] THEN "› " + [Fiscal Year Label] ELSE [Fiscal Year Label] END
+// FY Display      [fiscal_year_label]  with the marker on the current one
+IF [fiscal_year] = [p_FY] THEN "› " + [fiscal_year_label] ELSE [fiscal_year_label] END
 // FY State
-IF NOT [Has Plan] THEN "off" ELSEIF [Fiscal Year] = [p_FY] THEN "current" ELSE "on" END
+IF NOT [has_plan] THEN "off" ELSEIF [fiscal_year] = [p_FY] THEN "current" ELSE "on" END
 // FY Pick         (a greyed option passes the current value, so a click changes nothing)
-IF [Has Plan] THEN [Fiscal Year] ELSE [p_FY] END
+IF [has_plan] THEN [fiscal_year] ELSE [p_FY] END
 ```
 
 ```
 // Period Label    (the text of the option; the dates are in the tooltip via Pair Name)
-CASE [Pair Code] WHEN "FY" THEN "Full year" ELSE [Pair Code] END
-// Period Display / Period State / Period Pick: as FY, comparing [Pair Code] with [p_Period]
-// Version Display / State / Pick: as FY, comparing [Version Type] with [p_Version]; the text is [Version Type]
-// Group Display / State / Pick: as FY, comparing [Group Name] with [p_Group]
-// View Display / State: compare [View Name] with [p_View]; View State is never "off"
-// View Pick       [View Name]
+CASE [pair_code] WHEN "FY" THEN "Full year" ELSE [pair_code] END
+// Period Display / Period State / Period Pick: as FY, comparing [pair_code] with [p_Period]
+// Version Display / State / Pick: as FY, comparing [version_type] with [p_Version]; the text is [version_type]
+// Group Display / State / Pick: as FY, comparing [group_name] with [p_Group]
+// View Display / State: compare [view_name] with [p_View]; View State is never "off"
+// View Pick       [view_name]
 // View Default Group   (the group a View click lands on: the view's largest, always with a plan)
-{ FIXED [View Name] : MAX(IF [Is View Default] THEN [Group Name] END) }
+{ FIXED [view_name] : MAX(IF [is_view_default] THEN [group_name] END) }
 ```
 
 Put `View Default Group` on `Rail View`'s Detail.
 
-**Actions** (Worksheet > Actions > Add > Change Parameter; Run on **Select**; clearing the selection **Keep current value**):
+**Actions** need a dashboard (parameter and filter actions do not fire from a worksheet). Build a dashboard `TEST RAIL` with the five lists, `Reset` and the five parameter cards, and add the actions there (Dashboard > Actions > Add Action > Change Parameter; Run on **Select**; Aggregation **None**; clearing the selection **Keep current value**). **Keep `TEST RAIL`**: actions are tied to the dashboard they were built on, so in step 4 it is resized to 1400 × 850 and rearranged into the real dashboard instead of rebuilding the 19 actions. Tested on the Mac 2026-10-22: all rows below pass.
 
 | Name | Source | Target | Field |
 |---|---|---|---|
@@ -323,27 +330,27 @@ Expected: from any state, one click returns to T1.
 **The numbers** (aggregates over the single row `Row Is Current` leaves; every `SUM` here is a sum of one value). Build the sheet `KPI Cards` and put **`Row Is Current` = True** on Filters first.
 
 ```
-// K Close HC        SUM([Actual Ending Headcount])
-// K Plan HC         SUM([Planned Ending Headcount])
+// K Close HC        SUM([actual_ending_headcount])
+// K Plan HC         SUM([planned_ending_headcount])
 // K HC Gap          [K Close HC] - [K Plan HC]
-// K Cost Gap Pct    IF SUM([Planned Cost Usd]) = 0 THEN NULL
-//                   ELSE (SUM([Actual Cost Usd Plan Fx]) - SUM([Planned Cost Usd])) / SUM([Planned Cost Usd]) END
-// K NN Done         SUM([Actual Net New])
-// K NN Plan         SUM([Planned Net New])
+// K Cost Gap Pct    IF SUM([planned_cost_usd]) = 0 THEN NULL
+//                   ELSE (SUM([actual_cost_usd_plan_fx]) - SUM([planned_cost_usd])) / SUM([planned_cost_usd]) END
+// K NN Done         SUM([actual_net_new])
+// K NN Plan         SUM([planned_net_new])
 // K NN Pct          IF [K NN Plan] = 0 THEN NULL ELSE [K NN Done] / [K NN Plan] END
-// K BF Done         SUM([Actual Backfills])
-// K BF Plan         SUM([Planned Backfills])
+// K BF Done         SUM([actual_backfills])
+// K BF Plan         SUM([planned_backfills])
 // K BF Pct          IF [K BF Plan] = 0 THEN NULL ELSE [K BF Done] / [K BF Plan] END
-// K Days            SUM([Median Time To Fill Days])      (NULL when nothing was filled)
-// K Reuse           SUM([Reuse Candidate Fills])
-// K NN Fills        SUM([Net New Fills])
+// K Days            SUM([median_time_to_fill_days])      (NULL when nothing was filled)
+// K Reuse           SUM([reuse_candidate_fills])
+// K NN Fills        SUM([net_new_fills])
 // K Reuse Pct       IF [K NN Fills] = 0 THEN NULL ELSE [K Reuse] / [K NN Fills] END
-// K Reuse Pay       SUM([Reuse New Pay Usd Constant])
-// K CW Done         SUM([Actual Cw Headcount])
-// K CW Plan         SUM([Planned Cw Headcount])
+// K Reuse Pay       SUM([reuse_new_pay_usd_constant])
+// K CW Done         SUM([actual_cw_headcount])
+// K CW Plan         SUM([planned_cw_headcount])
 // K CW Gap          [K CW Done] - [K CW Plan]
-// K CW Spend Pct    IF SUM([Planned Cw Spend Usd]) = 0 THEN NULL
-//                   ELSE (SUM([Actual Cw Spend Usd Plan Fx]) - SUM([Planned Cw Spend Usd])) / SUM([Planned Cw Spend Usd]) END
+// K CW Spend Pct    IF SUM([planned_cw_spend_usd]) = 0 THEN NULL
+//                   ELSE (SUM([actual_cw_spend_usd_plan_fx]) - SUM([planned_cw_spend_usd])) / SUM([planned_cw_spend_usd]) END
 ```
 
 **Check before any text:** drag `K Close HC`, `K Plan HC`, `K NN Done`, `K NN Plan`, `K BF Done`, `K BF Plan`, `K Reuse`, `K CW Done`, `K CW Plan` onto Text of a plain text table. In T1 it must read **30,005 · 30,337 · 2,181 · 2,762 · 4,668 · 5,031 · 628 · 11,941 · 12,673** (these are the Section 1 numbers; the 46 SQL checks already prove them). Not 3,000,500 or any multiple: that means the `Row Is Current` filter is missing.
@@ -352,11 +359,11 @@ Expected: from any state, one click returns to T1.
 
 ```
 // K Cost T          cost in tenths of a million: 3,407,541,370 -> 34075
-INT(ROUND(SUM([Actual Cost Usd Plan Fx]) / 100000, 0))
-// K Cost Plan T     INT(ROUND(SUM([Planned Cost Usd]) / 100000, 0))
+INT(ROUND(SUM([actual_cost_usd_plan_fx]) / 100000, 0))
+// K Cost Plan T     INT(ROUND(SUM([planned_cost_usd]) / 100000, 0))
 // K Reuse Pay T     INT(ROUND([K Reuse Pay] / 100000, 0))
-// K CW Spend T      INT(ROUND(SUM([Actual Cw Spend Usd Plan Fx]) / 100000, 0))
-// K CW Spend Plan T INT(ROUND(SUM([Planned Cw Spend Usd]) / 100000, 0))
+// K CW Spend T      INT(ROUND(SUM([actual_cw_spend_usd_plan_fx]) / 100000, 0))
+// K CW Spend Plan T INT(ROUND(SUM([planned_cw_spend_usd]) / 100000, 0))
 ```
 
 ```
@@ -399,7 +406,7 @@ Cards (values, notes, titles; value and note are what the Label shelf holds):
 
 | Card | `KPI n Title` | `KPI n Value` | `KPI n Note` |
 |---|---|---|---|
-| 1 | `IF [Pair Code] = "FY" THEN "Year-end employees" ELSE "Employees at period end" END` (use `MIN([Pair Code])`) | the comma pattern on `K Close HC` | `[K HC Gap Str] + " vs plan " + [K Plan HC Str] + " · cost " + [K Cost Str] + " vs " + [K Cost Plan Str]` |
+| 1 | `IF [pair_code] = "FY" THEN "Year-end employees" ELSE "Employees at period end" END` (use `MIN([pair_code])`) | the comma pattern on `K Close HC` | `[K HC Gap Str] + " vs plan " + [K Plan HC Str] + " · cost " + [K Cost Str] + " vs " + [K Cost Plan Str]` |
 | 2 | `"Net-new seats filled"` | `K NN Pct Str` | `[K NN Done Str] + " of " + [K NN Plan Str] + " planned"` |
 | 3 | `"Backfills"` | `K BF Pct Str` | `[K BF Done Str] + " of " + [K BF Plan Str] + " · median " + IF ISNULL([K Days]) THEN "—" ELSE STR(INT(ROUND([K Days], 0))) END + " days to fill"` |
 | 4 | `"Net-new while a match stood empty"` | the comma pattern on `K Reuse` | `[K Reuse Pct Str] + " of net-new · " + [K Reuse Pay Str] + " starting base pay"` |
@@ -439,13 +446,13 @@ The title is the static text **Workforce Planning**. The subtitle is one calc on
 
 ```
 // From Text / To Text   (Eff From Date and To Date as "Jun 30, 2025")
-LEFT(DATENAME('month', MIN([Eff From Date])), 3) + " " + STR(DAY(MIN([Eff From Date]))) + ", " + STR(YEAR(MIN([Eff From Date])))
-LEFT(DATENAME('month', MIN([To Date])), 3) + " " + STR(DAY(MIN([To Date]))) + ", " + STR(YEAR(MIN([To Date])))
+LEFT(DATENAME('month', MIN([eff_from_date])), 3) + " " + STR(DAY(MIN([eff_from_date]))) + ", " + STR(YEAR(MIN([eff_from_date])))
+LEFT(DATENAME('month', MIN([to_date])), 3) + " " + STR(DAY(MIN([to_date]))) + ", " + STR(YEAR(MIN([to_date])))
 
 // Page Subtitle
-"Whether hiring followed the " + MIN([Fiscal Year Label]) + " " + MIN([Version Type])
-+ IF MIN([Covered Label]) = "Q1–Q4" THEN "" ELSE ", covering " + MIN([Covered Label]) END
-+ IF MIN([View Name]) = "Company" THEN " at Arcadia Systems" ELSE " in " + MIN([Group Name]) END
+"Whether hiring followed the " + MIN([fiscal_year_label]) + " " + MIN([version_type])
++ IF MIN([covered_label]) = "Q1–Q4" THEN "" ELSE ", covering " + MIN([covered_label]) END
++ IF MIN([view_name]) = "Company" THEN " at Arcadia Systems" ELSE " in " + MIN([group_name]) END
 + ", which seats it filled, and which stand empty · " + [From Text] + " to " + [To Text]
 ```
 
