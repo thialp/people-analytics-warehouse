@@ -231,7 +231,14 @@ ELSE [group_name] + " had no plan seats in " + [pair_name] + " (" + [version_typ
 
 ### 3.3 The rail lists (one sheet each)
 
-All five are the **Rail View** pattern from Dashboard #2 ([rail_controls_build.md](../compensation-walk/rail_controls_build.md)): Square marks, one row per option, Text = the display calc, Color = the state calc, header hidden, Entire View, Detail = the pick field + `Why Off` + `zzTrue` + `zzFalse`. Colors: **current** the active color of Rail View's selected row, **on** its inactive color, **off** a light gray (`#B5B4AE`). Tooltip = `<Why Off>` only (empty tooltips show nothing for working options).
+All five follow Dashboard #2's `Rail View` pattern, with one difference. Dashboard #2's `Rail View` is a **Text** mark with no Color pill (white words on the dark rail; the active row is shown only by the "›" marker). Here a list must also show an option that cannot be chosen, so each sheet adds one Color pill, the `… State` calc, and nothing else changes:
+
+- **Marks: Text** (Tableau Book, 9, Middle Left on the Text card). **Do not set a font color** there: a fixed font color overrides the Color shelf and the dimming never shows.
+- **Format > Shading:** Worksheet and Pane = the dark blue of Dashboard #2's Rail View.
+- **Color = the state calc:** **current** and **on** `#FFFFFF`, **off** `#6E7B93` (about 3 to 1 against the navy: clearly dimmer than white, still legible).
+- Header hidden, Entire View, tooltip = `<Why Off>` only. Detail = the pick field, `Why Off`, `zzTrue`, `zzFalse`, `Close Panel`.
+- Any pick field that returns a number (`FY Pick`) must be a **dimension** (Convert to Dimension); otherwise Detail shows `SUM(...)`.
+- Copy `zzTrue`, `zzFalse` and `Close Panel` from Dashboard #2's workbook (Ctrl+C, then Ctrl+V on WFP Summary) so the deselect trick is identical.
 
 | Sheet | Filter (True) | Rows | Text | Color | Pick (Detail; the action uses it) |
 |---|---|---|---|---|---|
@@ -266,7 +273,7 @@ CASE [pair_code] WHEN "FY" THEN "Full year" ELSE [pair_code] END
 
 Put `View Default Group` on `Rail View`'s Detail.
 
-**Actions** (Worksheet > Actions > Add > Change Parameter; Run on **Select**; clearing the selection **Keep current value**):
+**Actions** need a dashboard (parameter and filter actions do not fire from a worksheet). Build a dashboard `TEST RAIL` with the five lists, `Reset` and the five parameter cards, and add the actions there (Dashboard > Actions > Add Action > Change Parameter; Run on **Select**; Aggregation **None**; clearing the selection **Keep current value**). **Keep `TEST RAIL`**: actions are tied to the dashboard they were built on, so in step 4 it is resized to 1400 × 850 and rearranged into the real dashboard instead of rebuilding the 19 actions. Tested on the Mac 2026-10-22: all rows below pass.
 
 | Name | Source | Target | Field |
 |---|---|---|---|
