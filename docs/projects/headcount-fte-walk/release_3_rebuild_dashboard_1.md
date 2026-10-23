@@ -1,6 +1,6 @@
 # Release 3 rebuild: Dashboard #1, Headcount & FTE Walk
 
-Step-by-step rebuild of [arcadia_headcount_fte_walk](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount) on the release 3 data, so it works and reads like Dashboard #2 (Compensation Walk), keeps its own **top bar**, and shows **the same numbers** wherever the two dashboards show the same thing. Arcadia Systems is fictional and all data is synthetic.
+Step-by-step rebuild of [arcadia_headcount_fte_walk](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard) on the release 3 data, so it works and reads like Dashboard #2 (Compensation Walk), keeps its own **top bar**, and shows **the same numbers** wherever the two dashboards show the same thing. Arcadia Systems is fictional and all data is synthetic.
 
 Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_dashboard_2.md). Section 0 is identical in both; you can import sheets, calcs and parameters from one workbook to the other wherever a step says so.
 
@@ -16,7 +16,7 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 
 ## Where we are (updated Oct 17, 2026)
 
-**Dashboard #1 is rebuilt and published:** [https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/ArcadiaHeadcount). Sections 1 to 8 and 10 are done: top bar and popovers, waterfall (Summary | By driver), five KPI cards with hover tooltips, Trend and Turnover, layout aligned to the KPI grid. The published page was checked against section 11 for Employees, Contingent and Total (FY26 and FY25 Q3), Commercial and Finance; every figure ties to the cards, waterfall, trend and Dashboard #2.
+**Dashboard #1 is rebuilt and published:** [https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard). Sections 1 to 8 and 10 are done: top bar and popovers, waterfall (Summary | By driver), five KPI cards with hover tooltips, Trend and Turnover, layout aligned to the KPI grid. The published page was checked against section 11 for Employees, Contingent and Total (FY26 and FY25 Q3), Commercial and Finance; every figure ties to the cards, waterfall, trend and Dashboard #2.
 
 **Open follow-ups (small):** (1) `Period Name` still prints "Jan 2025 – Mar 2025" for a quarter while the Period field says "FY25 Q3"; see 8.5 for the quarter branch. (2) Apply the same toggle, KPI hover tooltips and type rule to Dashboard #2. (3) Cleanup of leftover calcs, sheets and actions: see section 13.
 
@@ -805,7 +805,67 @@ Sheet `Waterfall Caption`: `WF Caption` on Text, Tableau Book 8 slate, left, **w
 
 #### 8.2a Wider cards (30 px margin)
 
-The cards now span the full page grid (x 30 to 1370): five cards 255 wide with 16 gaps. Use the new background `docs/brand/arcadia_kpi_cards_bg_wide.png` (2800 × 220; generated with `make_kpi_cards_bg.py --left 30 --top 12 --card-w 255 --card-h 86 --gap 16 --radius 10`) as the background image item (0, 78, 1400 × 110). Set the KPI parameters: `kpi_GridLeft` 30, `kpi_CardW` 255, `kpi_GapX` 16 (others unchanged: GridTop 12, CardH 86, PadX 16). Tableau pads the map extent, so check that each title starts 16 px inside its card; if all five drift the same way nudge `kpi_FitX` by 0.01 (and `kpi_ShiftX` for a constant offset), as in the KPI guide, section 6.
+The cards now span the full page grid (x 30 to 1370): five cards 255 wide with 16 gaps. Use the new background `docs/brand/arcadia_kpi_cards_bg_wide.png` (2800 × 220; generated with `make_kpi_cards_bg.py --left 30 --top 12 --card-w 255 --card-h 86 --gap 16 --radius 10`) as the background image item (0, 78, 1400 × 110). Set the KPI parameters (calibrated on the real dashboard): `kpi_GridLeft` 30, `kpi_CardW` 255, `kpi_GapX` 16, `kpi_GridTop` 12, `kpi_CardH` 86, `kpi_SheetW` 1400, `kpi_SheetH` 110, **`kpi_FitX` 1.082**, **`kpi_ShiftX` −12**, **`kpi_PadX` 127.5** (half of CardW: the anchors sit at each card's centre). The text is **centred**: in all 15 mark layers of the `KPI cards` sheet (Title 1 to 5, Value 1 to 5, Note 1 to 5) open Label > Alignment and set Horizontal to Center. Expected anchor centres on the page: 157.5, 428.5, 699.5, 970.5, 1241.5. If the five cards drift the same way nudge `kpi_ShiftX`; if card 1 and card 5 drift in opposite directions nudge `kpi_FitX` by 0.005 (the map re-fits, so a change in FitX moves the text more than its size suggests), as in the KPI guide, section 6. Remove the parameter controls from the dashboard when done.
+
+#### 8.2b Build the cards (rewrite the text calcs in place; no layer changes)
+
+The map layers and anchors stay. Each card reads `KPI N Title`, `KPI N Value` and `KPI N Note`, so the slots are re-used: **KPI 2** = Joined (was Closing FTE), **KPI 3** = Voluntary turnover (was Hires), **KPI 4** = Internal moves (was Voluntary turnover), **KPI 5** = Workforce mix (was Internal moves). Card order on the page: Closing | Joined | Voluntary turnover | Internal moves | Workforce mix.
+
+Number calcs (Headcount Walk). `K Vol Emp` and `K Invol Emp` ignore the Workforce toggle on purpose (turnover is an employee measure); the mix calcs ignore it so each card can show the other side of the split:
+```
+// K Joined      IF [p_Worker] = "Employees" THEN [WF Joined] + [WF Conv In] ELSE [WF Joined] END
+// K Vol Emp     ZN(-SUM(IF [In Period] AND [Officers Out] AND [In Group] AND [Worker Type] = "Employee" AND [Movement Category] = "Voluntary Terminations" THEN [Headcount] END))
+// K Invol Emp   same with "Involuntary Terminations"
+// K CW Close    ZN(SUM(IF [In Period] AND [Officers Out] AND [In Group] AND [Worker Type] = "Contingent" AND [Is Closing Row] THEN [Headcount] END))
+// K EE Close    same with [Worker Type] = "Employee"
+// K All Close   [K CW Close] + [K EE Close]
+// K CW Share    IF [K All Close] = 0 THEN 0 ELSE [K CW Close] / [K All Close] END
+```
+Text twins: the comma pattern on `K Joined`, `K Vol Emp`, `K Invol Emp`, `K CW Close`, `K EE Close`, `K All Close` (`K Joined Str`, `K Vol Emp Str`, ...), and the percent pattern on `K CW Share` (`K CW Share Str`) and on `1 - [K CW Share]` (`K EE Share Str`).
+
+Card text:
+```
+// KPI 1 Title   CASE [p_Worker] WHEN "Employees" THEN "Closing headcount" WHEN "Contingent" THEN "Closing contingent" ELSE "Total workforce" END
+// KPI 2 Title   "Joined"
+// KPI 2 Value   IF NOT [K Valid] THEN "—" ELSE [K Joined Str] END
+// KPI 2 Note
+IF NOT [K Valid] THEN ""
+ELSEIF [p_Worker] = "Employees" THEN [WF Hires Str] + " hires · " + [WF Conv In Str] + " from contingent"
+ELSEIF [p_Worker] = "Contingent" THEN "contingent assignments that began"
+ELSE [WF Hires Str] + " hires · " + [WF Starts Str] + " contingent joined" END
+// KPI 3 Title   "Voluntary turnover (annualized)"
+// KPI 3 Value   (the old KPI 4 Value formula, unchanged)
+// KPI 3 Note
+IF NOT [K Valid] THEN ""
+ELSEIF [p_Worker] = "Employees" THEN [K Vol Emp Str] + " left by choice · " + [K Invol Emp Str] + " involuntary"
+ELSE "Employees only · " + [K Vol Emp Str] + " left by choice" END
+// KPI 4 Title   "Internal moves"
+// KPI 4 Value   (the old KPI 5 Value formula, unchanged)
+// KPI 4 Note
+IF NOT [K Valid] THEN ""
+ELSEIF [p_Worker] = "Contingent" THEN "between teams"
+ELSEIF [p_View] <> "Company" THEN ATTR([WF Moves In Str]) + " in · " + ATTR([WF Moves Out Str]) + " out"
+ELSE
+  IF [K Promotions] >= 1000
+  THEN STR(DIV(INT([K Promotions]), 1000)) + "," + RIGHT("00" + STR(INT([K Promotions]) % 1000), 3)
+  ELSE STR(INT([K Promotions])) END
+  + " promotions · " +
+  IF [K Other Moves] >= 1000
+  THEN STR(DIV(INT([K Other Moves]), 1000)) + "," + RIGHT("00" + STR(INT([K Other Moves]) % 1000), 3)
+  ELSE STR(INT([K Other Moves])) END
+  + " other moves"
+END
+// Why ATTR: [WF Moves In Str] is a FIXED calc (non-aggregate) and [K Promotions] is a SUM (aggregate); one IF cannot return both kinds, so the non-aggregate side is wrapped in ATTR(). Paste only the ELSE part of the old KPI 5 Note, not its own IF NOT [K Valid] line or its closing END.
+// KPI 5 Title   CASE [p_Worker] WHEN "Employees" THEN "Contingent workforce" WHEN "Contingent" THEN "Employees" ELSE "Contingent share" END
+// KPI 5 Value   IF NOT [K Valid] THEN "—" ELSE CASE [p_Worker] WHEN "Employees" THEN [K CW Close Str] WHEN "Contingent" THEN [K EE Close Str] ELSE [K CW Share Str] END END
+// KPI 5 Note
+IF NOT [K Valid] THEN ""
+ELSE CASE [p_Worker]
+  WHEN "Employees" THEN [K CW Share Str] + " of " + [K All Close Str] + " in total"
+  WHEN "Contingent" THEN [K EE Share Str] + " of " + [K All Close Str] + " in total"
+  ELSE [K CW Close Str] + " of " + [K All Close Str] END END
+```
+Delete afterwards: `KPI 2` FTE helpers (`K Close FTE`, `K FTE T`, `K Gap T`, `K Close PT`, `K Part Time Gap`), `KPI 3`'s old Hires formulas (`K Hires Show`), and any `... FTE` field. Check table: section 11.
 
 Card set per toggle value. The map layers and 15 anchors stay as built; only the text calcs change.
 
