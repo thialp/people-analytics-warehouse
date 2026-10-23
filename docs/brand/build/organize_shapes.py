@@ -46,6 +46,11 @@ MAP = {
         "seg_currency_constant_on": "d2_currency_constant_on", "seg_currency_constant_off": "d2_currency_constant_off",
         "seg_currency_nominal_on": "d2_currency_nominal_on", "seg_currency_nominal_off": "d2_currency_nominal_off",
     },
+    "d3": {
+        "fld_top": "d3_field_capsule", "btn_reset_circle": "d3_reset",
+        **{f"seg_version_{k}_{s}": f"d3_version_{k}_{s}"
+           for k in ("budget", "q1", "q2", "q3") for s in ("on", "off", "na")},
+    },
     "fp": {n: "fp_" + n[len("seg_fp_"):] for n in
            (f[:-4] for f in os.listdir(SRC) if f.startswith("seg_fp_") and f.endswith(".png"))},
 }
@@ -74,7 +79,7 @@ def contact_sheet(folder, names):
         x, y = (i % cols) * cw, (i // cols) * ch
         if "detail" in n:
             bg = (236, 235, 229)                    # the grey capsule behind Summary | By driver
-        elif any(k in n for k in ("workforce", "lens", "cost", "currency")):
+        elif any(k in n for k in ("workforce", "lens", "cost", "currency", "version")):
             bg = (36, 58, 87)                       # #243A57, the capsule behind a toggle
         else:
             bg = NAVY if (is_light(im) or "reset" in n) else CREAM  # white-on-transparent shapes are drawn on navy

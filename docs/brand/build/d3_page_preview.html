@@ -1,0 +1,150 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Design mock of Dashboard #3, Workforce Planning, at the default state (FY26 · Budget · All organizations).
+     Every number is from the release 3 marts. Geometry follows the build plan, section 10 (1400 x 850, #1's grid).
+     Render: python3 shot.py file://$PWD/d3_page_preview.html ../../images/workforce_planning_mock.png -->
+<style>
+@font-face { font-family: Inter; font-weight: 400; src: url(node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; src: url(node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 700; src: url(node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2); }
+:root { --navy:#13233A; --slate:#5A6170; --plan:#D5DBE4; --mid:#8C9BB0; --teal:#00938D; --grid:#E4E3DD; --card:#FBFBF8; --page:#F3F3EF; --head:#B8C4D6; }
+* { box-sizing: border-box; }
+body { margin:0; width:1400px; height:850px; background:var(--page); font-family:Inter,sans-serif; color:var(--navy); position:relative; overflow:hidden; }
+.abs { position:absolute; }
+.band { left:0; top:0; width:1400px; height:76px; background:var(--navy); }
+.h { font-size:10.5px; font-weight:700; color:var(--head); letter-spacing:.2px; }
+.field { width:180px; height:32px; border-radius:16px; background:#fff; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; }
+.card { background:var(--card); border:1px solid var(--grid); border-radius:10px; padding:14px 16px; }
+.kpi { text-align:center; padding:10px 12px; }
+.kpi .l { font-size:12px; font-weight:600; color:var(--navy); }
+.kpi .v { font-size:30px; font-weight:700; margin-top:2px; }
+.kpi .n { font-size:12px; color:var(--slate); margin-top:2px; }
+.t { font-size:16px; font-weight:600; }
+.s { font-size:12px; color:var(--slate); margin-top:3px; }
+.cap { font-size:11px; color:var(--slate); }
+svg text { font-family:Inter,sans-serif; }
+.tag { position:absolute; top:-10px; left:12px; background:#5B4FB3; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; }
+</style></head>
+<body>
+<div class="abs band"></div>
+<img class="abs" src="../arcadia_logo_horizontal_reverse.svg" style="left:30px;top:14px;height:48px">
+<div class="abs" style="left:223px;top:13px;width:275px">
+  <div style="color:#fff;font-size:24px;font-weight:700">Workforce Planning</div>
+  <div style="color:#C9D1DC;font-size:11px;margin-top:4px">Actual vs Budget · Jun 25 → Jun 26</div>
+</div>
+<div class="abs h" style="left:506px;top:12px">SELECT PERIOD</div>
+<div class="abs field" style="left:506px;top:30px">FY26 · Jun 25 → Jun 26 <span style="font-size:9px">▼</span></div>
+<div class="abs h" style="left:698px;top:12px">SELECT VIEW</div>
+<div class="abs field" style="left:698px;top:30px">All organizations <span style="font-size:9px">▼</span></div>
+<div class="abs h" style="left:890px;top:12px">COMPARE WITH</div>
+<div class="abs" style="left:890px;top:30px;width:392px;height:32px;border-radius:16px;background:#243A57;border:1px solid rgba(255,255,255,.47);display:flex;overflow:hidden">
+  <img src="../shapes/by_dashboard/d3/d3_version_budget_on.png" style="width:98px;height:32px">
+  <img src="../shapes/by_dashboard/d3/d3_version_q1_off.png" style="width:98px;height:32px">
+  <img src="../shapes/by_dashboard/d3/d3_version_q2_off.png" style="width:98px;height:32px">
+  <img src="../shapes/by_dashboard/d3/d3_version_q3_off.png" style="width:98px;height:32px">
+</div>
+<img class="abs" src="../shapes/by_dashboard/d3/d3_reset.png" style="left:1294px;top:30px;width:32px">
+<img class="abs" src="../shapes/by_dashboard/shared/shared_info_open.png" style="left:1338px;top:30px;width:32px">
+
+<div id="kpis"></div>
+
+<div class="abs card" style="left:30px;top:188px;width:797px;height:300px">
+  <div class="t">Net-new hiring reached 79.0% of plan; backfills 92.8%</div>
+  <div class="s">Seats filled against the FY26 Budget, by quarter · <span style="color:var(--mid);font-weight:600">light bar = planned</span> · <b style="color:var(--navy)">dark bar = filled</b></div>
+  <svg id="pva" width="765" height="200" style="margin-top:8px"></svg>
+  <div class="cap">Employees vs plan at each quarter-end: Q1 −214 · Q2 −438 · Q3 −428 · Q4 −332 (30,005 vs 30,337)</div>
+</div>
+
+<div class="abs card" style="left:843px;top:188px;width:526px;height:300px">
+  <div class="t">977 seats stand empty; 213 for over 90 days</div>
+  <div class="s">On Jun 30, 2026, by time empty · <b style="color:var(--navy)">Frozen</b> = on hold · <span style="color:var(--mid);font-weight:600">Open</span> = recruiting</div>
+  <svg id="pool" width="494" height="200" style="margin-top:10px"></svg>
+  <div class="cap">136 of the 213 stale seats are frozen: check them before approving a net-new seat.</div>
+</div>
+
+<div class="abs card" style="left:30px;top:504px;width:797px;height:308px">
+  <div class="t">467 refilled seats moved to another office</div>
+  <div class="s">280 to an office with a lower pay range · 101 routes into 30 offices · line = old office to new · dot = seats arriving</div>
+  <svg id="map" width="765" height="236" style="margin-top:4px"></svg>
+</div>
+
+<div class="abs card" style="left:843px;top:504px;width:526px;height:308px">
+  <div class="t">1,208 of 4,668 refilled seats changed level or office</div>
+  <div class="s">New people earn $7.0M a year less than those they replaced · label = pay change</div>
+  <svg id="chg" width="494" height="220" style="margin-top:10px"></svg>
+</div>
+
+<div class="abs cap" style="left:30px;top:824px;color:#8C8A84">Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026.</div>
+
+<script src="node_modules/d3/dist/d3.min.js"></script>
+<script src="node_modules/topojson-client/dist/topojson-client.min.js"></script>
+<script>
+const K = [
+ ["Employees vs plan","30,005","−332 vs plan 30,337 · cost −1.1%"],
+ ["Net-new seats filled","79.0%","2,181 of 2,762 planned"],
+ ["Backfills filled","92.8%","4,668 of 5,031 · median 42 days to fill"],
+ ["Net-new while a match stood empty","628","28.8% of net-new · $55.4M base pay"],
+ ["Seats standing empty","977","213 empty over 90 days · 252 frozen"]];
+document.getElementById("kpis").innerHTML = K.map((k,i)=>
+ `<div class="abs card kpi" style="left:${30+271*i}px;top:90px;width:255px;height:86px"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join("");
+
+// Card A: planned vs filled, by quarter
+const A = [["Net-new seats",[[832,649],[744,551],[562,471],[624,510]]],["Backfills",[[1046,1029],[1319,1231],[1356,1201],[1310,1207]]]];
+const sa = d3.select("#pva"), x = d3.scaleLinear([0,1400],[150,600]);
+let y = 4;
+A.forEach(([kind,qs])=>{
+  sa.append("text").attr("x",0).attr("y",y+12).attr("font-size",12).attr("font-weight",600).attr("fill","#13233A").text(kind);
+  qs.forEach(([p,a],i)=>{
+    const yy = y + i*22;
+    sa.append("text").attr("x",140).attr("y",yy+13).attr("text-anchor","end").attr("font-size",11).attr("fill","#5A6170").text("Q"+(i+1));
+    sa.append("rect").attr("x",150).attr("y",yy+2).attr("width",x(p)-150).attr("height",16).attr("fill","#D5DBE4").attr("rx",2);
+    sa.append("rect").attr("x",150).attr("y",yy+6).attr("width",x(a)-150).attr("height",8).attr("fill","#13233A").attr("rx",1);
+    sa.append("text").attr("x",x(Math.max(p,a))+8).attr("y",yy+14).attr("font-size",11).attr("fill","#13233A")
+      .html(`<tspan font-weight="600">${a.toLocaleString()}</tspan> of ${p.toLocaleString()} · ${(100*a/p).toFixed(1)}%`);
+  });
+  y += 4*22 + 10;
+});
+
+// Card D: vacancy pool by age band
+const D = [["0–30 days",353,43],["31–90 days",295,73],["91–180 days",46,80],["Over 180 days",31,56]];
+const sd = d3.select("#pool"), xd = d3.scaleLinear([0,420],[110,440]);
+D.forEach(([b,o,f],i)=>{
+  const yy = 10 + i*44, stale = i>=2;
+  sd.append("text").attr("x",100).attr("y",yy+16).attr("text-anchor","end").attr("font-size",12).attr("font-weight",stale?600:400).attr("fill",stale?"#13233A":"#5A6170").text(b);
+  sd.append("rect").attr("x",110).attr("y",yy).attr("width",xd(f)-110).attr("height",24).attr("fill","#13233A");
+  sd.append("rect").attr("x",xd(f)).attr("y",yy).attr("width",xd(f+o)-xd(f)).attr("height",24).attr("fill","#8C9BB0");
+  if (f>=25) sd.append("text").attr("x",112+(xd(f)-110)/2).attr("y",yy+16).attr("text-anchor","middle").attr("font-size",11).attr("fill","#fff").text(f);
+  sd.append("text").attr("x",xd(f)+(xd(f+o)-xd(f))/2).attr("y",yy+16).attr("text-anchor","middle").attr("font-size",11).attr("fill","#fff").text(o);
+  sd.append("text").attr("x",xd(f+o)+8).attr("y",yy+16).attr("font-size",11).attr("font-weight",600).attr("fill","#13233A").text(o+f);
+});
+sd.append("line").attr("x1",4).attr("x2",470).attr("y1",97).attr("y2",97).attr("stroke","#C9D1DC").attr("stroke-dasharray","3,3");
+sd.append("text").attr("x",470).attr("y",93).attr("text-anchor","end").attr("font-size",10).attr("fill","#8C8A84").text("stale: empty over 90 days ↓");
+
+// Card B: what changed when a seat was refilled
+const B = [["Same level, same office",3460,"+$0.7M",false],["One level down",556,"−$9.5M",true],["One level up",185,"+$3.0M",true],["Moved to another office",467,"−$1.2M",true]];
+const sb = d3.select("#chg"), xb = d3.scaleLinear([0,3460],[170,400]);
+B.forEach(([c,n,pay,ch],i)=>{
+  const yy = 12 + i*48;
+  sb.append("text").attr("x",160).attr("y",yy+16).attr("text-anchor","end").attr("font-size",12).attr("fill",ch?"#13233A":"#5A6170").attr("font-weight",ch?600:400).text(c);
+  sb.append("rect").attr("x",170).attr("y",yy).attr("width",Math.max(2,xb(n)-170)).attr("height",24).attr("fill",ch?"#13233A":"#8C9BB0");
+  sb.append("text").attr("x",xb(n)+8).attr("y",yy+16).attr("font-size",11).attr("fill","#13233A").html(`<tspan font-weight="600">${n.toLocaleString()}</tspan> · ${pay}`);
+});
+
+// Map: routes from the old office to the new one
+Promise.all([fetch("node_modules/world-atlas/land-110m.json").then(r=>r.json()), fetch("d3_preview_data.json").then(r=>r.json())]).then(([w,data])=>{
+  const land = topojson.feature(w, w.objects.land);
+  const box = {type:"MultiPoint",coordinates:[[-123,50],[152,-35],[-100,58],[140,-38]]};
+  const proj = d3.geoMercator().fitExtent([[10,10],[755,226]], box), path = d3.geoPath(proj);
+  const sm = d3.select("#map");
+  sm.append("path").attr("d", path(land)).attr("fill","#EEEDE8").attr("stroke","#D8D6CF").attr("stroke-width",.5);
+  data.routes.forEach(r=>{
+    sm.append("path").attr("d", path({type:"LineString",coordinates:[[r.flon,r.flat],[r.tlon,r.tlat]]}))
+      .attr("fill","none").attr("stroke","#00938D").attr("stroke-opacity",.55).attr("stroke-width",1.2);
+  });
+  const rs = d3.scaleSqrt([1,53],[2.5,9]);
+  data.offices.forEach(o=>{ const [px,py]=proj([o.lon,o.lat]);
+    sm.append("circle").attr("cx",px).attr("cy",py).attr("r",rs(o.n)).attr("fill","#00938D").attr("fill-opacity",.85).attr("stroke","#fff"); });
+  document.body.dataset.ready = "1";
+});
+</script>
+</body></html>
