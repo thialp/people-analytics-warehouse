@@ -1,18 +1,26 @@
-# Release 3 build plan: Dashboard #3, Workforce Planning (seats, not people)
+# Release 3 build plan: Dashboard #3, Workforce Planning (PIDs)
 
-This is the complete plan for the third Arcadia dashboard, from the data to the published page. It replaces the step-by-step build in [dashboard_3_build.md](dashboard_3_build.md), which stays only as history. It reuses what already works on Dashboard #1 (Headcount & FTE Walk): the top bar, popovers, KPI hovers, info panel, grid and type rules. From Dashboard #2 (Compensation Walk) it reuses the period grid, the map technique and the title rules. Arcadia Systems is fictional and all data is synthetic.
+This is the complete plan for the third Arcadia dashboard, from the data to the published page. It replaces the step-by-step build in [dashboard_3_build.md](dashboard_3_build.md), which stays only as history. It reuses what already works on Dashboard #1 (Headcount & FTE Walk): the top bar, popovers, KPI hovers, info panel, grid and type rules. From Dashboard #2 (Compensation Walk) it takes the period grid, the map technique and the title rules. Arcadia Systems is fictional and all data is synthetic.
 
-Companion guides, referred to as **G1** and **G2**: [Dashboard #1 rebuild](../headcount-fte-walk/release_3_rebuild_dashboard_1.md) and [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_dashboard_2.md). Method and definitions: [workforce_planning.md](workforce_planning.md).
+Companion guides: **G1** [Dashboard #1 rebuild](../headcount-fte-walk/release_3_rebuild_dashboard_1.md), **G2** [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_dashboard_2.md). Method and definitions: [workforce_planning.md](workforce_planning.md).
 
-![Design mock, default state](../../images/workforce_planning_mock.png)
+![Design mock](../../images/workforce_planning_mock.png)
 
-*Design mock at the default state (FY26 · All organizations). Every number comes from the release 3 data. File: `docs/brand/build/d3_page_preview.html`.*
+*Design mock at FY25 · All organizations. FY26's closing date is the last day of the simulation, where no new PID is open yet; section 3.3 fixes that. Every number comes from the release 3 data. File: `docs/brand/build/d3_page_preview.html`.*
 
-**Revision 2 (2026-10-23), after review:** the plan-version toggle is removed and the plan is the budget. The map is the main card again, now defined as seat movement (section 1). "Vacant" replaces open/frozen. Reset is the arrow icon. Card 5 is vacant seats.
+![KPI hovers](../../images/workforce_planning_hovers_mock.png)
+
+*The five KPI hovers, each a small chart inside the tooltip (Viz in Tooltip).*
+
+| Revision | Date | What changed |
+|---|---|---|
+| 1 | 2026-10-23 | Top bar, popovers, version toggle |
+| 2 | 2026-10-23 | No version toggle (plan = budget); the map is the main card; "vacant"; arrow-only reset |
+| **3** | 2026-10-23 | **Everything counts PIDs.** KPI 1 is total PIDs, KPIs 2 and 3 split the vacant PIDs, KPI 5 is backfills with a level change, and the hovers are charts. The capsule has a drawn chevron. Routes are shown as From / To columns, not "A → B" text. Period labels name the months. A generator fix opens net-new PIDs at the end of the data |
 
 ## Contents
 
-0. Seats vs people: the principle
+0. Which dashboard this is, and the PID principle
 1. The story
 2. Decisions
 3. Data
@@ -25,59 +33,61 @@ Companion guides, referred to as **G1** and **G2**: [Dashboard #1 rebuild](../he
 10. KPI band and hovers
 11. The four cards
 12. Dashboard layout
-13. Actions (complete list)
+13. Actions
 14. Check tables
 15. Click tests
 16. Publish
-17. Who does what, in what order
+17. Who does what
+18. Later: the PID forecast dashboard
 
 ---
 
-## 0. Seats vs people: the principle
+## 0. Which dashboard this is, and the PID principle
 
-Workforce planning has two ledgers, often called **seats vs butts**:
+**This is Workforce Planning:** *Are we hiring into the seats we planned, and what did each seat look like before?* It is not the Global Workforce Footprint (*Where are our people, where are we growing, and who moves between offices?*).
 
-| | Seats (positions, PIDs) | People ("butts in seats") |
+The two are easy to mix up because both have a map with lines between offices. The difference is what the line follows:
+
+| | Global Workforce Footprint | Workforce Planning (this one) |
 |---|---|---|
-| What it is | A budgeted place for one person: department, cost center, office, job, grade | A worker, with a hire date, an exit date and moves in between |
-| Who approves it | The plan (Finance) | Recruiting and the manager |
-| Headcount | Filled seats | People at month-end |
-| Changes when | A seat is created, re-graded, relocated, frozen or eliminated | A person is hired, moves, is promoted or leaves |
+| Unit | People | **PIDs** (positions, seats) |
+| A line on the map | A **person** changed office | A **PID** was refilled in another office than the person who left it |
+| Answers | Where people are and where they go | Where the budgeted seats are, which are vacant, how fast and how well we fill them, and what changed in the seat when it was refilled |
 
-The two always agree on how many seats are filled (test 45: filled seats = month-end headcount, same people, every month). They disagree on *where things moved*. That is the point of this dashboard:
+**The PID ledger.** Workforce planning counts PIDs, not people ("seats vs butts"):
 
-- **Every hire fills a seat.** It is either a **net-new seat**, created because the plan added growth, or a **vacant seat**: someone left (voluntarily, involuntarily, or by moving to another seat) and the seat is filled back. The second kind is a **backfill**.
-- **A backfill can change the seat.** The seat can come back one grade lower or higher, or **in another office**.
+- **Total PIDs = filled + vacant.** Filled PIDs equal headcount (test 45: same people, every month).
+- **A vacant PID is either previously held or new.** Previously held means someone left: they resigned, were let go, or moved to another PID. New means a net-new PID the plan approved that has not had its first hire yet.
+- **Filling a PID.** Filling a previously held PID is a **backfill**; filling a new PID is a **net-new** fill.
+- **A backfill can change the PID.** It can come back at another level or in another office.
 
-  *Example:* someone in Austin resigns. The seat they held (PID P-…) stays vacant, then Recruiting fills it with a new hire in Chicago. The person did not move; **the seat moved from Austin to Chicago**.
-- **Net-new seats have no "from".** They did not exist before, so they never appear on the map.
+  *Example:* a Senior Manager in Austin leaves. Their PID is refilled by a new hire in Chicago at Manager level. The PID moved from Austin to Chicago (the map) **and** went one level down (KPI 5 and the right-hand card).
+- **Net-new PIDs have no "before",** so they never appear on the map.
 
-**How this differs from the Compensation Walk's map.** That map follows **people**: an employee changes office and their pay moves with them. This map follows **seats**: it compares where the person who left sat with where the person who refilled the seat sits. It is the same PID with a different occupant and a different office. On `Position Fill` that is `prior_office_name` (the office of the seat's previous holder) → `office_name` (the office of the new holder), for backfills only.
+**Contingent workers do not hold PIDs at Arcadia.** They sit in the vendor system (Bridgeway; case study 3), so a PID is filled by an employee or it is vacant. KPI 1's hover says so in one line. This is common in real companies too, and it is a good interview point: the plan counts PIDs, while contingent workers are planned as spend.
 
 ---
 
 ## 1. The story
 
-**Page question:** *Where did hiring go: which seats were refilled, which were new, and what is still vacant?*
+**Page question:** *How many PIDs do we have, how many are vacant, how fast and how well do we fill them, and what changes when we refill one?*
 
-Read left to right, top to bottom:
-
-| Where | Question | Default (FY26 · All organizations) |
+| Where | Question | FY25 · All organizations (the mock) |
 |---|---|---|
-| Header | Which dates? | **Workforce Planning** · "Opening Jun 30, 2025 → Closing Jun 30, 2026" (the same line as #1) |
-| KPI 1 | How many people did we end with, against the plan? | **30,005** Employees · −332 vs plan 30,337 |
-| KPI 2 | How many vacant seats did we fill back? | **4,668** Backfilled seats · 92.8% of plan · median 42 days to fill |
-| KPI 3 | How many of them came back in another office? | **467** Backfills in a new office · 10.0% of backfills · 280 to lower pay |
-| KPI 4 | How much growth did we add? | **2,181** Net-new seats · 79.0% of plan · 628 with a vacant match |
-| KPI 5 | What is still vacant? | **977** Vacant seats · 213 vacant over 90 days |
-| **Main card**, left, full height | Where did backfilled seats move? | "467 backfilled seats were refilled in a different office". The map (old office → new office), then the five busiest seat routes |
-| Right, top | What else changed when a seat was refilled? | "1,208 of 4,668 backfills changed level or office". Same / one level down / one level up / moved office, with the pay change: new people earn $7.0M a year less than those who left |
-| Right, middle | Where did the growth seats go? | "2,181 net-new seats filled, 79.0% of plan". Filled vs planned by function, one level below the selection; 628 approved while a matching seat was vacant |
-| Right, bottom | How long have the vacant seats waited? | "977 seats are vacant; 213 for over 90 days". By time vacant on the closing date |
+| Header | Which dates? | **Workforce Planning** · "PIDs from Jul 1, 2024 to Jun 30, 2025" |
+| KPI 1 | How many PIDs do we have? | **29,508** PIDs · 28,438 filled · 1,070 vacant. Hover: filled by employees / vacant previously held / vacant new, and the plan |
+| KPI 2 | How many vacant PIDs did someone leave? | **821** Vacant, previously held · 179 vacant over 90 days. Hover: why they became vacant (voluntary 446, moved to another PID 254, involuntary 121) |
+| KPI 3 | How many new PIDs wait for a first hire? | **249** Vacant, new PIDs · approved, waiting for a first hire. Hover: by function |
+| KPI 4 | How many PIDs did we fill, against the plan? | **5,852** PIDs filled · 4,224 backfills · 1,628 net-new. Hover: bar inside a bar, backfills 4,224 of 4,737 (89.2%) and net-new 1,628 of 2,236 (72.8%); median 41 days to fill a backfill |
+| KPI 5 | Did refilled PIDs come back at another level? | **634** Backfills with a level change · 474 down · 160 up. Hover: down / up bars; 8 also changed office |
+| **Main card** (left, full height) | Where did backfilled PIDs move? | "396 backfilled PIDs changed office". The map, then the five busiest routes as a **From / To** table |
+| Right, top | What changed in each refilled PID? | "1,022 of 4,224 backfills changed level or office" · same 3,202 · one level down 466 · one level up 160 · moved office only 388 · changed level and office 8. New people earn $8.2M a year less than those they replaced |
+| Right, middle | Where did growth PIDs go? | "1,628 net-new PIDs filled, 72.8% of plan". Bar inside a bar by function; 466 approved while a matching PID was vacant |
+| Right, bottom | How long have vacant PIDs waited? | "1,070 PIDs are vacant; 185 for over 90 days". By time vacant, previously held vs new |
 
-The KPI band follows the page: cards 1–3 sit over the map (people, backfills, backfills that moved) and cards 4–5 sit over the right column (net-new, vacant). The vacant card is a "where we stand today" closer. It can be dropped without breaking the story, but it opens the best discussion: *how many seats do we still need to fill, and are we approving new seats while old ones wait?*
+**How the numbers tie together on the page.** KPI 2 + KPI 3 = the vacant part of KPI 1 = the vacant card's total. KPI 4's backfills = the right-top card's total. KPI 5 = one level down + one level up + changed level and office (466 + 160 + 8 = 634). The map's 396 = moved office only + changed level and office (388 + 8). Every pair is the same population, by construction.
 
-**The plan is one number per card.** The budget approved before each fiscal year is "the plan". It appears only as "vs plan" or "% of plan" (KPIs 1, 2 and 4, and the net-new bars), so a screenshot reads without knowing about versions. The reforecasts stay in the warehouse and in the case study write-up.
+**The plan** is the budget, approved before each fiscal year. It appears only in KPI 1's hover, KPI 4's hover and the net-new card, as "of plan".
 
 ---
 
@@ -85,18 +95,22 @@ The KPI band follows the page: cards 1–3 sit over the map (people, backfills, 
 
 | # | Decision | Why |
 |---|---|---|
-| D1 | Executive officers excluded (department `D-901`) | The same people on every Arcadia dashboard: 30,005 FY26 year-end employees on #1, #2 and #3 |
-| D2 | Periods are quarter-end pairs inside one fiscal year: Fiscal year (5), Half year (10), Quarter (20) | The plan is quarterly and set per fiscal year. A pair that crosses fiscal years has no single plan |
-| D3 | **No version choice. Plan = Budget**, filtered in the data source | Tableau Public visitors want the answer, not the reconciliation of four plans. The page reads from a screenshot |
-| D4 | **No click leads to an empty page**: a period or group with no plan is drawn dim, and clicking it does nothing | Only groups not yet open are affected (Philippines FY22; Portugal and South Korea FY22–23; Data & AI Platform FY22–24) |
-| D5 | A View pick lands on the view's **first group alphabetically**, as on #1 and #2 | Checked: Australia, Accounting & Controllership, Commercial and Client Services have a plan in every period |
-| D6 | **"Vacant"** for a seat with no one in it; no open/frozen split anywhere on the page | Your wording; simpler. The 90-day threshold stays: vacant over 90 days is "stale" |
-| D7 | Card 5 is **Vacant seats** | Agreed |
-| D8 | The **map is the main card** (797 × 624, left), seat moves only, teal only | Section 0 |
-| D9 | Reset is the **arrow icon** (`btn_reset_top`, now `d3_reset`), 32 × 32, next to ⓘ | Agreed |
-| D10 | Colour: navy for the measure the title is about, slate `#8C9BB0` as comparator, light `#D5DBE4` for plan, teal `#00938D` only on the map card. Never blue with orange | The quiet look you liked |
-| D11 | Card titles are **sheet titles from FIXED calcs** (one value per sheet), not separate title sheets | Fewer sheets and actions; a FIXED value never shows `*` |
-| D12 | **A new workbook**; the first one is archived | Clean action list, no leftovers |
+| D1 | Executive officers excluded (`D-901`) | The same people on every Arcadia dashboard |
+| D2 | Periods are quarter-end pairs inside one fiscal year: Fiscal year (5), Half year (10), Quarter (20) | The plan is quarterly, per fiscal year |
+| D3 | No version toggle; plan = Budget (data source filter) | Reads from a screenshot |
+| D4 | No click leads to an empty page: a period or group with no plan is dim and does nothing | Groups not yet open: Philippines FY22; Portugal, South Korea FY22–23; Data & AI Platform FY22–24 |
+| D5 | A View pick lands on the first group alphabetically | Same as #1 and #2; checked always planned |
+| D6 | **PID** is the unit everywhere ("PIDs", "backfilled PIDs", "new PIDs"); "vacant", never "frozen" or "open" | Your rule |
+| D7 | **KPI order: PIDs · Vacant, previously held · Vacant, new · PIDs filled · Backfills with a level change** | Stock first (what we have, what is vacant), then flow (what we filled and what changed) |
+| D8 | **The hovers are charts** (Viz in Tooltip), one small sheet per KPI | The cards stay clean, and the breakdown is one hover away |
+| D9 | Right-top card categories are **exclusive**: same; one level down; one level up; moved office only; changed level and office | So KPI 5 and the map are sums of its bars and never disagree |
+| D10 | **Chevron drawn in the capsule image** (`d3_field_capsule`, 200 × 36); the label carries no ▾ | The ▾ character was too small to read |
+| D11 | **No arrow glyph in text.** Routes are two columns (FROM, TO); periods are named by months ("FY26 Q3 · Jan – Mar 26"); tooltips say "from Austin HQ to Chicago" | "→" at 9 pt is unreadable |
+| D12 | Reset is the arrow icon, 32 × 32, next to ⓘ | Your choice: different from #1 and cleaner |
+| D13 | Colour: navy for the measure the title is about, slate `#8C9BB0` as comparator, `#D5DBE4` for plan, teal only on the main card | Quiet page, one accent |
+| D14 | Titles are FIXED calcs in sheet titles | No `*`, no extra sheets |
+| D15 | A new workbook; the first one is archived | Clean actions |
+| D16 | Contingent workers hold no PID (section 0) | The data has none, and it is true to the design of case study 3 |
 
 ---
 
@@ -104,64 +118,87 @@ The KPI band follows the page: cards 1–3 sit over the map (people, backfills, 
 
 ### 3.1 Sources
 
-| Data source | File (`tableau/`) | Rows | Data source filter | Feeds |
+| Data source | File (`tableau/`) | Rows (extract) | Data source filter | Feeds |
 |---|---|---:|---|---|
-| **WFP Summary** | `custom_sql_wfp_summary.sql` (**edited**, 3.2) | 10,080 → 2,520 | `version_type` = Budget | KPI band and hovers, header, Period and View pickers, Reset |
-| **Plan vs Actual** | `custom_sql_plan_vs_actual.sql` (unchanged) | 29,365 → 11,740 | `version_type` = Budget | Net-new card |
-| **Position Fill** | `custom_sql_position_fill.sql` (unchanged) | 30,575 | none | Main card (map, routes), backfill card |
-| **Vacancy Pool** | `custom_sql_vacancy_pool.sql` (unchanged) | 62,055 | none | Vacant card |
+| **WFP Summary** | `custom_sql_wfp_summary.sql` (**edited**) | 2,520 | `version_type` = Budget | KPI band, hovers 1 and 4, header, pickers, Reset |
+| **Plan vs Actual** | `custom_sql_plan_vs_actual.sql` | 11,740 | `version_type` = Budget | Net-new card |
+| **Position Fill** | `custom_sql_position_fill.sql` | about 30,800 after 3.3 | none | Main card, right-top card, hover 5 |
+| **Vacancy Pool** | `custom_sql_vacancy_pool.sql` | about 62,300 after 3.3 | none | Vacant card, hovers 2 and 3 |
 
-The summary keeps its four versions in SQL (the case study uses them); the workbook filters to Budget once, at the source. Every sheet then sees one plan.
+### 3.2 WFP Summary: new columns (still one row per fiscal year × period × version × view × group)
 
-### 3.2 WFP Summary: new columns (same 10,080 rows)
-
-| Column | Example | Used by |
+| Column | Example (FY25 · All) | Used by |
 |---|---|---|
-| `span_name`, `span_order` | `Quarter`, 3 | Period popover, span list |
-| `period_short` | `FY26 Q3` | Period grid, line 1 |
-| `period_dates` | `Dec 25 → Mar 26` | Period grid, line 2 |
-| `vacant_seats` | 977 | KPI 5 |
-| `vacant_stale` | 213 (vacant over 90 days) | KPI 5 |
-| `moved_seats` | 467 (backfills whose seat changed office in the period) | KPI 3 |
-| `moved_lower_pay` | 280 (of those, to a lower pay range: `location_effect_usd_constant` < 0) | KPI 3 |
-| `is_view_default` | **changed**: the view's first group alphabetically (D5) | View list |
+| `span_name`, `span_order` | `Quarter`, 3 | Period popover |
+| `period_short` | `FY25`, `FY26 Q3` | Grid line 1, capsule |
+| `period_months` | `Jul 24 – Jun 25`, `Jan – Mar 26` | Grid line 2, capsule |
+| `pids_total` | 29,508 | KPI 1 |
+| `pids_filled` | 28,438 (= `actual_ending_headcount`) | KPI 1, hover 1 |
+| `vacant_previously_held`, `vacant_new` | 821, 249 | KPIs 2 and 3, hover 1 |
+| `vacant_previously_held_stale`, `vacant_new_stale` | 179, 6 (over 90 days) | KPI 2, vacant card |
+| `level_down`, `level_up`, `level_and_office` | 474, 160, 8 | KPI 5, hover 5 |
+| `moved_office` | 396 | Main card check |
+| `is_view_default` | **changed**: first group alphabetically | View list |
 
-The vacant columns are read on `to_date` from `rpt.vw_vacancy_pool`. The moved columns are counted over the period's quarters from `rpt.vw_position_fill`. Both are the same in every version row.
+The vacant columns read `rpt.vw_vacancy_pool` on `to_date` (`vacated_by` = 'Never filled' is a new PID). The level and office columns count backfills in the period from `rpt.vw_position_fill`. All of them are the same in every version row.
 
-### 3.3 How it is checked (Claude, before you open Tableau)
+### 3.3 Generator fix: new PIDs at the end of the data
+
+Net-new PIDs are created backwards from their hire date (approved = hire date − time to fill). Hires after Jun 30, 2026 are not simulated, so no new PID is open on the last day: KPI 3 would read **0** on the default page. Every earlier quarter-end has them (for example 234 on Mar 31, 2026 and 249 on Jun 30, 2025).
+
+The fix, in `generator/generate_data.py`, with its **own random stream**, after the main simulation:
+
+- Draw the net-new hires the model would make from Jul 1 to Dec 31, 2026, by department, at FY26's monthly rate.
+- Create their PIDs and requisitions with the usual approval and time-to-fill rules.
+- Keep only those approved on or before Jun 30, 2026. They stay **Open**, with no hire, no assignment and no fill.
+
+Nothing that already exists changes. The check is that every existing table equals the current one row for row, apart from the added PIDs and requisitions.
+
+Expected: about 200–250 new vacant PIDs on Jun 30, 2026, in line with earlier quarter-ends. Section 14 gets the exact number after the run.
+
+### 3.4 How it is checked (Claude, before you open Tableau)
 
 | Check | Pass when |
 |---|---|
-| DuckDB mart `mart_wfp_summary` | `python pipeline/run_pipeline.py`: all tests pass. Test 80 is extended: vacant = vacancy pool on `to_date`; moved = position fill backfills with another office; defaults are alphabetical and always planned |
-| T-SQL = DuckDB | `python sqlserver/check_tsql_in_duckdb.py`: the summary matches row for row |
-| SQL Server on your Mac | `14_validate_workforce_planning_dashboard.sql` extended with the new columns: every line PASS |
+| Generator | Every pre-existing row unchanged; added PIDs Open on Jun 30, 2026, approved before it |
+| `python pipeline/run_pipeline.py` | All tests pass; test 80 extended: `pids_total` = filled + vacant; vacant = vacancy pool on `to_date`; level and office counts = position fill; defaults alphabetical and planned |
+| `python sqlserver/check_tsql_in_duckdb.py` | T-SQL summary = DuckDB mart, row for row |
+| `14_validate_workforce_planning_dashboard.sql` (your Mac) | Every line PASS |
 
-The expected values in section 14 were computed from the base marts (fills, vacancy pool, plan vs actual) by an independent script, and they tie to the summary in every state.
-
-### 3.4 On the Mac (after Claude pushes)
+### 3.5 On the Mac (after Claude pushes)
 
 ```bash
 cd ~/GitHub/people-analytics-warehouse
 git fetch origin
 git checkout dashboard-3-rebuild
 git pull
-export MSSQL_SA_PASSWORD="$(docker exec arcadia-sql printenv MSSQL_SA_PASSWORD)"
-docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -i /repo/sqlserver/14_validate_workforce_planning_dashboard.sql | grep -E "FAIL|Msg|returned"
 ```
 
-Expected: `WFP summary Custom SQL returned 10080 rows …`, `Plan vs actual Custom SQL returned 29365 rows …`, `Position fill Custom SQL returned 30575 rows …`, and no `FAIL` or `Msg` line.
+The generator fix adds rows, so the SQL Server warehouse is rebuilt the usual way (the run guide that comes with the branch lists the commands and every expected count). Then:
 
 ```bash
+export MSSQL_SA_PASSWORD="$(docker exec arcadia-sql printenv MSSQL_SA_PASSWORD)"
+docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -i /repo/sqlserver/14_validate_workforce_planning_dashboard.sql | grep -E "FAIL|Msg|returned"
 D="$HOME/Documents/Tableau/Tableau Public/ArcadiaHR/Custom SQL - Release 3/03 Workforce Planning"
 cp tableau/custom_sql_wfp_summary.sql tableau/custom_sql_plan_vs_actual.sql tableau/custom_sql_position_fill.sql tableau/custom_sql_vacancy_pool.sql "$D/"
-ls "$D"
 ```
+
+Expected: the three `returned` lines and no `FAIL` or `Msg`.
 
 ---
 
 ## 4. Shapes
 
-Palette **Arcadia D3**: `d3_field_capsule` (the white capsule, 180 × 36, as on #1) and `d3_reset` (the arrow icon, 32 × 32). From **Arcadia Shared**: `shared_info_open`, `shared_info_close`, `shared_close_light`.
+Palette **Arcadia D3** (`docs/brand/shapes/by_dashboard/d3/`):
+
+| File | Size | Sheet |
+|---|---|---|
+| `d3_field_capsule` | 200 × 36 | Period Field, Group Field: white capsule with a **navy chevron drawn in**, 18 px from the right |
+| `d3_reset` | 32 × 32 | Reset (arrow icon) |
+
+From **Arcadia Shared**: `shared_info_open`, `shared_info_close`, `shared_close_light`.
+
+![Field capsule](../../brand/build/d3_field_preview.png)
 
 ```bash
 cd ~/GitHub/people-analytics-warehouse/docs/brand/shapes/by_dashboard
@@ -170,31 +207,23 @@ cp d3/*.png ~/Documents/My\ Tableau\ Repository/Shapes/Arcadia\ D3/
 ls ~/Documents/My\ Tableau\ Repository/Shapes/Arcadia\ D3
 ```
 
-Expected: `d3_field_capsule.png  d3_reset.png`. In Tableau: Marks > Shape > More Shapes > **Reload Shapes**.
+Expected: `d3_field_capsule.png  d3_reset.png`. In Tableau: Shape > More Shapes > **Reload Shapes**.
 
 ---
 
 ## 5. Workbook and data sources
 
 1. Close Tableau. Move `Arcadia Workforce Planning.twb` to `_archive/2026-10-23/Arcadia Workforce Planning - first build.twb`.
-2. **File > New**, save as `Arcadia Workforce Planning.twb` in the same folder.
-3. Connect to SQL Server (`localhost, 1433`, `ArcadiaHR`, `sa`, Require SSL off). New Custom SQL with `custom_sql_wfp_summary.sql`. Rename it **WFP Summary**. Data > New Data Source for **Plan vs Actual**, **Position Fill** and **Vacancy Pool**.
-4. **Data source filters** (Data Source tab, top right > Filters > Add): `version_type` = Budget on WFP Summary and on Plan vs Actual.
-5. **Extract** all four.
+2. **File > New**; save as `Arcadia Workforce Planning.twb` in the same folder.
+3. Connect to SQL Server (`localhost, 1433`, `ArcadiaHR`, `sa`, Require SSL off). Add four Custom SQL sources named **WFP Summary**, **Plan vs Actual**, **Position Fill** and **Vacancy Pool**.
+4. Data source filters: `version_type` = Budget on WFP Summary and Plan vs Actual.
+5. Extract all four.
 
-**Checkpoint 1:** extract rows 2,520 · 11,740 · 30,575 · 62,055.
+**Checkpoint 1:** WFP Summary 2,520 rows; Plan vs Actual 11,740; the other two as section 14 states after the rebuild.
 
-**Types.** Convert to Dimension on WFP Summary: `fiscal_year`, `pair_order`, `view_order`, `span_order`. On Plan vs Actual: `fiscal_year`, `fiscal_quarter`. Geographic role **None** on every latitude and longitude of Position Fill. Number format `#,##0` on the count measures.
+**Types.** Convert to Dimension: WFP Summary `fiscal_year`, `pair_order`, `view_order`, `span_order`; Plan vs Actual `fiscal_year`, `fiscal_quarter`. Geographic role **None** on every latitude and longitude. Number format `#,##0` on counts.
 
-**Paste what is proven** (Data pane > Copy, then right-click the target source > Paste):
-
-| From | What | Into |
-|---|---|---|
-| Dashboard #1 workbook | the `kpi_` layout calcs (their 16 parameters come along) | WFP Summary |
-| Dashboard #1 workbook | `zzTrue`, `zzFalse`, `Close Panel`, `Pick Rows`, `Pick Col`, `Pick Row` | WFP Summary |
-| First #3 workbook (archived) | `K Close HC`, `K Plan HC`, `K HC Gap`, `K NN Done`, `K NN Plan`, `K NN Pct`, `K BF Done`, `K BF Plan`, `K BF Pct`, `K Days`, `K Reuse` and their `… Str` twins | WFP Summary |
-
-Delete anything else that comes along (`K CW …`, `K Cost …`, `KPI 5 …`).
+**Paste what is proven** (Data pane > Copy, then right-click the target source > Paste): from #1, the `kpi_` layout calcs (their 16 parameters come along), plus `zzTrue`, `zzFalse`, `Close Panel`, `Pick Rows`, `Pick Col`, `Pick Row`. From the archived #3 workbook: the comma and percent pattern calcs you already wrote (`K … Str`), as templates.
 
 ---
 
@@ -202,7 +231,7 @@ Delete anything else that comes along (`K CW …`, `K Cost …`, `KPI 5 …`).
 
 | Name | Type | Allowable values | Current |
 |---|---|---|---|
-| `p_FY` | Integer | List 2022–2026 (display FY22 … FY26) | 2026 |
+| `p_FY` | Integer | List 2022–2026 (FY22 … FY26) | 2026 |
 | `p_Period` | String | List FY, H1, H2, Q1, Q2, Q3, Q4 | FY |
 | `p_Span` | String | List `Fiscal year`, `Half year`, `Quarter` | Fiscal year |
 | `p_View` | String | List Company, Function, Sub-function, Department, Country | Company |
@@ -216,162 +245,153 @@ Delete anything else that comes along (`K CW …`, `K Cost …`, `KPI 5 …`).
 ### 7.1 WFP Summary: context and pickers
 
 ```
-// Row Is Current     (one row: KPI band, header, Period Field, Group Field, Reset, Info)
-[fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [view_name] = [p_View] AND [group_name] = [p_Group]
+// Row Is Current       [fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [view_name] = [p_View] AND [group_name] = [p_Group]
+// Period Grid Rows     [view_name] = [p_View] AND [group_name] = [p_Group] AND [span_name] = [p_Span]
+// Span Rows            [fiscal_year] = [p_FY] AND [view_name] = [p_View] AND [group_name] = [p_Group]
+// View Rows            [fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [is_view_default]
+// Group Grid Rows      [fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [view_name] = [p_View] AND [view_name] <> "Company"
+// Why Off              IF [has_plan] THEN "" ELSE [group_name] + " had no PIDs in the plan for " + [period_short] + " (" + [period_months] + ")." END
 
-// Period Grid Rows   [view_name] = [p_View] AND [group_name] = [p_Group] AND [span_name] = [p_Span]
-// Span Rows          [fiscal_year] = [p_FY] AND [view_name] = [p_View] AND [group_name] = [p_Group]
-// View Rows          [fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [is_view_default]
-// Group Grid Rows    [fiscal_year] = [p_FY] AND [pair_code] = [p_Period] AND [view_name] = [p_View] AND [view_name] <> "Company"
-
-// Why Off            IF [has_plan] THEN "" ELSE [group_name] + " had no seats in the plan for " + [pair_name] + "." END
-
-// FY Pick            IF [has_plan] THEN [fiscal_year] ELSE [p_FY] END          (dimension)
-// Period Pick        IF [has_plan] THEN [pair_code] ELSE [p_Period] END
-// Period Keep Open   NOT [has_plan]
-// Cell Is Current    [fiscal_year] = [p_FY] AND [pair_code] = [p_Period]
-// Cell State         IF [Cell Is Current] THEN "current" ELSEIF [has_plan] THEN "on" ELSE "off" END
-// Cell Title         IF [Cell Is Current] THEN "› " + [period_short] ELSE [period_short] END
-// Span Display       IF [span_name] = [p_Span] THEN "› " + [span_name] ELSE [span_name] END
-// Toggle Period Panel   NOT [p_PeriodOpen]
-
-// View Label         IF [view_name] = "Company" THEN "All organizations" ELSE [view_name] END
-// View Display       IF [view_name] = [p_View] THEN "› " + [View Label] ELSE [View Label] END
+// FY Pick              IF [has_plan] THEN [fiscal_year] ELSE [p_FY] END          (dimension)
+// Period Pick          IF [has_plan] THEN [pair_code] ELSE [p_Period] END
+// Period Keep Open     NOT [has_plan]
+// Cell Is Current      [fiscal_year] = [p_FY] AND [pair_code] = [p_Period]
+// Cell State           IF [Cell Is Current] THEN "current" ELSEIF [has_plan] THEN "on" ELSE "off" END
+// Cell Title           IF [Cell Is Current] THEN "› " + [period_short] ELSE [period_short] END
+// Span Display         IF [span_name] = [p_Span] THEN "› " + [span_name] ELSE [span_name] END
+// Period Field Text    [period_short] + " · " + [period_months]
+// View Label           IF [view_name] = "Company" THEN "All organizations" ELSE [view_name] END
+// View Display         IF [view_name] = [p_View] THEN "› " + [View Label] ELSE [View Label] END
 // Keep Group Panel Open   [view_name] <> "Company"
-// Group Pick         IF [has_plan] THEN [group_name] ELSE [p_Group] END
-// Group Keep Open    NOT [has_plan]
-// Group State        IF [group_name] = [p_Group] THEN "current" ELSEIF [has_plan] THEN "on" ELSE "off" END
-// Panel Title        "Select " + CASE [p_View] WHEN "Function" THEN "a function" WHEN "Sub-function" THEN "a sub-function"
-//                    WHEN "Department" THEN "a department" WHEN "Country" THEN "a country" ELSE "a view" END
-// Group Field Text   IF [p_View] = "Company" THEN "All organizations"
-//                    ELSEIF LEN([p_Group]) > 22 THEN LEFT([p_Group], 21) + "…" ELSE [p_Group] END
-// Toggle Group Panel NOT [p_GroupOpen]
-// Toggle Info        NOT [p_InfoOpen]
-// Info Shape         IF [p_InfoOpen] THEN "shared_info_close" ELSE "shared_info_open" END
+// Group Pick           IF [has_plan] THEN [group_name] ELSE [p_Group] END
+// Group Keep Open      NOT [has_plan]
+// Group State          IF [group_name] = [p_Group] THEN "current" ELSEIF [has_plan] THEN "on" ELSE "off" END
+// Panel Title          "Select " + CASE [p_View] WHEN "Function" THEN "a function" WHEN "Sub-function" THEN "a sub-function"
+//                      WHEN "Department" THEN "a department" WHEN "Country" THEN "a country" ELSE "a view" END
+// Group Field Text     IF [p_View] = "Company" THEN "All organizations"
+//                      ELSEIF LEN([p_Group]) > 20 THEN LEFT([p_Group], 19) + "…" ELSE [p_Group] END
+// Toggle Period Panel  NOT [p_PeriodOpen]
+// Toggle Group Panel   NOT [p_GroupOpen]
+// Toggle Info          NOT [p_InfoOpen]
+// Info Shape           IF [p_InfoOpen] THEN "shared_info_close" ELSE "shared_info_open" END
+// Default FY 2026 · Default Period "FY" · Default Span "Fiscal year" · Default View "Company" · Default Group "Arcadia Systems"
 ```
 
-Reset defaults: `Default FY` = `2026`, `Default Period` = `"FY"`, `Default Span` = `"Fiscal year"`, `Default View` = `"Company"`, `Default Group` = `"Arcadia Systems"`.
+The capsule labels stay at 22 characters or fewer ("FY26 Q3 · Jan – Mar 26", "All organizations"), so they never reach the chevron.
 
-Header (same text as #1's):
+Header:
 
 ```
-// From Day        LEFT(DATENAME('month', [from_date]), 3) + " " + STR(DAY([from_date])) + ", " + STR(YEAR([from_date]))
-// To Day          the same pattern on [to_date]
-// Page Subtitle   "Opening " + [From Day] + " → Closing " + [To Day]
+// Day Text (x)     LEFT(DATENAME('month', x), 3) + " " + STR(DAY(x)) + ", " + STR(YEAR(x))   (write it for DATEADD('day', 1, [from_date]) and for [to_date])
+// Page Subtitle    "PIDs from " + <Day Text of from_date + 1> + " to " + <Day Text of to_date>
 // Title Tip
 "Showing: " + (IF [p_View] = "Company" THEN "all of Arcadia" ELSE [view_name] + " · " + [group_name] END) + CHAR(10) +
-"Every hire fills a seat: a vacant seat someone left (a backfill) or a new seat the plan added (net-new)." + CHAR(10) +
-"The map follows seats, not people: where the person who left sat, and where the new person sits." + CHAR(10) +
+"A PID is a budgeted position, filled or vacant. A backfill refills a PID someone left; a net-new fill is a new PID's first hire." + CHAR(10) +
+"The map follows PIDs, not people: the office of the person who left, and of the person who replaced them." + CHAR(10) +
 "Plan = the budget approved before " + [fiscal_year_label] + ". Executive officers excluded."
 ```
 
 ### 7.2 WFP Summary: KPI numbers
 
-Keep the pasted `K …` calcs (comma and percent patterns from the first guide, 3.5). Add:
+```
+// K PIDs        SUM([pids_total])
+// K Filled      SUM([pids_filled])
+// K Plan Filled SUM([planned_ending_headcount])
+// K Vac Prev    SUM([vacant_previously_held])
+// K Vac New     SUM([vacant_new])
+// K Vacant      [K Vac Prev] + [K Vac New]
+// K Prev Stale  SUM([vacant_previously_held_stale])
+// K BF          SUM([actual_backfills])         K BF Plan   SUM([planned_backfills])
+// K NN          SUM([actual_net_new])           K NN Plan   SUM([planned_net_new])
+// K Fills       [K BF] + [K NN]
+// K Days        SUM([median_time_to_fill_days])
+// K Down        SUM([level_down])               K Up   SUM([level_up])     K Both   SUM([level_and_office])
+// K Level       [K Down] + [K Up]
+```
+
+Text twins with the comma pattern (`K PIDs Str`, `K Filled Str` …) and the percent pattern (`K BF Pct Str` = `K BF` / `K BF Plan`, `K NN Pct Str`).
+
+`K Level` counts every backfill whose grade changed: `level_down` and `level_up` already include the PIDs that also moved office. `K Both` is that overlap.
+
+### 7.3 Period window and group (on Plan vs Actual, Position Fill, Vacancy Pool)
 
 ```
-// K Moved         SUM([moved_seats])
-// K Moved Lower   SUM([moved_lower_pay])
-// K Moved Pct     IF [K BF Done] = 0 THEN NULL ELSE [K Moved] / [K BF Done] END
-// K Vacant        SUM([vacant_seats])
-// K Stale         SUM([vacant_stale])
-// K Reuse Pct     IF [K NN Done] = 0 THEN NULL ELSE [K Reuse] / [K NN Done] END
-```
-
-Add a `Str` twin for each count (plain comma pattern) and for `K Moved Pct` (percent pattern).
-
-### 7.3 Period window (on Plan vs Actual, Position Fill and Vacancy Pool; parameters only, so the formula is the same in each)
-
-```
-// Period First Q   CASE [p_Period] WHEN "FY" THEN 1 WHEN "H1" THEN 1 WHEN "H2" THEN 3
-//                  WHEN "Q1" THEN 1 WHEN "Q2" THEN 2 WHEN "Q3" THEN 3 ELSE 4 END
-// Period Last Q    CASE [p_Period] WHEN "FY" THEN 4 WHEN "H1" THEN 2 WHEN "H2" THEN 4
-//                  WHEN "Q1" THEN 1 WHEN "Q2" THEN 2 WHEN "Q3" THEN 3 ELSE 4 END
+// Period First Q   CASE [p_Period] WHEN "FY" THEN 1 WHEN "H1" THEN 1 WHEN "H2" THEN 3 WHEN "Q1" THEN 1 WHEN "Q2" THEN 2 WHEN "Q3" THEN 3 ELSE 4 END
+// Period Last Q    CASE [p_Period] WHEN "FY" THEN 4 WHEN "H1" THEN 2 WHEN "H2" THEN 4 WHEN "Q1" THEN 1 WHEN "Q2" THEN 2 WHEN "Q3" THEN 3 ELSE 4 END
 // Period To Date   DATEADD('day', -1, DATEADD('month', 3 * [Period Last Q], MAKEDATE([p_FY] - 1, 7, 1)))
-// In Group
-CASE [p_View]
-    WHEN "Company"      THEN TRUE
-    WHEN "Function"     THEN [function_name] = [p_Group]
-    WHEN "Sub-function" THEN [sub_function] = [p_Group]
-    WHEN "Department"   THEN [department_name] = [p_Group]
-    WHEN "Country"      THEN [country_name] = [p_Group]
-END
+// In Group         CASE [p_View] WHEN "Company" THEN TRUE WHEN "Function" THEN [function_name] = [p_Group]
+//                  WHEN "Sub-function" THEN [sub_function] = [p_Group] WHEN "Department" THEN [department_name] = [p_Group]
+//                  WHEN "Country" THEN [country_name] = [p_Group] END
 ```
 
-The group is always the seat's **current** department and country (where the new person sits). For a country view, a seat that moved from Bengaluru to Warsaw counts in Poland.
+The group is the PID's department and country **now** (where the new person sits).
 
-**Checkpoint 2** (scratch sheet `CHK`): filter `Row Is Current`, Text: `K Close HC`, `K Plan HC`, `K BF Done`, `K BF Plan`, `K Moved`, `K Moved Lower`, `K NN Done`, `K NN Plan`, `K Reuse`, `K Vacant`, `K Stale`. Default: **30,005 · 30,337 · 4,668 · 5,031 · 467 · 280 · 2,181 · 2,762 · 628 · 977 · 213**.
+**Checkpoint 2** (`CHK` sheet, filter `Row Is Current`), at FY25 (`p_FY` = 2025): `K PIDs` 29,508 · `K Filled` 28,438 · `K Vac Prev` 821 · `K Vac New` 249 · `K Prev Stale` 179 · `K BF` 4,224 · `K NN` 2,236 planned / 1,628 filled · `K Down` 474 · `K Up` 160 · `K Both` 8.
 
 ---
 
-## 8. Top bar (G1 section 6; band 76 high, controls 32 high on y 30)
+## 8. Top bar (G1 section 6)
 
 | Sheet | Build |
 |---|---|
-| `Page Title` | Filter `Row Is Current`. Line 1 `Workforce Planning` Tableau Bold 18 white; line 2 `<Page Subtitle>` Book 8 `#C9D1DC`. Detail `Title Tip`, `zzTrue`, `zzFalse`. Tooltip **How to read this page** + `<Title Tip>` + "Click ⓘ for the full definitions." |
-| `Period Field` | Shape `d3_field_capsule`, size max; Label `<pair_name>  ▾` Semibold 9 navy, centre, allow overlap. Filter `Row Is Current`. Detail `Toggle Period Panel`, `Close Panel`, `span_name`, `zzTrue`, `zzFalse`. Tooltip `Choose the period` |
-| `Group Field` | Same; Label `<Group Field Text>  ▾`; Detail `Toggle Group Panel`, `Close Panel`, `zzTrue`, `zzFalse`. Tooltip `<p_Group>` / `Choose who to look at` |
-| `Reset` | Shape `d3_reset`, size max, filter `Row Is Current`. Detail the five `Default …`, `Close Panel`, `zzTrue`, `zzFalse`. Tooltip `Reset to default view` |
-| `Info Button` | Shape `Info Shape` (assign the two shared files), filter `Row Is Current`. Detail `Toggle Info`, `Close Panel`, `zzTrue`, `zzFalse`. Tooltip `Click here for more information on how to read this page` |
-
-Headings: dashboard Text objects, Bold 10 `#B8C4D6`: `SELECT PERIOD`, `SELECT VIEW`.
+| `Page Title` | Filter `Row Is Current`. Line 1 `Workforce Planning` Bold 18 white; line 2 `<Page Subtitle>` Book 8 `#C9D1DC`. Detail `Title Tip`, `zzTrue`, `zzFalse`. Tooltip **How to read this page** / `<Title Tip>` / "Click ⓘ for the full definitions." |
+| `Period Field` | Shape `d3_field_capsule`, size max. Label `<Period Field Text>` Semibold 9 navy, centre, allow overlap, **no ▾**. Filter `Row Is Current`. Detail `Toggle Period Panel`, `Close Panel`, `span_name`, `zzTrue`, `zzFalse`. Tooltip `Choose the period` |
+| `Group Field` | Same, label `<Group Field Text>`. Detail `Toggle Group Panel`, `Close Panel`, `zzTrue`, `zzFalse`. Tooltip `<p_Group>` / `Choose who to look at` |
+| `Reset` | Shape `d3_reset`, filter `Row Is Current`, Detail the five `Default …`, `Close Panel`, `zzTrue`, `zzFalse`. Tooltip `Reset to default view` |
+| `Info Button` | Shape `Info Shape` (two shared files), filter `Row Is Current`, Detail `Toggle Info`, `Close Panel`, `zzTrue`, `zzFalse`. Tooltip `Click here for more information on how to read this page` |
 
 | Object | x | y | w | h |
 |---|---:|---:|---:|---:|
 | Header band (Blank `#13233A`) | 0 | 0 | 1400 | 76 |
 | Logo | 30 | 14 | 177 | 48 |
 | Page Title | 223 | 9 | 275 | 58 |
-| SELECT PERIOD / Period Field | 506 | 12 / 30 | 180 | 14 / 32 |
-| SELECT VIEW / Group Field | 698 | 12 / 30 | 180 | 14 / 32 |
+| `SELECT PERIOD` (Text, Bold 10 `#B8C4D6`) / Period Field | 506 | 12 / 28 | 200 | 14 / 36 |
+| `SELECT VIEW` / Group Field | 718 | 12 / 28 | 200 | 14 / 36 |
 | Reset | 1294 | 30 | 32 | 32 |
 | Info Button | 1338 | 30 | 32 | 32 |
 
-Every control: item background None, border None, padding 0 (G1 6.8).
+Controls: background None, border None, padding 0.
 
 ---
 
-## 9. Popovers (G1 0.5: navy `#13233A`, radius 10, inner padding 16, front, one open at a time)
-
-![Popovers mock](../../images/workforce_planning_popovers_mock.png)
-
-*Left: the period popover with Country · Portugal selected (FY22 and FY23 are dim: Portugal had no seats in the plan before FY24). Right: the view popover, showing a dim group the way it looks in FY22–FY24.*
+## 9. Popovers (G1 0.5 style)
 
 ### 9.1 Period popover
 
 | Sheet | Build |
 |---|---|
-| `Span List` | Filter `Span Rows`. Rows `span_order`, `span_name` (hidden). Text `Span Display`, Book 10 `#B8C0CC` in the Label editor, no Color (G1 7.2). Detail `span_name`, `zzTrue`, `zzFalse`. 3 rows |
-| `Period Panel` | Filter `Period Grid Rows`. Columns `fiscal_year` **descending**, Rows `pair_order` **descending**, headers hidden. Text: line 1 `<Cell Title>` Semibold 10, line 2 `<period_dates>` Book 9. Color `Cell State`: current `#FFFFFF`, on `#B8C0CC`, off `#56657E`. Detail `FY Pick`, `Period Pick`, `Period Keep Open`, `Why Off`, `zzTrue`, `zzFalse`. Tooltip `<Why Off>` only. A plain cross-tab with no table calcs, so Color as a dimension is safe |
-| `Period Close` | Shape `shared_close_light` 16 × 16; Detail `Close Panel`, `zzTrue`, `zzFalse`; tooltip `Close` |
+| `Span List` | Filter `Span Rows`; Rows `span_order`, `span_name` (hidden); Text `Span Display` Book 10 `#B8C0CC`; no Color; Detail `span_name`, `zzTrue`, `zzFalse` |
+| `Period Panel` | Filter `Period Grid Rows`; Columns `fiscal_year` descending, Rows `pair_order` descending, headers hidden; Text line 1 `<Cell Title>` Semibold 10, line 2 `<period_months>` Book 9; Color `Cell State` (white / `#B8C0CC` / `#56657E`); Detail `FY Pick`, `Period Pick`, `Period Keep Open`, `Why Off`, `zzTrue`, `zzFalse`; tooltip `<Why Off>` |
+| `Period Close` | `shared_close_light` 16 × 16, Detail `Close Panel`, `zzTrue`, `zzFalse` |
 
-Container `Period Popover`: **x 506, y 76, w 708, h 254**, visibility `p_PeriodOpen`. Inside: a header row ("Select a period" Bold 12 white + `Period Close`); a note (Book 9 `#8FA0B8`: "Fiscal year runs July to June. Each option compares two quarter-ends."); then horizontal `Span List` (120) + `Period Panel` (540).
+Container `Period Popover` **x 506, y 76, w 708, h 254**, visibility `p_PeriodOpen`: header ("Select a period" Bold 12 white + `Period Close`), note (Book 9 `#8FA0B8`: "Fiscal year runs July to June."), then `Span List` (120) + `Period Panel` (540). Quarter cells read "FY26 Q3" over "Jan – Mar 26".
 
 ### 9.2 View popover
 
 | Sheet | Build |
 |---|---|
-| `View List` | Filter `View Rows` (5 rows). Rows `view_order`, `view_name` (hidden). Text `View Display`, Book 10 `#B8C0CC`. Detail `view_name`, `group_name` (the view's default, the only row left by the filter), `Keep Group Panel Open`, `zzTrue`, `zzFalse` |
-| `Group Panel` | Filter `Group Grid Rows`. Columns `Pick Col`, Rows `Pick Row` (both Discrete, hidden). Text `group_name` Book 10. Color `Group State` (white / `#B8C0CC` / `#56657E`). Detail **in this order**: `group_name`, `Group Pick`, `Group State`, `Group Keep Open`, `Why Off`, `zzTrue`, `zzFalse`. Every table calc (`Pick Col`, `Pick Row`, and `Pick Rows` inside them): Specific Dimensions, **all fields ticked, `group_name` at the top**. `group_name` goes first, not `Group Pick`: a dim group's `Group Pick` is the current group, so two marks would share it and break the alphabetical fill. Tooltip `<Why Off>` |
-| `Group Heading` | `<Panel Title>` Bold 12 white, filter `Row Is Current` |
+| `View List` | Filter `View Rows`; Rows `view_order`, `view_name` (hidden); Text `View Display`; Detail `view_name`, `group_name`, `Keep Group Panel Open`, `zzTrue`, `zzFalse` |
+| `Group Panel` | Filter `Group Grid Rows`; Columns `Pick Col`, Rows `Pick Row` (Discrete, hidden); Text `group_name`; Color `Group State`. Detail in order: `group_name`, `Group Pick`, `Group State`, `Group Keep Open`, `Why Off`, `zzTrue`, `zzFalse`. Every table calc: Specific Dimensions, all ticked, **`group_name` on top** (a dim group's `Group Pick` repeats the current group, so it cannot lead) |
+| `Group Heading` | `<Panel Title>` Bold 12 white |
 | `Group Close` | Copy of `Period Close` |
 
-Container `Group Popover`: **x 610, y 76, w 760, h 330**, visibility `p_GroupOpen`. Header row (`Group Heading` + `Group Close`), then horizontal `View List` (140) + `Group Panel`.
+Container `Group Popover` **x 610, y 76, w 760, h 330**, visibility `p_GroupOpen`.
 
 ### 9.3 Info popover
 
-Container `Info Popover`: **x 960, y 76, w 410**, about 520 high, visibility `p_InfoOpen`. Header "How to read this page" + `Info Close`. Body Book 10 `#B8C0CC`, lead-ins Semibold 10 white:
+Container **x 960, y 76, w 410**, visibility `p_InfoOpen`. Body (Book 10 `#B8C0CC`, lead-ins Semibold white):
 
-> **Period.** Every option compares two quarter-ends inside one fiscal year, because the plan is quarterly. Arcadia's fiscal year runs July to June.
+> **Period.** Every option compares two quarter-ends inside one fiscal year. Arcadia's fiscal year runs July to June.
 >
-> **Who is counted.** Employees at quarter-end. The CEO and the eight function heads are left out on every Arcadia dashboard, so all three count the same people.
+> **PIDs.** A PID is a budgeted position. It is filled by an employee or vacant. Contingent workers are managed in the vendor system and hold no PID.
 >
-> **Seats, not people.** Every hire fills a seat. A net-new seat is growth the plan added. A backfill fills a vacant seat someone left, by resigning, being let go or moving to another seat. A promotion re-grades a seat with the same person in it, so it is not a fill.
+> **Vacant PIDs.** Previously held: someone left by resigning, being let go or moving to another PID. New: a net-new PID approved by the plan that has not had its first hire yet. Over 90 days counts as stale.
 >
-> **The map.** One line per backfilled seat that changed office: from where the person who left sat, to where the new person sits. People's own office moves are on the Compensation Walk.
+> **Filling PIDs.** A backfill refills a previously held PID; a net-new fill is a new PID's first hire. A promotion re-grades a PID with the same person in it, so it is not a fill.
 >
-> **Vacant seats.** A seat with no one in it. Vacant over 90 days is stale. A net-new seat approved while a stale seat with the same department, job family and country (grade within one) was vacant counts as "with a vacant match".
+> **What changed.** A backfill can come back at another level, in another office, or both. The map draws one line per PID that changed office, from the office of the person who left to the office of the person who replaced them.
 >
-> **Plan.** The budget approved before each fiscal year. Pay changes compare annual base pay in constant USD.
+> **Who and plan.** Employees at quarter-end, without the CEO and the eight function heads. The plan is the budget approved before each fiscal year.
 >
 > **Data.** Arcadia Systems is a fictional company. All data is synthetic.
 
@@ -379,170 +399,122 @@ Container `Info Popover`: **x 960, y 76, w 410**, about 520 high, visibility `p_
 
 ## 10. KPI band and hovers
 
-### 10.1 Band (`KPI Cards`, WFP Summary)
-
-Geometry as #1 (G1 8.2a): image `arcadia_kpi_cards_bg_wide.png` at 0, 78, 1400 × 110; `kpi_GridLeft` 30, `kpi_CardW` 255, `kpi_GapX` 16, `kpi_GridTop` 12, `kpi_CardH` 86. Filter `Row Is Current`. Centred text, as #1.
+### 10.1 Band (`KPI Cards`, WFP Summary; geometry as G1 8.2a, centred text)
 
 | Card | Title | Value | Note |
 |---|---|---|---|
-| 1 | `Employees` | `K Close HC Str` | `[K HC Gap Str] + " vs plan " + [K Plan HC Str]` |
-| 2 | `Backfilled seats` | `K BF Done Str` | `[K BF Pct Str] + " of plan · median " + (IF ISNULL([K Days]) THEN "—" ELSE STR(INT(ROUND([K Days], 0))) END) + " days to fill"` |
-| 3 | `Backfills in a new office` | `K Moved Str` | `[K Moved Pct Str] + " of backfills · " + [K Moved Lower Str] + " to lower pay"` |
-| 4 | `Net-new seats` | `K NN Done Str` | `[K NN Pct Str] + " of plan · " + [K Reuse Str] + " with a vacant match"` |
-| 5 | `Vacant seats` | `K Vacant Str` | `[K Stale Str] + " vacant over 90 days"` |
+| 1 | `PIDs` | `K PIDs Str` | `[K Filled Str] + " filled · " + [K Vacant Str] + " vacant"` |
+| 2 | `Vacant, previously held` | `K Vac Prev Str` | `[K Prev Stale Str] + " vacant over 90 days"` |
+| 3 | `Vacant, new PIDs` | `K Vac New Str` | `"approved, waiting for a first hire"` |
+| 4 | `PIDs filled` | `K Fills Str` | `[K BF Str] + " backfills · " + [K NN Str] + " net-new"` |
+| 5 | `Backfills with a level change` | `K Level Str` | `[K Down Str] + " down · " + [K Up Str] + " up"` |
 
-Every note is 45 characters or fewer, so each fits on one line at 255 wide.
+### 10.2 Hovers: a chart inside each tooltip
 
-### 10.2 Hovers (G1 8.2c)
-
-`KPI Hover 1`–`5` on WFP Summary (`Hover Cell` = `"."` on Columns and Rows, Square at 0% opacity, filter `Row Is Current`), floating at **x 30, 301, 572, 843, 1114 · y 90 · 255 × 86**, corner radius 5, a deselect action each. Tooltip: `<KPI n Title>` Semibold 10 navy, `<KPI n Tip>` Book 9 `#4A5A73`.
+The five transparent `KPI Hover N` sheets (G1 8.2c: `Hover Cell` square at 0% opacity, filter `Row Is Current`, x 30 / 301 / 572 / 843 / 1114, y 90, 255 × 86, radius 5, deselect action) each show a **tooltip sheet** with **Insert > Sheets**. Use `filter="<None>"`: the tooltip sheets read the parameters, so they need no filter passed in. Example:
 
 ```
-// KPI 1 Tip
-"People on the books on " + MIN([To Day]) + ": " + [K Close HC Str] + ". The plan expected " + [K Plan HC Str] + "."
-+ CHAR(10) + "Headcount counts people; the rest of the page counts seats. Executive officers are not included."
-
-// KPI 2 Tip
-"A backfill fills a vacant seat someone left: they resigned, were let go, or moved to another seat."
-+ CHAR(10) + [K BF Done Str] + " seats were filled back, against " + [K BF Plan Str] + " in the plan (" + [K BF Pct Str] + ")."
-+ " Median days from approval to fill; leader seats filled the same day by a successor are left out of the median."
-
-// KPI 3 Tip
-"The same seat, a different office: the person who left sat in one office, the person who filled it sits in another."
-+ CHAR(10) + [K Moved Str] + " of " + [K BF Done Str] + " backfills (" + [K Moved Pct Str] + "); " + [K Moved Lower Str] + " moved to an office with a lower pay range."
-
-// KPI 4 Tip
-"A net-new seat is growth the plan added. " + [K NN Done Str] + " were filled, against " + [K NN Plan Str] + " planned (" + [K NN Pct Str] + ")."
-+ CHAR(10) + [K Reuse Str] + " were approved while a matching seat had been vacant for over 90 days (same department, job family and country, grade within one)."
-
-// KPI 5 Tip
-"Seats with no one in them on " + MIN([To Day]) + ": " + [K Vacant Str] + ". " + [K Stale Str] + " have been vacant for over 90 days."
+<KPI 5 Title>                                           (Semibold 10 navy)
+<KPI 5 Tip>                                             (Book 9 #4A5A73)
+<Sheet name="Tip Level" maxwidth="320" maxheight="120" filter="<None>">
 ```
+
+| Hover | Text (`KPI n Tip`) | Tooltip sheet | Build |
+|---|---|---|---|
+| 1 | "Every budgeted position on <to_date>, filled or vacant. The plan expected <K Plan Filled Str> filled. Contingent workers sit in the vendor system and hold no PID." | `Tip PIDs` (WFP Summary) | Filter `Row Is Current`; Rows Measure Names (`pids_filled`, `vacant_previously_held`, `vacant_new`, aliased "Filled by employees", "Vacant, previously held", "Vacant, new PIDs"); Columns Measure Values; bars navy for filled, slate for the two vacant; label the value |
+| 2 | "PIDs someone left and nobody has replaced yet, by why they became vacant. <K Prev Stale Str> have waited over 90 days." | `Tip Vacant Why` (Vacancy Pool) | Filter `[month_end_date] = [Period To Date] AND [In Group] AND [vacated_by] <> "Never filled"`; Rows `vacated_by` (alias Internal Move Out → "Moved to another PID"); Columns `CNT(position_id)`; navy |
+| 3 | "Net-new PIDs the plan approved that have not had their first hire yet, by function." | `Tip Vacant New` (Vacancy Pool) | Same date and group filter, `[vacated_by] = "Never filled"`; Rows `function_name` (top 5 by count); navy. Empty: "No new PID was waiting on this date." |
+| 4 | "Hires and internal moves into a PID, against the plan. Median <K Days> days from approval to fill a backfill." | `Tip Filled BF` and `Tip Filled NN` (WFP Summary), stacked | Each: one bar inside a bar, planned `#D5DBE4` wide and filled navy narrow (dual axis, synchronized), label "4,224 of 4,737 · 89.2%" |
+| 5 | "The PID came back at a different grade than the person who left. <K Both Str> of them also changed office." | `Tip Level` (WFP Summary) | Rows Measure Names (`level_down`, `level_up`, aliased "One level down", "One level up"); navy bars, labels |
+
+Tooltip sheets: no title, no axes or gridlines, Fit Entire View, worksheet shading None, size about 300 × 90. They never go on the dashboard.
 
 ---
 
 ## 11. The four cards
 
-Card style: G1's type rule (title Semibold 12 navy, subtitle Book 9 slate `#5A6170`, labels Book 9), background `#FBFBF8`, corner radius 10. Titles and subtitles are FIXED calcs inserted in the sheet title (D11). On Position Fill:
+Card style as G1 (title Semibold 12 navy, subtitle Book 9 slate, background `#FBFBF8`, radius 10). Position Fill helpers:
 
 ```
 // Fill Quarter       INT(RIGHT([fiscal_quarter_label], 1))
 // In Period          [fiscal_year] = [p_FY] AND [Fill Quarter] >= [Period First Q] AND [Fill Quarter] <= [Period Last Q]
 // Backfill In Scope  [In Period] AND [In Group] AND [seat_type] = "Backfill"
-// Seat Moved         [Backfill In Scope] AND [location_change] <> "Same office"
+// Moved              [location_change] <> "Same office"
+// Change Kind        IF NOT [Moved] AND [level_change] = "Same" THEN "Same level, same office"
+//                    ELSEIF NOT [Moved] AND [level_change] = "Down" THEN "One level down"
+//                    ELSEIF NOT [Moved] AND [level_change] = "Up" THEN "One level up"
+//                    ELSEIF [level_change] = "Same" THEN "Moved office only" ELSE "Changed level and office" END
+// Change Order       1 to 5 in that order
 ```
 
-### 11.1 Main card: where backfilled seats moved (Position Fill, two sheets in one card)
+### 11.1 Main card: where backfilled PIDs moved (`Card: PID Moves`, x 30, y 188, w 797, h 624)
 
 ```
-// Seat Route         [prior_office_name] + " → " + [office_name]
-// Route Line         MAKELINE(MAKEPOINT(MIN([prior_latitude]), MIN([prior_longitude])), MAKEPOINT(MIN([latitude]), MIN([longitude])))
-// New Office Point   MAKEPOINT(MIN([latitude]), MIN([longitude]))
-// M Seats            { FIXED : SUM(IF [Seat Moved] THEN 1 END) }
-// M Lower            { FIXED : SUM(IF [Seat Moved] AND [location_effect_usd_constant] < 0 THEN 1 END) }
-// M Same Country     { FIXED : SUM(IF [Seat Moved] AND [location_change] = "Other office, same country" THEN 1 END) }
-// M Border           { FIXED : SUM(IF [Seat Moved] AND [location_change] = "Other country" THEN 1 END) }
-// M Title
-IF ZN([M Seats]) = 0 THEN "No backfilled seat changed office in this period"
-ELSEIF [M Seats] = 1 THEN "One backfilled seat was refilled in a different office"
-ELSE <comma [M Seats]> + " backfilled seats were refilled in a different office" END
-// M Subtitle
-"Each line is one seat: from where the person who left sat, to where the new person sits"
-+ IF ZN([M Seats]) = 0 THEN "" ELSE " · " + STR(ZN([M Lower])) + " moved to a lower-pay office" END
-// R Subtitle         (routes sheet)
-"Backfilled seats by old office → new office" + IF ZN([M Seats]) = 0 THEN "" ELSE
-" · " + STR(ZN([M Same Country])) + " stayed in the same country, " + STR(ZN([M Border])) + " crossed a border" END
+// PID Moved        [Backfill In Scope] AND [Moved]
+// Route Line       MAKELINE(MAKEPOINT(MIN([prior_latitude]), MIN([prior_longitude])), MAKEPOINT(MIN([latitude]), MIN([longitude])))
+// New Office Point MAKEPOINT(MIN([latitude]), MIN([longitude]))
+// Route Key        [prior_office_name] + "|" + [office_name]
+// M PIDs           { FIXED : SUM(IF [PID Moved] THEN 1 END) }
+// M Lower          { FIXED : SUM(IF [PID Moved] AND [location_effect_usd_constant] < 0 THEN 1 END) }
+// M Same Country   { FIXED : SUM(IF [PID Moved] AND [location_change] = "Other office, same country" THEN 1 END) }
+// M Border         { FIXED : SUM(IF [PID Moved] AND [location_change] = "Other country" THEN 1 END) }
+// M Title          IF ZN([M PIDs]) = 0 THEN "No backfilled PID changed office in this period"
+//                  ELSEIF [M PIDs] = 1 THEN "One backfilled PID changed office"
+//                  ELSE <comma [M PIDs]> + " backfilled PIDs changed office" END
+// M Subtitle       "Each line is one PID: from the office of the person who left to the office of the person who replaced them"
+//                  + IF ZN([M PIDs]) = 0 THEN "" ELSE " · " + STR(ZN([M Lower])) + " to a lower-pay office" END
+// R Subtitle       "PIDs by office before and after the backfill" + IF ZN([M PIDs]) = 0 THEN "" ELSE
+//                  " · " + STR(ZN([M Same Country])) + " stayed in the same country, " + STR(ZN([M Border])) + " crossed a border" END
 ```
 
-**Sheet `Seat Map`** (top of the card, 797 × 420): filter `Seat Moved` = True.
-- Layer 1, `Route Line`: Automatic mark, `Seat Route` on Detail, teal `#00938D` at 50%, thinnest size, no Size field.
-- Layer 2, `New Office Point`: Circle, `office_name` on Detail, `CNT(fill_id)` on Size (about 5 to 20 px), teal 85%, white border.
-- Map Layers: Base off, Coastline and Country borders on; shading None; search and toolbar off; frame from Vancouver to Sydney (G2 map guide, step 6). Title `<M Title>` / `<M Subtitle>`.
-- Tooltips. Route: `<Seat Route>` Semibold 10; `<CNT(fill_id)> seats: the person who left sat in <prior_office_name>, the new person sits in <office_name>`; `<AGG(Route Pay Words)>`, where `Route Pay Words` = `IF SUM([location_effect_usd_constant]) < 0 THEN "Lower pay range in the new office" ELSEIF SUM([location_effect_usd_constant]) > 0 THEN "Higher pay range in the new office" ELSE "Same pay range" END`. Dot: `<office_name>` Semibold 10; `<CNT(fill_id)> backfilled seats arrived from other offices`.
+- **`PID Map`** (fixed 420 high): filter `PID Moved`. Layer 1 `Route Line`: Automatic, `Route Key` on Detail, teal 50%, thinnest, no size. Layer 2 `New Office Point`: Circle, `office_name` on Detail, `CNT(fill_id)` on Size (5 to 20 px), teal 85%, white border. Base map off, coastline and borders on, no toolbar, framed Vancouver to Sydney (G2 map guide, step 6). Title `<M Title>` / `<M Subtitle>`. Route tooltip: "**From <prior_office_name> to <office_name>**" / "<CNT(fill_id)> PIDs: the person who left sat in <prior_office_name>; the person who replaced them sits in <office_name>" / `<Route Pay Words>`. Dot tooltip: "**<office_name>**" / "<CNT(fill_id)> backfilled PIDs arrived from another office".
+- **`PID Routes`** (about 190 high): filter `PID Moved` and `Route Rank` (`INDEX()` ≤ 5, Compute Using both office fields). Rows `prior_office_name` then `office_name`, **both headers shown** with the field labels renamed **FROM (PERSON WHO LEFT)** and **TO (NEW PERSON)** (Book 8 `#8C8A84` caps; Format > Field Labels), row text Book 10 / Semibold 10 navy. Columns `CNT(fill_id)`, sorted descending, teal, label "<CNT> PIDs". Title "Busiest routes" / `<R Subtitle>`. Readable in any font, and no arrow needed.
 
-**Sheet `Seat Routes`** (bottom of the card, 797 × 190): filter `Seat Moved`. Rows `Seat Route`, Columns `CNT(fill_id)`, sorted descending. Filter `Route Rank` = `INDEX()` ≤ 5 (Compute Using `Seat Route`). Bars teal, label `<CNT(fill_id)> seats`. Row header Semibold 10 navy, width about 190. Title "Busiest seat routes" (Semibold 10) / `<R Subtitle>` (Book 9). Axis hidden, no grid lines. Tooltip as the map route.
-
-Container `Card: Seat Moves`, **x 30, y 188, w 797, h 624**: vertical, background `#FBFBF8`, radius 10, padding 16, holding `Seat Map` (fixed 420) and `Seat Routes`.
-
-Expected default: 467 · 280 lower · 101 routes into 30 offices. Biggest dots: Pune and Austin HQ (53 each), Hyderabad 43, Bengaluru 39, Chicago 34. Routes: Bengaluru → Hyderabad 37, Hyderabad → Bengaluru 32, Bengaluru → Pune 27, Hyderabad → Pune 26, Mexico City → Guadalajara 22. Subtitle "… 410 stayed in the same country, 57 crossed a border".
-
-**What the routes say.** Most seat moves stay inside one country and favour lower-pay offices (the relocation rule in [workforce_planning.md](workforce_planning.md) section 3). The cross-border lines are leader seats filled the same day by a successor based elsewhere. Seats also move both ways (Bengaluru ↔ Hyderabad), because each refill goes where the hiring happened.
-
-### 11.2 Right top: what changed when a seat was refilled (Position Fill)
+### 11.2 Right top: what changed in each refilled PID (`Backfill Changes`, x 843, y 188, w 526, h 196)
 
 ```
-// Change Kind    IF [location_change] <> "Same office" THEN "Moved to another office"
-//                ELSEIF [level_change] = "Down" THEN "One level down"
-//                ELSEIF [level_change] = "Up" THEN "One level up" ELSE "Same level, same office" END
-// Change Order   CASE [Change Kind] WHEN "Same level, same office" THEN 1 WHEN "One level down" THEN 2 WHEN "One level up" THEN 3 ELSE 4 END
-// Changed        [Change Kind] <> "Same level, same office"
-// C Backfills    { FIXED : SUM(IF [Backfill In Scope] THEN 1 END) }
-// C Changed      { FIXED : SUM(IF [Backfill In Scope] AND [Changed] THEN 1 END) }
-// C Pay          { FIXED : SUM(IF [Backfill In Scope] THEN [pay_change_usd_constant] END) }
-// Pay Words      (for an amount x: "$7.0M", "$412K", "$950")
-IF ABS(x) >= 999950 THEN "$" + STR(ROUND(ABS(x) / 1000000, 1)) + "M"
-ELSEIF ABS(x) >= 999.5 THEN "$" + STR(INT(ROUND(ABS(x) / 1000, 0))) + "K"
-ELSE "$" + STR(INT(ROUND(ABS(x), 0))) END
-// C Title
-IF ZN([C Backfills]) = 0 THEN "No seat was backfilled in this period"
-ELSE <comma ZN([C Changed])> + " of " + <comma [C Backfills]> + " backfills changed level or office" END
-// C Subtitle
-IF ZN([C Backfills]) = 0 THEN ""
-ELSEIF ABS([C Pay]) < 500 THEN "New people earn about the same as those who left"
-ELSE "New people earn " + <Pay Words on [C Pay]> + " a year " + IIF([C Pay] < 0, "less", "more") + " than those who left · label = pay change" END
-// Row Pay Str    (IF SUM([pay_change_usd_constant]) < 0 THEN "−" ELSE "+" END) + <Pay Words on SUM([pay_change_usd_constant])>
+// C Backfills   { FIXED : SUM(IF [Backfill In Scope] THEN 1 END) }
+// C Changed     { FIXED : SUM(IF [Backfill In Scope] AND [Change Kind] <> "Same level, same office" THEN 1 END) }
+// C Pay         { FIXED : SUM(IF [Backfill In Scope] THEN [pay_change_usd_constant] END) }
+// C Title       IF ZN([C Backfills]) = 0 THEN "No PID was backfilled in this period"
+//               ELSE <comma ZN([C Changed])> + " of " + <comma [C Backfills]> + " backfills changed level or office" END
+// C Subtitle    IF ABS(ZN([C Pay])) < 500 THEN "New people earn about the same as those they replaced"
+//               ELSE "New people earn " + <Pay Words on [C Pay]> + " a year " + IIF([C Pay] < 0, "less", "more") + " than those they replaced · label = pay change" END
+// Pay Words     $7.0M / $412K / $950 (G-pattern: ≥ 999,950 in M with one decimal, ≥ 999.5 in K, else dollars)
+// Row Pay Str   sign + <Pay Words on SUM([pay_change_usd_constant])>
 ```
 
-Sheet `Backfill Changes`: filter `Backfill In Scope`. Rows `Change Kind` (by `Change Order`), Columns `CNT(fill_id)`, Color `Changed` (False `#8C9BB0`, True navy), Label `<CNT(fill_id)> · <AGG(Row Pay Str)>`. Item **x 843, y 188, w 526, h 196**. Tooltip: kind, count, pay, and one line of meaning ("Refilled one grade lower: a manager seat often comes back as an individual contributor").
+Rows `Change Kind` (by `Change Order`); Columns `CNT(fill_id)`; Color: "Same level, same office" slate, the rest navy; Label `<CNT(fill_id)> · <AGG(Row Pay Str)>`. Tooltip: kind, PIDs, pay, one line of meaning.
 
-Expected: 3,460 · +$0.7M; 556 · −$9.5M; 185 · +$3.0M; 467 · −$1.2M. The "Moved to another office" bar equals the map's 467 by construction.
-
-### 11.3 Right middle: net-new seats against plan (Plan vs Actual)
+### 11.3 Right middle: net-new PIDs against the plan (`Net-new by Group`, x 843, y 400, w 526, h 196, Plan vs Actual)
 
 ```
 // In Plan Period   [fiscal_year] = [p_FY] AND [fiscal_quarter] >= [Period First Q] AND [fiscal_quarter] <= [Period Last Q] AND [In Group]
-// NN Dim           (one level below the selection, as #1's turnover card)
-CASE [p_View]
-    WHEN "Company"      THEN [function_name]
-    WHEN "Function"     THEN IIF({ FIXED [function_name] : COUNTD([sub_function]) } > 1, [sub_function], [department_name])
-    WHEN "Sub-function" THEN [department_name]
-    WHEN "Department"   THEN [country_name]
-    WHEN "Country"      THEN [function_name]
-END
-// N Done     { FIXED : SUM(IF [In Plan Period] THEN [actual_net_new] END) }
-// N Plan     { FIXED : SUM(IF [In Plan Period] THEN [planned_net_new] END) }
-// N Reuse    { FIXED : SUM(IF [In Plan Period] THEN [actual_net_new_reuse_candidates] END) }
-// N Title
-IF ZN([N Plan]) = 0 AND ZN([N Done]) = 0 THEN "No net-new seats in this period"
-ELSEIF ZN([N Plan]) = 0 THEN <comma [N Done]> + " net-new seats filled; none were planned"
-ELSE <comma [N Done]> + " net-new seats filled, " + <percent [N Done] / [N Plan]> + " of plan" END
-// N Subtitle   "Filled vs planned by " + LOWER(<the NN Dim level name>) + " · " + STR(ZN([N Reuse])) + " approved while a matching seat was vacant"
-// N Rank       RANK_UNIQUE(SUM([planned_net_new]) + SUM([actual_net_new]) / 1000)    (Compute Using NN Dim)
+// NN Dim           CASE [p_View] WHEN "Company" THEN [function_name]
+//                  WHEN "Function" THEN IIF({ FIXED [function_name] : COUNTD([sub_function]) } > 1, [sub_function], [department_name])
+//                  WHEN "Sub-function" THEN [department_name] WHEN "Department" THEN [country_name] ELSE [function_name] END
+// N Done / N Plan / N Reuse   { FIXED : SUM(IF [In Plan Period] THEN [actual_net_new] / [planned_net_new] / [actual_net_new_reuse_candidates] END) }
+// N Title          IF ZN([N Plan]) = 0 AND ZN([N Done]) = 0 THEN "No net-new PIDs in this period"
+//                  ELSEIF ZN([N Plan]) = 0 THEN <comma [N Done]> + " net-new PIDs filled; none were planned"
+//                  ELSE <comma [N Done]> + " net-new PIDs filled, " + <percent> + " of plan" END
+// N Subtitle       "Filled vs planned by " + <level word> + " · " + STR(ZN([N Reuse])) + " approved while a matching PID was vacant"
 ```
 
-The level name for the subtitle: `CASE [p_View] WHEN "Company" THEN "function" WHEN "Function" THEN "sub-function or department" WHEN "Sub-function" THEN "department" WHEN "Department" THEN "country" ELSE "function" END`.
+A bar inside a bar: planned `#D5DBE4` (size 60%) and filled navy (size 30%), dual axis, synchronized, axis hidden. Label on the planned card: "<filled> of <planned>". At most 8 rows (top by planned), each about 16 px. Rows with neither planned nor filled are hidden.
 
-Sheet `Net-new by Group`: filter `In Plan Period` = True, `N Rank` ≤ 8, and `SUM(planned_net_new) + SUM(actual_net_new)` > 0. Rows `NN Dim` (sorted by planned, descending). Columns `SUM(planned_net_new)` (Bar `#D5DBE4`, size 60%) and `SUM(actual_net_new)` (Bar navy, size 30%), dual axis, synchronized, axis hidden. Label on the planned card: `<SUM(actual_net_new)> of <SUM(planned_net_new)>`. Item **x 843, y 400, w 526, h 196**. Fit Standard, rows about 16 px (the 8-row cap keeps the card the same height in every view). Tooltip: `<NN Dim>`; `<SUM(actual_net_new)> filled of <SUM(planned_net_new)> planned`; `<SUM(actual_net_new_reuse_candidates)> approved while a matching seat was vacant`.
-
-Expected default: Technology 830 of 1,029 · Commercial 559 of 660 · Operations 320 of 444 · Product 156 of 182 · People 94 of 134 · Finance 83 of 122 · Marketing 69 of 99 · Legal & Compliance 70 of 92.
-
-### 11.4 Right bottom: vacant seats (Vacancy Pool)
+### 11.4 Right bottom: how long vacant PIDs have waited (`Vacant PIDs`, x 843, y 612, w 526, h 200, Vacancy Pool)
 
 ```
 // In Vacant      [month_end_date] = [Period To Date] AND [In Group]
-// Band           CASE [vacancy_age_band] WHEN "0-30 days" THEN "0–30 days" WHEN "31-90 days" THEN "31–90 days"
-//                WHEN "91-180 days" THEN "91–180 days" ELSE "Over 180 days" END
-// Band Order     CASE [vacancy_age_band] WHEN "0-30 days" THEN 1 WHEN "31-90 days" THEN 2 WHEN "91-180 days" THEN 3 ELSE 4 END
-// V Seats        { FIXED : SUM(IF [In Vacant] THEN 1 END) }
+// Vacant Kind    IF [vacated_by] = "Never filled" THEN "New PID" ELSE "Previously held" END
+// Band, Band Order   0–30 · 31–90 · 91–180 · Over 180 days
+// V PIDs         { FIXED : SUM(IF [In Vacant] THEN 1 END) }
 // V Stale        { FIXED : SUM(IF [In Vacant] AND [is_stale] THEN 1 END) }
-// V Title        IF ZN([V Seats]) = 0 THEN "No seat was vacant on " + <day of [Period To Date]>
-//                ELSE <comma [V Seats]> + " seats are vacant; " + <comma ZN([V Stale])> + " for over 90 days" END
-// V Subtitle     "Seats with no one in them on " + <day of [Period To Date]> + ", by how long they have been vacant"
+// V Title        IF ZN([V PIDs]) = 0 THEN "No PID was vacant on " + <day> ELSE <comma [V PIDs]> + " PIDs are vacant; " + <comma ZN([V Stale])> + " for over 90 days" END
+// V Subtitle     "On " + <day of Period To Date> + ", by time vacant · previously held · new PID"   (colour the two words: navy, slate)
 ```
 
-Sheet `Vacant Seats`: filter `In Vacant`. Rows `Band` (by `Band Order`), Columns `CNT(position_id)`, Color `is_stale` (False `#8C9BB0`, True navy), label the count. Item **x 843, y 612, w 526, h 200**. Tooltip: `<Band>`: `<CNT(position_id)>` vacant seats.
-
-Expected default: 396 · 368 · 126 · 87.
+Rows `Band`; Columns `CNT(position_id)`; Color `Vacant Kind` (Previously held navy, New PID `#8C9BB0`), stacked; total label at the end.
 
 ---
 
@@ -551,130 +523,122 @@ Expected default: 396 · 368 · 126 · 87.
 | # | Object | x | y | w | h |
 |---|---|---:|---:|---:|---:|
 | 1–8 | Top bar (section 8) | | | | |
-| 9 | KPI background image | 0 | 78 | 1400 | 110 |
-| 10 | KPI Cards | 0 | 78 | 1400 | 110 |
+| 9–10 | KPI background image, KPI Cards | 0 | 78 | 1400 | 110 |
 | 11–15 | KPI Hover 1–5 | 30 / 301 / 572 / 843 / 1114 | 90 | 255 | 86 |
-| 16 | Card: Seat Moves (Seat Map + Seat Routes) | 30 | 188 | 797 | 624 |
+| 16 | Card: PID Moves (`PID Map` + `PID Routes`) | 30 | 188 | 797 | 624 |
 | 17 | Backfill Changes | 843 | 188 | 526 | 196 |
 | 18 | Net-new by Group | 843 | 400 | 526 | 196 |
-| 19 | Vacant Seats | 843 | 612 | 526 | 200 |
+| 19 | Vacant PIDs | 843 | 612 | 526 | 200 |
 | 20 | Footnote | 30 | 822 | 700 | 16 |
-| 21 | Period, Group, Info popovers | 9.1–9.3 | | | |
-
-Footnote: "Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026." Book 8 `#8C8A84`. Item order, bottom to top: background, KPI image, KPI Cards, cards, KPI hovers, band, controls, popovers.
+| 21 | Popovers | 9.1–9.3 | | | |
 
 ---
 
-## 13. Actions (complete list; build them on the dashboard after every sheet is placed)
-
-### 13.1 Change Parameter (30): Run on Select, Aggregation None, Keep current value
+## 13. Actions (30 Change Parameter + 19 Deselect = 49)
 
 | # | Name | Source | Target | Field |
 |---:|---|---|---|---|
 | 1 | Open period panel | Period Field | `p_PeriodOpen` | `Toggle Period Panel` |
 | 2 | Open period on its span | Period Field | `p_Span` | `span_name` |
-| 3 | Period opens, group closes | Period Field | `p_GroupOpen` | `Close Panel` |
-| 4 | Period opens, info closes | Period Field | `p_InfoOpen` | `Close Panel` |
+| 3–4 | Period opens, group / info closes | Period Field | `p_GroupOpen`, `p_InfoOpen` | `Close Panel` |
 | 5 | Set span | Span List | `p_Span` | `span_name` |
 | 6 | Set FY | Period Panel | `p_FY` | `FY Pick` |
 | 7 | Set period | Period Panel | `p_Period` | `Period Pick` |
 | 8 | Close period on pick | Period Panel | `p_PeriodOpen` | `Period Keep Open` |
 | 9 | Close period on ✕ | Period Close | `p_PeriodOpen` | `Close Panel` |
 | 10 | Open group panel | Group Field | `p_GroupOpen` | `Toggle Group Panel` |
-| 11 | Group opens, period closes | Group Field | `p_PeriodOpen` | `Close Panel` |
-| 12 | Group opens, info closes | Group Field | `p_InfoOpen` | `Close Panel` |
+| 11–12 | Group opens, period / info closes | Group Field | `p_PeriodOpen`, `p_InfoOpen` | `Close Panel` |
 | 13 | Set view | View List | `p_View` | `view_name` |
 | 14 | Set group from view | View List | `p_Group` | `group_name` |
 | 15 | Keep group panel open | View List | `p_GroupOpen` | `Keep Group Panel Open` |
 | 16 | Set group | Group Panel | `p_Group` | `Group Pick` |
 | 17 | Close group on pick | Group Panel | `p_GroupOpen` | `Group Keep Open` |
 | 18 | Close group on ✕ | Group Close | `p_GroupOpen` | `Close Panel` |
-| 19–23 | Reset FY / period / span / view / group | Reset | `p_FY`, `p_Period`, `p_Span`, `p_View`, `p_Group` | the five `Default …` |
-| 24–26 | Reset closes period / group / info | Reset | `p_PeriodOpen`, `p_GroupOpen`, `p_InfoOpen` | `Close Panel` |
+| 19–23 | Reset FY / period / span / view / group | Reset | the five parameters | the five `Default …` |
+| 24–26 | Reset closes the three popovers | Reset | `p_PeriodOpen`, `p_GroupOpen`, `p_InfoOpen` | `Close Panel` |
 | 27 | Open info | Info Button | `p_InfoOpen` | `Toggle Info` |
 | 28–29 | Info opens, period / group closes | Info Button | `p_PeriodOpen`, `p_GroupOpen` | `Close Panel` |
 | 30 | Close info on ✕ | Info Close | `p_InfoOpen` | `Close Panel` |
 
-### 13.2 Deselect (19 Filter actions)
-
-Source and target the same worksheet, Run on Select, Show all values, `zzTrue` → `zzFalse` (G1 7.4): `Page Title`, `Period Field`, `Group Field`, `Reset`, `Info Button`, `Span List`, `Period Panel`, `Period Close`, `View List`, `Group Panel`, `Group Heading`, `Group Close`, `Info Close`, `KPI Cards`, `KPI Hover 1`–`5`. The four cards keep normal selection.
-
-**Total: 49 actions.** The final audit compares Dashboard > Actions with these two tables row by row.
+Deselect (Filter, same sheet, `zzTrue` → `zzFalse`, Show all values): `Page Title`, `Period Field`, `Group Field`, `Reset`, `Info Button`, `Span List`, `Period Panel`, `Period Close`, `View List`, `Group Panel`, `Group Heading`, `Group Close`, `Info Close`, `KPI Cards`, `KPI Hover 1`–`5`. The tooltip sheets need none (they are never on the dashboard).
 
 ---
 
-## 14. Check tables (independent script on the base marts; ties to the summary in every state)
+## 14. Check tables (independent script on the raw seat tables and marts; ties to the summary)
 
 ### 14.1 KPI band
 
-| State | 1 Employees | 2 Backfilled seats | 3 In a new office | 4 Net-new seats | 5 Vacant |
+| State | 1 PIDs (filled + prev + new) | 2 Prev · over 90 | 3 New | 4 Filled (BF of plan · NN of plan) | 5 Level change (down · up · also moved) |
 |---|---|---|---|---|---|
-| T1 FY26 · FY · All | 30,005 · −332 vs plan 30,337 | 4,668 · 92.8% · median 42 | 467 · 10.0% · 280 lower | 2,181 · 79.0% · 628 | 977 · 213 |
-| T2 FY26 · Q3 · All | 29,618 · −428 vs plan 30,046 | 1,201 · 88.6% · median 43 | 102 · 8.5% · 59 | 471 · 83.8% · 135 | 1,189 · 219 |
-| T3 FY26 · FY · Function Finance | 1,271 · −37 vs plan 1,308 | 181 · 78.7% · median 42 | 15 · 8.3% · 7 | 83 · 68.0% · 13 | 43 · 14 |
-| T4 FY26 · FY · Country India | 6,967 · −89 vs plan 7,056 | 1,047 · 93.9% · median 44 | 135 · 12.9% · 99 | 418 · 74.4% · 191 | 228 · 58 |
-| T5 FY24 · FY · All (restructuring) | 27,208 · −1,381 vs plan 28,589 | 4,105 · 91.2% · median 47 | 425 · 10.4% · 242 | 910 · 32.1% · 228 | 976 · 248 |
-| T6 FY26 · H1 · Dept Accounting & Controllership | 547 · −3 vs plan 550 | 34 · 77.3% · median 42 | 4 · 11.8% · 2 | 18 · 60.0% · 5 | 24 · 5 |
-| T7 FY26 · Q3 · Country Switzerland | 145 · +1 vs plan 144 | 3 · 60.0% · median 32 | 0 · 0.0% · 0 | 1 · **—** · 0 | 5 · 0 |
+| FY25 · FY · All | 29,508 = 28,438 + 821 + 249 | 821 · 179 | 249 | 5,852 (4,224 of 4,737 · 1,628 of 2,236) | 634 (474 · 160 · 8) |
+| FY26 · Q3 · All | 30,807 = 29,618 + 955 + 234 | 955 · 214 | 234 | 1,672 (1,201 of 1,356 · 471 of 562) | 181 (139 · 42 · 2) |
+| FY24 · FY · All | 28,184 = 27,208 + 858 + 118 | 858 | 118 | 5,015 (4,105 of 4,503 · 910 of 2,833) | 672 (511 · 161 · 7) |
+| FY26 · FY · All | 30,005 + 977 + **new from 3.3** | 977 · 213 | **set by 3.3** (0 today) | 6,849 (4,668 of 5,031 · 2,181 of 2,762) | 752 (567 · 185 · 11) |
+| FY26 · FY · Function Finance | 1,271 + 43 + new | 43 · 14 | set by 3.3 | 264 (181 of 230 · 83 of 122) | 21 (17 · 4 · 0) |
+| FY26 · FY · Country India | 6,967 + 228 + new | 228 · 58 | set by 3.3 | 1,465 (1,047 of 1,115 · 418 of 562) | 170 (136 · 34 · 2) |
 
-### 14.2 Cards
+### 14.2 Cards, FY25 · All
 
-| State | Main card | Backfill changes | Net-new by group | Vacant by age |
-|---|---|---|---|---|
-| T1 | 467 · 101 routes · 30 offices · top Bengaluru → Hyderabad 37 · 410 / 57 | 3,460 +$0.7M · 556 −$9.5M · 185 +$3.0M · 467 −$1.2M; $7.0M less | Technology 830/1,029 … Legal & Compliance 70/92 | 396 · 368 · 126 · 87 |
-| T2 | 102 · 48 routes · 24 offices · top Bengaluru → Pune 7 | 920 · 137 · 42 · 102; $1.8M less | Technology 188/217, Commercial 119/124, Operations 69/103 … | 506 · 465 · 157 · 61 |
-| T3 | 15 · 11 routes · 9 offices · top Austin HQ → Chicago 3 | 145 · 17 · 4 · 15; $373K less | by **department**: Treasury & Tax 27/54, Accounting & Controllership 29/44, FP&A 27/24 | 11 · 18 · 7 · 7 |
-| T4 | 135 · 14 routes · 3 offices · top Bengaluru → Hyderabad 37 | 744 · 134 · 34 · 135; **$816K more** | Technology 185/238, Operations 97/145, Commercial 78/99 … Legal & Compliance 8/5 | 88 · 82 · 35 · 23 |
-| T5 | 425 · 84 routes · 30 offices · top Bengaluru → Hyderabad 56 | 3,015 · 504 · 161 · 425; $10.3M less | Technology 331/954 … every function near a third of plan | 401 · 332 · 192 · 51 |
-| T7 | **No backfilled seat changed office in this period** | 3 same; about the same ($15K) | **1 net-new seat filled; none were planned** | 1 · 4 |
+| Card | Expected |
+|---|---|
+| Main | 396 backfilled PIDs changed office · 238 to a lower-pay office · 360 same country, 36 crossed a border · routes: Bengaluru / Hyderabad 41, Hyderabad / Bengaluru 30, Bengaluru / Pune 21, Hyderabad / Pune 19, Austin HQ / Atlanta 18 |
+| Backfill changes | 1,022 of 4,224 · same 3,202 (−$1.2M) · down 466 (−$8.5M) · up 160 (+$2.7M) · moved office only 388 (−$1.0M) · changed level and office 8 (−$201K) · $8.2M less |
+| Net-new by function | 1,628, 72.8% of plan · Technology 642 of 870 · Commercial 372 of 514 · Operations 210 of 285 · Product 126 of 180 · People 82 of 111 · Finance 72 of 107 · Marketing 59 of 87 · Legal & Compliance 65 of 82 · 466 with a vacant match |
+| Vacant | 1,070 vacant; 185 over 90 days · 0–30: 333 + 152 new · 31–90: 312 + 91 · 91–180: 120 + 6 · over 180: 56 + 0 |
 
-### 14.3 Dim options
+FY26 · All (after 3.3, previously held unchanged): map 467 (280 lower; 410 / 57); changes 4,668 = 3,460 + 556 + 185 + 456 + 11, $7.0M less; net-new 2,181, 79.0%.
 
-| State | Must be dim | Tooltip |
-|---|---|---|
-| FY22 · Country | Philippines, Portugal, South Korea | Portugal had no seats in the plan for FY22 · Jun 21 → Jun 22. |
-| FY24 · Department | Data & AI Platform | Data & AI Platform had no seats in the plan for FY24 · Jun 23 → Jun 24. |
-| Country · Portugal | Period grid: every FY22 and FY23 cell | Portugal had no seats in the plan for FY23 Q2 · Sep 22 → Dec 22. (that cell) |
+### 14.3 Ties to check on every state
+
+KPI 2 + KPI 3 = vacant in KPI 1 = vacant card total · KPI 4 backfills = right-top total · KPI 5 = down + up + changed level and office · map PIDs = moved office only + changed level and office.
 
 ---
 
-## 15. Click tests (Presentation mode)
+## 15. Click tests
 
 | # | Do | Expect |
 |---:|---|---|
-| 1 | Hover every control and KPI card | Outline only, never a square; the tooltips of 8 and 10.2 |
-| 2 | Click every control, the title and the KPI band | Nothing stays highlighted |
-| 3 | Open Period, then View, then ⓘ | Only the last one open |
-| 4 | Period > Quarter > FY26 Q3 | Closes; field "FY26 Q3 · Dec 25 → Mar 26"; page = T2 |
-| 5 | View > Function | Stays open on Commercial; pick Finance: closes; page = T3 |
-| 6 | View > All organizations | Closes at once |
-| 7 | View > Country > Portugal, then Period | FY22 and FY23 cells dim; clicking one does nothing, the popover stays open |
-| 8 | Hover a route and a dot on the map | Old office, new office, seats, pay range |
+| 1 | Hover every KPI card | A tooltip with its chart; numbers equal the card |
+| 2 | Hover each control | Outline only; tooltips; the chevron is part of the capsule |
+| 3 | Click every control, title, KPI band | Nothing stays highlighted |
+| 4 | Open Period, View, ⓘ in turn | One open at a time |
+| 5 | Period > Quarter > FY26 Q3 | Closes; capsule "FY26 Q3 · Jan – Mar 26"; KPI row as 14.1 |
+| 6 | View > Function > Finance | Popover stays open after Function, closes on Finance |
+| 7 | Country > Portugal, then Period | FY22 and FY23 cells dim; clicking one does nothing |
+| 8 | Hover a route and a dot | "From … to …", PIDs, pay range |
 | 9 | Reset | FY26 · All organizations, popovers closed |
 
 ---
 
 ## 16. Publish
 
-1. Reset, close popovers, hide all sheets. **File > Save to Tableau Public As** `arcadia_workforce_planning`, extracts only.
-2. Check the live page against T1, T3, T4 and T7, and against section 15.
-3. Screenshot (same crop as #1) to `docs/images/workforce_planning_dashboard.png`. Update the README, the Tableau Public profile and the portfolio site.
-4. Claude: record the as-built values here, update `workforce_planning.md` (section 0's principle and the map definition), sync the project docs.
+Reset, close popovers, hide sheets, **Save to Tableau Public As** `arcadia_workforce_planning`. Check the live page against 14 and 15. Then: screenshot to `docs/images/workforce_planning_dashboard.png`, README and profile, and add section 0 to `workforce_planning.md` (the PID ledger and the map definition).
 
 ---
 
-## 17. Who does what, in what order
+## 17. Who does what
 
 | Phase | Who | What | Done when |
 |---|---|---|---|
 | 0 | Claude | This plan, shapes, mocks | You approve sections 0–2 and the mocks |
-| 1 | Claude | SQL (3.2), test 80, T-SQL check, `14_validate`; branch `dashboard-3-rebuild` | All of 3.3 passes |
-| 2 | You (Mac) | 3.4 and section 4 | No FAIL; 2 shapes installed |
-| 3 | You (Tableau) | Sections 5–7 | Checkpoints 1 and 2 |
-| 4 | You | Sections 8, 9 and the action table (13) for the controls | Click tests 3–7 and 9 |
-| 5 | You | Section 10 | 14.1 for T1, T3, T7 |
-| 6 | You | Section 11 | 14.2 for T1, T4, T7 |
-| 7 | You | Section 12, info text, action audit, all of 15 | Everything passes |
-| 8 | Both | Section 16 | Live on Tableau Public |
+| 1 | Claude | Generator fix (3.3), summary columns (3.2), tests, T-SQL check, `14_validate`, run guide; branch `dashboard-3-rebuild` | 3.4 passes; 14.1 filled in for FY26 |
+| 2 | You (Mac) | Rebuild, validate, copy files, shapes | No FAIL |
+| 3 | You | Sections 5–7 | Checkpoints 1 and 2 |
+| 4 | You | Sections 8, 9, 13 | Click tests 2–7 and 9 |
+| 5 | You | Section 10 | 14.1 and click test 1 |
+| 6 | You | Section 11 | 14.2 and 14.3 |
+| 7 | You | Section 12, info, action audit, 15 | All pass |
+| 8 | Both | Section 16 | Live |
 
-One screenshot per phase (the dashboard at T1 plus the state named in "Done when"). I check it against the tables and come back only with corrections.
+One screenshot per phase; I check it against the tables.
+
+---
+
+## 18. Later: the PID forecast dashboard (not this one)
+
+The next step after this page is a forecast built on the same PID ledger:
+
+1. **History.** How fast vacant PIDs have been filled, by level, function and country: time to fill, and the share filled within 30, 60 and 90 days.
+2. **Prediction.** Given planned growth and expected attrition, how many PIDs will need filling each quarter, and how many will still be vacant at quarter-end.
+
+Plan it as its own dashboard once this one is published. The inputs already exist: `fact_requisition` (approval, fill, cancel dates), the vacancy pool, the plan, and the attrition rates from Dashboard #1.

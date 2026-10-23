@@ -1,8 +1,9 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<!-- Design mock of Dashboard #3, Workforce Planning (seat view), default state: FY26 · All organizations.
-     Every number is from the release 3 marts. Geometry follows the build plan, section 10 (1400 x 850, #1's grid).
-     Render: serve docs/brand over http, open build/d3_page_preview.html at 1400 x 850. -->
+<!-- Design mock of Dashboard #3, Workforce Planning (PIDs), shown at FY25 · All organizations
+     (FY26's closing date is the end of the simulation, where no new PID is open yet; see the plan, section 3.3).
+     Every number is from the release 3 data (d3_preview_data.json). Serve docs/brand over http and open at 1400 x 850.
+     ?hovers=1 renders the five KPI hover tooltips instead. -->
 <style>
 @font-face { font-family: Inter; font-weight: 400; src: url(node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2); }
 @font-face { font-family: Inter; font-weight: 600; src: url(node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
@@ -13,7 +14,7 @@ body { margin:0; width:1400px; height:850px; background:var(--page); font-family
 .abs { position:absolute; }
 .band { left:0; top:0; width:1400px; height:76px; background:var(--navy); }
 .h { font-size:10.5px; font-weight:700; color:var(--head); letter-spacing:.2px; }
-.field { width:180px; height:32px; border-radius:16px; background:#fff; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; }
+.field { width:200px; height:36px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; background:url(../shapes/by_dashboard/d3/d3_field_capsule.png) 0 0/200px 36px no-repeat; padding-top:4px; padding-right:12px; }
 .card { background:var(--card); border:1px solid var(--grid); border-radius:10px; padding:14px 16px; }
 .kpi { text-align:center; padding:10px 12px; }
 .kpi .l { font-size:12px; font-weight:600; }
@@ -23,95 +24,130 @@ body { margin:0; width:1400px; height:850px; background:var(--page); font-family
 .s { font-size:12px; color:var(--slate); margin-top:3px; }
 .cap { font-size:11px; color:var(--slate); }
 svg text { font-family:Inter,sans-serif; }
+.tip { background:#fff; border:1px solid #D6D9DE; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,.12); padding:10px 12px; width:330px; }
+.tip .tt { font-size:13px; font-weight:600; } .tip .tx { font-size:11.5px; color:#4A5A73; margin:3px 0 6px; line-height:1.4; }
 </style></head>
 <body>
+<div id="page">
 <div class="abs band"></div>
 <img class="abs" src="../arcadia_logo_horizontal_reverse.svg" style="left:30px;top:14px;height:48px">
 <div class="abs" style="left:223px;top:13px;width:275px">
   <div style="color:#fff;font-size:24px;font-weight:700">Workforce Planning</div>
-  <div style="color:#C9D1DC;font-size:11px;margin-top:4px">Opening Jun 30, 2025 → Closing Jun 30, 2026</div>
+  <div style="color:#C9D1DC;font-size:11px;margin-top:4px">PIDs from Jul 1, 2024 to Jun 30, 2025</div>
 </div>
 <div class="abs h" style="left:506px;top:12px">SELECT PERIOD</div>
-<div class="abs field" style="left:506px;top:30px">FY26 · Jun 25 → Jun 26 <span style="font-size:9px">▼</span></div>
-<div class="abs h" style="left:698px;top:12px">SELECT VIEW</div>
-<div class="abs field" style="left:698px;top:30px">All organizations <span style="font-size:9px">▼</span></div>
+<div class="abs field" style="left:506px;top:26px">FY25 · Jul 24 – Jun 25</div>
+<div class="abs h" style="left:718px;top:12px">SELECT VIEW</div>
+<div class="abs field" style="left:718px;top:26px">All organizations</div>
 <img class="abs" src="../shapes/by_dashboard/d3/d3_reset.png" style="left:1294px;top:30px;width:32px">
 <img class="abs" src="../shapes/by_dashboard/shared/shared_info_open.png" style="left:1338px;top:30px;width:32px">
-
 <div id="kpis"></div>
 
 <div class="abs card" style="left:30px;top:188px;width:797px;height:624px">
-  <div class="t">467 backfilled seats were refilled in a different office</div>
-  <div class="s">Each line is one seat: from where the person who left sat, to where the new person sits · 280 moved to a lower-pay office</div>
+  <div class="t" id="mt"></div>
+  <div class="s" id="ms"></div>
   <svg id="map" width="765" height="350" style="margin-top:6px"></svg>
-  <div style="font-size:12px;font-weight:600;margin-top:6px">Busiest seat routes</div>
-  <div class="cap" style="margin-bottom:6px">Backfilled seats by old office → new office · 410 stayed in the same country, 57 crossed a border</div>
-  <svg id="top" width="765" height="150"></svg>
+  <div style="font-size:12px;font-weight:600;margin-top:4px">Busiest routes</div>
+  <div class="cap" id="rs" style="margin-bottom:4px"></div>
+  <svg id="top" width="765" height="160"></svg>
 </div>
-
 <div class="abs card" style="left:843px;top:188px;width:526px;height:196px">
-  <div class="t">1,208 of 4,668 backfills changed level or office</div>
-  <div class="s">New people earn $7.0M a year less than those who left · label = pay change</div>
-  <svg id="chg" width="494" height="120" style="margin-top:8px"></svg>
+  <div class="t" id="ct"></div><div class="s" id="cs"></div>
+  <svg id="chg" width="494" height="124" style="margin-top:6px"></svg>
 </div>
-
 <div class="abs card" style="left:843px;top:400px;width:526px;height:196px">
-  <div class="t">2,181 net-new seats filled, 79.0% of plan</div>
-  <div class="s">Filled vs planned by function · 628 approved while a matching seat was vacant</div>
+  <div class="t" id="nt"></div><div class="s" id="ns"></div>
   <svg id="nn" width="494" height="132" style="margin-top:6px"></svg>
 </div>
-
 <div class="abs card" style="left:843px;top:612px;width:526px;height:200px">
-  <div class="t">977 seats are vacant; 213 for over 90 days</div>
-  <div class="s">Seats with no one in them on Jun 30, 2026, by how long they have been vacant</div>
+  <div class="t" id="vt"></div>
+  <div class="s">On Jun 30, 2025, by time vacant · <b style="color:#13233A">previously held</b> · <span style="color:#8C9BB0;font-weight:600">new PID</span></div>
   <svg id="pool" width="494" height="124" style="margin-top:8px"></svg>
 </div>
-
 <div class="abs cap" style="left:30px;top:824px;color:#8C8A84">Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026.</div>
+</div>
+<div id="hovers" style="display:none;padding:24px;gap:18px;flex-wrap:wrap;width:1400px"></div>
 
 <script src="node_modules/d3/dist/d3.min.js"></script>
 <script src="node_modules/topojson-client/dist/topojson-client.min.js"></script>
 <script>
-const K = [
- ["Employees","30,005","−332 vs plan 30,337"],
- ["Backfilled seats","4,668","92.8% of plan · median 42 days to fill"],
- ["Backfills in a new office","467","10.0% of backfills · 280 to lower pay"],
- ["Net-new seats","2,181","79.0% of plan · 628 with a vacant match"],
- ["Vacant seats","977","213 vacant over 90 days"]];
-document.getElementById("kpis").innerHTML = K.map((k,i)=>
- `<div class="abs card kpi" style="left:${30+271*i}px;top:90px;width:255px;height:86px"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join("");
-
-function bars(id, rows, max, x0, x1, h, gap, fmt) {
-  const s = d3.select(id), x = d3.scaleLinear([0,max],[x0,x1]);
+const fmt = n => Math.round(n).toLocaleString("en-US");
+const pct = (a,b) => b ? (100*a/b).toFixed(1)+"%" : "—";
+const money = x => (x<0?"−":"+")+"$"+(Math.abs(x)>=999950?(Math.abs(x)/1e6).toFixed(1)+"M":Math.round(Math.abs(x)/1e3)+"K");
+function bars(sel, rows, max, x0, x1, h, gap, label) {
+  const s = d3.select(sel), x = d3.scaleLinear([0,max],[x0,x1]);
   rows.forEach((r,i)=>{ const y = 4 + i*(h+gap);
     s.append("text").attr("x",x0-10).attr("y",y+h/2+4).attr("text-anchor","end").attr("font-size",11.5).attr("fill",r.hi?"#13233A":"#5A6170").attr("font-weight",r.hi?600:400).text(r.name);
     if (r.plan!==undefined) s.append("rect").attr("x",x0).attr("y",y).attr("width",x(r.plan)-x0).attr("height",h).attr("fill","#D5DBE4").attr("rx",2);
-    const bh = r.plan!==undefined ? h/2 : h, by = r.plan!==undefined ? y+h/4 : y;
-    s.append("rect").attr("x",x0).attr("y",by).attr("width",Math.max(2,x(r.n)-x0)).attr("height",bh).attr("fill",r.hi?"#13233A":"#8C9BB0").attr("rx",1);
-    s.append("text").attr("x",x(Math.max(r.n,r.plan||0))+8).attr("y",y+h/2+4).attr("font-size",11).attr("fill","#13233A").html(fmt(r));
+    let at = x0;
+    (r.parts || [[r.n, r.color || (r.hi?"#13233A":"#8C9BB0")]]).forEach(([v,c])=>{
+      const bh = r.plan!==undefined ? h/2 : h, by = r.plan!==undefined ? y+h/4 : y;
+      s.append("rect").attr("x",at).attr("y",by).attr("width",Math.max(v?2:0,x(v)-x0)).attr("height",bh).attr("fill",c).attr("rx",1); at += x(v)-x0; });
+    s.append("text").attr("x",Math.max(at, x(r.plan||0))+8).attr("y",y+h/2+4).attr("font-size",11).attr("fill","#13233A").html(label(r));
   });
 }
-bars("#chg",[{name:"Same level, same office",n:3460,p:"+$0.7M"},{name:"One level down",n:556,p:"−$9.5M",hi:1},{name:"One level up",n:185,p:"+$3.0M",hi:1},{name:"Moved to another office",n:467,p:"−$1.2M",hi:1}],
-  3460,170,400,20,8,r=>`<tspan font-weight="600">${r.n.toLocaleString()}</tspan> · ${r.p}`);
-bars("#nn",[["Technology",830,1029],["Commercial",559,660],["Operations",320,444],["Product",156,182],["People",94,134],["Finance",83,122],["Marketing",69,99],["Legal & Compliance",70,92]].map(a=>({name:a[0],n:a[1],plan:a[2],hi:1})),
-  1029,130,390,12,4,r=>`<tspan font-weight="600">${r.n}</tspan> of ${r.plan}`);
-bars("#pool",[{name:"0–30 days",n:396},{name:"31–90 days",n:368},{name:"91–180 days",n:126,hi:1},{name:"Over 180 days",n:87,hi:1}],
-  396,110,400,22,8,r=>`<tspan font-weight="600">${r.n}</tspan>`);
+fetch("d3_preview_data.json").then(r=>r.json()).then(D=>{
+  const k = D.k, pids = k.filled+k.prev+k.new;
+  const K = [
+   ["PIDs", fmt(pids), `${fmt(k.filled)} filled · ${fmt(k.prev+k.new)} vacant`],
+   ["Vacant, previously held", fmt(k.prev), `${fmt(k.prev_stale)} vacant over 90 days`],
+   ["Vacant, new PIDs", fmt(k.new), "approved, waiting for a first hire"],
+   ["PIDs filled", fmt(k.fills), `${fmt(k.bf)} backfills · ${fmt(k.nn)} net-new`],
+   ["Backfills with a level change", fmt(k.lvl), `${fmt(k.down)} down · ${fmt(k.up)} up`]];
+  document.getElementById("kpis").innerHTML = K.map((c,i)=>
+   `<div class="abs card kpi" style="left:${30+271*i}px;top:90px;width:255px;height:86px"><div class="l">${c[0]}</div><div class="v">${c[1]}</div><div class="n">${c[2]}</div></div>`).join("");
 
-Promise.all([fetch("node_modules/world-atlas/land-110m.json").then(r=>r.json()), fetch("d3_preview_data.json").then(r=>r.json())]).then(([w,data])=>{
-  const land = topojson.feature(w, w.objects.land);
-  const box = {type:"MultiPoint",coordinates:[[-123,50],[152,-35],[-100,58],[140,-38]]};
-  const proj = d3.geoMercator().fitExtent([[6,6],[759,344]], box), path = d3.geoPath(proj);
-  const sm = d3.select("#map");
-  sm.append("path").attr("d", path(land)).attr("fill","#EEEDE8").attr("stroke","#D8D6CF").attr("stroke-width",.5);
-  data.routes.forEach(r=> sm.append("path").attr("d", path({type:"LineString",coordinates:[[r.flon,r.flat],[r.tlon,r.tlat]]}))
-      .attr("fill","none").attr("stroke","#00938D").attr("stroke-opacity",.5).attr("stroke-width",1.2));
-  const rs = d3.scaleSqrt([1,53],[2.5,10]);
-  data.offices.forEach(o=>{ const [px,py]=proj([o.lon,o.lat]);
-    sm.append("circle").attr("cx",px).attr("cy",py).attr("r",rs(o.n)).attr("fill","#00938D").attr("fill-opacity",.85).attr("stroke","#fff"); });
-  bars("#top", data.top.map(t=>({name:t[0]+" → "+t[1], n:t[2], hi:1})), 37, 200, 520, 20, 8, r=>`<tspan font-weight="600">${r.n}</tspan> seats`);
-  d3.selectAll("#top rect").attr("fill","#00938D");
-  document.body.dataset.ready = "1";
+  document.getElementById("mt").textContent = `${fmt(k.moved)} backfilled PIDs changed office`;
+  document.getElementById("ms").textContent = `Each line is one PID: from the office of the person who left to the office of the person who replaced them · ${k.lower} to a lower-pay office`;
+  document.getElementById("rs").textContent = `PIDs by office before and after the backfill · ${k.samec} stayed in the same country, ${k.border} crossed a border`;
+  const C = Object.fromEntries(D.chg.map(c=>[c.c,c])), chg = C["Same level, same office"];
+  document.getElementById("ct").textContent = `${fmt(k.bf-chg.n)} of ${fmt(k.bf)} backfills changed level or office`;
+  document.getElementById("cs").textContent = `New people earn ${money(k.pay).slice(1)} a year ${k.pay<0?"less":"more"} than those they replaced · label = pay change`;
+  bars("#chg", ["Same level, same office","One level down","One level up","Moved office only","Changed level and office"].map((n,i)=>({name:n, n:C[n].n, p:money(C[n].pay), hi:i>0})),
+       chg.n, 175, 400, 18, 6, r=>`<tspan font-weight="600">${fmt(r.n)}</tspan> · ${r.p}`);
+  document.getElementById("nt").textContent = `${fmt(k.nn)} net-new PIDs filled, ${pct(k.nn,k.nnp)} of plan`;
+  document.getElementById("ns").textContent = `Filled vs planned by function · ${k.reuse} approved while a matching PID was vacant`;
+  bars("#nn", D.nn.map(a=>({name:a[0], n:a[2], plan:a[1], hi:1})), D.nn[0][1], 130, 390, 12, 4, r=>`<tspan font-weight="600">${r.n}</tspan> of ${r.plan}`);
+  document.getElementById("vt").textContent = `${fmt(k.prev+k.new)} PIDs are vacant; ${k.prev_stale+D.vac.reduce((a,v)=>a+(v[0].startsWith("91")||v[0].startsWith("Over")?v[2]:0),0)} for over 90 days`;
+  bars("#pool", D.vac.map(v=>({name:v[0].replace("-","–"), parts:[[v[1],"#13233A"],[v[2],"#8C9BB0"]], n:v[1]+v[2], hi:v[0].startsWith("91")||v[0].startsWith("Over")})),
+       Math.max(...D.vac.map(v=>v[1]+v[2])), 110, 400, 22, 8, r=>`<tspan font-weight="600">${r.n}</tspan>`);
+
+  // routes as a From / To table: no arrow glyph to read
+  const t = d3.select("#top");
+  t.append("text").attr("x",0).attr("y",12).attr("font-size",10.5).attr("fill","#8C8A84").attr("font-weight",600).text("FROM (PERSON WHO LEFT)");
+  t.append("text").attr("x",190).attr("y",12).attr("font-size",10.5).attr("fill","#8C8A84").attr("font-weight",600).text("TO (NEW PERSON)");
+  const xt = d3.scaleLinear([0,D.top[0][2]],[0,330]);
+  D.top.forEach((r,i)=>{ const y = 22 + i*27;
+    t.append("text").attr("x",0).attr("y",y+14).attr("font-size",12).attr("fill","#13233A").text(r[0]);
+    t.append("text").attr("x",190).attr("y",y+14).attr("font-size",12).attr("fill","#13233A").attr("font-weight",600).text(r[1]);
+    t.append("rect").attr("x",360).attr("y",y+2).attr("width",xt(r[2])).attr("height",18).attr("fill","#00938D").attr("rx",1);
+    t.append("text").attr("x",360+xt(r[2])+8).attr("y",y+15).attr("font-size",11).attr("fill","#13233A").html(`<tspan font-weight="600">${r[2]}</tspan> PIDs`); });
+
+  // hover tooltips (viz in tooltip)
+  const H = document.getElementById("hovers");
+  const tip = (title, text, id) => { H.insertAdjacentHTML("beforeend", `<div class="tip"><div class="tt">${title}</div><div class="tx">${text}</div><svg id="${id}" width="306" height="96"></svg></div>`); };
+  tip("PIDs", `Every budgeted position on Jun 30, 2025, filled or vacant. The plan expected ${fmt(k.plan)} filled. Contingent workers sit in the vendor system and hold no PID.`, "h1");
+  bars("#h1", [{name:"Filled by employees",n:k.filled,hi:1},{name:"Vacant, previously held",n:k.prev},{name:"Vacant, new PIDs",n:k.new}], k.filled, 140, 250, 16, 6, r=>fmt(r.n));
+  tip("Vacant, previously held", `PIDs someone left and nobody has replaced yet, by why they became vacant. ${k.prev_stale} have waited over 90 days.`, "h2");
+  bars("#h2", Object.entries(k.why).map(([n,v])=>({name:n.replace("Internal Move Out","Moved to another PID"),n:v,hi:1})), Math.max(...Object.values(k.why)), 140, 250, 16, 6, r=>fmt(r.n));
+  tip("Vacant, new PIDs", "Net-new PIDs the plan approved that have not had their first hire yet, by function.", "h3");
+  bars("#h3", Object.entries(k.newfn).slice(0,4).map(([n,v])=>({name:n,n:v,hi:1})), Math.max(...Object.values(k.newfn)), 140, 250, 14, 5, r=>fmt(r.n));
+  tip("PIDs filled", `Hires and internal moves into a PID, against the plan. Median ${k.med} days from approval to fill a backfill.`, "h4");
+  bars("#h4", [{name:"Backfills",n:k.bf,plan:k.bfp,hi:1},{name:"Net-new",n:k.nn,plan:k.nnp,hi:1}], k.bfp, 90, 190, 22, 10, r=>`${fmt(r.n)} of ${fmt(r.plan)} · ${pct(r.n,r.plan)}`);
+  tip("Backfills with a level change", `The PID came back at a different grade than the person who left. ${k.lvlmoved} of them also changed office.`, "h5");
+  bars("#h5", [{name:"One level down",n:k.down,hi:1},{name:"One level up",n:k.up,hi:1}], k.down, 120, 250, 20, 8, r=>fmt(r.n));
+
+  if (location.search.includes("hovers")) { document.getElementById("page").style.display="none"; H.style.display="flex"; document.body.style.height="auto"; document.body.dataset.ready="1"; return; }
+  Promise.all([fetch("node_modules/world-atlas/land-110m.json").then(r=>r.json())]).then(([w])=>{
+    const land = topojson.feature(w, w.objects.land);
+    const proj = d3.geoMercator().fitExtent([[6,6],[759,344]], {type:"MultiPoint",coordinates:[[-123,50],[152,-35],[-100,58],[140,-38]]}), path = d3.geoPath(proj);
+    const sm = d3.select("#map");
+    sm.append("path").attr("d", path(land)).attr("fill","#EEEDE8").attr("stroke","#D8D6CF").attr("stroke-width",.5);
+    D.routes.forEach(r=> sm.append("path").attr("d", path({type:"LineString",coordinates:[[r.flon,r.flat],[r.tlon,r.tlat]]})).attr("fill","none").attr("stroke","#00938D").attr("stroke-opacity",.5).attr("stroke-width",1.2));
+    const rs = d3.scaleSqrt([1,d3.max(D.offices,o=>o.n)],[2.5,10]);
+    D.offices.forEach(o=>{ const [px,py]=proj([o.lon,o.lat]); sm.append("circle").attr("cx",px).attr("cy",py).attr("r",rs(o.n)).attr("fill","#00938D").attr("fill-opacity",.85).attr("stroke","#fff"); });
+    document.body.dataset.ready = "1";
+  });
 });
 </script>
 </body></html>

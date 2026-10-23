@@ -46,7 +46,7 @@ MAP = {
         "seg_currency_constant_on": "d2_currency_constant_on", "seg_currency_constant_off": "d2_currency_constant_off",
         "seg_currency_nominal_on": "d2_currency_nominal_on", "seg_currency_nominal_off": "d2_currency_nominal_off",
     },
-    "d3": {"fld_top": "d3_field_capsule", "btn_reset_top": "d3_reset"},
+    "d3": {"fld_top_chevron": "d3_field_capsule", "btn_reset_top": "d3_reset"},
     "fp": {n: "fp_" + n[len("seg_fp_"):] for n in
            (f[:-4] for f in os.listdir(SRC) if f.startswith("seg_fp_") and f.endswith(".png"))},
 }
