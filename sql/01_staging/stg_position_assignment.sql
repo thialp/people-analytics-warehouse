@@ -4,6 +4,7 @@
 --   vacate_reason  Voluntary, Involuntary (left the company), Internal Move Out (moved to
 --                  another seat the next day), NULL while still in the seat
 -- end_date is inclusive; NULL means the worker is still in the seat.
+-- Release 3.1: employees only; contingent assignments are in stg_cw_position_assignment.
 CREATE OR REPLACE TABLE staging.stg_position_assignment AS
 SELECT
     assignment_id,
@@ -16,4 +17,5 @@ SELECT
     fill_type,
     NULLIF(requisition_id, '')                               AS requisition_id,
     NULLIF(vacate_reason, '')                                AS vacate_reason
-FROM raw.fact_position_assignment;
+FROM raw.fact_position_assignment
+WHERE worker_type = 'Employee';

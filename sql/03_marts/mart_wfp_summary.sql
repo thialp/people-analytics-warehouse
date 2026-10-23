@@ -17,6 +17,13 @@
 --
 -- Population: the 9 executive officers (department D-901) are excluded, as on Dashboards #1 and
 -- #2, so FY26 year-end employees read 30,005 here and there.
+--
+-- PIDs (release 3.1): every PID in Keystone on to_date, employee and contingent, filled or
+-- vacant, and a vacant PID either previously held (someone left it) or new (created for a
+-- request, never filled yet). Version-independent: the same in every version row. Filled
+-- employee PIDs equal actual_ending_headcount and filled contingent PIDs the contingent
+-- headcount (tests 45 and 81). Level and office changes count employee backfills in the
+-- effective quarters; contingent fills count contingent assignments starting in them.
 CREATE OR REPLACE TABLE marts.mart_wfp_summary AS
 WITH fy AS (
     SELECT DISTINCT fiscal_year FROM marts.mart_plan_vs_actual
@@ -62,10 +69,10 @@ fill_groups AS (
     WHERE f.department_id <> 'D-901'
 ),
 group_list AS (   -- every group that ever had a plan row, in every period: no choice can drop a row.
-                  -- is_view_default marks each view's largest group at the last year-end, which is
-                  -- where a View pick lands (it has a plan in every period and version)
+                  -- is_view_default marks each view's first group alphabetically, which is where a
+                  -- View pick lands, as on Dashboards #1 and #2 (it has a plan in every period and version)
     SELECT view_name, view_order, group_name,
-           ROW_NUMBER() OVER (PARTITION BY view_name ORDER BY year_end_headcount DESC, group_name) = 1 AS is_view_default
+           ROW_NUMBER() OVER (PARTITION BY view_name ORDER BY group_name) = 1 AS is_view_default   -- first alphabetically (release 3.1)
     FROM (
         SELECT view_name, view_order, group_name,
                SUM(CASE WHEN version_type = 'Budget'
@@ -109,10 +116,62 @@ fill_agg AS (
            SUM(CASE WHEN f.reuse_candidate THEN f.new_pay_usd_constant END)          AS reuse_new_pay_usd_constant,
            SUM(CASE WHEN f.seat_type = 'Backfill' THEN f.pay_change_usd_constant END) AS backfill_pay_change_usd_constant,
            median(f.time_to_fill_days) FILTER (WHERE f.seat_type = 'Backfill' AND f.seat_decision <> 'Immediate refill') AS median_time_to_fill_days,
-           median(f.vacancy_days)      FILTER (WHERE f.seat_type = 'Backfill' AND f.seat_decision <> 'Immediate refill') AS median_vacancy_days
+           median(f.vacancy_days)      FILTER (WHERE f.seat_type = 'Backfill' AND f.seat_decision <> 'Immediate refill') AS median_vacancy_days,
+           COUNT(*) FILTER (WHERE f.seat_type = 'Backfill' AND f.level_change = 'Down')                        AS level_down,
+           COUNT(*) FILTER (WHERE f.seat_type = 'Backfill' AND f.level_change = 'Up')                          AS level_up,
+           COUNT(*) FILTER (WHERE f.seat_type = 'Backfill' AND f.level_change <> 'Same'
+                              AND f.location_change <> 'Same office')                                         AS level_and_office,
+           COUNT(*) FILTER (WHERE f.seat_type = 'Backfill' AND f.location_change <> 'Same office')            AS moved_office
     FROM grid_period AS g
     JOIN fill_groups AS f
       ON f.fiscal_year = g.fiscal_year AND f.q BETWEEN g.eff_first_quarter AND g.eff_last_quarter
+    GROUP BY ALL
+),
+org AS (
+    SELECT d.department_id, d.function_name, d.sub_function, d.department_name FROM staging.stg_department AS d
+),
+pid_rows AS (     -- the PID ledger on every month-end (mart_pid_month_end)
+    SELECT month_end_date, worker_type, pid_kind, is_stale, department_id, country_name, pids
+    FROM marts.mart_pid_month_end
+),
+pid_groups AS (
+    SELECT r.*, g.view_name, g.group_name
+    FROM pid_rows AS r
+    JOIN org AS o ON o.department_id = r.department_id
+    CROSS JOIN LATERAL (VALUES ('Company', 'Arcadia Systems'), ('Function', o.function_name),
+                               ('Sub-function', o.sub_function), ('Department', o.department_name),
+                               ('Country', r.country_name)) AS g(view_name, group_name)
+    WHERE r.department_id <> 'D-901'
+),
+pid_agg AS (
+    SELECT month_end_date, view_name, group_name,
+           SUM(pids) FILTER (WHERE pid_kind = 'Filled' AND worker_type = 'Employee')                 AS pids_filled_employee,
+           SUM(pids) FILTER (WHERE pid_kind = 'Filled' AND worker_type = 'Contingent')               AS pids_filled_contingent,
+           SUM(pids) FILTER (WHERE pid_kind = 'Vacant previously held')                              AS vacant_previously_held,
+           SUM(pids) FILTER (WHERE pid_kind = 'Vacant previously held' AND worker_type = 'Contingent') AS vacant_previously_held_contingent,
+           SUM(pids) FILTER (WHERE pid_kind = 'Vacant previously held' AND is_stale)                 AS vacant_previously_held_stale,
+           SUM(pids) FILTER (WHERE pid_kind = 'Vacant new')                                          AS vacant_new,
+           SUM(pids) FILTER (WHERE pid_kind = 'Vacant new' AND worker_type = 'Contingent')           AS vacant_new_contingent,
+           SUM(pids) FILTER (WHERE pid_kind = 'Vacant new' AND is_stale)                             AS vacant_new_stale
+    FROM pid_groups
+    GROUP BY ALL
+),
+cw_fill_groups AS (   -- contingent assignments that start in the quarter (mart_cw_pid_fill)
+    SELECT c.fiscal_year, c.fiscal_quarter AS q, c.is_backfill, g.view_name, g.group_name
+    FROM marts.mart_cw_pid_fill AS c
+    JOIN org AS o ON o.department_id = c.department_id
+    CROSS JOIN LATERAL (VALUES ('Company', 'Arcadia Systems'), ('Function', o.function_name),
+                               ('Sub-function', o.sub_function), ('Department', o.department_name),
+                               ('Country', c.country_name)) AS g(view_name, group_name)
+    WHERE c.department_id <> 'D-901'
+),
+cw_fill_agg AS (
+    SELECT g.fiscal_year, g.pair_code, g.version_type, c.view_name, c.group_name,
+           COUNT(*)                                  AS contingent_fills,
+           COUNT(*) FILTER (WHERE c.is_backfill)     AS contingent_backfill_fills
+    FROM grid_period AS g
+    JOIN cw_fill_groups AS c
+      ON c.fiscal_year = g.fiscal_year AND c.q BETWEEN g.eff_first_quarter AND g.eff_last_quarter
     GROUP BY ALL
 )
 SELECT
@@ -167,7 +226,30 @@ SELECT
     ROUND(COALESCE(f.reuse_new_pay_usd_constant, 0), 2)                              AS reuse_new_pay_usd_constant,
     ROUND(COALESCE(f.backfill_pay_change_usd_constant, 0), 2)                        AS backfill_pay_change_usd_constant,
     f.median_time_to_fill_days,
-    f.median_vacancy_days
+    f.median_vacancy_days,
+    -- release 3.1: periods named by months, and the PID ledger
+    CASE WHEN g.pair_code = 'FY' THEN 'Fiscal year' WHEN g.pair_code IN ('H1', 'H2') THEN 'Half year' ELSE 'Quarter' END AS span_name,
+    CASE WHEN g.pair_code = 'FY' THEN 1 WHEN g.pair_code IN ('H1', 'H2') THEN 2 ELSE 3 END                      AS span_order,
+    g.fiscal_year_label || CASE WHEN g.pair_code = 'FY' THEN '' ELSE ' ' || g.pair_code END                      AS period_short,
+    CASE WHEN g.pair_code = 'FY'
+         THEN strftime(g.from_date + INTERVAL 1 DAY, '%b %y') || ' – ' || strftime(g.to_date, '%b %y')
+         ELSE strftime(g.from_date + INTERVAL 1 DAY, '%b') || ' – ' || strftime(g.to_date, '%b %y') END           AS period_months,
+    COALESCE(x.pids_filled_employee, 0) + COALESCE(x.pids_filled_contingent, 0)
+        + COALESCE(x.vacant_previously_held, 0) + COALESCE(x.vacant_new, 0)                                     AS pids_total,
+    COALESCE(x.pids_filled_employee, 0)                                              AS pids_filled_employee,
+    COALESCE(x.pids_filled_contingent, 0)                                            AS pids_filled_contingent,
+    COALESCE(x.vacant_previously_held, 0)                                            AS vacant_previously_held,
+    COALESCE(x.vacant_previously_held_contingent, 0)                                 AS vacant_previously_held_contingent,
+    COALESCE(x.vacant_previously_held_stale, 0)                                      AS vacant_previously_held_stale,
+    COALESCE(x.vacant_new, 0)                                                        AS vacant_new,
+    COALESCE(x.vacant_new_contingent, 0)                                             AS vacant_new_contingent,
+    COALESCE(x.vacant_new_stale, 0)                                                  AS vacant_new_stale,
+    COALESCE(f.level_down, 0)                                                        AS level_down,
+    COALESCE(f.level_up, 0)                                                          AS level_up,
+    COALESCE(f.level_and_office, 0)                                                  AS level_and_office,
+    COALESCE(f.moved_office, 0)                                                      AS moved_office,
+    COALESCE(c.contingent_fills, 0)                                                  AS contingent_fills,
+    COALESCE(c.contingent_backfill_fills, 0)                                         AS contingent_backfill_fills
 FROM grid_period AS g
 CROSS JOIN group_list AS l
 LEFT JOIN plan_agg AS p
@@ -176,4 +258,9 @@ LEFT JOIN plan_agg AS p
 LEFT JOIN fill_agg AS f
   ON f.fiscal_year = g.fiscal_year AND f.pair_code = g.pair_code AND f.version_type = g.version_type
  AND f.view_name = l.view_name AND f.group_name = l.group_name
+LEFT JOIN pid_agg AS x
+  ON x.month_end_date = g.to_date AND x.view_name = l.view_name AND x.group_name = l.group_name
+LEFT JOIN cw_fill_agg AS c
+  ON c.fiscal_year = g.fiscal_year AND c.pair_code = g.pair_code AND c.version_type = g.version_type
+ AND c.view_name = l.view_name AND c.group_name = l.group_name
 ORDER BY g.fiscal_year, g.pair_order, g.version_order, l.view_order, l.group_name;

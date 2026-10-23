@@ -36,6 +36,7 @@ import numpy as np
 import pandas as pd
 
 import contingent_workforce
+import cw_positions
 import fringe_research
 import fx_rates
 import keystone_feed
@@ -1603,6 +1604,58 @@ for r in req_rows.values():
 
 
 # ======================================================================================
+# 6c. The hiring pipeline at the extract (release 3.1)
+# ======================================================================================
+# A net-new seat is created when its requisition is approved, as long before the hire as
+# recruiting takes. The simulation stops on the last month-end, so the hires due after it never
+# happen and, without this step, no new seat would be open on that day. Here the net-new hires of
+# the next six months are drawn at FY26's pace and mix; the seats and requisitions of those
+# approved by the extract are kept, still Open, with their applicants in process. Own stream:
+# nothing simulated before moves.
+tail_rng = domain_stream("pipeline_tail")
+_fy_start = dt.date(LAST_ME.year - 1, 7, 1)
+_mix = [r for r in req_rows.values() if r["req_type"] == "Net-new" and r["status"] == "Filled"
+        and _fy_start <= r["filled_date"] <= LAST_ME and r["department_id"] != "D-901"]
+_per_day = len(_mix) / ((LAST_ME - _fy_start).days + 1)
+_mgrs = defaultdict(list)
+for _w in active.values():
+    if _w["is_pm"] and not _w["is_exec"]:
+        _mgrs[_w["dept"]].append(_w["worker_id"])
+_day = LAST_ME + ONE_DAY
+while _day <= LAST_ME + dt.timedelta(days=183):
+    for _ in range(int(tail_rng.poisson(_per_day))):
+        r0 = _mix[int(tail_rng.integers(len(_mix)))]
+        lvl = int(r0["job_level"])
+        med = ref.REQ_TIME_TO_FILL_MEDIAN[min(lvl, 11)]
+        ttf = int(np.clip(round(tail_rng.lognormal(math.log(med), ref.REQ_TIME_TO_FILL_SIGMA)),
+                          ref.REQ_TIME_TO_FILL_MIN, 240))
+        approved = _day - dt.timedelta(days=ttf)
+        if approved > LAST_ME:
+            continue
+        share, (lo, hi) = ref.REQ_LATE_APPROVAL
+        lag = int(tail_rng.integers(lo, hi + 1)) if tail_rng.random() < share else \
+            int(tail_rng.integers(ref.REQ_APPROVAL_DAYS[0], ref.REQ_APPROVAL_DAYS[1] + 1))
+        fam, track = r0["job_profile_id"].split("-")[0], r0["job_profile_id"].split("-")[1][0]
+        s = new_seat(approved, "Net-new", r0["department_id"], fam, lvl, r0["location_id"],
+                     is_pm=track == "M", fte=1.0)
+        pool = _mgrs.get(r0["department_id"]) or [None]
+        r = new_requisition(s, approved - dt.timedelta(days=lag), approved, pool[int(tail_rng.integers(len(pool)))])
+        r["target_start_date"] = _day
+        for _ in range(int(tail_rng.poisson(ref.CANDIDATES_PER_REQ[min(lvl, 11)] * 0.6))):
+            reached = int(tail_rng.integers(1, 4))
+            span = max(0, (LAST_ME - approved).days)
+            days = sorted(int(x) for x in tail_rng.integers(0, span + 1, reached))
+            cid = next_id("candidate", "C")
+            candidate_rows.append({"candidate_id": cid, "requisition_id": r["requisition_id"], "is_internal": False,
+                                   "candidate_source": weighted_choice(ref.CANDIDATE_SOURCES, tail_rng),
+                                   "worker_id": None, "final_status": "In process"})
+            for order, (stage, dd) in enumerate(zip(STAGES[:reached], days), start=1):
+                candidate_event_rows.append({"candidate_id": cid, "stage": stage, "stage_order": order,
+                                             "stage_date": approved + dt.timedelta(days=dd)})
+    _day += ONE_DAY
+
+
+# ======================================================================================
 # 7. Write raw tables
 # ======================================================================================
 def write(df: pd.DataFrame, name: str):
@@ -1637,16 +1690,8 @@ job = job[["job_record_id", "worker_id", "effective_start_date", "effective_end_
            "is_people_manager", "leads_org_unit_id"]]
 write(job, "fact_job_history")
 
-# seats
-pos = pd.DataFrame(pos_rows).sort_values(["position_id", "effective_start_date"]).reset_index(drop=True)
-pos.insert(0, "position_record_id", [f"PS{n:07d}" for n in range(1, len(pos) + 1)])
-write(pos[["position_record_id", "position_id", "effective_start_date", "effective_end_date", "change_reason", "status",
-           "department_id", "cost_center_id", "location_id", "job_profile_id", "job_level", "fte", "created_date",
-           "created_reason"]],
-      "dim_position")
-write(pd.DataFrame(assign_rows)[["assignment_id", "position_id", "worker_id", "start_date", "end_date", "fill_type",
-                                 "requisition_id", "vacate_reason"]].sort_values("assignment_id"),
-      "fact_position_assignment")
+# seats: dim_position and fact_position_assignment are written in section 8, after the
+# contingent PIDs join them (release 3.1)
 write(pd.DataFrame(req_rows.values())[[
     "requisition_id", "position_id", "req_type", "opened_date", "approved_date", "target_start_date", "filled_date",
     "cancelled_date", "status", "department_id", "cost_center_id", "location_id", "job_profile_id", "job_level",
@@ -1828,6 +1873,29 @@ for c in candidate_rows:
     if c["candidate_id"] in _converted:
         c["candidate_source"] = "Contingent conversion"
 write(pd.DataFrame(candidate_rows).sort_values("candidate_id"), "dim_candidate")
+
+# PIDs (release 3.1). Every contingent worker holds a PID in Keystone like an employee does: the
+# PID is created (or a vacant one reused) when the request is approved, filled for the days
+# Bridgeway holds the assignment, and left vacant afterwards until reused or closed by the
+# position audit. Own stream; employee PIDs keep their rows and IDs (P200001 up), contingent
+# PIDs are P800001 up.
+cw_pos_rows, cw_assign_rows = cw_positions.build(
+    stream=domain_stream("cw_positions"), tables=cw_tables, program=cw_program, cost_centers=cost_center_rows,
+    start_number=ref.CW_PID_START_NUMBER)
+for _r in pos_rows:
+    _r.update(worker_type="Employee", cw_type=None, cw_role_family=None)
+for _r in assign_rows:
+    _r.update(worker_type="Employee", bw_worker_id=None)
+pos = pd.DataFrame(pos_rows + cw_pos_rows).sort_values(["position_id", "effective_start_date"]).reset_index(drop=True)
+pos.insert(0, "position_record_id", [f"PS{n:07d}" for n in range(1, len(pos) + 1)])
+pos["job_level"] = pos["job_level"].astype("Int64")          # contingent PIDs have no grade
+write(pos[["position_record_id", "position_id", "effective_start_date", "effective_end_date", "change_reason", "status",
+           "department_id", "cost_center_id", "location_id", "job_profile_id", "job_level", "fte", "created_date",
+           "created_reason", "worker_type", "cw_type", "cw_role_family"]],
+      "dim_position")
+write(pd.DataFrame(assign_rows + cw_assign_rows)[[
+    "assignment_id", "position_id", "worker_id", "start_date", "end_date", "fill_type", "requisition_id",
+    "vacate_reason", "worker_type", "bw_worker_id"]].sort_values("assignment_id"), "fact_position_assignment")
 
 # The plan's contingent line, from its own stream so no employee plan number moves.
 _plan = pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"])

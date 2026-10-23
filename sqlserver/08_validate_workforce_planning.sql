@@ -20,15 +20,18 @@ SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
               SELECT 'dw.DimCostCenter rows'          AS check_name, (SELECT COUNT(*) FROM dw.DimCostCenter)          AS actual, 630     AS expected
-    UNION ALL SELECT 'dw.DimPosition rows',                          (SELECT COUNT(*) FROM dw.DimPosition),                      99398
+    UNION ALL SELECT 'dw.DimPosition rows',                          (SELECT COUNT(*) FROM dw.DimPosition),                      99689
     UNION ALL SELECT 'dw.FactPositionAssignment rows',               (SELECT COUNT(*) FROM dw.FactPositionAssignment),          54094
-    UNION ALL SELECT 'dw.FactRequisition rows',                      (SELECT COUNT(*) FROM dw.FactRequisition),                 31323
+    UNION ALL SELECT 'dw.FactRequisition rows',                      (SELECT COUNT(*) FROM dw.FactRequisition),                 31614
     UNION ALL SELECT 'dw.FactWorkforcePlan rows',                    (SELECT COUNT(*) FROM dw.FactWorkforcePlan),               29415
-    UNION ALL SELECT 'dw.DimCandidate rows',                         (SELECT COUNT(*) FROM dw.DimCandidate),                    188982
-    UNION ALL SELECT 'dw.FactCandidateStageEvent rows',              (SELECT COUNT(*) FROM dw.FactCandidateStageEvent),         531691
-    UNION ALL SELECT 'dw.PositionMonthEndSnapshot rows',             (SELECT COUNT(*) FROM dw.PositionMonthEndSnapshot),        1701742
+    UNION ALL SELECT 'dw.DimCandidate rows',                         (SELECT COUNT(*) FROM dw.DimCandidate),                    189964
+    UNION ALL SELECT 'dw.FactCandidateStageEvent rows',              (SELECT COUNT(*) FROM dw.FactCandidateStageEvent),         533671
+    UNION ALL SELECT 'dw.PositionMonthEndSnapshot rows',             (SELECT COUNT(*) FROM dw.PositionMonthEndSnapshot),        1702178
     UNION ALL SELECT 'rpt.vw_position_fill rows',                    (SELECT COUNT(*) FROM rpt.vw_position_fill),               30575
-    UNION ALL SELECT 'rpt.vw_vacancy_pool rows',                     (SELECT COUNT(*) FROM rpt.vw_vacancy_pool),                62055
+    UNION ALL SELECT 'dw.DimContingentPosition rows',                (SELECT COUNT(*) FROM dw.DimContingentPosition),           122472
+    UNION ALL SELECT 'dw.FactContingentPositionAssignment rows',     (SELECT COUNT(*) FROM dw.FactContingentPositionAssignment), 44295
+    UNION ALL SELECT 'dw.ContingentPositionMonthEndSnapshot rows',   (SELECT COUNT(*) FROM dw.ContingentPositionMonthEndSnapshot), 975547
+    UNION ALL SELECT 'rpt.vw_vacancy_pool rows',                     (SELECT COUNT(*) FROM rpt.vw_vacancy_pool),                439286
     UNION ALL SELECT 'rpt.vw_plan_vs_actual rows',                   (SELECT COUNT(*) FROM rpt.vw_plan_vs_actual),              29415
     UNION ALL SELECT 'rpt.vw_seat_corridors rows',                   (SELECT COUNT(*) FROM rpt.vw_seat_corridors),              821
 ) AS c;
@@ -85,7 +88,7 @@ FROM (
     UNION ALL SELECT 'backfills',                    (SELECT COUNT(*) FROM rpt.vw_position_fill WHERE fiscal_year = 2026 AND seat_type = 'Backfill'), 4668
     UNION ALL SELECT 'net-new seats',                (SELECT COUNT(*) FROM rpt.vw_position_fill WHERE fiscal_year = 2026 AND seat_type = 'Net-new'), 2181
     UNION ALL SELECT 'internal moves',               (SELECT COUNT(*) FROM rpt.vw_position_fill WHERE fiscal_year = 2026 AND fill_type = 'Internal Move'), 1614
-    UNION ALL SELECT 'reuse candidates (net-new)',   (SELECT COUNT(*) FROM rpt.vw_position_fill WHERE fiscal_year = 2026 AND reuse_candidate = 1), 628
+    UNION ALL SELECT 'reuse candidates (net-new)',   (SELECT COUNT(*) FROM rpt.vw_position_fill WHERE fiscal_year = 2026 AND reuse_candidate = 1), 631
     UNION ALL SELECT 'vacancy chains',               (SELECT COUNT(DISTINCT chain_id) FROM rpt.vw_position_fill WHERE fiscal_year = 2026), 5681
     UNION ALL SELECT 'pay change, $',                (SELECT CAST(SUM(pay_change_usd_constant) AS DECIMAL(18, 2)) FROM rpt.vw_position_fill WHERE fiscal_year = 2026), -7004254.10
     UNION ALL SELECT 'level effect, $',              (SELECT CAST(SUM(level_effect_usd_constant) AS DECIMAL(18, 2)) FROM rpt.vw_position_fill WHERE fiscal_year = 2026), -6788600.86
@@ -100,8 +103,8 @@ PRINT '4. Vacancy pool at 30 Jun 2026';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'open seats' AS check_name, (SELECT COUNT(*) FROM rpt.vw_vacancy_pool WHERE month_end_date = '2026-06-30' AND status = 'Open') AS actual, 725 AS expected
-    UNION ALL SELECT 'open seats vacant 90+ days',   (SELECT COUNT(*) FROM rpt.vw_vacancy_pool WHERE month_end_date = '2026-06-30' AND status = 'Open' AND is_stale = 1), 77
+              SELECT 'open seats' AS check_name, (SELECT COUNT(*) FROM rpt.vw_vacancy_pool WHERE month_end_date = '2026-06-30' AND status = 'Open' AND worker_type = 'Employee') AS actual, 1016 AS expected
+    UNION ALL SELECT 'open seats vacant 90+ days',   (SELECT COUNT(*) FROM rpt.vw_vacancy_pool WHERE month_end_date = '2026-06-30' AND status = 'Open' AND worker_type = 'Employee' AND is_stale = 1), 85
     UNION ALL SELECT 'frozen seats',                 (SELECT COUNT(*) FROM rpt.vw_vacancy_pool WHERE month_end_date = '2026-06-30' AND status = 'Frozen'), 252
     UNION ALL SELECT 'frozen seats vacant 90+ days', (SELECT COUNT(*) FROM rpt.vw_vacancy_pool WHERE month_end_date = '2026-06-30' AND status = 'Frozen' AND is_stale = 1), 136
 ) AS c;

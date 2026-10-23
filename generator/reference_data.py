@@ -428,6 +428,12 @@ CW_RESTRUCTURING_CUT = 0.35           # Commercial and Marketing contingent work
 CW_ATTRIBUTE_CHANGE_MONTHLY = {"Cost center change": 0.004, "Manager change": 0.006, "Office change": 0.002}
 CW_WITHDRAWN_SHARE = 0.04             # requests whose submitted worker is withdrawn or rejected before starting
 CW_LATE_EXTENSION_SHARE = 0.06        # extensions approved after the old end date
+# Contingent PIDs in Keystone (release 3.1, generator/cw_positions.py)
+CW_PID_REUSE_SHARE = 0.45             # an approved request takes a matching vacant PID this often; otherwise HR Ops creates a new one
+CW_PID_AUDIT_MONTHS = (1, 7)          # the position audit runs at the end of January and July
+CW_PID_AUDIT_MIN_DAYS = 180           # it looks at contingent PIDs vacant this long or longer
+CW_PID_AUDIT_CLOSE_SHARE = 0.30       # and closes this share of them; the rest stay vacant
+CW_PID_START_NUMBER = 800000          # contingent PIDs are P800001 upward (employee PIDs start at P200001)
 CW_LOCAL_BILLING_SHARE = {"IN": 0.10, "PL": 0.30, "GB": 0.50, "CA": 0.60, "SG": 0.30, "AU": 0.50, "JP": 0.70,
                           "DE": 0.40, "FR": 0.40, "NL": 0.40, "IE": 0.40, "ES": 0.40, "PT": 0.30, "CH": 0.60,
                           "SE": 0.50, "MX": 0.10, "BR": 0.20, "ZA": 0.30, "AE": 0.20, "KR": 0.50, "PH": 0.10, "US": 0.0}

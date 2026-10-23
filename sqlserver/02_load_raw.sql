@@ -291,7 +291,10 @@ CREATE TABLE raw.dim_position (
     [job_level]            NVARCHAR(400) NULL,
     [fte]                  NVARCHAR(400) NULL,
     [created_date]         NVARCHAR(400) NULL,
-    [created_reason]       NVARCHAR(400) NULL
+    [created_reason]       NVARCHAR(400) NULL,
+    [worker_type]          NVARCHAR(400) NULL,
+    [cw_type]              NVARCHAR(400) NULL,
+    [cw_role_family]       NVARCHAR(400) NULL
 );
 BULK INSERT raw.dim_position
 FROM '/repo/data/raw/dim_position.csv'
@@ -422,7 +425,9 @@ CREATE TABLE raw.fact_position_assignment (
     [end_date]       NVARCHAR(400) NULL,
     [fill_type]      NVARCHAR(400) NULL,
     [requisition_id] NVARCHAR(400) NULL,
-    [vacate_reason]  NVARCHAR(400) NULL
+    [vacate_reason]  NVARCHAR(400) NULL,
+    [worker_type]    NVARCHAR(400) NULL,
+    [bw_worker_id]   NVARCHAR(400) NULL
 );
 BULK INSERT raw.fact_position_assignment
 FROM '/repo/data/raw/fact_position_assignment.csv'

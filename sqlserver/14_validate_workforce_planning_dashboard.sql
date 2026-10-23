@@ -127,8 +127,8 @@ FROM (
     UNION ALL SELECT 'Budget: card 3 backfills',          actual_backfills,            4668          FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'Budget: card 3 backfills planned',  planned_backfills,           5031          FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'Budget: card 3 median days to fill', median_time_to_fill_days,   42            FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
-    UNION ALL SELECT 'Budget: card 4 reuse candidates',   reuse_candidate_fills,       628           FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
-    UNION ALL SELECT 'Budget: card 4 starting base pay',  reuse_new_pay_usd_constant,  55391516.29   FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'Budget: card 4 reuse candidates',   reuse_candidate_fills,       631           FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'Budget: card 4 starting base pay',  reuse_new_pay_usd_constant,  55680160.14   FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'Budget: card 5 contingent workers', actual_cw_headcount,         11941         FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'Budget: card 5 contingent planned', planned_cw_headcount,        12673         FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'Budget: card 5 spend, actual at plan FX', actual_cw_spend_usd_plan_fx, 1238675225.91 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
@@ -136,7 +136,7 @@ FROM (
     UNION ALL SELECT 'RF2 (plans Q3-Q4): net-new filled', actual_net_new,              981           FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'RF2' AND view_name = 'Company'
     UNION ALL SELECT 'RF2: net-new planned',              planned_net_new,             1097          FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'RF2' AND view_name = 'Company'
     UNION ALL SELECT 'RF2: year-end planned',             planned_ending_headcount,    30142         FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'RF2' AND view_name = 'Company'
-    UNION ALL SELECT 'RF2: reuse candidates (Q3-Q4)',     reuse_candidate_fills,       300           FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'RF2' AND view_name = 'Company'
+    UNION ALL SELECT 'RF2: reuse candidates (Q3-Q4)',     reuse_candidate_fills,       303           FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'RF2' AND view_name = 'Company'
     UNION ALL SELECT 'H1 with RF2: not covered (0)',      CAST(is_covered AS INT),     0             FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'H1' AND version_type = 'RF2' AND view_name = 'Company'
     UNION ALL SELECT 'Q3 Budget: year-end employees',     actual_ending_headcount,     29618         FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'Q3' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'Q3 Budget: median days vacant',     median_vacancy_days,         56            FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'Q3' AND version_type = 'Budget' AND view_name = 'Company'
@@ -156,5 +156,26 @@ FROM (
     UNION ALL SELECT 'FY26 H1',  (SELECT MAX(pair_name) FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'H1'), N'FY26 H1 · Jun 25 → Dec 25'
     UNION ALL SELECT 'FY26 Q3',  (SELECT MAX(pair_name) FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'Q3'), N'FY26 Q3 · Dec 25 → Mar 26'
     UNION ALL SELECT 'RF2 covers', (SELECT MAX(covered_label) FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'RF2'), N'Q3–Q4'
+) AS c;
+GO
+
+PRINT '5. The PID ledger on Jun 30, 2026 (release 3.1: every contingent worker holds a PID)';
+SELECT check_name, actual, expected,
+       CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
+FROM (
+              SELECT 'PIDs in total' AS check_name, CAST(pids_total AS INT) AS actual, 51163 AS expected FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'filled by employees',               pids_filled_employee,               30005 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'filled by contingent workers',      pids_filled_contingent,             11941 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'vacant, previously held',           vacant_previously_held,              8689 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'vacant, previously held, contingent', vacant_previously_held_contingent, 7712 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'vacant, previously held, 90+ days', vacant_previously_held_stale,        6540 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'vacant, new',                       vacant_new,                           528 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'vacant, new, contingent',           vacant_new_contingent,                237 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'backfills one level down',          level_down,                           567 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'backfills one level up',            level_up,                             185 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'backfills in another office',       moved_office,                         467 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'contingent fills',                  contingent_fills,                    7358 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'period label FY26 Q3',              CASE WHEN (SELECT MAX(CONCAT(period_short, N' · ', period_months)) FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'Q3') = N'FY26 Q3 · Jan – Mar 26' THEN 1 ELSE 0 END, 1
+    UNION ALL SELECT 'View default (Country) is Australia', CASE WHEN (SELECT MAX(group_name) FROM #wfp WHERE view_name = 'Country' AND is_view_default = 1) = N'Australia' THEN 1 ELSE 0 END, 1
 ) AS c;
 GO

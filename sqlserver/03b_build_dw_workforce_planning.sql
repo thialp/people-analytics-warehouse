@@ -53,7 +53,8 @@ SELECT
     CONVERT(DATE, created_date)                            AS CreatedDate,
     CAST(created_reason AS VARCHAR(20))                    AS CreatedReason
 INTO dw.DimPosition
-FROM raw.dim_position;
+FROM raw.dim_position
+WHERE worker_type = 'Employee';     /* release 3.1: contingent PIDs are in dw.DimContingentPosition */
 CREATE CLUSTERED INDEX CIX_DimPosition ON dw.DimPosition (PositionID, EffectiveStartDate);
 GO
 
@@ -79,11 +80,12 @@ SELECT
     CONVERT(DATE, NULLIF(end_date, ''))                    AS EndDate,
     ISNULL(CONVERT(DATE, NULLIF(end_date, '')),
            CONVERT(DATE, '9999-12-31'))                    AS EndDateFilled,
-    CAST(fill_type      AS VARCHAR(20))                    AS FillType,
+    CAST(fill_type      AS VARCHAR(30))                    AS FillType,
     CAST(NULLIF(requisition_id, '') AS VARCHAR(12))        AS RequisitionID,
-    CAST(NULLIF(vacate_reason, '')  AS VARCHAR(20))        AS VacateReason
+    CAST(NULLIF(vacate_reason, '')  AS VARCHAR(30))        AS VacateReason
 INTO dw.FactPositionAssignment
-FROM raw.fact_position_assignment;
+FROM raw.fact_position_assignment
+WHERE worker_type = 'Employee';     /* release 3.1: contingent holders are in dw.FactContingentPositionAssignment */
 CREATE CLUSTERED INDEX CIX_FactPositionAssignment ON dw.FactPositionAssignment (PositionID, StartDate);
 CREATE INDEX IX_FactPositionAssignment_Worker ON dw.FactPositionAssignment (WorkerID, StartDate) INCLUDE (EndDate, PositionID, FillType);
 GO
@@ -239,6 +241,100 @@ GO
 
 ALTER TABLE dw.PositionMonthEndSnapshot
     ADD CONSTRAINT PK_PositionMonthEndSnapshot PRIMARY KEY CLUSTERED (MonthEndDate, PositionID);
+GO
+
+/* ------------------------------------------- contingent PIDs (release 3.1)
+   Keystone holds every PID in one table; a contingent PID is created (or a vacant one reused)
+   when a request is approved, Filled while Bridgeway holds the assignment, then vacant until
+   reused or closed by the position audit. It has no job profile or grade. */
+DROP TABLE IF EXISTS dw.DimContingentPosition;
+SELECT
+    CAST(position_record_id AS VARCHAR(12))                AS PositionRecordID,
+    CAST(position_id        AS VARCHAR(12))                AS PositionID,
+    CONVERT(DATE, effective_start_date)                    AS EffectiveStartDate,
+    CONVERT(DATE, NULLIF(effective_end_date, ''))          AS EffectiveEndDate,
+    ISNULL(CONVERT(DATE, NULLIF(effective_end_date, '')),
+           CONVERT(DATE, '9999-12-31'))                    AS EffectiveEndDateFilled,
+    CAST(change_reason  AS VARCHAR(40))                    AS ChangeReason,
+    CAST(status         AS VARCHAR(12))                    AS Status,
+    CAST(department_id  AS VARCHAR(10))                    AS DepartmentID,
+    CAST(cost_center_id AS VARCHAR(16))                    AS CostCenterID,
+    CAST(location_id    AS VARCHAR(10))                    AS LocationID,
+    CAST(cw_type        AS VARCHAR(12))                    AS CwType,
+    CAST(cw_role_family AS VARCHAR(30))                    AS CwRoleFamily,
+    CONVERT(DATE, created_date)                            AS CreatedDate,
+    CAST(created_reason AS VARCHAR(20))                    AS CreatedReason
+INTO dw.DimContingentPosition
+FROM raw.dim_position
+WHERE worker_type = 'Contingent';
+CREATE CLUSTERED INDEX CIX_DimContingentPosition ON dw.DimContingentPosition (PositionID, EffectiveStartDate);
+GO
+
+DROP TABLE IF EXISTS dw.FactContingentPositionAssignment;
+SELECT
+    CAST(assignment_id  AS VARCHAR(12))                    AS AssignmentID,
+    CAST(position_id    AS VARCHAR(12))                    AS PositionID,
+    CAST(NULLIF(worker_id, '') AS VARCHAR(12))             AS WorkerID,
+    CAST(bw_worker_id   AS VARCHAR(12))                    AS BwWorkerID,
+    CONVERT(DATE, start_date)                              AS StartDate,
+    CONVERT(DATE, NULLIF(end_date, ''))                    AS EndDate,
+    ISNULL(CONVERT(DATE, NULLIF(end_date, '')),
+           CONVERT(DATE, '9999-12-31'))                    AS EndDateFilled,
+    CAST(requisition_id AS VARCHAR(12))                    AS ServiceOrderID,
+    CAST(NULLIF(vacate_reason, '') AS VARCHAR(30))         AS VacateReason
+INTO dw.FactContingentPositionAssignment
+FROM raw.fact_position_assignment
+WHERE worker_type = 'Contingent';
+CREATE CLUSTERED INDEX CIX_FactContingentPositionAssignment ON dw.FactContingentPositionAssignment (PositionID, StartDate);
+GO
+
+/* one row per contingent PID per month-end, every contingent PID that exists and is not closed */
+DROP TABLE IF EXISTS dw.ContingentPositionMonthEndSnapshot;
+WITH flagged AS (
+    SELECT p.*, LAG(p.Status) OVER (PARTITION BY p.PositionID ORDER BY p.EffectiveStartDate) AS PrevStatus
+    FROM dw.DimContingentPosition AS p
+),
+runs AS (
+    SELECT f.*, SUM(CASE WHEN f.Status = f.PrevStatus THEN 0 ELSE 1 END)
+                    OVER (PARTITION BY f.PositionID ORDER BY f.EffectiveStartDate ROWS UNBOUNDED PRECEDING) AS RunID
+    FROM flagged AS f
+),
+hist AS (
+    SELECT r.*, MIN(r.EffectiveStartDate) OVER (PARTITION BY r.PositionID, r.RunID) AS StatusSince
+    FROM runs AS r
+)
+SELECT
+    c.MonthEndDate,
+    c.FiscalYear,
+    h.PositionID,
+    h.Status,
+    h.StatusSince,
+    DATEDIFF(DAY, h.StatusSince, c.MonthEndDate) + 1      AS DaysInStatus,
+    a.WorkerID                                            AS IncumbentWorkerID,
+    a.BwWorkerID                                          AS IncumbentBwWorkerID,
+    h.DepartmentID,
+    h.CostCenterID,
+    h.LocationID,
+    l.CountryCode,
+    h.CwType,
+    h.CwRoleFamily,
+    h.CreatedDate,
+    h.CreatedReason
+INTO dw.ContingentPositionMonthEndSnapshot
+FROM dw.MonthEndCalendar AS c
+JOIN hist AS h
+  ON c.MonthEndDate BETWEEN h.EffectiveStartDate AND h.EffectiveEndDateFilled
+ AND h.Status <> 'Eliminated'
+JOIN dw.DimLocation AS l ON l.LocationID = h.LocationID
+LEFT JOIN dw.FactContingentPositionAssignment AS a
+  ON a.PositionID = h.PositionID
+ AND c.MonthEndDate BETWEEN a.StartDate AND a.EndDateFilled;
+ALTER TABLE dw.ContingentPositionMonthEndSnapshot ALTER COLUMN PositionID VARCHAR(12) NOT NULL;
+ALTER TABLE dw.ContingentPositionMonthEndSnapshot ALTER COLUMN MonthEndDate DATE NOT NULL;
+GO
+
+ALTER TABLE dw.ContingentPositionMonthEndSnapshot
+    ADD CONSTRAINT PK_ContingentPositionMonthEndSnapshot PRIMARY KEY CLUSTERED (MonthEndDate, PositionID);
 GO
 
 /* ----------------------------------------------------------------- seat fills
@@ -583,6 +679,9 @@ UNION ALL SELECT 'dw.FactWorkforcePlan', COUNT(*) FROM dw.FactWorkforcePlan
 UNION ALL SELECT 'dw.DimCandidate', COUNT(*) FROM dw.DimCandidate
 UNION ALL SELECT 'dw.FactCandidateStageEvent', COUNT(*) FROM dw.FactCandidateStageEvent
 UNION ALL SELECT 'dw.PositionMonthEndSnapshot', COUNT(*) FROM dw.PositionMonthEndSnapshot
+UNION ALL SELECT 'dw.DimContingentPosition', COUNT(*) FROM dw.DimContingentPosition
+UNION ALL SELECT 'dw.FactContingentPositionAssignment', COUNT(*) FROM dw.FactContingentPositionAssignment
+UNION ALL SELECT 'dw.ContingentPositionMonthEndSnapshot', COUNT(*) FROM dw.ContingentPositionMonthEndSnapshot
 UNION ALL SELECT 'dw.SeatFill', COUNT(*) FROM dw.SeatFill
 UNION ALL SELECT 'dw.SeatVacancyChain', COUNT(*) FROM dw.SeatVacancyChain
 UNION ALL SELECT 'dw.PlanVsActual', COUNT(*) FROM dw.PlanVsActual;

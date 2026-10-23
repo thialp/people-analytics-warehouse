@@ -1,5 +1,7 @@
 # Dashboard #3, Workforce Planning: build guide
 
+> **Superseded on 2026-10-23** by [release_3_rebuild_dashboard_3.md](release_3_rebuild_dashboard_3.md), the full rebuild plan (top bar, popovers, version toggle, new panels). This file stays as the history of the first build.
+
 The as-built guide for the third Arcadia dashboard, written step by step with the value every step must show. It follows Dashboards #1 and #2: the same 1400 × 850 page, the same rail, KPI band, card background and type ramp (Figma file `ecic7dYoG638uJPVjiQtgg`, Sizing & type page), and the same habits (titles state the finding, "drivers" not "steps", every control tested on a picked period). Method and definitions: [workforce_planning.md](workforce_planning.md). Arcadia Systems is fictional and all data is synthetic.
 
 | Step | What | State |

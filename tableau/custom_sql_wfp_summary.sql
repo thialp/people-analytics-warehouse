@@ -31,6 +31,13 @@
   WHO IS COUNTED. Employees, without the 9 executive officers (department D-901), as on
   Dashboards #1 and #2: FY26 year-end 30,005. Contingent columns are Bridgeway's count.
 
+  PIDS (release 3.1). Every PID in Keystone on to_date, employee and contingent, filled or
+  vacant (previously held, or new: created for a request and never filled), from
+  rpt.vw_pid_month_end; the same in every version row. Level and office changes count employee
+  backfills; contingent fills count contingent assignments starting in the quarters
+  (rpt.vw_cw_pid_fill). span_name, period_short and period_months name the period by months.
+  A View pick lands on the view's first group alphabetically (is_view_default).
+
   Checked row for row against the DuckDB mart mart_wfp_summary by sqlserver/check_tsql_in_duckdb.py.
   Tableau rules: one SELECT, no CTEs, no ORDER BY, block comments only.
   Arcadia Systems is fictional and all data is synthetic.
@@ -91,7 +98,29 @@ SELECT
     ROUND(COALESCE(fa.reuse_new_pay_usd_constant, 0), 2)                           AS reuse_new_pay_usd_constant,
     ROUND(COALESCE(fa.backfill_pay_change_usd_constant, 0), 2)                     AS backfill_pay_change_usd_constant,
     md.median_time_to_fill_days,
-    md.median_vacancy_days
+    md.median_vacancy_days,
+    CASE WHEN g.pair_code = 'FY' THEN 'Fiscal year' WHEN g.pair_code IN ('H1', 'H2') THEN 'Half year' ELSE 'Quarter' END AS span_name,
+    CASE WHEN g.pair_code = 'FY' THEN 1 WHEN g.pair_code IN ('H1', 'H2') THEN 2 ELSE 3 END                           AS span_order,
+    CONCAT(g.fiscal_year_label, CASE WHEN g.pair_code = 'FY' THEN N'' ELSE CONCAT(N' ', g.pair_code) END)          AS period_short,
+    CONCAT(LEFT(DATENAME(MONTH, DATEADD(DAY, 1, g.from_date)), 3),
+           CASE WHEN g.pair_code = 'FY' THEN CONCAT(N' ', RIGHT(CONVERT(VARCHAR(4), YEAR(DATEADD(DAY, 1, g.from_date))), 2)) ELSE N'' END,
+           N' – ', LEFT(DATENAME(MONTH, g.to_date), 3), N' ', RIGHT(CONVERT(VARCHAR(4), YEAR(g.to_date)), 2))           AS period_months,
+    COALESCE(x.pids_filled_employee, 0) + COALESCE(x.pids_filled_contingent, 0)
+        + COALESCE(x.vacant_previously_held, 0) + COALESCE(x.vacant_new, 0)                                         AS pids_total,
+    COALESCE(x.pids_filled_employee, 0)                                            AS pids_filled_employee,
+    COALESCE(x.pids_filled_contingent, 0)                                          AS pids_filled_contingent,
+    COALESCE(x.vacant_previously_held, 0)                                          AS vacant_previously_held,
+    COALESCE(x.vacant_previously_held_contingent, 0)                               AS vacant_previously_held_contingent,
+    COALESCE(x.vacant_previously_held_stale, 0)                                    AS vacant_previously_held_stale,
+    COALESCE(x.vacant_new, 0)                                                      AS vacant_new,
+    COALESCE(x.vacant_new_contingent, 0)                                           AS vacant_new_contingent,
+    COALESCE(x.vacant_new_stale, 0)                                                AS vacant_new_stale,
+    COALESCE(fa.level_down, 0)                                                     AS level_down,
+    COALESCE(fa.level_up, 0)                                                       AS level_up,
+    COALESCE(fa.level_and_office, 0)                                               AS level_and_office,
+    COALESCE(fa.moved_office, 0)                                                   AS moved_office,
+    COALESCE(cf.contingent_fills, 0)                                               AS contingent_fills,
+    COALESCE(cf.contingent_backfill_fills, 0)                                      AS contingent_backfill_fills
 FROM (
     /* === PERIOD GRID === fiscal year x period x version, with the quarters the version plans */
     SELECT fy.fiscal_year,
@@ -112,7 +141,7 @@ CROSS JOIN (
     /* === GROUP LIST === every group that ever had a plan row; the view's largest is its default */
     SELECT s.view_name, s.view_order, s.group_name,
            CAST(CASE WHEN ROW_NUMBER() OVER (PARTITION BY s.view_name
-                                             ORDER BY s.year_end_headcount DESC, s.group_name) = 1
+                                             ORDER BY s.group_name) = 1
                      THEN 1 ELSE 0 END AS BIT)                                          AS is_view_default
     FROM (
         SELECT gv.view_name, gv.view_order, gv.group_name,
@@ -176,7 +205,12 @@ LEFT JOIN (
            SUM(CASE WHEN f.fill_type = 'Internal Move' THEN 1 ELSE 0 END)                       AS internal_fills,
            SUM(CASE WHEN f.reuse_candidate = 1 THEN 1 ELSE 0 END)                               AS reuse_candidate_fills,
            SUM(CASE WHEN f.reuse_candidate = 1 THEN f.new_pay_usd_constant END)                 AS reuse_new_pay_usd_constant,
-           SUM(CASE WHEN f.seat_type = 'Backfill' THEN f.pay_change_usd_constant END)           AS backfill_pay_change_usd_constant
+           SUM(CASE WHEN f.seat_type = 'Backfill' THEN f.pay_change_usd_constant END)           AS backfill_pay_change_usd_constant,
+           SUM(CASE WHEN f.seat_type = 'Backfill' AND f.level_change = 'Down' THEN 1 ELSE 0 END)  AS level_down,
+           SUM(CASE WHEN f.seat_type = 'Backfill' AND f.level_change = 'Up' THEN 1 ELSE 0 END)    AS level_up,
+           SUM(CASE WHEN f.seat_type = 'Backfill' AND f.level_change <> 'Same'
+                     AND f.location_change <> 'Same office' THEN 1 ELSE 0 END)                  AS level_and_office,
+           SUM(CASE WHEN f.seat_type = 'Backfill' AND f.location_change <> 'Same office' THEN 1 ELSE 0 END) AS moved_office
     FROM (
         SELECT fy.fiscal_year, p.pair_code, p.last_quarter, v.version_type,
                CASE WHEN p.first_quarter > v.version_order THEN p.first_quarter ELSE v.version_order END AS eff_first_quarter
@@ -221,3 +255,47 @@ LEFT JOIN (
 ) AS md
   ON md.fiscal_year = g.fiscal_year AND md.pair_code = g.pair_code AND md.version_type = g.version_type
  AND md.view_name = l.view_name AND md.group_name = l.group_name
+LEFT JOIN (
+    /* === PID LEDGER === every PID on each quarter-end (release 3.1) */
+    SELECT p.month_end_date, gv.view_name, gv.group_name,
+           SUM(CASE WHEN p.pid_kind = 'Filled' AND p.worker_type = 'Employee' THEN p.pids ELSE 0 END)                  AS pids_filled_employee,
+           SUM(CASE WHEN p.pid_kind = 'Filled' AND p.worker_type = 'Contingent' THEN p.pids ELSE 0 END)                AS pids_filled_contingent,
+           SUM(CASE WHEN p.pid_kind = 'Vacant previously held' THEN p.pids ELSE 0 END)                                 AS vacant_previously_held,
+           SUM(CASE WHEN p.pid_kind = 'Vacant previously held' AND p.worker_type = 'Contingent' THEN p.pids ELSE 0 END) AS vacant_previously_held_contingent,
+           SUM(CASE WHEN p.pid_kind = 'Vacant previously held' AND p.is_stale = 1 THEN p.pids ELSE 0 END)              AS vacant_previously_held_stale,
+           SUM(CASE WHEN p.pid_kind = 'Vacant new' THEN p.pids ELSE 0 END)                                             AS vacant_new,
+           SUM(CASE WHEN p.pid_kind = 'Vacant new' AND p.worker_type = 'Contingent' THEN p.pids ELSE 0 END)            AS vacant_new_contingent,
+           SUM(CASE WHEN p.pid_kind = 'Vacant new' AND p.is_stale = 1 THEN p.pids ELSE 0 END)                          AS vacant_new_stale
+    FROM rpt.vw_pid_month_end AS p
+    JOIN dw.DimDepartment AS d ON d.DepartmentID = p.department_id
+    CROSS APPLY (VALUES (N'Company', N'Arcadia Systems'), (N'Function', d.FunctionName),
+                        (N'Sub-function', d.SubFunction), (N'Department', d.DepartmentName),
+                        (N'Country', p.country_name)) AS gv(view_name, group_name)
+    WHERE p.department_id <> 'D-901'
+    GROUP BY p.month_end_date, gv.view_name, gv.group_name
+) AS x
+  ON x.month_end_date = g.to_date AND x.view_name = l.view_name AND x.group_name = l.group_name
+LEFT JOIN (
+    /* === CONTINGENT FILLS === assignments starting in the effective quarters */
+    SELECT g5.fiscal_year, g5.pair_code, g5.version_type, gv.view_name, gv.group_name,
+           COUNT(*)                                          AS contingent_fills,
+           SUM(CASE WHEN c.is_backfill = 1 THEN 1 ELSE 0 END) AS contingent_backfill_fills
+    FROM (
+        SELECT fy.fiscal_year, p.pair_code, p.last_quarter, v.version_type,
+               CASE WHEN p.first_quarter > v.version_order THEN p.first_quarter ELSE v.version_order END AS eff_first_quarter
+        FROM (SELECT DISTINCT fiscal_year FROM rpt.vw_plan_vs_actual) AS fy
+        CROSS JOIN (VALUES ('FY', 1, 4), ('H1', 1, 2), ('H2', 3, 4), ('Q1', 1, 1), ('Q2', 2, 2), ('Q3', 3, 3), ('Q4', 4, 4))
+                   AS p(pair_code, first_quarter, last_quarter)
+        CROSS JOIN (VALUES ('Budget', 1), ('RF1', 2), ('RF2', 3), ('RF3', 4)) AS v(version_type, version_order)
+    ) AS g5
+    JOIN rpt.vw_cw_pid_fill AS c
+      ON c.fiscal_year = g5.fiscal_year AND c.fiscal_quarter BETWEEN g5.eff_first_quarter AND g5.last_quarter
+    JOIN dw.DimDepartment AS d ON d.DepartmentID = c.department_id
+    CROSS APPLY (VALUES (N'Company', N'Arcadia Systems'), (N'Function', d.FunctionName),
+                        (N'Sub-function', d.SubFunction), (N'Department', d.DepartmentName),
+                        (N'Country', c.country_name)) AS gv(view_name, group_name)
+    WHERE c.department_id <> 'D-901'
+    GROUP BY g5.fiscal_year, g5.pair_code, g5.version_type, gv.view_name, gv.group_name
+) AS cf
+  ON cf.fiscal_year = g.fiscal_year AND cf.pair_code = g.pair_code AND cf.version_type = g.version_type
+ AND cf.view_name = l.view_name AND cf.group_name = l.group_name
