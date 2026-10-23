@@ -167,6 +167,7 @@ FROM (
     UNION ALL SELECT 'filled by employees',               pids_filled_employee,               30005 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'filled by contingent workers',      pids_filled_contingent,             11941 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'vacant, previously held',           vacant_previously_held,              8689 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
+    UNION ALL SELECT 'vacant, previously held, contingent', vacant_previously_held_contingent, 7712 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'vacant, previously held, 90+ days', vacant_previously_held_stale,        6540 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'vacant, new',                       vacant_new,                           528 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'
     UNION ALL SELECT 'vacant, new, contingent',           vacant_new_contingent,                237 FROM #wfp WHERE fiscal_year = 2026 AND pair_code = 'FY' AND version_type = 'Budget' AND view_name = 'Company'

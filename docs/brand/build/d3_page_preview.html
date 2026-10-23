@@ -128,7 +128,7 @@ fetch("d3_preview_data.json").then(r=>r.json()).then(D=>{
   const tip = (title, text, id) => { H.insertAdjacentHTML("beforeend", `<div class="tip"><div class="tt">${title}</div><div class="tx">${text}</div><svg id="${id}" width="306" height="96"></svg></div>`); };
   tip("PIDs", `Every budgeted position on Jun 30, 2025, filled or vacant. Contractors hold PIDs in Keystone like employees. The plan expected ${fmt(k.plan)} employees.`, "h1");
   bars("#h1", [{name:"Filled by employees",n:k.filled,hi:1},{name:"Filled by contractors",n:k.cw,hi:1},{name:"Vacant",n:k.prev+k.new}], k.filled, 140, 250, 16, 6, r=>fmt(r.n));
-  tip("Vacant, previously held", `PIDs someone left and nobody has replaced yet, by why they became vacant. ${fmt(k.prev_stale)} have waited over 90 days.`, "h2");
+  tip("Vacant, previously held", `PIDs someone left and nobody has replaced yet. ${fmt(k.why['Contract ended'])} of them are contractor PIDs whose contract ended. ${fmt(k.prev_stale)} have waited over 90 days.`, "h2");
   bars("#h2", Object.entries(k.why).map(([n,v])=>({name:n.replace("Internal Move Out","Moved to another PID"),n:v,hi:1})), Math.max(...Object.values(k.why)), 140, 250, 16, 6, r=>fmt(r.n));
   tip("Vacant, new PIDs", "Net-new PIDs the plan approved that have not had their first hire yet, by function.", "h3");
   bars("#h3", Object.entries(k.newfn).slice(0,4).map(([n,v])=>({name:n,n:v,hi:1})), Math.max(...Object.values(k.newfn)), 140, 250, 14, 5, r=>fmt(r.n));

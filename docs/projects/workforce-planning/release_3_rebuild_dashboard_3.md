@@ -111,6 +111,7 @@ The two are easy to mix up because both have a map with lines between offices. T
 | D13 | Colour: navy for the measure the title is about, slate `#8C9BB0` as comparator, `#D5DBE4` for plan, teal only on the main card | Quiet page, one accent |
 | D14 | Titles are FIXED calcs in sheet titles | No `*`, no extra sheets |
 | D15 | A new workbook; the first one is archived | Clean actions |
+| D17 | KPI 2 counts every vacant previously held PID, contractors included; its hover says how many are contractor PIDs (7,473 of 8,294 at FY25, 7,712 of 8,689 at FY26) | Keep the number true and explain it, rather than tune the data to look smaller |
 | D16 | ~~Contingent workers hold no PID~~ **Reversed in 3.1:** contractors hold PIDs in Keystone | Keystone converts every contractor to an Arcadia ID and a PID; the data now does the same (test 81) |
 
 ---
@@ -298,6 +299,7 @@ Header:
 // K Vac New     SUM([vacant_new])
 // K Vacant      [K Vac Prev] + [K Vac New]
 // K Prev Stale  SUM([vacant_previously_held_stale])
+// K Prev CW     SUM([vacant_previously_held_contingent])     (decision D17: KPI 2 keeps every PID; the hover names the contractor share)
 // K BF          SUM([actual_backfills])         K BF Plan   SUM([planned_backfills])
 // K NN          SUM([actual_net_new])           K NN Plan   SUM([planned_net_new])
 // K Fills       [K BF] + [K NN]
@@ -419,7 +421,7 @@ The five transparent `KPI Hover N` sheets (G1 8.2c: `Hover Cell` square at 0% op
 | Hover | Text (`KPI n Tip`) | Tooltip sheet | Build |
 |---|---|---|---|
 | 1 | "Every position on <to_date>, filled or vacant. Contractors hold PIDs in Keystone like employees. The plan expected <K Plan Filled Str> employees." | `Tip PIDs` (WFP Summary) | Filter `Row Is Current`; Rows Measure Names (`pids_filled_employee`, `pids_filled_contingent`, `Vacant PIDs` = `vacant_previously_held` + `vacant_new`, aliased "Filled by employees", "Filled by contractors", "Vacant"); Columns Measure Values; bars navy for the two filled, slate for vacant; label the value |
-| 2 | "PIDs someone left and nobody has replaced yet, by why they became vacant. <K Prev Stale Str> have waited over 90 days." | `Tip Vacant Why` (Vacancy Pool) | Filter `[month_end_date] = [Period To Date] AND [In Group] AND [vacated_by] <> "Never filled"`; Rows `vacated_by` (alias Internal Move Out → "Moved to another PID"); Columns `CNT(position_id)`; navy |
+| 2 | "PIDs someone left and nobody has replaced yet, by why they became vacant. <K Prev CW Str> of them are contractor PIDs whose contract ended, waiting to be reused or closed by the position audit. <K Prev Stale Str> have waited over 90 days." | `Tip Vacant Why` (Vacancy Pool) | Filter `[month_end_date] = [Period To Date] AND [In Group] AND [vacated_by] <> "Never filled"`; Rows `vacated_by` (alias Internal Move Out → "Moved to another PID"); Columns `CNT(position_id)`; navy |
 | 3 | "Net-new PIDs the plan approved that have not had their first hire yet, by function." | `Tip Vacant New` (Vacancy Pool) | Same date and group filter, `[vacated_by] = "Never filled"`; Rows `function_name` (top 5 by count); navy. Empty: "No new PID was waiting on this date." |
 | 4 | "Hires and internal moves into a PID, against the plan. Median <K Days> days from approval to fill a backfill." | `Tip Filled BF` and `Tip Filled NN` (WFP Summary), stacked | Each: one bar inside a bar, planned `#D5DBE4` wide and filled navy narrow (dual axis, synchronized), label "4,224 of 4,737 · 89.2%" |
 | 5 | "The PID came back at a different grade than the person who left. <K Both Str> of them also changed office." | `Tip Level` (WFP Summary) | Rows Measure Names (`level_down`, `level_up`, aliased "One level down", "One level up"); navy bars, labels |
