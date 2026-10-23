@@ -12,7 +12,8 @@
       Same content as data/marts/mart_org_leader_summary.csv.
   rpt.vw_fringe_rate
       Grain: country x calendar year. Same content as data/marts/mart_fringe_rate.csv.
-  rpt.vw_position_fill, rpt.vw_vacancy_pool, rpt.vw_plan_vs_actual, rpt.vw_seat_corridors
+  rpt.vw_position_fill, rpt.vw_vacancy_pool, rpt.vw_plan_vs_actual, rpt.vw_seat_corridors,
+  rpt.vw_pid_month_end, rpt.vw_cw_pid_fill
       Workforce Planning (seats, requisitions, plan). Same content as the marts of
       the same names in data/marts/; built on 03b_build_dw_workforce_planning.sql
       (the plan's contingent line, actual_cw_*, on 03c_build_dw_contingent.sql).
@@ -251,7 +252,10 @@ SELECT
     s.Grade                        AS grade,
     s.IsManagerSeat                AS is_manager_seat,
     s.CreatedDate                  AS created_date,
-    s.CreatedReason                AS created_reason
+    s.CreatedReason                AS created_reason,
+    CAST('Employee' AS VARCHAR(10)) AS worker_type,
+    CAST(NULL AS VARCHAR(12))      AS cw_type,
+    CAST(NULL AS VARCHAR(30))      AS cw_role_family
 FROM dw.PositionMonthEndSnapshot AS s
 JOIN dw.MonthEndCalendar AS cal ON cal.MonthEndDate = s.MonthEndDate
 OUTER APPLY (   /* the most recent incumbent to leave the seat before the month-end */
@@ -267,7 +271,83 @@ LEFT JOIN dw.FactRequisition AS q ON q.RequisitionID = s.OpenRequisitionID
 JOIN dw.DimDepartment AS d  ON d.DepartmentID  = s.DepartmentID
 JOIN dw.DimLocation   AS l  ON l.LocationID    = s.LocationID
 JOIN dw.DimJobProfile AS jp ON jp.JobProfileID = s.JobProfileID
-WHERE s.Status IN ('Open', 'Frozen');
+WHERE s.Status IN ('Open', 'Frozen')
+UNION ALL
+/* release 3.1: contingent PIDs, vacant from the end of the last assignment, or since they were
+   created for a request that has not started ('Never filled'); no grade, job or requisition */
+SELECT
+    s.MonthEndDate, s.FiscalYear, cal.FiscalQuarterLabel, cal.IsFiscalYearEnd, s.PositionID, s.Status,
+    s.StatusSince, s.DaysInStatus,
+    ISNULL(e.VacateReason, 'Never filled'),
+    e.EndDate,
+    v.DaysVacant,
+    CASE WHEN v.DaysVacant <= 30  THEN '0-30 days'
+         WHEN v.DaysVacant <= 90  THEN '31-90 days'
+         WHEN v.DaysVacant <= 180 THEN '91-180 days'
+         ELSE 'Over 180 days' END,
+    CAST(CASE WHEN v.DaysVacant >= 90 THEN 1 ELSE 0 END AS BIT),
+    NULL, NULL, NULL,
+    s.DepartmentID, d.DepartmentName, d.SubFunction, d.FunctionName, s.CostCenterID, s.LocationID,
+    l.OfficeName, s.CountryCode, l.CountryName, l.Region,
+    NULL, NULL, NULL, NULL, CAST(0 AS BIT),
+    s.CreatedDate, s.CreatedReason,
+    'Contingent', s.CwType, s.CwRoleFamily
+FROM dw.ContingentPositionMonthEndSnapshot AS s
+JOIN dw.MonthEndCalendar AS cal ON cal.MonthEndDate = s.MonthEndDate
+OUTER APPLY (
+    SELECT TOP 1 a.EndDate, a.VacateReason
+    FROM dw.FactContingentPositionAssignment AS a
+    WHERE a.PositionID = s.PositionID AND a.EndDate < s.MonthEndDate
+    ORDER BY a.EndDate DESC
+) AS e
+CROSS APPLY (
+    SELECT DATEDIFF(DAY, ISNULL(DATEADD(DAY, 1, e.EndDate), s.CreatedDate), s.MonthEndDate) + 1 AS DaysVacant
+) AS v
+JOIN dw.DimDepartment AS d ON d.DepartmentID = s.DepartmentID
+JOIN dw.DimLocation   AS l ON l.LocationID   = s.LocationID
+WHERE s.Status = 'Open';
+GO
+
+/* release 3.1: the PID ledger, every PID on every month-end by worker type and kind */
+CREATE OR ALTER VIEW rpt.vw_pid_month_end AS
+SELECT x.month_end_date, x.worker_type, x.pid_kind, x.is_stale, x.department_id, x.country_name, COUNT(*) AS pids
+FROM (
+    SELECT s.MonthEndDate AS month_end_date, CAST('Employee' AS VARCHAR(10)) AS worker_type,
+           CAST('Filled' AS VARCHAR(30)) AS pid_kind, CAST(0 AS BIT) AS is_stale,
+           s.DepartmentID AS department_id, l.CountryName AS country_name
+    FROM dw.PositionMonthEndSnapshot AS s
+    JOIN dw.DimLocation AS l ON l.LocationID = s.LocationID
+    WHERE s.Status = 'Filled'
+    UNION ALL
+    SELECT s.MonthEndDate, 'Contingent', 'Filled', CAST(0 AS BIT), s.DepartmentID, l.CountryName
+    FROM dw.ContingentPositionMonthEndSnapshot AS s
+    JOIN dw.DimLocation AS l ON l.LocationID = s.LocationID
+    WHERE s.Status = 'Filled'
+    UNION ALL
+    SELECT v.month_end_date, v.worker_type,
+           CASE WHEN v.vacated_by = 'Never filled' THEN 'Vacant new' ELSE 'Vacant previously held' END,
+           v.is_stale, v.department_id, v.country_name
+    FROM rpt.vw_vacancy_pool AS v
+) AS x
+GROUP BY x.month_end_date, x.worker_type, x.pid_kind, x.is_stale, x.department_id, x.country_name;
+GO
+
+/* release 3.1: every contingent assignment that starts in a PID, held before or new */
+CREATE OR ALTER VIEW rpt.vw_cw_pid_fill AS
+SELECT
+    a.AssignmentID                 AS assignment_id,
+    a.PositionID                   AS position_id,
+    a.StartDate                    AS start_date,
+    YEAR(a.StartDate) + CASE WHEN MONTH(a.StartDate) >= 7 THEN 1 ELSE 0 END AS fiscal_year,
+    ((MONTH(a.StartDate) + 5) % 12) / 3 + 1                                  AS fiscal_quarter,
+    CAST(CASE WHEN LAG(a.AssignmentID) OVER (PARTITION BY a.PositionID ORDER BY a.StartDate) IS NOT NULL
+              THEN 1 ELSE 0 END AS BIT)                                       AS is_backfill,
+    p.DepartmentID                 AS department_id,
+    l.CountryName                  AS country_name
+FROM dw.FactContingentPositionAssignment AS a
+JOIN dw.DimContingentPosition AS p
+  ON p.PositionID = a.PositionID AND a.StartDate BETWEEN p.EffectiveStartDate AND p.EffectiveEndDateFilled
+JOIN dw.DimLocation AS l ON l.LocationID = p.LocationID;
 GO
 
 CREATE OR ALTER VIEW rpt.vw_plan_vs_actual AS

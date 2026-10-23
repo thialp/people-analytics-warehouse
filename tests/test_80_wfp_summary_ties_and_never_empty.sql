@@ -6,6 +6,9 @@
 --   4. Company FY rows equal mart_plan_vs_actual summed directly (executive officers excluded)
 --   5. a version plans exactly the quarters ahead of it: covered = last quarter >= version order
 --   6. each view's default group has a plan in every covered period and version
+--   7. (release 3.1) the PID ledger: filled employee PIDs = year-end employees, filled
+--      contingent PIDs = the contingent headcount, vacant PIDs = the vacancy pool, every view
+--      adds up to Company, and the ledger is the same in every version
 WITH s AS (SELECT * FROM marts.mart_wfp_summary),
 checks AS (
     SELECT 'duplicate key' AS rule, COUNT(*) - COUNT(DISTINCT (fiscal_year, pair_code, version_type, view_name, group_name)) AS n
@@ -64,5 +67,36 @@ checks AS (
     UNION ALL
     SELECT 'executive officers counted', COUNT(*)
     FROM s WHERE view_name = 'Department' AND group_name = 'Office of the CEO'
+    UNION ALL
+    SELECT 'filled employee PIDs differ from employees', COUNT(*)
+    FROM s WHERE has_plan AND pids_filled_employee <> actual_ending_headcount
+    UNION ALL
+    SELECT 'filled contingent PIDs differ from the contingent headcount', COUNT(*)
+    FROM s WHERE has_plan AND pids_filled_contingent <> actual_cw_headcount
+    UNION ALL
+    SELECT 'PID total does not add up', COUNT(*)
+    FROM s WHERE pids_total <> pids_filled_employee + pids_filled_contingent + vacant_previously_held + vacant_new
+    UNION ALL
+    SELECT 'vacant PIDs differ from the vacancy pool', COUNT(*)
+    FROM s
+    JOIN (SELECT month_end_date, COUNT(*) FILTER (WHERE vacated_by <> 'Never filled') AS prev,
+                 COUNT(*) FILTER (WHERE vacated_by = 'Never filled') AS new
+          FROM marts.mart_vacancy_pool WHERE department_id <> 'D-901' GROUP BY 1) AS v
+      ON v.month_end_date = s.to_date
+    WHERE s.view_name = 'Company' AND (s.vacant_previously_held <> v.prev OR s.vacant_new <> v.new)
+    UNION ALL
+    SELECT 'PID ledger groups do not add up to Company', COUNT(*)
+    FROM (SELECT fiscal_year, pair_code, version_type, view_name, SUM(pids_total) AS t, SUM(vacant_new) AS n,
+                 SUM(level_down) AS ld, SUM(moved_office) AS mo, SUM(contingent_fills) AS cf
+          FROM s WHERE view_name <> 'Company' GROUP BY ALL) AS v
+    JOIN s AS c ON c.view_name = 'Company' AND c.fiscal_year = v.fiscal_year
+               AND c.pair_code = v.pair_code AND c.version_type = v.version_type
+    WHERE v.t <> c.pids_total OR v.n <> c.vacant_new OR v.ld <> c.level_down OR v.mo <> c.moved_office
+       OR v.cf <> c.contingent_fills
+    UNION ALL
+    SELECT 'PID ledger changes with the version', COUNT(*)
+    FROM (SELECT fiscal_year, pair_code, view_name, group_name
+          FROM s GROUP BY ALL
+          HAVING COUNT(DISTINCT pids_total) > 1 OR COUNT(DISTINCT vacant_new) > 1) AS x
 )
 SELECT rule, n FROM checks WHERE n <> 0

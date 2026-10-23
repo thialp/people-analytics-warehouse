@@ -153,7 +153,7 @@ Pay ranges in local currency by fiscal year (FY21–FY26), level and country: `r
 The position (seat) layer of case study 1. How it is simulated and used: [Workforce Planning](../projects/workforce-planning/workforce_planning.md).
 
 #### dim_position
-Seat history (SCD Type 2): a new record whenever a seat changes status, grade, office or department. 99,398 records for 33,359 seats.
+PID (seat) history (SCD Type 2): a new record whenever a PID changes status, grade, office or department. Release 3.1 adds the contingent workers' PIDs: every contractor holds a PID in Keystone, like an employee. 222,161 records: 99,689 for 33,650 employee PIDs and 122,472 for 31,264 contingent PIDs (`P800001` onward).
 
 | Column | Description |
 |---|---|
@@ -162,22 +162,27 @@ Seat history (SCD Type 2): a new record whenever a seat changes status, grade, o
 | `change_reason` | `Initial`, `Net-new`, `Filled`, `Vacated`, `Re-levelled with incumbent` (promotion or demotion in place), `Re-levelled for backfill`, `Relocated with incumbent`, `Relocated for backfill`, `Job change with incumbent`, `Reorganization`, `Frozen`, `Unfrozen`, `Requisition cancelled`, `Eliminated` |
 | `status` | `Filled`, `Open`, `Frozen` or `Eliminated`. Filled exactly when someone holds the seat (test 44) |
 | `department_id`, `cost_center_id`, `location_id`, `job_profile_id`, `job_level`, `fte` | The seat as it stands in that record |
-| `created_date`, `created_reason` | When the seat was created and why: `Initial` (held at the start of history), `Net-new` (growth), `Team split` (a new manager seat when a team passes nine) |
+| `created_date`, `created_reason` | When the seat was created and why: `Initial` (held at the start of history), `Net-new` (growth), `Team split` (a new manager seat when a team passes nine). A PID is created when its requisition (or contingent request) is approved, not when it is filled, so new PIDs wait vacant for their first hire |
+| `worker_type` | `Employee` or `Contingent` (release 3.1). Staging splits them: `stg_position` keeps employees, `stg_cw_position` contingent |
+| `cw_type`, `cw_role_family` | Contingent PIDs only: the worker type and role the PID is for; with department, office and cost center, the key on which a vacant contingent PID is reused. Contingent PIDs have no job profile or level |
+
+Contingent PIDs (`generator/cw_positions.py`): created, or a vacant one reused (45% when one with the same key is waiting), on the service order's approval date; `Filled` for the days Bridgeway holds the assignment, so filled contingent PIDs equal the contingent headcount (test 81); `Open` after it ends, until reused, or closed (`Eliminated`, reason `Closed by position audit`) by the January and July position audit, which closes 30% of those vacant 180 days or more. A worker returning after a lapse goes back to their own PID.
 
 #### fact_position_assignment
-Who held which seat (54,094 assignments). A seat never has two incumbents at once (test 42).
+Who held which PID: 98,389 assignments, 54,094 employee and 44,295 contingent. A seat never has two incumbents at once (test 42).
 
 | Column | Description |
 |---|---|
 | `assignment_id` | Assignment key; it is also the `fill_id` of the fill that started it |
 | `position_id`, `worker_id` | The seat and the person |
 | `start_date`, `end_date` | Inclusive; empty while the person is in the seat |
-| `fill_type` | `Initial` (in the seat when history starts), `External Hire` or `Internal Move` |
-| `requisition_id` | The requisition the fill closed; empty for `Initial` |
-| `vacate_reason` | `Voluntary`, `Involuntary` (the person left the company that day) or `Internal Move Out` (they start in another seat the next day); empty while in the seat (test 47) |
+| `fill_type` | `Initial` (in the seat when history starts), `External Hire`, `Internal Move` or `Contingent Assignment` (`PC…` keys) |
+| `requisition_id` | The requisition the fill closed; empty for `Initial`; the Bridgeway service order for a contingent assignment |
+| `vacate_reason` | `Voluntary`, `Involuntary` (the person left the company that day) or `Internal Move Out` (they start in another seat the next day); for contractors `Contract ended`, `Ended early` or `Converted to employee`; empty while in the seat (test 47) |
+| `worker_type`, `bw_worker_id` | `Employee` or `Contingent`; a contractor's `worker_id` is their Keystone person ID (`W5…`), with the Bridgeway worker ID beside it |
 
 #### fact_requisition
-One row per requisition (31,323), an accumulating snapshot of its dates.
+One row per requisition (31,614; the requisitions open at the extract and their PIDs, created the day they were approved, run six months past it at FY26's pace), an accumulating snapshot of its dates.
 
 | Column | Description |
 |---|---|
@@ -583,7 +588,7 @@ Grain: **seat fill** (external hire or internal move), 30,575 rows from FY22. Th
 | `chain_id`, `parent_fill_id`, `chain_depth`, `chain_length`, `chain_trigger` | The vacancy chain the fill belongs to (test 55) |
 
 ### mart_vacancy_pool
-Grain: **month-end × vacant seat** (Open or Frozen; 62,055 rows): `status`, `status_since`, `days_in_status`, `vacated_by`, `vacated_date`, `days_vacant`, `vacancy_age_band`, `is_stale` (vacant 90 days or more), the open requisition (`open_requisition_id`, `req_type`, `requisition_approved_date`), and the seat's organization, cost center, office, country, region, job and grade, `created_date`, `created_reason`. At 30 Jun 2026: 725 open (77 stale) and 252 frozen (136 stale).
+Grain: **month-end × vacant PID** (Open or Frozen; 439,286 rows, employee and contingent; `worker_type`, `cw_type`, `cw_role_family` added in release 3.1, job and grade empty for contingent PIDs): `status`, `status_since`, `days_in_status`, `vacated_by`, `vacated_date`, `days_vacant`, `vacancy_age_band`, `is_stale` (vacant 90 days or more), the open requisition (`open_requisition_id`, `req_type`, `requisition_approved_date`), and the seat's organization, cost center, office, country, region, job and grade, `created_date`, `created_reason`. At 30 Jun 2026: employee 725 open and 252 frozen held before, plus 291 new; contingent 7,712 held before and 237 new.
 
 ### mart_plan_vs_actual
 Grain: **plan version × cost center × fiscal quarter** (29,415 rows; the 615 contingent-only cost center rows are zero on every employee measure). The plan (`planned_*`) beside the actuals: `actual_ending_headcount`, `actual_ending_fte`, `actual_net_new`, `actual_net_new_reuse_candidates`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `actual_cost_usd_plan_fx` (comparable with `planned_cost_usd`) and `actual_cost_usd_constant`; plus `version_order`, `is_latest_version` and the cost center's department, function, country and region. For every version and quarter, the actual headcount sums to the company and the actual fills to the seat fills (test 56). Attainment = actual ÷ planned. Release 3 adds the contingent line: `planned_cw_headcount` beside `actual_cw_headcount` (Bridgeway on the quarter-end), and `planned_cw_spend_usd` beside `actual_cw_spend_usd_plan_fx` (annualized bill run-rate at the plan's FX) and `actual_cw_spend_usd_constant` (test 74).
@@ -608,8 +613,14 @@ Grain: **date pair × view × group × factor** (release 3; 1,224 rows): each fi
 ### mart_seat_corridors
 Grain: **fiscal quarter × from office × to office** (821 rows): where backfilled seats moved, from the prior incumbent's office to the new incumbent's, with both offices' coordinates and pay zones, `location_change`, `seats`, `seats_levelled_down`, `seats_levelled_up`, `seats_relocated_for_backfill`, `pay_change_usd_constant`, `location_effect_usd_constant`. Draws the map lines in the Footprint pattern (`MAKELINE`).
 
+### mart_pid_month_end
+Grain: **month-end × worker type × PID kind × stale flag × department × country** (release 3.1): `pids`. PID kind is `Filled`, `Vacant previously held` or `Vacant new` (never filled); stale is vacant 90 days or more. The PID ledger behind Dashboard #3's KPIs. At 30 Jun 2026: 51,163 PIDs = 30,005 filled by employees + 11,941 by contractors + 8,689 vacant previously held + 528 vacant new.
+
+### mart_cw_pid_fill
+Grain: **contingent assignment** (release 3.1): `assignment_id`, `position_id`, `start_date`, `fiscal_year`, `fiscal_quarter`, `is_backfill` (the PID had a holder before), `department_id`, `country_name`.
+
 ### mart_wfp_summary
-Grain: **fiscal year × period × plan version × view × group** (10,080 rows = 5 years × 7 periods × 4 versions × 72 groups). Feeds Dashboard #3's KPI band and rail. Periods (`pair_code` FY, H1, H2, Q1–Q4, with `pair_name` "FY26 · Jun 25 → Jun 26") compare quarter-ends inside one fiscal year. A reforecast plans only the quarters ahead of it, so `eff_first_quarter`..`eff_last_quarter` (`covered_label`, `eff_from_date`) is the part of the period it plans and every flow, plan and actual, is counted over those quarters; `is_covered` is false when it plans none of them. `has_plan` says whether the group has plan rows there (160 planned combinations of groups not yet open, such as Data & AI Platform before FY25); `is_view_default` marks each view's largest group. Flows: `planned_net_new`, `actual_net_new`, `planned_backfills`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `fills`, `backfill_fills`, `net_new_fills`, `internal_fills`, `reuse_candidate_fills`, `reuse_new_pay_usd_constant`, `backfill_pay_change_usd_constant`, `median_time_to_fill_days`, `median_vacancy_days` (backfills, immediate refills excluded). Levels at `to_date`: `planned_/actual_ending_headcount`, `planned_cost_usd`, `actual_cost_usd_plan_fx`, `planned_/actual_cw_headcount`, `planned_cw_spend_usd`, `actual_cw_spend_usd_plan_fx`. Executive officers (D-901) excluded. Test 80 checks that every choice has a row, plan actuals equal the fills, groups add up to Company and Company ties to `mart_plan_vs_actual`.
+Grain: **fiscal year × period × plan version × view × group** (10,080 rows = 5 years × 7 periods × 4 versions × 72 groups). Feeds Dashboard #3's KPI band and rail. Periods (`pair_code` FY, H1, H2, Q1–Q4, with `pair_name` "FY26 · Jun 25 → Jun 26") compare quarter-ends inside one fiscal year. A reforecast plans only the quarters ahead of it, so `eff_first_quarter`..`eff_last_quarter` (`covered_label`, `eff_from_date`) is the part of the period it plans and every flow, plan and actual, is counted over those quarters; `is_covered` is false when it plans none of them. `has_plan` says whether the group has plan rows there (160 planned combinations of groups not yet open, such as Data & AI Platform before FY25); `is_view_default` marks each view's largest group. Flows: `planned_net_new`, `actual_net_new`, `planned_backfills`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `fills`, `backfill_fills`, `net_new_fills`, `internal_fills`, `reuse_candidate_fills`, `reuse_new_pay_usd_constant`, `backfill_pay_change_usd_constant`, `median_time_to_fill_days`, `median_vacancy_days` (backfills, immediate refills excluded). Levels at `to_date`: `planned_/actual_ending_headcount`, `planned_cost_usd`, `actual_cost_usd_plan_fx`, `planned_/actual_cw_headcount`, `planned_cw_spend_usd`, `actual_cw_spend_usd_plan_fx`. Executive officers (D-901) excluded. Release 3.1 adds the PID ledger at `to_date` (`pids_total`, `pids_filled_employee`, `pids_filled_contingent`, `vacant_previously_held`, `vacant_previously_held_contingent`, `vacant_previously_held_stale`, `vacant_new`, `vacant_new_contingent`, `vacant_new_stale`), backfill level and office changes (`level_down`, `level_up`, `level_and_office`, `moved_office`), contingent fills (`contingent_fills`, `contingent_backfill_fills`) and period labels (`span_name`, `span_order`, `period_short`, `period_months`, e.g. "FY26 Q3 · Jan – Mar 26"); `is_view_default` now marks each view's first group alphabetically. Test 80 checks that every choice has a row, filled PIDs equal the headcounts, filled + vacant = total, plan actuals equal the fills, groups add up to Company and Company ties to `mart_plan_vs_actual`.
 
 ## Intermediate models
 
@@ -657,6 +668,9 @@ One row per worker per month-end: running totals of every pay event by reason, F
 
 ### int_position_history
 Seat history (`dim_position`) with the start of each status run (`status_since`), the seat's country, currency and pay zone, job family and manager-seat flag.
+
+### int_cw_position_snapshot
+One row per contingent PID per month-end while it exists and is not closed: status, `status_since`, holder, department, cost center, office, country, worker type, role, created date. Filled contingent PIDs equal `int_cw_month_end_snapshot` by month, department and country (test 81).
 
 ### int_position_snapshot
 One row per seat per month-end (1.7 million rows) for every seat that exists and is not eliminated: status, days in status, incumbent, open requisition. Filled seats equal the worker month-end snapshot, same people (test 45).

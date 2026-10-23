@@ -5,6 +5,10 @@
 -- incumbent (a promotion re-levels the seat in place); when it is vacated it can be
 -- re-levelled or relocated before it is refilled.
 -- effective_end_date is inclusive; NULL means the record is still current.
+--
+-- Release 3.1: Keystone holds every PID in one table, employees' and contingent workers'
+-- (worker_type). This model keeps the EMPLOYEE PIDs, which carry a job, a grade and a
+-- requisition; contingent PIDs are in stg_cw_position.
 CREATE OR REPLACE TABLE staging.stg_position AS
 SELECT
     position_record_id,
@@ -23,4 +27,5 @@ SELECT
     CAST(fte AS DECIMAL(4, 2))                               AS fte,
     CAST(created_date AS DATE)                               AS created_date,
     created_reason
-FROM raw.dim_position;
+FROM raw.dim_position
+WHERE worker_type = 'Employee';

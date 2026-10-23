@@ -35,6 +35,10 @@ flowchart LR
 | **Cost center** (`dim_cost_center`) | Department × country (`CC-1010-US`), so a plan line and a seat meet on one key. |
 | **Plan** (`fact_workforce_plan`) | Per cost center and fiscal quarter: a **Budget** before the year and reforecasts **RF1–RF3** after each quarter, each covering only the quarters still ahead. Versions sit side by side and are never overwritten. |
 
+**Contractors hold PIDs too (release 3.1).** Bridgeway sends Keystone each contractor under a Bridgeway worker ID; Keystone converts it to an Arcadia person ID (`W5…`) and assigns a PID, exactly as for an employee. The PID is created, or a vacant contingent PID with the same department, office, type and role reused, on the day the request (service order) is approved. It is Filled for the days Bridgeway holds the assignment, then vacant until the next contractor reuses it or the January / July position audit closes it. A contractor who returns goes back to their own PID. So filled contingent PIDs equal the contingent headcount every month-end (test 81), and the PID count covers the whole workforce: 51,163 PIDs on 30 Jun 2026.
+
+**A PID is created at recruiting, not at hiring.** A net-new PID exists from the day its requisition is approved; until the first hire it is *vacant, new*. The data runs the hiring pipeline six months past the extract at FY26's pace, so the requisitions open on 30 Jun 2026 have their PIDs and applicants.
+
 **Promotions and demotions happen in place.** The seat is reclassified one grade with the same person in it. That is a new seat record, not a vacancy.
 
 ## 3. What happens when a seat empties
@@ -115,7 +119,7 @@ Attainment is actual ÷ planned, against the budget or any reforecast. A reforec
 
 ## 8. Validation
 
-Sixteen tests (41 to 56) guard the seat layer; the build stops if any returns a row. Each one was also run against a deliberately broken copy of the data, to confirm it fails.
+Eighteen tests (41 to 56, 80 and 81) guard the PID layer; the build stops if any returns a row. Each one was also run against a deliberately broken copy of the data, to confirm it fails.
 
 | # | Test | Guards against |
 |---|---|---|
@@ -135,6 +139,8 @@ Sixteen tests (41 to 56) guard the seat layer; the build stops if any returns a 
 | 54 | Every reuse candidate meets the rule on its approval date | A flag that can't be defended |
 | 55 | Vacancy chains link correctly; every seat left by an internal move is accounted for | Lost seats, broken chains |
 | 56 | **Plan vs actual ties to the company headcount and the seat fills every quarter** | Two versions of the actuals |
+| 80 | Dashboard #3's summary: every choice has a row; filled PIDs equal the headcounts; filled + vacant = total; groups add up | KPIs that disagree with each other |
+| 81 | **Every contractor holds a PID**: filled contingent PIDs = contingent headcount by month, department, country; one holder at a time; no gaps | Contractors outside the position model |
 
 The same seat layer is built in T-SQL ([`03b_build_dw_workforce_planning.sql`](../../../sqlserver/03b_build_dw_workforce_planning.sql)). [`08_validate_workforce_planning.sql`](../../../sqlserver/08_validate_workforce_planning.sql) checks it on SQL Server against the DuckDB values; all checks pass ([run guide](sql_server_release_2_run.md)).
 
@@ -150,9 +156,12 @@ The same seat layer is built in T-SQL ([`03b_build_dw_workforce_planning.sql`](.
 | Backfills by why the seat emptied: voluntary / internal move out / involuntary | 2,612 / 1,397 / 659 |
 | Backfills by level change: same / down / up | 3,916 / 567 / 185 |
 | Backfills filled in another office of the same country (348 of them a seat relocation) | 410 |
-| Net-new seats approved while a matching seat stood vacant 90+ days | 628 (29% of net-new), $55.4M of starting base pay |
+| Net-new seats approved while a matching seat stood vacant 90+ days | 631 (29% of net-new), $55.7M of starting base pay |
 | Median days from approval to fill (backfills) | 42 |
-| Vacancy pool at 30 Jun 2026: open / frozen (vacant 90+ days) | 725 (77) / 252 (136) |
+| PIDs at 30 Jun 2026 | 51,163 |
+| Filled by employees / by contractors | 30,005 / 11,941 |
+| Vacant, previously held: employee (open + frozen) / contingent | 977 (725 + 252) / 7,712 |
+| Vacant, new (never filled): employee / contingent | 291 / 237 |
 
 **Backfills save money, mostly by re-levelling.** Across the 4,668 FY26 backfills, the new incumbents earn $7.0M a year less than the people they replaced: level −$6.8M, location −$0.7M, market +$2.2M, positioning −$1.8M. Re-levelling a seat on refill saves far more than moving it to a cheaper office.
 
@@ -177,7 +186,8 @@ The FY24 budget was set before the restructuring: net-new hiring stopped and onl
 | Table | Grain | Use it for |
 |---|---|---|
 | [`mart_position_fill`](../../../sql/03_marts/mart_position_fill.sql) | fill | Hires by seat type; prior incumbent's exit, grade, office and pay; level and location change; pay walk; reuse; chains |
-| [`mart_vacancy_pool`](../../../sql/03_marts/mart_vacancy_pool.sql) | month-end × vacant seat | Open and frozen seats, how long they've been empty, age bands, open requisitions |
+| [`mart_vacancy_pool`](../../../sql/03_marts/mart_vacancy_pool.sql) | month-end × vacant PID | Open and frozen PIDs, employee and contingent, how long they've been empty, age bands, open requisitions |
+| [`mart_pid_month_end`](../../../sql/03_marts/mart_pid_month_end.sql) | month-end × worker type × PID kind × department × country | The PID ledger: filled, vacant previously held, vacant new |
 | [`mart_plan_vs_actual`](../../../sql/03_marts/mart_plan_vs_actual.sql) | plan version × cost center × quarter | Attainment by version, quarter, year, cost center |
 | [`mart_seat_corridors`](../../../sql/03_marts/mart_seat_corridors.sql) | quarter × from office × to office | Where backfilled seats moved (map lines), with pay and location effects |
 
@@ -187,6 +197,7 @@ Column definitions: [data dictionary](../../warehouse/data_dictionary.md#workfor
 
 - **The plan is written around the actuals** (section 7). Variance and attainment are real calculations; the plan does not drive hiring.
 - **Grade creep.** A backfill hires at the leaver's grade, while net-new hires follow a junior-leaning mix, so the average grade drifts from 3.62 to 3.71 over five years and FY26 cost is 4.5% higher than before seats were modelled. It is kept because it is real, and it feeds case study 5.
+- **Contingent PIDs are kept simple:** no job profile or grade (Bridgeway roles are not on Arcadia's grade structure), FTE 1.0, and only reuse and the twice-yearly audit decide what happens to a vacant one. The parameters (45% reuse, audit closes 30% of PIDs vacant 180+ days) are set in `reference_data.py`.
 - **Not modelled:** short overlaps (two incumbents during a handover) and rehires. Test 42 holds strictly.
 - **Seats cross borders rarely**, by design (decision D8 in the [release plan](release_2_plan.md)): the 57 FY26 backfills in another country are all leader seats refilled the same day by a successor based there.
 - **The pay walk is ordered** (level, location, market). Changing the order moves amounts between steps but not the total.

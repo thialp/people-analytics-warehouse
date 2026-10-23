@@ -17,6 +17,7 @@ Companion guides: **G1** [Dashboard #1 rebuild](../headcount-fte-walk/release_3_
 | 1 | 2026-10-23 | Top bar, popovers, version toggle |
 | 2 | 2026-10-23 | No version toggle (plan = budget); the map is the main card; "vacant"; arrow-only reset |
 | **3** | 2026-10-23 | **Everything counts PIDs.** KPI 1 is total PIDs, KPIs 2 and 3 split the vacant PIDs, KPI 5 is backfills with a level change, and the hovers are charts. The capsule has a drawn chevron. Routes are shown as From / To columns, not "A → B" text. Period labels name the months. A generator fix opens net-new PIDs at the end of the data |
+| **3.1** | 2026-10-23 | **Contractors hold PIDs; new PIDs open at recruiting.** Data release 3.1: every contractor gets a PID in Keystone (filled contingent PIDs = contingent headcount), and the hiring pipeline runs past the extract, so Jun 30, 2026 has 528 new PIDs. KPI 1 counts both; D16 reversed; mock numbers refreshed |
 
 ## Contents
 
@@ -64,7 +65,7 @@ The two are easy to mix up because both have a map with lines between offices. T
   *Example:* a Senior Manager in Austin leaves. Their PID is refilled by a new hire in Chicago at Manager level. The PID moved from Austin to Chicago (the map) **and** went one level down (KPI 5 and the right-hand card).
 - **Net-new PIDs have no "before",** so they never appear on the map.
 
-**Contingent workers do not hold PIDs at Arcadia.** They sit in the vendor system (Bridgeway; case study 3), so a PID is filled by an employee or it is vacant. KPI 1's hover says so in one line. This is common in real companies too, and it is a good interview point: the plan counts PIDs, while contingent workers are planned as spend.
+**Contractors hold PIDs too (revision 3.1).** Bridgeway sends Keystone each contractor under a Bridgeway worker ID; Keystone converts it to an Arcadia ID and assigns a PID, like any employee. So a PID is filled by an employee, filled by a contractor, or vacant. A contingent PID is created (or a vacant one reused) when the request is approved, and stays vacant after the assignment ends until it is reused or the January / July position audit closes it. That is why most vacant PIDs are contingent ones: on Jun 30, 2025, 7,473 of the 8,294 previously held. KPIs 4 and 5, the map and the right-hand cards stay on employee fills, because those are what the plan and the pay walk cover.
 
 ---
 
@@ -75,15 +76,15 @@ The two are easy to mix up because both have a map with lines between offices. T
 | Where | Question | FY25 · All organizations (the mock) |
 |---|---|---|
 | Header | Which dates? | **Workforce Planning** · "PIDs from Jul 1, 2024 to Jun 30, 2025" |
-| KPI 1 | How many PIDs do we have? | **29,508** PIDs · 28,438 filled · 1,070 vacant. Hover: filled by employees / vacant previously held / vacant new, and the plan |
-| KPI 2 | How many vacant PIDs did someone leave? | **821** Vacant, previously held · 179 vacant over 90 days. Hover: why they became vacant (voluntary 446, moved to another PID 254, involuntary 121) |
-| KPI 3 | How many new PIDs wait for a first hire? | **249** Vacant, new PIDs · approved, waiting for a first hire. Hover: by function |
+| KPI 1 | How many PIDs do we have? | **48,017** PIDs · 39,145 filled · 8,872 vacant. Hover: filled by employees 28,438 / filled by contractors 10,707 / vacant 8,872, and the plan |
+| KPI 2 | How many vacant PIDs did someone leave? | **8,294** Vacant, previously held · 6,423 vacant over 90 days. Hover: why they became vacant (contract ended 7,473, voluntary 446, moved to another PID 254, involuntary 121) |
+| KPI 3 | How many new PIDs wait for a first hire? | **578** Vacant, new PIDs (249 employee, 329 contingent) · approved, waiting for a first hire. Hover: by function |
 | KPI 4 | How many PIDs did we fill, against the plan? | **5,852** PIDs filled · 4,224 backfills · 1,628 net-new. Hover: bar inside a bar, backfills 4,224 of 4,737 (89.2%) and net-new 1,628 of 2,236 (72.8%); median 41 days to fill a backfill |
 | KPI 5 | Did refilled PIDs come back at another level? | **634** Backfills with a level change · 474 down · 160 up. Hover: down / up bars; 8 also changed office |
 | **Main card** (left, full height) | Where did backfilled PIDs move? | "396 backfilled PIDs changed office". The map, then the five busiest routes as a **From / To** table |
 | Right, top | What changed in each refilled PID? | "1,022 of 4,224 backfills changed level or office" · same 3,202 · one level down 466 · one level up 160 · moved office only 388 · changed level and office 8. New people earn $8.2M a year less than those they replaced |
 | Right, middle | Where did growth PIDs go? | "1,628 net-new PIDs filled, 72.8% of plan". Bar inside a bar by function; 466 approved while a matching PID was vacant |
-| Right, bottom | How long have vacant PIDs waited? | "1,070 PIDs are vacant; 185 for over 90 days". By time vacant, previously held vs new |
+| Right, bottom | How long have vacant PIDs waited? | "8,872 PIDs are vacant; 6,429 for over 90 days". By time vacant, previously held vs new |
 
 **How the numbers tie together on the page.** KPI 2 + KPI 3 = the vacant part of KPI 1 = the vacant card's total. KPI 4's backfills = the right-top card's total. KPI 5 = one level down + one level up + changed level and office (466 + 160 + 8 = 634). The map's 396 = moved office only + changed level and office (388 + 8). Every pair is the same population, by construction.
 
@@ -110,7 +111,7 @@ The two are easy to mix up because both have a map with lines between offices. T
 | D13 | Colour: navy for the measure the title is about, slate `#8C9BB0` as comparator, `#D5DBE4` for plan, teal only on the main card | Quiet page, one accent |
 | D14 | Titles are FIXED calcs in sheet titles | No `*`, no extra sheets |
 | D15 | A new workbook; the first one is archived | Clean actions |
-| D16 | Contingent workers hold no PID (section 0) | The data has none, and it is true to the design of case study 3 |
+| D16 | ~~Contingent workers hold no PID~~ **Reversed in 3.1:** contractors hold PIDs in Keystone | Keystone converts every contractor to an Arcadia ID and a PID; the data now does the same (test 81) |
 
 ---
 
@@ -132,29 +133,25 @@ The two are easy to mix up because both have a map with lines between offices. T
 | `span_name`, `span_order` | `Quarter`, 3 | Period popover |
 | `period_short` | `FY25`, `FY26 Q3` | Grid line 1, capsule |
 | `period_months` | `Jul 24 – Jun 25`, `Jan – Mar 26` | Grid line 2, capsule |
-| `pids_total` | 29,508 | KPI 1 |
-| `pids_filled` | 28,438 (= `actual_ending_headcount`) | KPI 1, hover 1 |
-| `vacant_previously_held`, `vacant_new` | 821, 249 | KPIs 2 and 3, hover 1 |
-| `vacant_previously_held_stale`, `vacant_new_stale` | 179, 6 (over 90 days) | KPI 2, vacant card |
+| `pids_total` | 48,017 | KPI 1 |
+| `pids_filled_employee` | 28,438 (= `actual_ending_headcount`) | KPI 1, hover 1 |
+| `pids_filled_contingent` | 10,707 (= `actual_cw_headcount`) | KPI 1, hover 1 |
+| `vacant_previously_held`, `vacant_new` | 8,294, 578 (`…_contingent`: 7,473, 329) | KPIs 2 and 3, hover 1 |
+| `vacant_previously_held_stale`, `vacant_new_stale` | 6,423, 7 (over 90 days) | KPI 2, vacant card |
 | `level_down`, `level_up`, `level_and_office` | 474, 160, 8 | KPI 5, hover 5 |
 | `moved_office` | 396 | Main card check |
 | `is_view_default` | **changed**: first group alphabetically | View list |
 
 The vacant columns read `rpt.vw_vacancy_pool` on `to_date` (`vacated_by` = 'Never filled' is a new PID). The level and office columns count backfills in the period from `rpt.vw_position_fill`. All of them are the same in every version row.
 
-### 3.3 Generator fix: new PIDs at the end of the data
+### 3.3 Data release 3.1: contingent PIDs and new PIDs at the extract (done)
 
-Net-new PIDs are created backwards from their hire date (approved = hire date − time to fill). Hires after Jun 30, 2026 are not simulated, so no new PID is open on the last day: KPI 3 would read **0** on the default page. Every earlier quarter-end has them (for example 234 on Mar 31, 2026 and 249 on Jun 30, 2025).
+- **New PIDs at the extract.** Net-new hires for the six months after Jun 30, 2026 are drawn at FY26's pace, on their own random stream; their PIDs and requisitions are created on the approval date, and those approved by Jun 30 stay Open with applicants. Jun 30, 2026: 291 new employee PIDs.
+- **Contingent PIDs** (`generator/cw_positions.py`): created or reused on the service order's approval date, Filled while Bridgeway holds the assignment, vacant until reused (45% when a match waits) or closed by the audit (30% of those vacant 180+ days). Jun 30, 2026: 237 new contingent PIDs.
+- Nothing that existed moved: every pre-existing raw row is identical; Dashboards #1 and #2 are unchanged.
+- New marts `mart_pid_month_end` (the ledger) and `mart_cw_pid_fill`; tests 80 (extended) and 81.
 
-The fix, in `generator/generate_data.py`, with its **own random stream**, after the main simulation:
-
-- Draw the net-new hires the model would make from Jul 1 to Dec 31, 2026, by department, at FY26's monthly rate.
-- Create their PIDs and requisitions with the usual approval and time-to-fill rules.
-- Keep only those approved on or before Jun 30, 2026. They stay **Open**, with no hire, no assignment and no fill.
-
-Nothing that already exists changes. The check is that every existing table equals the current one row for row, apart from the added PIDs and requisitions.
-
-Expected: about 200–250 new vacant PIDs on Jun 30, 2026, in line with earlier quarter-ends. Section 14 gets the exact number after the run.
+**Jun 30, 2026:** 51,163 PIDs = 30,005 filled by employees + 11,941 by contractors + 8,689 vacant previously held (977 employee, 7,712 contingent) + 528 vacant new (291 + 237).
 
 ### 3.4 How it is checked (Claude, before you open Tableau)
 
@@ -295,7 +292,7 @@ Header:
 
 ```
 // K PIDs        SUM([pids_total])
-// K Filled      SUM([pids_filled])
+// K Filled      SUM([pids_filled_employee]) + SUM([pids_filled_contingent])
 // K Plan Filled SUM([planned_ending_headcount])
 // K Vac Prev    SUM([vacant_previously_held])
 // K Vac New     SUM([vacant_new])
@@ -326,7 +323,7 @@ Text twins with the comma pattern (`K PIDs Str`, `K Filled Str` …) and the per
 
 The group is the PID's department and country **now** (where the new person sits).
 
-**Checkpoint 2** (`CHK` sheet, filter `Row Is Current`), at FY25 (`p_FY` = 2025): `K PIDs` 29,508 · `K Filled` 28,438 · `K Vac Prev` 821 · `K Vac New` 249 · `K Prev Stale` 179 · `K BF` 4,224 · `K NN` 2,236 planned / 1,628 filled · `K Down` 474 · `K Up` 160 · `K Both` 8.
+**Checkpoint 2** (`CHK` sheet, filter `Row Is Current`), at FY25 (`p_FY` = 2025): `K PIDs` 48,017 · `K Filled` 39,145 · `K Vac Prev` 8,294 · `K Vac New` 578 · `K Prev Stale` 6,423 · `K BF` 4,224 · `K NN` 2,236 planned / 1,628 filled · `K Down` 474 · `K Up` 160 · `K Both` 8.
 
 ---
 
@@ -383,7 +380,7 @@ Container **x 960, y 76, w 410**, visibility `p_InfoOpen`. Body (Book 10 `#B8C0C
 
 > **Period.** Every option compares two quarter-ends inside one fiscal year. Arcadia's fiscal year runs July to June.
 >
-> **PIDs.** A PID is a budgeted position. It is filled by an employee or vacant. Contingent workers are managed in the vendor system and hold no PID.
+> **PIDs.** A PID is a position in Keystone, Arcadia's HR system. It is filled by an employee, filled by a contractor, or vacant. Contractors come from the supplier system and get an Arcadia ID and a PID like anyone else.
 >
 > **Vacant PIDs.** Previously held: someone left by resigning, being let go or moving to another PID. New: a net-new PID approved by the plan that has not had its first hire yet. Over 90 days counts as stale.
 >
@@ -403,7 +400,7 @@ Container **x 960, y 76, w 410**, visibility `p_InfoOpen`. Body (Book 10 `#B8C0C
 
 | Card | Title | Value | Note |
 |---|---|---|---|
-| 1 | `PIDs` | `K PIDs Str` | `[K Filled Str] + " filled · " + [K Vacant Str] + " vacant"` |
+| 1 | `PIDs` | `K PIDs Str` (`pids_total`) | `[K Filled Str] + " filled · " + [K Vacant Str] + " vacant"` (filled = `pids_filled_employee` + `pids_filled_contingent`) |
 | 2 | `Vacant, previously held` | `K Vac Prev Str` | `[K Prev Stale Str] + " vacant over 90 days"` |
 | 3 | `Vacant, new PIDs` | `K Vac New Str` | `"approved, waiting for a first hire"` |
 | 4 | `PIDs filled` | `K Fills Str` | `[K BF Str] + " backfills · " + [K NN Str] + " net-new"` |
@@ -421,7 +418,7 @@ The five transparent `KPI Hover N` sheets (G1 8.2c: `Hover Cell` square at 0% op
 
 | Hover | Text (`KPI n Tip`) | Tooltip sheet | Build |
 |---|---|---|---|
-| 1 | "Every budgeted position on <to_date>, filled or vacant. The plan expected <K Plan Filled Str> filled. Contingent workers sit in the vendor system and hold no PID." | `Tip PIDs` (WFP Summary) | Filter `Row Is Current`; Rows Measure Names (`pids_filled`, `vacant_previously_held`, `vacant_new`, aliased "Filled by employees", "Vacant, previously held", "Vacant, new PIDs"); Columns Measure Values; bars navy for filled, slate for the two vacant; label the value |
+| 1 | "Every position on <to_date>, filled or vacant. Contractors hold PIDs in Keystone like employees. The plan expected <K Plan Filled Str> employees." | `Tip PIDs` (WFP Summary) | Filter `Row Is Current`; Rows Measure Names (`pids_filled_employee`, `pids_filled_contingent`, `Vacant PIDs` = `vacant_previously_held` + `vacant_new`, aliased "Filled by employees", "Filled by contractors", "Vacant"); Columns Measure Values; bars navy for the two filled, slate for vacant; label the value |
 | 2 | "PIDs someone left and nobody has replaced yet, by why they became vacant. <K Prev Stale Str> have waited over 90 days." | `Tip Vacant Why` (Vacancy Pool) | Filter `[month_end_date] = [Period To Date] AND [In Group] AND [vacated_by] <> "Never filled"`; Rows `vacated_by` (alias Internal Move Out → "Moved to another PID"); Columns `CNT(position_id)`; navy |
 | 3 | "Net-new PIDs the plan approved that have not had their first hire yet, by function." | `Tip Vacant New` (Vacancy Pool) | Same date and group filter, `[vacated_by] = "Never filled"`; Rows `function_name` (top 5 by count); navy. Empty: "No new PID was waiting on this date." |
 | 4 | "Hires and internal moves into a PID, against the plan. Median <K Days> days from approval to fill a backfill." | `Tip Filled BF` and `Tip Filled NN` (WFP Summary), stacked | Each: one bar inside a bar, planned `#D5DBE4` wide and filled navy narrow (dual axis, synchronized), label "4,224 of 4,737 · 89.2%" |
@@ -568,14 +565,14 @@ Deselect (Filter, same sheet, `zzTrue` → `zzFalse`, Show all values): `Page Ti
 
 ### 14.1 KPI band
 
-| State | 1 PIDs (filled + prev + new) | 2 Prev · over 90 | 3 New | 4 Filled (BF of plan · NN of plan) | 5 Level change (down · up · also moved) |
+| State | 1 PIDs (employee + contractor filled + prev + new) | 2 Prev · over 90 | 3 New | 4 Filled (BF of plan · NN of plan) | 5 Level change (down · up · also moved) |
 |---|---|---|---|---|---|
-| FY25 · FY · All | 29,508 = 28,438 + 821 + 249 | 821 · 179 | 249 | 5,852 (4,224 of 4,737 · 1,628 of 2,236) | 634 (474 · 160 · 8) |
-| FY26 · Q3 · All | 30,807 = 29,618 + 955 + 234 | 955 · 214 | 234 | 1,672 (1,201 of 1,356 · 471 of 562) | 181 (139 · 42 · 2) |
-| FY24 · FY · All | 28,184 = 27,208 + 858 + 118 | 858 | 118 | 5,015 (4,105 of 4,503 · 910 of 2,833) | 672 (511 · 161 · 7) |
-| FY26 · FY · All | 30,005 + 977 + **new from 3.3** | 977 · 213 | **set by 3.3** (0 today) | 6,849 (4,668 of 5,031 · 2,181 of 2,762) | 752 (567 · 185 · 11) |
-| FY26 · FY · Function Finance | 1,271 + 43 + new | 43 · 14 | set by 3.3 | 264 (181 of 230 · 83 of 122) | 21 (17 · 4 · 0) |
-| FY26 · FY · Country India | 6,967 + 228 + new | 228 · 58 | set by 3.3 | 1,465 (1,047 of 1,115 · 418 of 562) | 170 (136 · 34 · 2) |
+| FY25 · FY · All | 48,017 = 28,438 + 10,707 + 8,294 + 578 | 8,294 · 6,423 | 578 | 5,852 (4,224 of 4,737 · 1,628 of 2,236) | 634 (474 · 160 · 8) |
+| FY26 · Q3 · All | 49,463 = 29,618 + 11,277 + 7,953 + 615 | 7,953 · 5,872 | 615 | 1,672 (1,201 of 1,356 · 471 of 562) | 181 (139 · 42 · 2) |
+| FY24 · FY · All | 45,299 = 27,208 + 9,910 + 7,737 + 444 | 7,737 · 5,913 | 444 | 5,015 (4,105 of 4,503 · 910 of 2,833) | 672 (511 · 161 · 7) |
+| FY26 · FY · All | 51,163 = 30,005 + 11,941 + 8,689 + 528 | 8,689 · 6,540 | 528 | 6,849 (4,668 of 5,031 · 2,181 of 2,762) | 752 (567 · 185 · 11) |
+| FY26 · FY · Function Finance | 2,107 = 1,271 + 370 + 439 + 27 | 439 · 342 | 27 | 264 (181 of 230 · 83 of 122) | 21 (17 · 4 · 0) |
+| FY26 · FY · Country India | 15,620 = 6,967 + 4,883 + 3,617 + 153 | 3,617 · 2,812 | 153 | 1,465 (1,047 of 1,115 · 418 of 562) | 170 (136 · 34 · 2) |
 
 ### 14.2 Cards, FY25 · All
 
@@ -584,9 +581,9 @@ Deselect (Filter, same sheet, `zzTrue` → `zzFalse`, Show all values): `Page Ti
 | Main | 396 backfilled PIDs changed office · 238 to a lower-pay office · 360 same country, 36 crossed a border · routes: Bengaluru / Hyderabad 41, Hyderabad / Bengaluru 30, Bengaluru / Pune 21, Hyderabad / Pune 19, Austin HQ / Atlanta 18 |
 | Backfill changes | 1,022 of 4,224 · same 3,202 (−$1.2M) · down 466 (−$8.5M) · up 160 (+$2.7M) · moved office only 388 (−$1.0M) · changed level and office 8 (−$201K) · $8.2M less |
 | Net-new by function | 1,628, 72.8% of plan · Technology 642 of 870 · Commercial 372 of 514 · Operations 210 of 285 · Product 126 of 180 · People 82 of 111 · Finance 72 of 107 · Marketing 59 of 87 · Legal & Compliance 65 of 82 · 466 with a vacant match |
-| Vacant | 1,070 vacant; 185 over 90 days · 0–30: 333 + 152 new · 31–90: 312 + 91 · 91–180: 120 + 6 · over 180: 56 + 0 |
+| Vacant | 8,872 vacant · 0–30: 816 + 407 new · 31–90: 1,063 + 165 · 91–180: 1,280 + 6 · over 180: 5,135 + 0 |
 
-FY26 · All (after 3.3, previously held unchanged): map 467 (280 lower; 410 / 57); changes 4,668 = 3,460 + 556 + 185 + 456 + 11, $7.0M less; net-new 2,181, 79.0%.
+FY26 · All: map 467 (280 lower; 410 / 57); changes 4,668 = 3,460 + 556 + 185 + 456 + 11, $7.0M less; net-new 2,181, 79.0%.
 
 ### 14.3 Ties to check on every state
 

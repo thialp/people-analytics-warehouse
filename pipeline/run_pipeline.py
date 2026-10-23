@@ -67,6 +67,8 @@ EXPORTS = [
     "mart_region_walk",
     "mart_career_moves",
     "mart_wfp_summary",
+    "mart_pid_month_end",
+    "mart_cw_pid_fill",
 ]
 
 
@@ -136,12 +138,21 @@ def run_tests(con: duckdb.DuckDBPyConnection) -> bool:
     return all_passed
 
 
+# A mart whose full CSV would pass GitHub's 100 MB file limit is exported on the dates the
+# dashboards use. The warehouse table (and rpt.vw_vacancy_pool on SQL Server) keeps every month-end.
+EXPORT_FILTERS = {
+    # release 3.1: contingent PIDs made the vacancy pool 439,286 rows (121 MB); quarter-ends only
+    "mart_vacancy_pool": "WHERE MONTH(month_end_date) IN (3, 6, 9, 12)",
+}
+
+
 def export_marts(con: duckdb.DuckDBPyConnection):
     log("\n4. Exporting marts for Tableau")
     MART_DIR.mkdir(parents=True, exist_ok=True)
     for name in EXPORTS:
         out = MART_DIR / f"{name}.csv"
-        con.execute(f"COPY marts.{name} TO '{out.as_posix()}' (HEADER, DELIMITER ',')")
+        source = f"(SELECT * FROM marts.{name} {EXPORT_FILTERS[name]})" if name in EXPORT_FILTERS else f"marts.{name}"
+        con.execute(f"COPY {source} TO '{out.as_posix()}' (HEADER, DELIMITER ',')")
         log(f"   {out.relative_to(ROOT)}  ({out.stat().st_size / 1e6:.1f} MB)")
 
 

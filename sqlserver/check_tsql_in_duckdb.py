@@ -56,7 +56,9 @@ VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_cw_discrepancy_detail", "rpt.vw_cw_discrepancy_detail"),
          ("mart_cw_reconciliation", "rpt.vw_cw_reconciliation"),
          ("mart_cw_engagement_cap", "rpt.vw_cw_engagement_cap"),
-         ("mart_cw_detection_score", "rpt.vw_cw_detection_score")]
+         ("mart_cw_detection_score", "rpt.vw_cw_detection_score"),
+         ("mart_pid_month_end", "rpt.vw_pid_month_end"),
+         ("mart_cw_pid_fill", "rpt.vw_cw_pid_fill")]
 SKIP = re.compile(r"^\s*(CREATE\s+(CLUSTERED\s+|UNIQUE\s+)?INDEX|ALTER\s+TABLE|SET\s+NOCOUNT|USE\s|PRINT\s|DECLARE\s"
                   r"|IF\s+DB_ID|IF\s+SCHEMA_ID)", re.I)
 

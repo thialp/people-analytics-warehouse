@@ -1,7 +1,8 @@
 /*
   custom_sql_vacancy_pool.sql
   Tableau Custom SQL for Dashboard #3, Workforce Planning (SQL Server, database ArcadiaHR).
-  Vacancy pool: one row per empty seat (Open or Frozen) per month-end, 62,055 rows.
+  Vacancy pool: one row per vacant PID (Open or Frozen) per month-end, employee and contingent
+  (release 3.1: contingent PIDs added; worker_type says which).
 
   Reads the reporting view rpt.vw_vacancy_pool (built by sqlserver/04_create_reporting_views.sql
   from the seat layer in 03b). The columns are listed so the data source documents itself and
@@ -53,6 +54,9 @@ SELECT
     v.grade,
     v.is_manager_seat,
     v.created_date,
-    v.created_reason
+    v.created_reason,
+    v.worker_type,
+    v.cw_type,
+    v.cw_role_family
 FROM rpt.vw_vacancy_pool AS v
 WHERE v.department_id <> 'D-901'

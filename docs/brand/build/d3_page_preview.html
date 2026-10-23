@@ -87,9 +87,9 @@ function bars(sel, rows, max, x0, x1, h, gap, label) {
   });
 }
 fetch("d3_preview_data.json").then(r=>r.json()).then(D=>{
-  const k = D.k, pids = k.filled+k.prev+k.new;
+  const k = D.k, pids = k.filled+k.cw+k.prev+k.new;
   const K = [
-   ["PIDs", fmt(pids), `${fmt(k.filled)} filled · ${fmt(k.prev+k.new)} vacant`],
+   ["PIDs", fmt(pids), `${fmt(k.filled+k.cw)} filled · ${fmt(k.prev+k.new)} vacant`],
    ["Vacant, previously held", fmt(k.prev), `${fmt(k.prev_stale)} vacant over 90 days`],
    ["Vacant, new PIDs", fmt(k.new), "approved, waiting for a first hire"],
    ["PIDs filled", fmt(k.fills), `${fmt(k.bf)} backfills · ${fmt(k.nn)} net-new`],
@@ -108,9 +108,9 @@ fetch("d3_preview_data.json").then(r=>r.json()).then(D=>{
   document.getElementById("nt").textContent = `${fmt(k.nn)} net-new PIDs filled, ${pct(k.nn,k.nnp)} of plan`;
   document.getElementById("ns").textContent = `Filled vs planned by function · ${k.reuse} approved while a matching PID was vacant`;
   bars("#nn", D.nn.map(a=>({name:a[0], n:a[2], plan:a[1], hi:1})), D.nn[0][1], 130, 390, 12, 4, r=>`<tspan font-weight="600">${r.n}</tspan> of ${r.plan}`);
-  document.getElementById("vt").textContent = `${fmt(k.prev+k.new)} PIDs are vacant; ${k.prev_stale+D.vac.reduce((a,v)=>a+(v[0].startsWith("91")||v[0].startsWith("Over")?v[2]:0),0)} for over 90 days`;
+  document.getElementById("vt").textContent = `${fmt(k.prev+k.new)} PIDs are vacant; ${fmt(k.prev_stale+D.vac.reduce((a,v)=>a+(v[0].startsWith("91")||v[0].startsWith("Over")?v[2]:0),0))} for over 90 days`;
   bars("#pool", D.vac.map(v=>({name:v[0].replace("-","–"), parts:[[v[1],"#13233A"],[v[2],"#8C9BB0"]], n:v[1]+v[2], hi:v[0].startsWith("91")||v[0].startsWith("Over")})),
-       Math.max(...D.vac.map(v=>v[1]+v[2])), 110, 400, 22, 8, r=>`<tspan font-weight="600">${r.n}</tspan>`);
+       Math.max(...D.vac.map(v=>v[1]+v[2])), 110, 400, 22, 8, r=>`<tspan font-weight="600">${fmt(r.n)}</tspan>`);
 
   // routes as a From / To table: no arrow glyph to read
   const t = d3.select("#top");
@@ -126,9 +126,9 @@ fetch("d3_preview_data.json").then(r=>r.json()).then(D=>{
   // hover tooltips (viz in tooltip)
   const H = document.getElementById("hovers");
   const tip = (title, text, id) => { H.insertAdjacentHTML("beforeend", `<div class="tip"><div class="tt">${title}</div><div class="tx">${text}</div><svg id="${id}" width="306" height="96"></svg></div>`); };
-  tip("PIDs", `Every budgeted position on Jun 30, 2025, filled or vacant. The plan expected ${fmt(k.plan)} filled. Contingent workers sit in the vendor system and hold no PID.`, "h1");
-  bars("#h1", [{name:"Filled by employees",n:k.filled,hi:1},{name:"Vacant, previously held",n:k.prev},{name:"Vacant, new PIDs",n:k.new}], k.filled, 140, 250, 16, 6, r=>fmt(r.n));
-  tip("Vacant, previously held", `PIDs someone left and nobody has replaced yet, by why they became vacant. ${k.prev_stale} have waited over 90 days.`, "h2");
+  tip("PIDs", `Every budgeted position on Jun 30, 2025, filled or vacant. Contractors hold PIDs in Keystone like employees. The plan expected ${fmt(k.plan)} employees.`, "h1");
+  bars("#h1", [{name:"Filled by employees",n:k.filled,hi:1},{name:"Filled by contractors",n:k.cw,hi:1},{name:"Vacant",n:k.prev+k.new}], k.filled, 140, 250, 16, 6, r=>fmt(r.n));
+  tip("Vacant, previously held", `PIDs someone left and nobody has replaced yet, by why they became vacant. ${fmt(k.prev_stale)} have waited over 90 days.`, "h2");
   bars("#h2", Object.entries(k.why).map(([n,v])=>({name:n.replace("Internal Move Out","Moved to another PID"),n:v,hi:1})), Math.max(...Object.values(k.why)), 140, 250, 16, 6, r=>fmt(r.n));
   tip("Vacant, new PIDs", "Net-new PIDs the plan approved that have not had their first hire yet, by function.", "h3");
   bars("#h3", Object.entries(k.newfn).slice(0,4).map(([n,v])=>({name:n,n:v,hi:1})), Math.max(...Object.values(k.newfn)), 140, 250, 14, 5, r=>fmt(r.n));
