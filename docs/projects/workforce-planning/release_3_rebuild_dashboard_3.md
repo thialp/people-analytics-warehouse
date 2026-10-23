@@ -165,14 +165,7 @@ The vacant columns read `rpt.vw_vacancy_pool` on `to_date` (`vacated_by` = 'Neve
 
 ### 3.5 On the Mac (after Claude pushes)
 
-```bash
-cd ~/GitHub/people-analytics-warehouse
-git fetch origin
-git checkout dashboard-3-rebuild
-git pull
-```
-
-The generator fix adds rows, so the SQL Server warehouse is rebuilt the usual way (the run guide that comes with the branch lists the commands and every expected count). Then:
+**Done on 2026-10-23.** Release 3.1 is merged into `main` (PR #53); the Mac is on `main`, SQL Server was rebuilt with `build_all.sql` and every line of 08, 12 and 14 passed (51,163 PIDs). The Custom SQL files and the D3 shapes are copied. For a later rebuild, use the [run guide](sql_server_release_3_1_run.md), then:
 
 ```bash
 export MSSQL_SA_PASSWORD="$(docker exec arcadia-sql printenv MSSQL_SA_PASSWORD)"
@@ -221,7 +214,27 @@ Expected: `d3_field_capsule.png  d3_reset.png`. In Tableau: Shape > More Shapes 
 
 **Types.** Convert to Dimension: WFP Summary `fiscal_year`, `pair_order`, `view_order`, `span_order`; Plan vs Actual `fiscal_year`, `fiscal_quarter`. Geographic role **None** on every latitude and longitude. Number format `#,##0` on counts.
 
-**Paste what is proven** (Data pane > Copy, then right-click the target source > Paste): from #1, the `kpi_` layout calcs (their 16 parameters come along), plus `zzTrue`, `zzFalse`, `Close Panel`, `Pick Rows`, `Pick Col`, `Pick Row`. From the archived #3 workbook: the comma and percent pattern calcs you already wrote (`K … Str`), as templates.
+**Paste what is proven** (the full list, from the first build's workbook, is in 5.1) (Data pane > Copy, then right-click the target source > Paste): from #1, the `kpi_` layout calcs (their 16 parameters come along), plus `zzTrue`, `zzFalse`, `Close Panel`, `Pick Rows`, `Pick Col`, `Pick Row`. From the archived #3 workbook: the comma and percent pattern calcs you already wrote (`K … Str`), as templates.
+
+### 5.1 What to take from the first build (inventoried 2026-10-23)
+
+The first build (`Arcadia Workforce Planning.twb`, left rail, Version list, seat wording) has 6 data sources, 28 sheets and about 220 calcs. Its **design** is replaced, so nothing is reused as a sheet or a dashboard. Its **formulas** are proven, so copy these from the archived workbook (Data pane > select the fields > Copy; in the new workbook right-click the source > Paste), then rename to this plan's names:
+
+| Take | From source | Fields | Change after pasting |
+|---|---|---|---|
+| Yes | Parameters + WFP Summary | `kpi_Scale`, `kpi_SheetW` … `kpi_SubDY` (16 parameters) and every `kpi_` calc (`kpi_lat …`, `kpi_lon C1–C5`, `kpi_pt Title/Value/Note 1–5`, `kpi_Corner TL/BR`, `kpi_Check`) | Nothing: the card geometry is the same as #1 |
+| Yes | WFP Summary | `zzTrue`, `zzFalse`, `Close Panel`, `Pick Rows`, `Pick Col`, `Pick Row` | Nothing |
+| Yes, as templates | WFP Summary | `K Close HC Str` (comma pattern), `K NN Pct Str` (percent pattern), `K Cost Str` ($ pattern) | Duplicate and point at the new K measures (7.2) |
+| Yes | Plan vs Actual, Position Fill, Vacancy Pool | `Period First Q`, `Period Last Q`, `In Group` | Nothing (they read `p_Period` and `p_View` only) |
+| Yes | Position Fill | `Is Moved Seat`, `Seat Line`, `Arrival Point`, `Map Routes`, `Map Offices` | Rename "Seat" to "PID" (`Is Moved PID`, `PID Line`) |
+| No | WFP Summary | `Version Display/State/Pick`, `version_type filter`, `Default Version`, `Pick Context Version` | The version toggle is gone (D3) |
+| No | WFP Summary | `KPI 1–5 Title/Value/Note`, `K CW …`, `K Cost …`, `K Reuse …`, `Page Subtitle`, `Fills Title`, `K Internal …` | The KPIs and cards are new (D7, section 11) |
+| No | WFP Summary | `Cell Label`, `Period Field Text`, `Group Label` | They print "→" and "▾" (D10, D11) |
+| No | Vacancy Pool | `Pool Title`, `Pool Seats …` | Open / Frozen becomes previously held / new |
+| No | Position Fill | `Version First Q`, `Corridor` (built with " to ") | No version; routes are two columns (D11) |
+| No | Seat Corridors (source) | the whole source | The map reads Position Fill |
+
+The Custom SQL of every source is **pasted fresh** from `tableau/` on `main` (the WFP Summary and Vacancy Pool files changed in 3.1), and every extract is rebuilt.
 
 ---
 
@@ -620,8 +633,8 @@ Reset, close popovers, hide sheets, **Save to Tableau Public As** `arcadia_workf
 | Phase | Who | What | Done when |
 |---|---|---|---|
 | 0 | Claude | This plan, shapes, mocks | You approve sections 0–2 and the mocks |
-| 1 | Claude | Generator fix (3.3), summary columns (3.2), tests, T-SQL check, `14_validate`, run guide; branch `dashboard-3-rebuild` | 3.4 passes; 14.1 filled in for FY26 |
-| 2 | You (Mac) | Rebuild, validate, copy files, shapes | No FAIL |
+| 1 | Claude | Generator fix (3.3), summary columns (3.2), tests, T-SQL check, `14_validate`, run guide | **Done** (PR #53, merged) |
+| 2 | You (Mac) | Rebuild, validate, copy files, shapes | **Done** 2026-10-23, no FAIL |
 | 3 | You | Sections 5–7 | Checkpoints 1 and 2 |
 | 4 | You | Sections 8, 9, 13 | Click tests 2–7 and 9 |
 | 5 | You | Section 10 | 14.1 and click test 1 |
