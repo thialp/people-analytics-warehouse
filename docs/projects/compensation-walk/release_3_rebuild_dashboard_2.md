@@ -635,7 +635,7 @@ Why View applied on the first click: `Set view` and `Set group from view` both f
 
 Why the rail `›` stays on the view in use: the rail is always visible, so it must say what the page shows. While you browse, the popover title says which view you are looking at ("Select a department"). If you close the popover without picking, nothing changed and the rail is still right.
 
-### 14.2 Refinements (all small; tell me any you do not want)
+### 14.2 Refinements (all five approved, Oct 24)
 
 | # | Refinement | Why | Cost |
 |---|---|---|---|
