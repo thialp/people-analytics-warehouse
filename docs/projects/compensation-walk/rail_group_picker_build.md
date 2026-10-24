@@ -1,5 +1,7 @@
 # Rail group picker: build steps
 
+> **Oct 24, 2026:** the Group popover's layout and the rail view click are superseded by [section 14 of the Dashboard #2 plan](release_3_rebuild_dashboard_2.md#14-popover-carryback-from-dashboard-3-oct-24-2026): a rail view click now browses (`p_ViewTab`) and opens the popover; a group click applies view and group together.
+
 Step-by-step build for the Group selector in the Compensation Walk rail. Background and sources: [rail_selector_research.md](rail_selector_research.md). Data source for every calc and sheet: the walk (`ArcadiaHR`).
 
 What you build:

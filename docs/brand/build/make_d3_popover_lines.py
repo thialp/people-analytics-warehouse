@@ -13,8 +13,16 @@ Dashboard #1 (Headcount & FTE Walk) uses the same frame (x 506, w 864) with a sh
   d1_popover_divider_period.png   48 x 416 -> item 24 x 208  (between Span List and Period Panel; body 208 = 8 + 6 x 32 + 8)
   d1_popover_divider_group.png    48 x 604 -> item 24 x 302
 
+Dashboard #2 (Compensation Walk) hangs its popovers from the side rail (x 216) at 624 wide; the Group popover is a grid only
+(the view list is the rail itself), so it needs no group divider:
+
+  d2_popover_line_wide.png      1248 x 18  -> item 624 x 9   (under the Period and Group popover headers)
+  d2_popover_line_info.png      1182 x 18  -> item 591 x 9   (under the Info popover header)
+  d2_popover_divider_period.png   48 x 416 -> item 24 x 208  (between Span List and Period Panel; body 208 = 8 + 6 x 32 + 8)
+
 Usage: python3 docs/brand/build/make_d3_popover_lines.py docs/brand/shapes/by_dashboard/d3        (d3: the four files are committed there)
-       python3 docs/brand/build/make_d3_popover_lines.py docs/brand/shapes/by_dashboard/d1 d1     (d1: the four files are committed there)"""
+       python3 docs/brand/build/make_d3_popover_lines.py docs/brand/shapes/by_dashboard/d1 d1     (d1: the four files are committed there)
+       python3 docs/brand/build/make_d3_popover_lines.py docs/brand/shapes/by_dashboard/d2 d2     (d2: the three files are committed there)"""
 import os, sys
 from PIL import Image, ImageDraw
 
@@ -42,6 +50,10 @@ if which == "d1":
     hline("d1_popover_line_info.png", 410, 9, 16)
     vline("d1_popover_divider_period.png", 24, 208, 8)
     vline("d1_popover_divider_group.png", 24, 302, 8)
+elif which == "d2":
+    hline("d2_popover_line_wide.png", 624, 9, 16)
+    hline("d2_popover_line_info.png", 591, 9, 16)
+    vline("d2_popover_divider_period.png", 24, 208, 8)
 else:
     hline("d3_popover_line_wide.png", 864, 9, 16)
     hline("d3_popover_line_info.png", 410, 9, 16)
