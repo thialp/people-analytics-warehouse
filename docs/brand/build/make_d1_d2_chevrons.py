@@ -2,7 +2,7 @@
 
 The typed "▾" in a Tableau label is too small to read as "open a list", so the chevron is part of the
 image. This script opens the existing white capsule (d1_field_capsule, d2_field_capsule) and draws a solid
-navy chevron 10 x 6 dashboard pixels, 18 px from the right edge, one pixel below the middle of the box,
+navy chevron 10 x 6 dashboard pixels, 18 px (12 px on the narrower #1 capsule) from the right edge, one pixel below the middle of the box,
 exactly where d3_field_capsule has it. It is idempotent: it always starts from the capsule alone
 (the capsule is the white area, so the old chevron is painted white again before the new one is drawn).
 
@@ -17,17 +17,17 @@ NAVY, WHITE = (19, 35, 58, 255), (255, 255, 255, 255)
 SS = 8
 
 
-def add_chevron(path, scale=3):
+def add_chevron(path, margin, scale=3):
     im = Image.open(path).convert("RGBA")
     w, h = im.size
     # opaque box of the capsule: top row of the capsule (the rows above are transparent padding)
     top = next(y for y in range(h) if im.getpixel((w // 2, y))[3] > 200)
     box_h = h - top
-    cx = w - 18 * scale
+    cx = w - margin * scale
     cy = top + box_h / 2 + 1 * scale
     # wipe an earlier chevron (white again), then draw at 8x and shrink
     d0 = ImageDraw.Draw(im)
-    d0.rectangle((cx - 8 * scale, cy - 5 * scale, cx + 8 * scale, cy + 5 * scale), fill=WHITE)
+    d0.rectangle((w - 30 * scale, cy - 5 * scale, w - 5 * scale, cy + 5 * scale), fill=WHITE)
     big = Image.new("RGBA", (w * SS, h * SS), (0, 0, 0, 0))
     d = ImageDraw.Draw(big)
     hw, hh = 5 * scale * SS, 3 * scale * SS
@@ -39,5 +39,6 @@ def add_chevron(path, scale=3):
     return path
 
 
-for name in ("d1/d1_field_capsule.png", "d2/d2_field_capsule.png"):
-    print("wrote", add_chevron(os.path.join(DST, name)))
+# d1's capsule is 180 wide (d2 and d3: 200), so its chevron sits closer to the edge (12 px) to leave the label room
+for name, margin in (("d1/d1_field_capsule.png", 12), ("d2/d2_field_capsule.png", 18)):
+    print("wrote", add_chevron(os.path.join(DST, name), margin))
