@@ -36,7 +36,7 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 
 | | Question a leader asks | What the warehouse shows | Dashboard |
 |---|---|---|---|
-| 🪑 **1. [Workforce Planning](#case-study-1-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | *in design* |
+| 🪑 **1. [Workforce Planning](#case-study-1-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)** |
 | 📈 **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* | Start + hires − leavers ± moves = end, for employees, contractors and both, for any team | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard)** |
 | 🗺️ **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
 | 💵 **4. [Compensation Walk](#case-study-4-compensation-walk)** | *Why did pay in this group change?* | Each dollar of change traced to hires, exits, promotions, raises, employer costs or currency | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)** |
@@ -505,7 +505,22 @@ Eighteen tests (41 to 56, 80 and 81) guard the PID layer, and [`08_validate_work
 
 ### Tableau
 
-Dashboard #3 is in design. Four Tableau Custom SQL data sources are ready, one per grain (fills, vacancy pool, plan vs actual, seat corridors: `tableau/custom_sql_position_fill.sql` and the three beside it), each matching its mart row for row, with a [step-by-step guide from the connection to the first check sheets](docs/projects/workforce-planning/tableau_first_sheets_guide.md) and the [headline values](docs/projects/workforce-planning/headline_values.md).
+**Published:** [Workforce Planning on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard) (release 3.1 data, four Custom SQL extracts: the per-period PID summary 2,520 rows, plan vs actual 11,740, position fills 30,575 and the vacancy pool at quarter-ends 149,615).
+
+[![Workforce Planning on Tableau Public](docs/images/workforce_planning_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)
+
+*FY26, all of Arcadia. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)**: pick a fiscal year, half or quarter, and a company, function, sub-function, department or country; hover any KPI card for its breakdown, and hover the map title for the busiest routes.*
+
+| Part | What it does |
+|---|---|
+| Top bar and popovers | Period (fiscal year, half, quarter) and View (company down to country) as browse-then-apply popovers: pick a tab to see its choices, then pick the choice. A period or group with no plan is dimmed and does nothing, so no click leads to an empty page |
+| KPI band | PIDs, vacant previously held, vacant new, PIDs filled and backfills with a level change; each card is a map layer drawn behind transparent hover sheets, and each hover is a small chart (Viz in Tooltip) |
+| PID Moves | The map: one line per backfilled PID that came back in another office than the person who left it, a dot per receiving office; the five busiest routes are in the title's tooltip |
+| Backfill Changes | Of the backfills, how many changed level or office, and what that did to pay (a pay walk that adds up to the cent) |
+| Net-new by Group | Net-new PIDs filled against the plan, bar inside a bar, with the share approved while a matching PID stood vacant |
+| Vacant PIDs | How long vacant PIDs have waited, previously held against new, on the period's closing date |
+
+Every control is a parameter action (34 of them, plus 19 deselect actions), so one click drives all four data sources. Every card ties to the others by construction (backfills with a level change = one level down + one level up + changed level and office). Build plan with every calculation, size and expected value: [`release_3_rebuild_dashboard_3.md`](docs/projects/workforce-planning/release_3_rebuild_dashboard_3.md); method and the PID ledger: [`workforce_planning.md`](docs/projects/workforce-planning/workforce_planning.md#0-which-dashboard-this-is-and-the-pid-principle); [headline values](docs/projects/workforce-planning/headline_values.md).
 
 ---
 

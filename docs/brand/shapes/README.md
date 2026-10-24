@@ -7,6 +7,7 @@ Tableau lists a shape palette in file-name order, shows white-on-transparent sha
 | `by_dashboard/shared` | `Arcadia Shared` | ⓘ and ✕ buttons, Summary \| By driver toggle, expand/collapse icons (both dashboards) |
 | `by_dashboard/d1` | `Arcadia D1` | Dashboard #1 Headcount & FTE Walk |
 | `by_dashboard/d2` | `Arcadia D2` | Dashboard #2 Compensation Walk |
+| `by_dashboard/d3` | `Arcadia D3` | Dashboard #3 Workforce Planning: capsule, reset, and the four popover lines (`d3_popover_line_*`, `d3_popover_divider_*`, drawn by `build/make_d3_popover_lines.py`; transparent white lines at 14%, so they show only on the navy popover) |
 | `by_dashboard/fp` | `Arcadia FP` | Global Workforce Footprint |
 | `Arcadia` | `Arcadia` | Generator output and the palette Dashboard #1 was **published** with. Leave it alone until #1 is republished on the new names |
 | `index/` | (not copied) | One picture per folder: every shape on the background it is drawn on, with its file name. Keep it open beside Tableau |
@@ -20,10 +21,10 @@ Tableau lists a shape palette in file-name order, shows white-on-transparent sha
 **Copy to Tableau (Mac):**
 ```
 cd ~/GitHub/people-analytics-warehouse/docs/brand/shapes/by_dashboard
-for s in shared:Arcadia\ Shared d1:Arcadia\ D1 d2:Arcadia\ D2 fp:Arcadia\ FP; do
+for s in shared:Arcadia\ Shared d1:Arcadia\ D1 d2:Arcadia\ D2 d3:Arcadia\ D3 fp:Arcadia\ FP; do
   mkdir -p ~/Documents/My\ Tableau\ Repository/Shapes/"${s#*:}"
   cp ${s%%:*}/*.png ~/Documents/My\ Tableau\ Repository/Shapes/"${s#*:}"/
 done
 ls ~/Documents/My\ Tableau\ Repository/Shapes | grep Arcadia
 ```
-Expected: `Arcadia`, `Arcadia Shapes`, `Arcadia D1`, `Arcadia D2`, `Arcadia FP`, `Arcadia Shared`.
+Expected: `Arcadia`, `Arcadia Shapes`, `Arcadia D1`, `Arcadia D2`, `Arcadia D3`, `Arcadia FP`, `Arcadia Shared`.

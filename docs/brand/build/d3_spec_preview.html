@@ -1,0 +1,122 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Dashboard #3 build spec preview: top bar, popovers, KPI band and KPI hovers at FY25 · All organizations.
+     Inter stands in for the Tableau fonts (px = pt x 4/3). Geometry and colours follow plan sections 8 to 10.
+     ?view=period | group | info | hovers -->
+<style>
+@font-face { font-family: Inter; font-weight: 400; src: url(node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; src: url(node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 700; src: url(node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2); }
+* { box-sizing: border-box; }
+body { margin:0; font-family:Inter,sans-serif; background:#F3F3EF; }
+.page { position:relative; width:1400px; height:480px; overflow:hidden; background:#F3F3EF; }
+.abs { position:absolute; }
+.band { left:0; top:0; width:1400px; height:76px; background:#13233A; }
+.lab { font-size:10.7px; font-weight:700; color:#B8C4D6; letter-spacing:.2px; }
+.cap { width:200px; height:36px; background:url(../shapes/by_dashboard/d3/d3_field_capsule.png) 0 0/200px 36px no-repeat; display:flex; align-items:center; justify-content:center; padding-right:14px; font-size:12px; font-weight:600; color:#13233A; }
+.kv { position:absolute; width:255px; text-align:center; color:#13233A; transform:translateY(-50%); white-space:nowrap; }
+.kt { font-size:12px; font-weight:600; } .kval { font-size:29.3px; font-weight:700; } .kn { font-size:12px; color:#5A6170; }
+.pop { position:absolute; background:#13233A; border-radius:0 0 10px 10px; }
+.ph { height:44px; display:flex; align-items:center; justify-content:space-between; padding-left:16px; color:#fff; font-size:16px; font-weight:700; }
+.ph img { width:16px; height:16px; margin-right:14px; }
+.line { display:block; }
+.body { display:flex; }
+.list { width:160px; position:relative; }
+.grid { position:relative; }
+.it { position:absolute; left:0; right:0; text-align:center; transform:translateY(-50%); font-size:13.3px; color:#B8C0CC; white-space:nowrap; }
+.it.cur { color:#fff; font-weight:600; }
+.cell { position:absolute; text-align:center; transform:translate(-50%,-50%); white-space:nowrap; color:#B8C0CC; }
+.cell b { display:block; font-size:13.3px; font-weight:600; } .cell span { font-size:12px; }
+.cell.cur { color:#fff; } .cell.off { color:#56657E; }
+.gcell { position:absolute; transform:translate(-50%,-50%); white-space:nowrap; font-size:12px; color:#B8C0CC; }
+.gcell.cur { color:#fff; font-weight:600; } .gcell.off { color:#56657E; }
+.foot { height:28px; padding:6px 16px 0; font-size:12px; color:#8FA0B8; }
+.info { padding:4px 16px 0; font-size:13.3px; color:#B8C0CC; line-height:1.38; }
+.info p { margin:0 0 12px; } .info b { color:#fff; font-weight:600; }
+.tips { display:flex; flex-wrap:wrap; gap:20px; padding:24px; width:1400px; background:#F3F3EF; }
+.tip { background:#fff; border:1px solid #CFD3D9; box-shadow:0 2px 6px rgba(0,0,0,.15); padding:9px 10px 8px; width:344px; }
+.tt { font-size:13.3px; font-weight:600; color:#13233A; }
+.tx { font-size:12px; color:#4A5A73; margin:3px 0 8px; line-height:1.38; }
+.row { display:flex; align-items:center; height:22px; }
+.rl { flex:none; width:136px; font-size:12px; color:#5A6170; white-space:nowrap; }
+.rb { flex:none; height:14px; background:#13233A; }
+.rv { font-size:12px; color:#13233A; margin-left:6px; font-weight:600; white-space:nowrap; }
+.bib { flex:none; position:relative; height:18px; }
+.cap2 { font-size:10.7px; color:#8C8A84; margin-top:4px; }
+</style></head><body>
+<div id="root"></div>
+<script>
+const V = new URLSearchParams(location.search).get("view") || "period";
+const fmt = n => n.toLocaleString("en-US");
+const root = document.getElementById("root");
+const K = [["PIDs","48,017","39,145 filled · 8,872 vacant"],["Vacant, previously held","8,294","6,423 vacant over 90 days"],
+  ["Vacant, new PIDs","578","approved, waiting for a first hire"],["PIDs filled","5,852","4,224 backfills · 1,628 net-new"],
+  ["Backfills with a level change","634","474 down · 160 up"]];
+function page(field1, field2) {
+  let h = `<div class="page" id="shot"><div class="abs band"></div>
+  <img class="abs" src="../arcadia_logo_horizontal_reverse.png" style="left:30px;top:14px;height:44px">
+  <div class="abs" style="left:223px;top:15px"><div style="color:#fff;font-size:24px;font-weight:700">Workforce Planning</div>
+  <div style="color:#C9D1DC;font-size:10.7px;margin-top:5px">PIDs from Jul 1, 2024 to Jun 30, 2025</div></div>
+  <div class="abs lab" style="left:506px;top:12px">SELECT PERIOD</div><div class="abs cap" style="left:506px;top:28px">${field1}</div>
+  <div class="abs lab" style="left:718px;top:12px">SELECT VIEW</div><div class="abs cap" style="left:718px;top:28px">${field2}</div>
+  <img class="abs" src="../shapes/by_dashboard/d3/d3_reset.png" style="left:1294px;top:30px;width:32px">
+  <img class="abs" src="../shapes/by_dashboard/shared/${V==='info'?'shared_info_close':'shared_info_open'}.png" style="left:1338px;top:30px;width:32px">
+  <img class="abs" src="../arcadia_kpi_cards_bg_wide.png" style="left:0;top:78px;width:1400px;height:110px">`;
+  K.forEach((k,i)=>{ const x = 30 + 271*i;
+    h += `<div class="kv kt" style="left:${x}px;top:${90+17}px">${k[0]}</div><div class="kv kval" style="left:${x}px;top:${90+44}px">${k[1]}</div><div class="kv kn" style="left:${x}px;top:${90+71}px">${k[2]}</div>`; });
+  return h;
+}
+if (V === "band") { root.innerHTML = page("FY25 · Jul 24 – Jun 25", "All organizations") + "</div>"; document.getElementById("shot").style.height="200px"; }
+if (V === "period") {
+  let h = page("FY25 Q3 · Jan – Mar 25", "All organizations");
+  h += `<div class="pop" style="left:506px;top:76px;width:864px;height:273px">
+   <div class="ph">Select a period<img src="../shapes/by_dashboard/shared/shared_close_light.png"></div>
+   <img class="line" src="../shapes/by_dashboard/d3/d3_popover_line_wide.png" style="width:864px;height:9px">
+   <div class="body" style="height:192px"><div class="list">`;
+  ["Fiscal year","Half year","Quarter"].forEach((s,i)=>{ h += `<div class="it ${s==='Quarter'?'cur':''}" style="top:${8+44*i+22}px">${s==='Quarter'?'› ':''}${s}</div>`; });
+  h += `</div><img src="../shapes/by_dashboard/d3/d3_popover_divider_period.png" style="width:24px;height:192px"><div class="grid" style="width:680px">`;
+  const fy=[2026,2025,2024,2023,2022], q=[["Q4","Apr – Jun"],["Q3","Jan – Mar"],["Q2","Oct – Dec"],["Q1","Jul – Sep"]];
+  fy.forEach((y,c)=>q.forEach((p,r)=>{ const yy = (p[0]==='Q2'||p[0]==='Q1') ? (y-2001) : (y-2000);
+    const cur = y===2025 && p[0]==='Q3'; const off = y===2022 && p[0]==='Q1';
+    h += `<div class="cell ${cur?'cur':off?'off':''}" style="left:${68+136*c}px;top:${8+44*r+22}px"><b>${cur?'› ':''}FY${y-2000} ${p[0]}</b><span>${p[1]} ${yy}</span></div>`; }));
+  h += `</div></div><div class="foot">Dim: no PIDs in the plan for that period. Fiscal year runs July to June.</div></div></div>`;
+  root.innerHTML = h;
+}
+if (V === "group") {
+  const D = ["Accounting & Controllership","Analytics Engineering","Brand & Communications","Client Success","Compliance & Risk","Core Platform Engineering","Customer Operations","Data & AI Platform","Design & Research","Enterprise IT","Enterprise Sales - Americas","Enterprise Sales - APAC","Enterprise Sales - EMEA","FP&A","Growth Marketing","HR Business Partners","Information Security","Legal","Mobile & Web Engineering","Partnerships","People Analytics","Product Engineering","Product Management","Sales Operations","Site Reliability","Talent Acquisition","Technical Support","Total Rewards","Treasury & Tax","Trust & Safety Operations","Workplace & Procurement"];
+  let h = page("FY25 · Jul 24 – Jun 25", "Accounting & Contro…");
+  h += `<div class="pop" style="left:506px;top:76px;width:864px;height:383px">
+   <div class="ph">Select a department<img src="../shapes/by_dashboard/shared/shared_close_light.png"></div>
+   <img class="line" src="../shapes/by_dashboard/d3/d3_popover_line_wide.png" style="width:864px;height:9px">
+   <div class="body" style="height:302px"><div class="list">`;
+  ["All organizations","Function","Sub-function","Department","Country"].forEach((s,i)=>{ h += `<div class="it ${s==='Department'?'cur':''}" style="top:${8+26*i+13}px">${s==='Department'?'› ':''}${s}</div>`; });
+  h += `</div><img src="../shapes/by_dashboard/d3/d3_popover_divider_group.png" style="width:24px;height:302px"><div class="grid" style="width:680px">`;
+  const per = Math.ceil(D.length/3);
+  D.forEach((g,i)=>{ const c=Math.floor(i/per), r=i%per; const cur = i===0, off = g==="Data & AI Platform";
+    h += `<div class="gcell ${cur?'cur':off?'off':''}" style="left:${113+227*c}px;top:${8+26*r+13}px">${g}</div>`; });
+  h += `</div></div><div class="foot">Dim: no PIDs in the plan for the chosen period.</div></div></div>`;
+  root.innerHTML = h;
+}
+if (V === "info") {
+  let h = page("FY25 · Jul 24 – Jun 25", "All organizations");
+  h += `<div class="pop" style="left:960px;top:76px;width:410px;height:560px">
+   <div class="ph">How to read this page<img src="../shapes/by_dashboard/shared/shared_close_light.png"></div>
+   <img class="line" src="../shapes/by_dashboard/d3/d3_popover_line_info.png" style="width:410px;height:9px">
+   <div class="info">
+   <p><b>Period.</b> Every option compares two quarter-ends inside one fiscal year. Arcadia's fiscal year runs July to June.</p>
+   <p><b>PIDs.</b> A PID is a position in Keystone, Arcadia's HR system. It is filled by an employee, filled by a contractor, or vacant. Contractors come from the supplier system and get an Arcadia ID and a PID like anyone else.</p>
+   <p><b>Vacant PIDs.</b> Previously held: someone left by resigning, being let go or moving to another PID. New: a net-new PID approved by the plan that has not had its first hire yet. Over 90 days counts as stale.</p></div></div></div>`;
+  root.innerHTML = h;
+}
+if (V === "hovers") {
+  const bars = (rows, max) => rows.map(r=>`<div class="row"><div class="rl">${r[0]}</div><div class="rb" style="width:${Math.max(2,120*r[1]/max)}px;background:${r[2]||'#13233A'}"></div><div class="rv">${fmt(r[1])}</div></div>`).join("");
+  const bib = (name, done, plan, pct) => `<div class="row"><div class="rl" style="width:80px">${name}</div><div class="bib" style="width:${110*plan/4737}px;background:#D5DBE4"><div style="position:absolute;left:0;top:4px;height:10px;width:${110*done/4737}px;background:#13233A"></div></div><div class="rv">${fmt(done)} of ${fmt(plan)} · ${pct}</div></div>`;
+  const T = [
+   ["PIDs","Every position on Jun 30, 2025, filled or vacant. Contractors hold PIDs in Keystone like employees. The plan expected 28,908 employees.", bars([["Filled by employees",28438],["Filled by contractors",10707],["Vacant",8872,"#8C9BB0"]],28438), "Tip PIDs"],
+   ["Vacant, previously held","PIDs someone left and nobody has replaced yet. 7,473 of them are contractor PIDs whose contract ended, waiting to be reused or closed by the position audit. 6,423 have waited over 90 days.", bars([["Contract ended",7473],["Voluntary",446],["Moved to another PID",254],["Involuntary",121]],7473), "Tip Vacant Why"],
+   ["Vacant, new PIDs","Net-new PIDs the plan approved that have not had their first hire yet, by function.", bars([["Technology",319],["Operations",82],["Commercial",74],["People",28],["Product",27]],319), "Tip Vacant New"],
+   ["PIDs filled","Hires and internal moves into a PID, against the plan. Median 41 days from approval to fill a backfill.", bib("Backfills",4224,4737,"89.2%") + bib("Net-new",1628,2236,"72.8%"), "Tip Filled BF + Tip Filled NN"],
+   ["Backfills with a level change","The PID came back at a different grade than the person who left. 8 of them also changed office.", bars([["One level down",474],["One level up",160]],474), "Tip Level"]];
+  root.innerHTML = `<div class="tips" id="shot">` + T.map(t=>`<div><div class="tip"><div class="tt">${t[0]}</div><div class="tx">${t[1]}</div>${t[2]}</div><div class="cap2">Hover ${T.indexOf(t)+1} · sheet ${t[3]}</div></div>`).join("") + `</div>`;
+}
+document.fonts.ready.then(()=>{ document.body.dataset.ready = "1"; });
+</script></body></html>
