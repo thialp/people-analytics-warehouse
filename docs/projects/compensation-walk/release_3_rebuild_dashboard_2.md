@@ -621,6 +621,8 @@ Dashboard #3 (Workforce Planning, published Oct 23) taught us two things about p
 
 **The #2 difference from #1 and #3.** #2 has no view list inside the popover: the rail's `Rail View` list *is* the view list (decision, Oct 24). So a rail view click sets `p_ViewTab` and opens the Group popover, the rail stays where it is, and the popover is a grid of groups only.
 
+**Status (Oct 24, 2026): built, reviewed against 14.11 and published** at the same URL. All click tests passed. Corrections found while building are folded in below: `Rail View` must keep `Close Panel` on Detail, `WF Caption` is an unused leftover (not an R1 item), and the navy that was published (see R3).
+
 ### 14.1 What each picker does today, and what it will do
 
 | Picker | Today (checked in your saved .twb, Oct 24) | After this section |
@@ -639,9 +641,9 @@ Why the rail `›` stays on the view in use: the rail is always visible, so it m
 
 | # | Refinement | Why | Cost |
 |---|---|---|---|
-| R1 | **Remove the arrow glyph** from `Pair Label` (Year over Year cells) and `WF Caption` (the FTE sentence under the waterfall): " to " instead | Project rule: no arrow characters; an arrow at 9 pt is unreadable (same as #1 R1 and #3 D11) | 2 formula edits |
+| R1 | **Remove the arrow glyph** from `Pair Label` (Year over Year cells): " to " instead. (`WF Caption`, the FTE sentence, was in the first draft of this row. It is not used on any sheet, so nobody can see its arrow, and Tableau shows it red on its own: it mixes aggregated and row-level fields. It was deleted with the other unused red calcs; nothing to fix.) | Project rule: no arrow characters; an arrow at 9 pt is unreadable (same as #1 R1 and #3 D11) | 1 formula edit |
 | R2 | **Fix a broken action**: `Close period panel when group opens` (Group Field) has **no source field** in the saved file, so it may not close the Period popover | Found in the .twb; one open at a time is the rule (0.5) | Pick `Close Panel` as its field |
-| R3 | **One navy, `#13233A`**: the rail and the Group and Info popovers are `#13223A`, the Period popover `#12213B`; section 0.5 and #1 use `#13233A` | The popovers now touch the rail, so a one-digit difference shows as a seam | Format only |
+| R3 | **One navy for the three popovers**: the file had `#13223A` (rail, Group, Info) and `#12213B` (Period). Published: all three popovers `#13243A`, the rail `#13223A`. The best match for a clean seam is the rail's own `#13223A` on the popovers; the 2-step difference in green is nearly invisible | The popovers touch the rail, so a difference can show as a faint line | Format only |
 | R4 | **`Rail View` tooltip**: its tooltip still lists `Default Group`, `View Label`, `view_name` and a `<!Missing Field!>` (`Zero`) | Tooltips are off on every control; the missing field is a warning in waiting | Untick Show tooltips |
 | R5 | **Info text style per 0.5**: lead-ins Tableau Semibold 10 white, body Tableau Book 10 `#B8C0CC` (today bold `#F5F5F5` and plain `#F5F5F5`) | Same as #1's info body | Format only |
 
@@ -748,14 +750,11 @@ IF [view_name] = "Company" THEN [group_name] ELSE [p_Group] END
 
 That is seven new calcs. *Keep as they are, on purpose:* `Group In View` (`[view_name] = [p_View]`, still read by `Rail Group`), `View Label` (the rail `›` on `p_View`), `Has Groups`, `Group Field Text`, `Toggle Group Panel`.
 
-*R1, arrows (two formula edits):*
+*R1, arrows (one formula edit):*
 
 ```
 // Pair Label   (only the Year over Year line changes: the arrow becomes " to ")
 WHEN "Year over Year" THEN LEFT(DATENAME('month',[from_month_end]),3) + " " + RIGHT(STR(YEAR([from_month_end])),2) + " to " + LEFT(DATENAME('month',[to_month_end]),3) + " " + RIGHT(STR(YEAR([to_month_end])),2)
-// WF Caption   (only the FTE part changes)
-... " other) move people between teams, so they net to zero at company level. FTE " +
-[WF FTE Open Str] + " to " + [WF FTE Close Str] + ", including " + [WF FTE Chg Str] + " from schedule changes."
 ```
 
 The FY26 cell then reads `Jun 25 to Jun 26` (Semibold 9, about 85 px in a 120 px column).
@@ -789,7 +788,7 @@ All sheets in this section: Fit **Entire View**, Format > Shading > Worksheet **
 
 **`Group Heading 2`** (the popover title): Text `<Tab Title>` only (replace `Panel Title`; delete any typed run): Tableau **Bold 12**, white `#FFFFFF`, alignment **Left**, **Middle**. Tooltip off. Add `zzTrue`, `zzFalse` to Detail if missing.
 
-**`Rail View`**: Detail: **add** `Group Apply From View`, `View Apply`, `Keep Group Panel Open`; **remove** `Default Group` and `Close Panel` (no action reads them any more). Keep `view_name`, `zzTrue`, `zzFalse`, Text `View Label`, rows, fonts and size exactly as today. Tooltip: untick Show tooltips (R4). Nothing visible changes in the rail.
+**`Rail View`**: Detail: **add** `Group Apply From View`, `View Apply`, `Keep Group Panel Open`; **remove** `Default Group` only (no action reads it any more). **Keep `Close Panel` on Detail**: `Close on view change` and `Close info on view change` read it from `Rail View`, and without it they stop firing silently, so Period or Info stays open when you click a view. Keep `view_name`, `zzTrue`, `zzFalse`, Text `View Label`, rows, fonts and size exactly as today. Tooltip: untick Show tooltips (R4). Nothing visible changes in the rail.
 
 **`Group Field`:** add `view_name` to **Detail** ("Open group on its view" reads it). Its filter `Group Is Current` now also checks the view, which still leaves exactly one mark.
 
@@ -933,12 +932,12 @@ Save the workbook, tell me, and I read the file. I check these and report pass o
 | Parameters | **31**: the 30 now plus `p_ViewTab` (String, list of 6, Company); none named "(copy)" except the existing `p_To`; `kpi_` values unchanged |
 | Parameter actions | **43** with the targets and fields in 14.8; **20** deselects; every action has a source field (17 fixed) |
 | Dangling references | No `Calculation_` id without a definition; no red calc; `Group Panel` filter is `Group Grid Rows` |
-| Arrows | No arrow glyph (U+2192) in any calc, label or text object a viewer can see (`Pair Label`, `WF Caption` fixed) |
+| Arrows | No arrow glyph (U+2192) in any calc, label or text object a viewer can see (`Pair Label` fixed) |
 | Stray colour legend | No colour-legend zone on the dashboard |
 | Dashboard zones | Popover positions and sizes as 14.3; padding 0; radius 0 on the rail side; image objects present with Fit Image; `Group Panel` inside its popover under the line; popovers in front |
-| Navy | Rail and popovers `#13233A`; no `#12213B` or `#13223A` left on them |
+| Navy | The three popovers share one colour and match the rail (published: popovers `#13243A`, rail `#13223A`); no `#12213B` left |
 | Controls | No parameter control (`p_PeriodOpen`, `p_GroupOpen`, `p_InfoOpen`, `p_ViewTab`) on the page |
-| Sheet specifics | `Span List`, `Period Panel`, `Group Panel`: Text marks, continuous slot pill, axis 0 to 12 or 0 to 24, reversed, header hidden; `Rail View` Detail has `Group Apply From View`, `View Apply`, `Keep Group Panel Open` and no `Default Group`; `Group Heading 2` shows `Tab Title` |
+| Sheet specifics | `Span List`, `Period Panel`, `Group Panel`: Text marks, continuous slot pill, axis 0 to 12 or 0 to 24, reversed, header hidden; `Rail View` Detail has `Group Apply From View`, `View Apply`, `Keep Group Panel Open` and **`Close Panel`**, and no `Default Group`; `Group Heading 2` shows `Tab Title` |
 
 ### 14.12 Order of work, then publish and repo
 
