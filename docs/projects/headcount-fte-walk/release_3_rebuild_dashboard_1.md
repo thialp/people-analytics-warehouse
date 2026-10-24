@@ -18,6 +18,8 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 
 **Dashboard #1 is rebuilt and published:** [https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard). Sections 1 to 8 and 10 are done: top bar and popovers, waterfall (Summary | By driver), five KPI cards with hover tooltips, Trend and Turnover, layout aligned to the KPI grid. The published page was checked against section 11 for Employees, Contingent and Total (FY26 and FY25 Q3), Commercial and Finance; every figure ties to the cards, waterfall, trend and Dashboard #2.
 
+**Next change (Oct 24, 2026):** the popovers get the two improvements proven on Dashboard #3: organised popovers (fixed row slots, one shared frame) and a Group popover that browses first and applies on a group click. Everything is in [section 14](#14-popover-carryback-from-dashboard-3-oct-24-2026); nothing else on the page changes.
+
 **Open follow-ups (small):** (1) `Period Name` still prints "Jan 2025 – Mar 2025" for a quarter while the Period field says "FY25 Q3"; see 8.5 for the quarter branch. (2) Apply the same toggle, KPI hover tooltips and type rule to Dashboard #2. (3) Cleanup of leftover calcs, sheets and actions: see section 13.
 
 ## Checkpoints
@@ -515,6 +517,8 @@ Delete any parameter control (`p_InfoOpen`, `p_Worker`, `p_From`, `p_To`) and sh
 
 ### 7.1 Period popover (copy of #2's)
 
+> **Layout superseded by [section 14](#14-popover-carryback-from-dashboard-3-oct-24-2026)** (Oct 24, 2026): the frame is now x 506, w 864, rows sit on fixed slots, and the sizes below no longer apply. The sheets, calcs and actions named here stay.
+
 Each popover opens directly under its own control (left edge aligned with the field, top at y 76, the bottom of the band); the Info panel is right-aligned to the page margin (x 960, w 410, right edge 1370).
 
 Sheets on **Region Walk**, built exactly as [rail_controls_build.md](../compensation-walk/rail_controls_build.md) Part 4.3: `Span List`, `Period Panel`, `Popover Close` (shape `btn_close_light`, Detail `Close Panel`, `zzTrue`, `zzFalse`, tooltip `Close`). Title text object "Select a period"; note line 9 pt `#8FA0B8`: "Fiscal year runs July to June. Each option compares two month-ends. Data through Jun 30, 2026."
@@ -535,6 +539,8 @@ Period actions (Dashboard > Actions, all Run on **Select**, Clearing **Keep curr
 | Close period on ✕ | Popover Close (period) | `p_PeriodOpen` | `Close Panel` |
 
 ### 7.2 Group popover (new: the view list on the left, the groups on the right)
+
+> **Layout and behaviour superseded by [section 14](#14-popover-carryback-from-dashboard-3-oct-24-2026).** A view click no longer applies the first group alphabetically: it only browses (`p_ViewTab`), and a group click applies view and group together. The text below describes the first build.
 
 The top bar has no room for #2's six-row view list, so the view list moves into the popover, laid out like the period popover (choice of kind on the left, options on the right).
 
@@ -1087,6 +1093,8 @@ IF [p_Worker] = "Employees" THEN "" ELSE " · employees only" END
 
 ### 8.4 Info popover (replaces the white Info Panel)
 
+> **Frame updated in [section 14](#14-popover-carryback-from-dashboard-3-oct-24-2026)** (44 px header, line, body 518; same text and the same 410 x 571 box). The old hidden `Info Panel` is deleted there.
+
 Container `Info Popover`, navy style (0.5), **x 960, y 76, w 410, h 571** (as built: 410 wide so the paragraphs wrap in fewer lines; right edge 1370 = page margin), visibility `p_InfoOpen`, front. Item hierarchy: `Info Popover` > `Info Popover Header` (title text + `Popover Close Info`, a duplicate of `Popover Close Group`) and `Info Popover Panel` (the body text). Header row: title "How to read this page" + ✕ (`Popover Close Info`; action `Close info on ✕` and `Deselect Popover Close Info` use it). Body (one Text object, 10 pt):
 
 > **Period.** Every number compares two month-ends: the walk opens on the first and closes on the second. Arcadia's fiscal year runs July to June.
@@ -1245,7 +1253,7 @@ If the secondary number shows blank: the link is not active (click the link icon
 | 17 | Trend | 843 | 188 | 526 | 296 | left edge 843 = left edge of KPI card 4, right edge 1369 = KPI card 5; 16 px gap to Turnover; Inner Padding bottom 4 |
 | 18 | Turnover | 843 | 500 | 526 | 312 | Bottom 812, level with the waterfall; Inner Padding bottom 4 |
 | 19 | Footnote (Text object) | 30 | 822 | 600 | 16 | "Arcadia Systems is a fictional company. All data is synthetic and covers Jul 2021 to Jun 2026." Book 8 slate (width 600 is enough; widen to 700 if it clips) |
-| 20 | Period / Group / Info popovers | 7.1, 7.2, 8.4 | | | | Front, hidden |
+| 20 | Period / Group / Info popovers | section 14.3 | 506 / 506 / 960 | 76 | 864 / 864 / 410 | 289 / 383 / 571 | Front, hidden (Period and Group share one frame) |
 
 Item order (Layout pane, bottom to top): background, cards, charts, buttons, header controls, popovers last.
 
@@ -1318,3 +1326,358 @@ Publish: reset the dashboard, hide all sheets, **File > Save to Tableau Public A
 | KPI 3 title follows the period | "Voluntary turnover" for 12 months or more, "(annualized)" below that, so a quarter and a year compare on one scale |
 | Hires per leaver replaces the old hires/FTE card | FTE equals headcount in release 3; the new ratio reads as a trend signal (1.35 FY26) |
 
+---
+
+## 14. Popover carryback from Dashboard #3 (Oct 24, 2026)
+
+Dashboard #3 (Workforce Planning, published Oct 23) taught us two things about popovers. This section carries both back to #1. **Nothing else on the page changes**: the waterfall, KPI cards, trend, turnover, tie-out note, numbers and layout below y 76 stay exactly as they are. Sources: [release_3_rebuild_dashboard_3.md](../workforce-planning/release_3_rebuild_dashboard_3.md) sections 7.1, 9.0 to 9.2 and 13, and the lessons in `dashboard_3_published.md` section 3. This section supersedes 7.1, 7.2 and 8.4 for layout and for how the Group popover behaves; those sections keep the calcs and sheet names, and each now has a pointer here.
+
+**Change A, organised popovers.** Every row sits on a fixed slot, so a short list starts at the top instead of spreading out; Period and Group share one frame; each popover hangs from the header band with a header, a thin line, a body and a footer; a vertical divider separates the list from the grid.
+
+**Change B, browse first, apply on a group click.** Clicking a view only browses (a new parameter, `p_ViewTab`) and the page does not move. Clicking a group applies the view and the group together and closes the popover. "All organizations" has no groups, so it applies at once. Nothing defaults to the first country, function or office alphabetically any more.
+
+### 14.1 What each picker does today, and what it will do
+
+| Picker | Today (checked in your saved .twb, Oct 24) | After this section |
+|---|---|---|
+| **Period** (`Period Field`, `Span List`, `Period Panel`) | Already browse-then-apply: a span click only sets `p_Span`, a cell click sets `p_From` and `p_To` and closes. The container floats at x 506, w 620, h 330. Rows are spread by `Period Row`, an ordinal table calc, so a short grid sits wherever the pane puts it. Cell labels use an arrow glyph in `Pair Label` | Same behaviour. Rows on fixed slots (6 slots of 32 px), shared frame x 506 to 1370, header, line, divider and footer. Arrow glyph replaced (R1) |
+| **Group** (`Group Field`, `View List`, `Group Panel`) | **Applies on the first click.** A click on Function sets `p_View` = Function and `p_Group` = the first group alphabetically (`Default Group`, a FIXED MIN), so the page changes to Commercial before you have chosen. Country sets Argentina, Department sets the first department, and so on. The popover then stays open for the real pick. Container x 610, w 760 | Browse first. View click sets `p_ViewTab` only. Group click sets `p_Group` and `p_View` together and closes. "All organizations" applies at once |
+| **Info** (`Info`, hidden panel) | Works; header is 30 px high with no line. A second, older panel (`Info Panel`, hidden, with the From / To text) is still in the item list | Same text and size; 44 px header with a line. Old panel deleted (R3) |
+| **Reset** | Resets `p_View` and `p_Group` (through `Default Group`) | Also resets `p_ViewTab` (action 23b) |
+
+Why Group applied on the first click: `Set view` and `Set group from view` both fire on a View List click, and `Default Group` is `{ FIXED [view_name] : MIN([group_name]) }`. Browsing needs a parameter that is *not* the one the page reads, which is exactly what `p_ViewTab` is.
+
+### 14.2 Refinements (all small; tell me any you do not want)
+
+| # | Refinement | Why | Cost |
+|---|---|---|---|
+| R1 | **Remove the arrow glyph** from `Pair Label` (cells and capsule), `Page Subtitle` and `Trend Subtitle`: " to " or " · " instead of the arrow | Same rule as #3 (D11): an arrow at 9 pt is unreadable, and the project rule is no arrow characters | 3 formula edits (14.5) |
+| R2 | **Add two missing closers**: `Period opens, info closes` and `Group opens, info closes` | Today Info closes the other two, but opening Period or Group while Info is open leaves both open (Info starts at x 960, inside the Period frame). #3 has all six pairs | 2 actions |
+| R3 | **Delete the old hidden `Info Panel`** (the zone with the "walk starts at the month-end before From" text) | It is dead weight in the item list and its text is out of date | 1 delete |
+| R4 | **One navy, `#13233A`**: the file has `#13223A` (header band, Info body), `#13203B` (Period Panel and Group Panel sheets) and `#12213B` (toggle); popovers should match the band exactly or you see a seam | Popovers hang from the band, so a one-digit difference shows as a line | Format only |
+| R5 | `Group Heading 2` still holds a typed run `SELECT PERIOD`; make sure the label is only `<Panel Title>` | A typed run beats the field and would print the wrong heading | Check |
+
+Not changing (so you do not wonder): the typed `▾` in `Period Field` and `Group Field` (a drawn chevron like #3's capsule is possible later, `d1_field_capsule.png` already exists, but it is not part of this job); the calibrated `kpi_FitX` 1.082 and `kpi_ShiftX` -12 (those are #1's own); `Set collapse` (leave it alone).
+
+**Known and left alone.** `Group Panel` lists every group that ever existed (Department 31, Country 22 across all periods), while a single period has 30 to 31 departments and 19 to 22 countries. A group that did not exist in the selected period is still clickable and gives an empty page. This predates the job and needs a period filter on the picker source; flagged for later.
+
+### 14.3 The frame, in numbers
+
+Page 1400 x 850. All popovers hang from the header band (top y 76, flush), navy `#13233A`, **corner radius top-left 0, top-right 0, bottom-left 10, bottom-right 10**, inner and outer padding 0, border None.
+
+Four bands, top to bottom: **header** 44, **line** 9 (1 px line inset 16 each side), **body**, **footer** 28 (no footer on Info).
+
+| Popover | x | y | w | Body | Total h | Visibility |
+|---|---:|---:|---:|---:|---:|---|
+| `Period Popover` | 506 | 76 | 864 | **208** (8 + 6 x 32 + 8) | 44 + 9 + 208 + 28 = **289** | `p_PeriodOpen` |
+| `Group Popover` | 506 | 76 | 864 | **302** (8 + 11 x 26 + 8) | 44 + 9 + 302 + 28 = **383** | `p_GroupOpen` |
+| `Info Popover` | 960 | 76 | 410 | **518** | 44 + 9 + 518 = **571** (unchanged) | `p_InfoOpen` |
+
+Period and Group share x 506 to 1370 (left edge under `SELECT PERIOD`, right edge under the info button), so switching from one to the other does not jump. Both were narrower before (Period 620, Group 760).
+
+Why 6 period slots: the Month span has 48 periods in a grid of **6 rows by 8 columns** (`Period Rows` = ceil(48 / 8)); Fiscal year (16) and Quarter (16) are 4 by 4 and Year to date (8) is 2 by 4. Six rows of 32 px is the tallest any span needs, and the shorter spans simply start at the top.
+
+**Fixed-slot rule** (same as #3): a row position goes on Rows as a **continuous** measure with a fixed, reversed axis and no header. Tableau rejects decimals such as 0.5 in the axis boxes, so every slot is **2 units wide with its centre on an odd number** (1, 3, 5 ...) and the axis runs from 0 to 2 x the number of slots.
+
+| Sheet | Slots | Axis fixed start / end | Pane height | Pixels per unit |
+|---|---:|---|---:|---:|
+| `Span List`, `Period Panel` | 6 | 0 / 12 | 192 | 16 (slot = 32) |
+| `View List`, `Group Panel` | 11 | 0 / 22 | 286 | 13 (slot = 26) |
+
+### 14.4 Before Tableau (Mac)
+
+The four images are made by `docs/brand/build/make_d3_popover_lines.py` (now with a `d1` mode) and are committed in `docs/brand/shapes/by_dashboard/d1/`. They are dashboard **Image** objects, not shapes, drawn at 2x so **Fit Image** keeps them crisp:
+
+| File | Pixels | Item size | Where |
+|---|---|---|---|
+| `d1_popover_line_wide.png` | 1728 x 18 | 864 x 9 | Under the Period and Group headers |
+| `d1_popover_line_info.png` | 820 x 18 | 410 x 9 | Under the Info header |
+| `d1_popover_divider_period.png` | 48 x 416 | 24 x 208 | Between `Span List` and `Period Panel` |
+| `d1_popover_divider_group.png` | 48 x 604 | 24 x 302 | Between `View List` and `Group Panel` |
+
+I have already copied the four files into `Arcadia Headcount/Images and Buttons/`. Check, and make a backup before you touch the workbook:
+
+```bash
+cd ~/Documents/Tableau/Tableau\ Public/ArcadiaHR/Arcadia\ Headcount
+ls "Images and Buttons" | grep d1_popover
+cp "Arcadia Headcount FTE Walk.twb" "Arcadia Headcount FTE Walk - before popovers.twb"
+ls -1 *.twb
+```
+
+Expected: the four `d1_popover_*` names, then both `.twb` files. (The same four files are in the repo, so a later `git pull` brings them too.)
+
+### 14.5 Parameter and calcs
+
+**Parameter.** Add one: `p_ViewTab`, String, List, values **Company, Function, Sub-function, Department, Country** (the same five as `p_View`, spelled the same), current value **Company**. Easiest: right-click `p_View` in the Data pane > **Duplicate**, rename to `p_ViewTab`, and check the list. It is the tab the Group popover is *browsing*; `p_View` stays the view the page *uses*. Parameters go from 26 to **27**.
+
+**Calcs on Region Walk.** Edit the six that exist, create the new ones, delete the two that are replaced. Spell the field names with the Data pane (`view_name`, `group_name`, `view_order` are Region Walk's own).
+
+*Edit in place (double-click the calc):*
+
+```
+// Group Is Current   (was: group only; six names exist in two views, see 14.9)
+[group_name] = [p_Group] AND [view_name] = [p_View]
+```
+```
+// Panel Title   (change p_View to p_ViewTab; the rest is as it is)
+"Select " + CASE [p_ViewTab]
+    WHEN "Function" THEN "a function" WHEN "Sub-function" THEN "a sub-function"
+    WHEN "Department" THEN "a department" WHEN "Country" THEN "a country"
+    ELSE "a view" END
+```
+```
+// Default Group   (was { FIXED [view_name] : MIN([group_name]) }, the alphabetical rule)
+"Arcadia Systems"
+```
+```
+// View Label   (the text on View List: the chevron marks the tab being browsed, not the view in use; "All organizations" matches the Group field)
+IF [view_name] = [p_ViewTab] THEN "› " ELSE "" END
++ IF [view_name] = "Company" THEN "All organizations" ELSE [View Name Display] END
+```
+```
+// Pick Row   (odd slots 1, 3, 5 ... inside the column; Pick Col and Pick Rows stay as they are)
+2 * ((INDEX() - 1) % [Pick Rows]) + 1
+```
+```
+// Period Row   (odd slots; Period Col and Period Rows stay as they are)
+2 * ((INDEX() - 1) % [Period Rows]) + 1
+```
+
+Why `Default Group` becomes a constant: it feeds `Reset` (a reset must land on Arcadia Systems, which it did only because Company's minimum happens to be that) and the old View List click. With the View List click gone, nothing may pick "the first one" any more, so the calc says what it means. If a calc named `Default Group All` also exists, point nothing at it and delete it.
+
+*Create (all row-level, no aggregation):*
+
+```
+// Span Slot          (Span Order is 1 to 4: Fiscal year, Year to date, Quarter, Month)
+2 * [Span Order] - 1
+// Span Is Current
+[Span Value] = [p_Span]
+// View Slot          (Office, view_order 5, is not offered, so Country at 6 is pulled up to slot 9: no gap)
+2 * (IF [view_order] > 5 THEN [view_order] - 1 ELSE [view_order] END) - 1
+// View Is Current
+[view_name] = [p_ViewTab]
+// Group Grid Rows    (the groups of the tab being browsed; Company has no groups, so the grid is empty there)
+[view_name] = [p_ViewTab] AND [view_name] <> "Company"
+// View Apply         (a click on All organizations applies at once; any other view only browses)
+IF [view_name] = "Company" THEN "Company" ELSE [p_View] END
+// Group Apply From View
+IF [view_name] = "Company" THEN [group_name] ELSE [p_Group] END
+```
+
+*Keep as they are, on purpose:* `Group In View` (`[view_name] = [p_View]`) and `Keep Group Panel Open` (`[view_name] <> "Company"`). `Group Field` still filters on `Group In View`, because the field must show the view *in use*, not the one being browsed.
+
+*Delete:* `Panel Shows Groups` (replaced by `Group Grid Rows`). Right-click > Delete: the dialog should list only `Group Panel`; if it lists anything else, press No and tell me.
+
+*R1, arrows (three formula edits):*
+
+```
+// Pair Label   (only the Year over Year line changes: the arrow between the two dates becomes " to ")
+WHEN "Year over Year" THEN LEFT(DATENAME('month',[from_month_end]),3) + " " + RIGHT(STR(YEAR([from_month_end])),2) + " to " + LEFT(DATENAME('month',[to_month_end]),3) + " " + RIGHT(STR(YEAR([to_month_end])),2)
+// Page Subtitle
+"Opening " + [TT Open Day] + " · Closing " + [TT Close Day]
+// Trend Subtitle   (both arrows become " to ")
+IF NOT [K Valid] THEN "" ELSE
+[TT Open Day] + " to " + [TT Close Day] + " · " + [Trend Open Str] + " to " + [Trend Close Str]
++ " (" + [Trend Chg Str] + ", " + [Trend Pct Str] + ")" END
+```
+The capsule then reads `FY26 · Jun 25 to Jun 26` (24 characters at Semibold 9, about 130 px of the 180-px capsule, clear of the chevron).
+
+**Checkpoint P1 (CHK sheet or any text table, Region Walk):** `Span Slot` per `Span Value` = Fiscal year 1, Year to date 3, Quarter 5, Month 7. `View Slot` per `view_name` = Company 1, Function 3, Sub-function 5, Department 7, Country 9 (Office would be 9 too, but it is filtered out; if Office appears in a test table, ignore it). `Default Group` = Arcadia Systems on every row.
+
+### 14.6 Sheets
+
+All sheets in this section: Fit **Entire View**, Format > Shading > Worksheet **None**, grid lines, zero lines, axis rulers and ticks **None**, row and column dividers **None**, Marks type **Text** (not Automatic: Automatic sometimes picks Bar on a continuous pill and the label then sits at the bar's end).
+
+**`Span List` (Region Walk)**
+1. Drag `Span Slot` to Rows (replace `pair_type`). Right-click the pill > **Measure > Minimum**, then right-click again > **Continuous**.
+2. Right-click the axis > Edit Axis: Range **Fixed**, start **0**, end **12**; tick **Reversed**; close. Right-click the axis > untick **Show Header**.
+3. `pair_type` stays on **Detail** (and keeps its filter, which hides "Custom Range"). Drag `Span Is Current` to **Color**: True white `#FFFFFF`, False `#B8C0CC` (Edit Colors; if Tableau offers a palette, pick any and then set the two chips by hand).
+4. Text: `<Span Display>`, Tableau Book 10, alignment **Center**, **Middle**. (The `›` in `Span Display` marks the span being browsed.)
+5. Detail also keeps `Span Value`, `zzTrue`, `zzFalse`. Tooltip: untick Show tooltips.
+
+**`Period Panel` (Region Walk)**
+1. Columns `Period Col` (Discrete, header hidden) as today. Rows: `Period Row` (now odd slots 1, 3, ... 11): right-click the pill > **Continuous** (the pill turns green). The pill changes from discrete to continuous, so the table calc setup is kept: right-click > **Edit Table Calculation** and check **Specific Dimensions** with **every** field of Detail ticked (`Period Key`, `Pair Label`, `from_month_end`, `to_month_end`, `Close Panel`, `zzTrue`, `zzFalse`, and the colour and tooltip fields). Do the same in the nested calcs: click **Nested calculation** at the top of that dialog, choose `Period Rows`, `Period Col` in turn, and set each to the same Specific Dimensions (this is the lesson from #3: one nested calc left on "Table (Across)" shifts the grid).
+2. Axis: Fixed 0 to **12**, **Reversed**, header hidden. Format > Lines: all None.
+3. Marks Text: `<Pair Label>` Tableau **Semibold 9**, **Center**, **Middle**. Color `Period Is Current`: True white `#FFFFFF`, False `#B8C0CC`. Tooltip `<Pair Name>` as today.
+4. Keep the filters (`Action (zzFalse)`, `Period In Span` = True) and every Detail field.
+
+**`View List` (Region Walk)**
+1. Rows: drag `View Slot` onto Rows, **Measure > Minimum**, **Continuous**; **remove** `View Label` from Rows and drag it to **Text**. Axis Fixed **0** to **22**, **Reversed**, header hidden.
+2. Marks Text: `<View Label>` Tableau **Book 10**, **Center**, **Middle**. Color `View Is Current`: True white `#FFFFFF`, False `#B8C0CC`.
+3. Detail: `view_name`, `Group Apply From View`, `View Apply`, `Keep Group Panel Open`, `zzTrue`, `zzFalse`. **Remove `Default Group` and `Close Panel`** (they are not used by the new actions). Filter `view_name` keeps Company, Function, Sub-function, Department, Country (no Office). Tooltip off.
+4. Why `view_name` stays on Detail: it is the field the "Browse view" action reads, and the field that keeps one mark per view.
+
+**`Group Panel` (Region Walk)**
+1. Filters: remove `Panel Shows Groups`; add `Group Grid Rows` = **True**. Keep `Action (zzFalse)`.
+2. Columns `Pick Col` (Discrete, header hidden). Rows `Pick Row` (now odd slots 1, 3 ... 21): right-click > **Continuous**; axis Fixed 0 to **22**, **Reversed**, header hidden. Re-check **Edit Table Calculation** on `Pick Row`, `Pick Col` and the nested `Pick Rows`: Specific Dimensions with every Detail field ticked, `group_name` at the top.
+3. Marks **Text** (it is Automatic today): `<Group Label>` Tableau **Book 9** (it is Bold 12 in the saved file), **Center**, **Middle**. Color `Group Is Current`: True white `#FFFFFF`, False `#B8C0CC`.
+4. Detail: `group_name`, `view_name` (new, needed by the "Apply view" action), `Group Label` stays on Text, `Close Panel`, `zzTrue`, `zzFalse`, `Panel Title` (remove it if present; it belongs to the heading sheet).
+5. The sheet is empty while `p_ViewTab` = Company. That is correct. To test: right-click `p_ViewTab` > Show Parameter, set Function, look, set Company, then hide the control (Remove from dashboard when you add it to a dashboard; in the sheet it is free).
+
+**`Group Heading 2`:** Text `<Panel Title>` only (delete the typed `SELECT PERIOD` run if it is still there, R5): Tableau **Bold 12**, white `#FFFFFF`, alignment **Left**, **Middle**. Tooltip off. Detail `zzTrue`, `zzFalse`.
+
+**`Group Field`:** add `view_name` to **Detail** (action 31 needs it). Nothing else changes.
+
+**`Reset`:** no change. Its Detail already holds `Default View` (it will feed `p_ViewTab` too), and `Default Group` is now the constant.
+
+**Close sheets** (`Popover Close`, `Popover Close Group`, `Popover Close Info`): unchanged; they only need the new 44 x 44 item size (14.7).
+
+**Checkpoint P2 (sheets, before the dashboard):** `Span List` shows 4 rows level with slots 1, 3, 5, 7; `Period Panel` at Fiscal year shows a 4 by 4 block starting at the top, at Month a 6 by 8 block; set `p_ViewTab` to Function: `Group Panel` shows 8 names in 3 columns (3, 3, 2) from the top; Department: 31 names (11, 11, 9); Country: 22 (8, 8, 6); Sub-function: 10 (4, 4, 2). Set it back to Company.
+
+### 14.7 Dashboard
+
+Edit the three existing popover containers in place; do not delete and rebuild them, so every action keeps its source. Open one at a time: right-click `p_PeriodOpen` in the Data pane > **Show Parameter**, set True, work, then **Remove from Dashboard** the control and set the value back to False. In the Layout pane use **Item hierarchy** (it lists hidden containers too).
+
+**R4 first (a minute):** on the header band (blank object), the three popover containers and the three panel sheets: background `#13233A`, border None. Sheets get this through Format > Shading > Worksheet **None** where they sit on a navy container, so set the **container** navy and the sheets None.
+
+**Period Popover** (vertical container, Floating): x **506**, y **76**, w **864**, h **289**.
+
+| Item | Type | w | h | Format |
+|---|---|---:|---:|---|
+| `Period Popover` | Vertical container | 864 | 289 | Background `#13233A`, border None, radius bottom-left and bottom-right 10, top 0, padding 0 |
+| `Period Popover Header` | Horizontal container | 864 | 44 | Background None, padding 0 |
+| title | Text | 820 | 44 | `Select a period`, Tableau Bold 12, white `#FFFFFF`; inner padding left 16, top 12 |
+| `Popover Close` | Sheet | 44 | 44 | Inner padding 14 on all sides |
+| header line | Image `d1_popover_line_wide.png` | 864 | 9 | **Fit Image**, no border, padding 0 |
+| `Period Popover Panel` | Horizontal container | 864 | 208 | Background None, padding 0 |
+| `Span List` | Sheet | 160 | 208 | Inner padding top 8, bottom 8, left 0, right 0 |
+| divider | Image `d1_popover_divider_period.png` | 24 | 208 | Fit Image, no border, padding 0 |
+| `Period Panel` | Sheet | 680 | 208 | Inner padding top 8, bottom 8, left 0, right 0 |
+| footer | Text | 864 | 28 | `Fiscal year runs July to June. Each option compares two month-ends. Data through Jun 30, 2026.` Tableau Book 9, `#8FA0B8`; inner padding left 16, top 6 |
+
+The current header text object holds `SELECT PERIOD` and the note in one run; split it: the note moves to the footer (copy its text), and the header text becomes the title above. Steps: (1) set the container to the new size and position first; (2) set the header container to h 44 and the text and close sheet to the sizes above; (3) drag an **Image** object from the Objects pane into the container, between the header and the panel (a grey drop guide shows the spot), choose `d1_popover_line_wide.png`, Fit Image; (4) resize `Span List` and `Period Panel` and drag an Image between them for the divider; (5) drag a **Text** object below the panel for the footer. For every tiled item, type the w and h in the Layout pane.
+
+**Group Popover:** x **506**, y **76**, w **864**, h **383**.
+
+| Item | Type | w | h | Format |
+|---|---|---:|---:|---|
+| `Group Popover` | Vertical container | 864 | 383 | As the Period popover |
+| `Group Popover Header` | Horizontal container | 864 | 44 | |
+| `Group Heading 2` | Sheet | 820 | 44 | Inner padding left 16, others 0 |
+| `Popover Close Group` | Sheet | 44 | 44 | Inner padding 14 |
+| header line | Image `d1_popover_line_wide.png` | 864 | 9 | Fit Image |
+| `Group Popover Panel` | Horizontal container | 864 | 302 | |
+| `View List` | Sheet | 160 | 302 | Inner padding top 8, bottom 8 |
+| divider | Image `d1_popover_divider_group.png` | 24 | 302 | Fit Image |
+| `Group Panel` | Sheet | 680 | 302 | Inner padding top 8, bottom 8 |
+| footer | Text | 864 | 28 | `Choose a view on the left, then a group on the right. All organizations applies at once.` Tableau Book 9, `#8FA0B8`; inner padding left 16, top 6 |
+
+**Info Popover:** x **960**, y **76**, w **410**, h **571** (unchanged size).
+
+| Item | Type | w | h | Format |
+|---|---|---:|---:|---|
+| `Info Popover Header` | Horizontal container | 410 | 44 | |
+| title | Text | 366 | 44 | `How to read this page`, Tableau Bold 12, white; inner padding left 16, top 12 |
+| `Popover Close Info` | Sheet | 44 | 44 | Inner padding 14 |
+| header line | Image `d1_popover_line_info.png` | 410 | 9 | Fit Image |
+| `Info Popover Panel` body | Text | 410 | 518 | Inner padding left 16, right 16, top 4. Lead-ins Tableau Semibold 10 white `#FFFFFF`, body Tableau Book 10 `#B8C0CC`; text exactly as 8.4 |
+
+**R3:** Item hierarchy > the hidden **`Info Panel`** (the old one, 286 px wide, with the From / To text) > right-click > **Remove from Dashboard**.
+
+**Front-to-back order** (Item hierarchy, top of the list is in front): `Info Popover`, `Group Popover`, `Period Popover`; then `KPI Hover 1` to `5`; then `KPI cards`; then the rest. A popover has to be in front of the hovers or a hover cover steals clicks from the open popover. Remove every parameter control you showed for testing (`p_PeriodOpen`, `p_GroupOpen`, `p_ViewTab`) and any colour legend Tableau added.
+
+### 14.8 Actions (38 Change Parameter + 21 Deselect = 59; today 32 + 21 = 53)
+
+Dashboard > Actions. Every Change Parameter action: **Run action on Select**, clearing the selection **Keep current value**, source = the dashboard and the single sheet named, aggregation as offered.
+
+| # | Name | Source sheet | Target parameter | Source field | Status |
+|---:|---|---|---|---|---|
+| 1 | Open period panel | Period Field | `p_PeriodOpen` | `Toggle Period Panel` | keep |
+| 2 | Period opens, group closes | Period Field | `p_GroupOpen` | `Close Panel` | keep |
+| 3 | **Period opens, info closes** | Period Field | `p_InfoOpen` | `Close Panel` | **new (R2)** |
+| 4 | Set span | Span List | `p_Span` | `Span Value` | keep |
+| 5 | Set From | Period Panel | `p_From` | `from_month_end` | keep |
+| 6 | Set To | Period Panel | `p_To` | `to_month_end` | keep |
+| 7 | Close on pick | Period Panel | `p_PeriodOpen` | `Close Panel` | keep, rename `Close period on pick` |
+| 8 | Close period on ✕ | Popover Close | `p_PeriodOpen` | `Close Panel` | keep |
+| 9 | Open group panel | Group Field | `p_GroupOpen` | `Toggle Group Panel` | keep |
+| 10 | Group opens, period closes | Group Field | `p_PeriodOpen` | `Close Panel` | keep |
+| 11 | **Group opens, info closes** | Group Field | `p_InfoOpen` | `Close Panel` | **new (R2)** |
+| 12 | **Open group on its view** (#3 action 31) | Group Field | `p_ViewTab` | `view_name` | **new** |
+| 13 | **Browse view** (#3 action 13) | View List | `p_ViewTab` | `view_name` | **edit `Set view`**: change the target from `p_View` to `p_ViewTab`; rename |
+| 14 | **Apply group for All organizations** (#3 action 14) | View List | `p_Group` | `Group Apply From View` | **edit `Set group from view`**: change the field from `Default Group`; rename |
+| 15 | **Apply view for All organizations** (#3 action 32) | View List | `p_View` | `View Apply` | **new** |
+| 16 | Keep group panel open | View List | `p_GroupOpen` | `Keep Group Panel Open` | keep, rename from `Keep panel open unless All` |
+| 17 | Set group | Group Panel | `p_Group` | `group_name` | keep |
+| 18 | **Apply view on group pick** (#3 action 33) | Group Panel | `p_View` | `view_name` | **new** |
+| 19 | Close on group pick | Group Panel | `p_GroupOpen` | `Close Panel` | keep |
+| 20 | Close group on ✕ | Popover Close Group | `p_GroupOpen` | `Close Panel` | keep |
+| 21 | Set worker | Workforce Toggle | `p_Worker` | `Worker Pick` | keep |
+| 22 | Set detail | Detail Toggle | `p_Expand` | `Detail Pick` | keep |
+| 23 to 29 | Reset from / to / span / view / group / worker / expand | Reset | `p_From`, `p_To`, `p_Span`, `p_View`, `p_Group`, `p_Worker`, `p_Expand` | the `Default ...` calcs | keep |
+| 30 | **Reset view tab** (#3 action 23b) | Reset | `p_ViewTab` | `Default View` | **new** |
+| 31 to 33 | Reset closes popovers 1 to 3 | Reset | `p_PeriodOpen`, `p_GroupOpen`, `p_InfoOpen` | `Close Panel` | keep |
+| 34 | Open info | Info | `p_InfoOpen` | `Toggle Info` | keep |
+| 35 to 36 | Info opens, period closes / Info opens, group closes | Info | `p_PeriodOpen`, `p_GroupOpen` | `Close Panel` | keep, rename from `Info opens, others close 1 / 2` |
+| 37 | Close info on ✕ | Popover Close Info | `p_InfoOpen` | `Close Panel` | keep |
+| 38 | Set collapse | (as saved) | `p_Expand` | (as saved) | leave alone |
+
+That is **6 new** (3, 11, 12, 15, 18, 30), **2 edited** (13, 14), the rest kept: 32 + 6 = **38**. The 21 Deselect actions already cover every sheet used here (`Span List`, `Period Panel`, `View List`, `Group Panel`, `Group Heading 2`, the three Close sheets, the fields); nothing new is needed.
+
+**How a View List click now runs** (three actions fire on the one click): 13 sets the tab; 14 and 15 set `p_Group` and `p_View` to the values they already hold, except on All organizations, where they set Arcadia Systems and Company; 16 keeps the popover open (True) except on All organizations, where it closes (False). So Function, Sub-function, Department and Country only browse. **A Group Panel click** fires 17 (group), 18 (the view that group belongs to) and 19 (close), so view and group arrive together. Six names exist in two views (Finance, Legal & Compliance, Marketing, Operations, People, Product), which is why 18 reads `view_name` from the clicked mark.
+
+### 14.9 Expected values
+
+Page numbers do not change (section 11 stands). What is new is *when* they change and what the popovers show.
+
+| State | Expect |
+|---|---|
+| Open, nothing clicked (FY26, All organizations) | Opening 28,438, closing 30,005. Capsule `FY26 · Jun 25 to Jun 26`; field `All organizations` |
+| Group popover, View List | 5 items on slots 1, 3, 5, 7, 9: All organizations (› and white while browsing), Function, Sub-function, Department, Country. No gap, no Office |
+| Click **Function** | List shows `›` on Function; grid shows 8 names (3, 3, 2). **The page does not move**: still 28,438 to 30,005, field still All organizations |
+| Click **Commercial** | Popover closes; field `Commercial`; opening 7,441, closing 7,795; turnover by sub-function |
+| Click Sub-function (popover reopened on the Function tab, Commercial applied) | 10 names (4, 4, 2). `Marketing`, `Finance` and the other four shared names are **not** white here, because the applied view is Function; each is white only on the tab of the view in use |
+| Department | 31 names (11, 11, 9). Click Accounting & Controllership: 543 to 560 |
+| Country | 22 names (8, 8, 6). Click India: 6,672 to 6,967 |
+| Click **All organizations** from any tab | Applies at once, popover closes, page back to Company numbers |
+| Reset | FY26, All organizations, Employees, compact; popovers closed; reopening the Group popover starts on the All organizations tab with an empty grid |
+| Period popover | Fiscal year: 4 by 4 block from the top, level with "Fiscal year". Year to date: 2 by 4. Quarter: 4 by 4 (FY26 Q4 top-left). Month: 6 by 8. Click Quarter, then FY26 Q4: closes, opening 29,618, closing 30,005 |
+
+### 14.10 Click tests
+
+| # | Do | Expect |
+|---:|---|---|
+| 1 | Open Period | Left edge level with `SELECT PERIOD`, right edge under the info button; title 16 px in; line 16 px short of each edge; footer note; bottom corners round, top corners square against the band |
+| 2 | Fiscal year, Year to date, Quarter, Month | Rows start at the top each time and never float to the middle; Month fills six rows |
+| 3 | Open Group, then Period | Only Period is open (Group closed by action 2) |
+| 4 | Open Period, then Info, then Group | One open at a time; with Info open, opening Period closes Info (R2) |
+| 5 | Group, click Function | Tab changes, **page does not change**, popover stays open |
+| 6 | Click Commercial | Closes, page changes to 7,441 / 7,795 |
+| 7 | Reopen Group | Opens on the Function tab with Commercial white |
+| 8 | Marketing check: Function, Marketing; reopen; Sub-function tab | Marketing not white on Sub-function |
+| 9 | Department, Country, All organizations | Values per 14.9; no click lands on a default group |
+| 10 | Click every control, the title, the KPI band | No blue box or outline stays |
+| 11 | Reset | Everything back; reopen Group: All organizations tab, empty grid |
+| 12 | Info | Header 44, line, body unchanged; ✕ closes |
+
+### 14.11 My review of the saved .twb (before you publish)
+
+Save the workbook, tell me, and I read the file. I check these and report pass or fail for each:
+
+| Check | Expect |
+|---|---|
+| Parameters | **27**: the 26 now plus `p_ViewTab` (String, list of 5, Company); none named "(copy)"; `kpi_` values unchanged (FitX 1.082, ShiftX -12) |
+| Parameter actions | **38** with the targets and fields in 14.8; **21** deselects; none with a missing source sheet except `Set collapse` |
+| Dangling references | No calc points at a deleted field (`Panel Shows Groups`); no `Calculation_` id without a definition; no red calc |
+| Arrows | No arrow glyph (U+2192) in any calc, label or text object a viewer can see |
+| Stray colour legend | No colour-legend zone on the dashboard (adding `Span Is Current` and `View Is Current` to Color can drop one) |
+| Dashboard zones | Popover positions and sizes as 14.3; image objects present with Fit Image; old `Info Panel` gone; popovers in front of the hovers |
+| Navy | The band and the popovers use `#13233A` |
+| Controls | No parameter control (`p_PeriodOpen`, `p_GroupOpen`, `p_ViewTab`) left on the page |
+| Sheet specifics | `Span List`, `View List`, `Period Panel`, `Group Panel`: Text marks, continuous slot pill, axis 0 to 12 or 0 to 22, reversed, header hidden; `Group Panel` filter is `Group Grid Rows`; `View List` Detail has no `Default Group` |
+
+### 14.12 Order of work, then publish and repo
+
+1. Mac: backup (14.4).
+2. Parameter and calcs (14.5), checkpoint P1.
+3. Sheets (14.6), checkpoint P2.
+4. Dashboard (14.7), one popover at a time; click test 1 and 2 after Period, 5 to 9 after Group, 12 after Info.
+5. Actions (14.8).
+6. Click tests 3, 4, 10, 11.
+7. Save, send me the file for 14.11.
+8. Publish: reset, close popovers, hide helper sheets, **File > Save to Tableau Public As...** `arcadia_headcount_fte_walk` (same name keeps the URL). Check the published page with the 14.10 table.
+9. Repo: new screenshot to `docs/images/` for the README row; section 0 of the case-study README mentions the browse-first picker; this section's status line.
+
+### 14.13 What this section does not touch
+
+The data sources and Custom SQL; the waterfall, KPI cards, trend, turnover and tie-out; the header layout (6.8); the other `Reset` defaults (only `Default Group` changes, and `p_ViewTab` is added to the reset); Dashboard #2 (its rail is a different shape and gets its own pass, with one open decision on what a rail view click does); and any number on the page.

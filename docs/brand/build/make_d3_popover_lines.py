@@ -6,12 +6,21 @@ Drawn at 2x so they stay crisp when Tableau fits them to the item size.
   d3_popover_divider_period.png   48 x 384 -> item 24 x 192  (between Span List and Period Panel; 8 px inset top and bottom)
   d3_popover_divider_group.png    48 x 604 -> item 24 x 302  (between View List and Group Panel; 8 px inset top and bottom)
 
-Usage: python3 docs/brand/build/make_d3_popover_lines.py docs/brand/shapes/by_dashboard/d3   (the four files are committed there)"""
+Dashboard #1 (Headcount & FTE Walk) uses the same frame (x 506, w 864) with a shorter period body (6 slots of 32 px), so it needs its own period divider:
+
+  d1_popover_line_wide.png      1728 x 18  -> item 864 x 9
+  d1_popover_line_info.png       820 x 18  -> item 410 x 9
+  d1_popover_divider_period.png   48 x 416 -> item 24 x 208  (between Span List and Period Panel; body 208 = 8 + 6 x 32 + 8)
+  d1_popover_divider_group.png    48 x 604 -> item 24 x 302
+
+Usage: python3 docs/brand/build/make_d3_popover_lines.py docs/brand/shapes/by_dashboard/d3        (d3: the four files are committed there)
+       python3 docs/brand/build/make_d3_popover_lines.py docs/brand/shapes/by_dashboard/d1 d1     (d1: the four files are committed there)"""
 import os, sys
 from PIL import Image, ImageDraw
 
 ALPHA = int(255 * 0.14)
 out = sys.argv[1] if len(sys.argv) > 1 else "."
+which = sys.argv[2] if len(sys.argv) > 2 else "d3"
 
 
 def hline(name, w, h, inset):
@@ -28,7 +37,13 @@ def vline(name, w, h, inset):
     im.save(os.path.join(out, name)); print(name, im.size)
 
 
-hline("d3_popover_line_wide.png", 864, 9, 16)
-hline("d3_popover_line_info.png", 410, 9, 16)
-vline("d3_popover_divider_period.png", 24, 192, 8)
-vline("d3_popover_divider_group.png", 24, 302, 8)
+if which == "d1":
+    hline("d1_popover_line_wide.png", 864, 9, 16)
+    hline("d1_popover_line_info.png", 410, 9, 16)
+    vline("d1_popover_divider_period.png", 24, 208, 8)
+    vline("d1_popover_divider_group.png", 24, 302, 8)
+else:
+    hline("d3_popover_line_wide.png", 864, 9, 16)
+    hline("d3_popover_line_info.png", 410, 9, 16)
+    vline("d3_popover_divider_period.png", 24, 192, 8)
+    vline("d3_popover_divider_group.png", 24, 302, 8)
