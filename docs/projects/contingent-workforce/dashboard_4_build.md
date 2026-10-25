@@ -7,6 +7,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | Revision | Date | What changed |
 |---|---|---|
 | 1 | 2026-10-25 | First full plan, steps 0 to 16. Spikes S1, S2 and S3 passed. Two findings added while writing it: the Sankey's place order breaks under a group filter (section 9.2, spike S7), and a Sankey click cannot show a hidden gap list (spike S2b). The page grid moves onto Dashboard #2's (cards from x 246, KPI band at y 88). **The build starts at step 5** (the dashboard shell, with the Sankey in its final tile) so the Sankey can be judged in place before anything else is built |
+| 2 | 2026-10-25 | Steps 3 and 4 done by a generator (`tableau/build/d4_fields/`): every parameter and calc written into the workbook and checked. Small changes to make the formulas valid as written: `Has Prior` is an aggregate; `Main Subtitle` is an aggregate with `Top Flag Prior Rank` and `Clear Own Gaps`; one `Tick Shape` and one `List Row` per list; `p_Close` allows All, opening on `Latest Close` |
 
 ## Contents
 
@@ -41,8 +42,8 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 0 | Data: generator, warehouse, SQL Server, Custom SQL, check tables, prototype (release plan phases 1 to 6) | Claude, Thiago on the Mac | | **Done** (88 of 88 tests, 35 of 35 SQL Server checks, prototype approved) |
 | 1 | Spikes S1 to S7 | Both | S | S1, S2, S3 **passed**. S7 in section 9.2, S2b in 13.4; S4, S5, S6 in their sections |
 | 2 | Workbook and data source | Thiago | S | Done in the spike workbook; step 2 makes it the real one |
-| 3 | Parameters | Thiago | S | |
-| 4 | Calculations | Thiago | M | Some exist from the spikes (label and tooltip calcs); step 6 replaces them |
+| 3 | Parameters | Claude | S | **Written into the workbook** 2026-10-25 (10; `kpi_` in step 9) |
+| 4 | Calculations | Claude | M | **Written into the workbook** 2026-10-25 (211 new; the 21 spike label and tooltip calcs rewritten in place) |
 | **5** | **Dashboard shell: rail, KPI band, three cards, footnote, with placeholders; the Sankey in its tile (section 8)** | Thiago | S | **Next** |
 | 6 | The Sankey: anchors (S7), levels, colours, labels, tooltip, tuned in its tile | Thiago | M | After 5 |
 | 7 | Rail controls | Thiago | M | |
@@ -171,7 +172,7 @@ ls "$W/_archive/2026-10-25"
 
 | Name | Type | Allowable values | Current | Notes |
 |---|---|---|---|---|
-| `p_Close` | Date | **List**, "When workbook opens" add values from field `month_end_date` | **Value when workbook opens: `Latest Close`** (7.1) | The close the page shows. Dynamic, so a refreshed extract opens on the newest close |
+| `p_Close` | Date | **All** (the close grid and Reset set it, so no list is needed) | **Value when workbook opens: `Latest Close`** (7.1) | The close the page shows. Opens on the newest close after a refresh |
 | `p_Functions` | String | All | empty | `|Commercial|Technology|`; empty = All functions |
 | `p_Departments` | String | All | empty | Same pattern |
 | `p_Countries` | String | All | empty | Same pattern |
@@ -189,7 +190,9 @@ Create `Latest Close` (7.1) before `p_Close`, so it can be chosen as the opening
 
 ## 7. Step 4: calculations
 
-All on **CW Reconciliation**. Field names are the SQL columns as Tableau shows them (`month_end_date`); calcs you create keep the names below. Create them in this order (each block uses only the ones before it).
+All on **CW Reconciliation**. Field names are the SQL columns as Tableau shows them (`month_end_date`); calcs keep the names below.
+
+**Written into the workbook, 2026-10-25.** The 10 parameters of section 6 and every calc in sections 7, 10, 11, 12.4, 13, 14, 15 and 16 (211 new, 21 spike calcs rewritten in place) were added to `Arcadia CW Reconciliation.twb` by [`tableau/build/d4_fields/`](../../../tableau/build/d4_fields/README.md), which also checks each formula for balanced brackets, IF and END, and mixed aggregate and row-level parts. Not included: the `kpi_` calcs and parameters (copied from Dashboard #2 in step 9). The formulas below are the source; the generator follows them.
 
 ### 7.1 Close and scope
 
@@ -201,7 +204,7 @@ All on **CW Reconciliation**. Field names are the SQL columns as Tableau shows t
 // Is Selected Close    [month_end_date] = [p_Close]
 // Is Prior Close       [month_end_date] = [Prior Close]
 // Is Current           [p_Close] = [Latest Close]
-// Has Prior            [p_Close] > [First Close]
+// Has Prior            [p_Close] > MIN([First Close])                                      (aggregate, so it sits with the K strings on the KPI cards)
 // Close Month          DATENAME('month', [p_Close])                                        "June"
 // Close Name           DATENAME('month', [p_Close]) + " " + STR(YEAR([p_Close]))          "June 2026"
 // Close Short          LEFT(DATENAME('month', [p_Close]), 3) + " " + STR(YEAR([p_Close])) "Jun 2026"
@@ -265,8 +268,9 @@ ELSE (IF [p_Functions] = "" THEN "|" + [function_name] + "|" ELSE [p_Functions] 
 // Function State       IF [Function Is On] THEN "on" ELSE "off" END
 // Department State     IF [Department Is On] THEN "on" ELSEIF [Dept In Functions] THEN "off" ELSE "dim" END
 // Country State        IF [Country Is On] THEN "on" ELSE "off" END
-// Tick Shape           (one per list; values must match the shape file names)
-//                      IF [Function Is On] THEN "d4_tick_on" ELSE "d4_tick_off" END
+// Function Tick Shape    IF [Function Is On] THEN "d4_tick_on" ELSE "d4_tick_off" END     (values match the shape file names)
+// Department Tick Shape  IF [Department Is On] THEN "d4_tick_on" ELSEIF [Dept In Functions] THEN "d4_tick_off" ELSE "d4_tick_dim" END
+// Country Tick Shape     IF [Country Is On] THEN "d4_tick_on" ELSE "d4_tick_off" END
 // Empty Text           ""
 // Toggle Close Panel   NOT [p_CloseOpen]
 // Toggle Function Panel  NOT [p_FunctionOpen]      (Department, Country, Info the same)
@@ -424,7 +428,8 @@ Every Tip calc counts only `Sankey Gap Row`, so the anchors (section 9.2) never 
 // Top Place           { FIXED : MIN(IF [Sankey Gap Row] AND [Place Gaps] = [Top Place Gaps] THEN [place] END) }
 // Top Flag Gaps       { FIXED : MAX(IF [Sankey Gap Row] THEN [Flag Gaps] END) }
 // Top Flag            { FIXED : MIN(IF [Sankey Gap Row] AND [Flag Gaps] = [Top Flag Gaps] THEN [flag_name] END) }
-// Top Flag Was First  { FIXED : MIN(IF [Sankey Gap Row] AND [flag_name] = [Top Flag] THEN [flag_rank_prior_close] END) } = 1
+// Top Flag Prior Rank { FIXED : MIN(IF [Sankey Gap Row] AND [flag_name] = [Top Flag] THEN [flag_rank_prior_close] END) }
+// Clear Own Gaps      { FIXED : SUM(IF [Sankey Gap Row] AND NOT [is_counted] THEN 1 ELSE 0 END) }
 // Move                ABS([flag_rank_year_ago] - [flag_rank])
 // Max Move            { FIXED : MAX(IF [Sankey Gap Row] THEN [Move] END) }
 // Mover               { FIXED : MIN(IF [Sankey Gap Row] AND [Move] = [Max Move] THEN [flag_label] END) }
@@ -439,18 +444,15 @@ Every Tip calc counts only `Sankey Gap Row`, so the anchors (section 9.2) never 
 IF ZN([Total Gaps]) = 0 THEN "No gaps in this selection"
 ELSE [Top Place] + " holds " + [Top Place Gaps Str] + " of " + [Total Gaps Str] + " gaps. Largest flag: " + [Top Flag] + " (" + [Top Flag Gaps Str] + ")" END
 
-// Main Subtitle
-IF ZN([Total Gaps]) = 0 THEN "Choose another close or fewer groups"
+// Main Subtitle       (aggregate: every LOD inside MIN(), so it can use Has Prior)
+(IF ZN(MIN([Total Gaps])) = 0 THEN "Choose another close or fewer groups"
 ELSEIF NOT [Scope Is All] THEN "Ranks and year-ago comparisons cover all of Arcadia: choose All in the rail to see them"
 ELSEIF NOT [Has Prior] THEN "First close in the data"
-ELSE (IF [Top Flag Was First] THEN "Same largest flag as " ELSE "New largest flag since " END) + [Prior Month] + ". "
-   + (IF ZN([Max Move]) = 0 OR ISNULL([Max Move]) THEN "No flag changed rank since a year ago" ELSE [Mover Text] END)
-END
-+ IF ZN(SUM(IF [Sankey Gap Row] AND NOT [is_counted] THEN 1 END)) > 0
-  THEN " · " + STR(SUM(IF [Sankey Gap Row] AND NOT [is_counted] THEN 1 END)) + " clear on their own by the next run" ELSE "" END
+ELSE (IF MIN([Top Flag Prior Rank]) = 1 THEN "Same largest flag as " ELSE "New largest flag since " END) + [Prior Month] + ". "
+   + (IF ZN(MIN([Max Move])) = 0 THEN "No flag changed rank since a year ago" ELSE MIN([Mover Text]) END)
+END)
++ (IF MIN([Clear Own Gaps]) > 0 THEN " · " + STR(MIN([Clear Own Gaps])) + " clear on their own by the next run" ELSE "" END)
 ```
-
-`Main Subtitle` mixes row-level LODs and an aggregate; if Tableau refuses it, wrap each LOD in `MIN()` (it is one value).
 
 Expected: Current "Bridgeway holds 194 of 407 gaps. Largest flag: Order open or billed after the end date (100)" / "Same largest flag as May. One person, two IDs: 8th a year ago (24), 6th now (28)". May 2026 "…200 of 418…(99)" / "Same largest flag as April. PID still filled after the end date: 5th a year ago (33), 3rd now (51) · 1 clear on their own by the next run". Jun 2025 "…167 of 349…(85)" / "Same largest flag as May. No flag changed rank since a year ago · 3 clear on their own by the next run". Dec 2024 "…210 of 386…(126)" / "Same largest flag as November. One person, two IDs: 8th a year ago (18), 7th now (22)". Technology "Bridgeway holds 125 of 263 gaps. Largest flag: Order open or billed after the end date (73)".
 
@@ -716,11 +718,11 @@ Filter on both sheets: `Close Grid Row` = True. 2021 shows Jun to Dec; 2026 Jan 
 
 ```
 // Function Slot       (table calc) 2 * (INDEX() - 1) + 1     Compute Using function_name
-// List Row            [Is Pop] AND { FIXED [function_name] : MIN([cost_center_id]) } = [cost_center_id]   (one row per function; same for department, country)
+// Function List Row   [Is Pop] AND { FIXED [function_name] : MIN([cost_center_id]) } = [cost_center_id]   (one row per function; Department List Row and Country List Row the same)
 // Tick X              MIN(0.6)
 ```
 
-Header: "Choose functions" 492 × 44, `Function Clear` 80 × 44 (Text mark "Clear all", Book 9 `#B8C0CC`, Detail `Empty Text`, `zzTrue`, `zzFalse`), ✕ 44 × 44 (w 312 total: use 188 + 80 + 44). Body `Function List` 312 × 224 (padding top 8, bottom 8, left 16): Rows `Function Slot` (continuous, axis 0 to 16, reversed); Columns `Tick X` (continuous, axis fixed 0 to 10, header hidden); Marks Shape `Tick Shape` (`d4_tick_on`, `d4_tick_off`), size small (12 px); Label `function_name` Right, Tableau Book 10, colour by `Function State` (on white `#FFFFFF`, off `#B8C0CC`), allow overlap; Detail `function_name`, `Function Toggle`, `zzTrue`, `zzFalse`; sort `function_name` ascending; filter `List Row` = True. Footer: `Choose one or more. None chosen means all functions.`
+Header: "Choose functions" 492 × 44, `Function Clear` 80 × 44 (Text mark "Clear all", Book 9 `#B8C0CC`, Detail `Empty Text`, `zzTrue`, `zzFalse`), ✕ 44 × 44 (w 312 total: use 188 + 80 + 44). Body `Function List` 312 × 224 (padding top 8, bottom 8, left 16): Rows `Function Slot` (continuous, axis 0 to 16, reversed); Columns `Tick X` (continuous, axis fixed 0 to 10, header hidden); Marks Shape `Function Tick Shape` (`d4_tick_on`, `d4_tick_off`), size small (12 px); Label `function_name` Right, Tableau Book 10, colour by `Function State` (on white `#FFFFFF`, off `#B8C0CC`), allow overlap; Detail `function_name`, `Function Toggle`, `zzTrue`, `zzFalse`; sort `function_name` ascending; filter `Function List Row` = True. Footer: `Choose one or more. None chosen means all functions.`
 
 A click toggles the function and **keeps the popover open**, so several can be ticked in a row; ✕ or another control closes it.
 
@@ -733,7 +735,7 @@ Three columns on fixed slots, as Dashboard #3's group panel (G3 9.2) with the D2
 // Pick Row    2 * ((INDEX() - 1) - [Pick Col] * [Pick Rows]) + 1
 ```
 
-Columns `Pick Col` (discrete, header hidden), then `Tick X` (continuous 0 to 10, header hidden); Rows `Pick Row` continuous (axis 0 to 22 for departments, 0 to 16 for countries; reversed); Compute Using `department_name` (or `country_name`) on every nested calc. Shape `Tick Shape` (on the Department version: `d4_tick_on`, `d4_tick_off`, `d4_tick_dim`), label the name Right, Book 9; Color by `Department State`: on white, off `#B8C0CC`, **dim `#56657E`** (outside the chosen functions: still clickable, D in the release plan's phase 8); Detail the name, its `Toggle`, `zzTrue`, `zzFalse`. Header "Choose departments" / "Choose countries" with `Clear all` and ✕; footer `Dim: outside the chosen functions. None chosen means all.` (country: `None chosen means all countries.`).
+Columns `Pick Col` (discrete, header hidden), then `Tick X` (continuous 0 to 10, header hidden); Rows `Pick Row` continuous (axis 0 to 22 for departments, 0 to 16 for countries; reversed); Compute Using `department_name` (or `country_name`) on every nested calc. Shape `Department Tick Shape` or `Country Tick Shape` (the Department one adds `d4_tick_dim`); filter `Department List Row` or `Country List Row` = True, label the name Right, Book 9; Color by `Department State`: on white, off `#B8C0CC`, **dim `#56657E`** (outside the chosen functions: still clickable, D in the release plan's phase 8); Detail the name, its `Toggle`, `zzTrue`, `zzFalse`. Header "Choose departments" / "Choose countries" with `Clear all` and ✕; footer `Dim: outside the chosen functions. None chosen means all.` (country: `None chosen means all countries.`).
 
 Expected: Department 31 names in 3 columns (11, 11, 9); Country 22 (8, 8, 6).
 
