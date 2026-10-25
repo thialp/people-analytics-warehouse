@@ -46,7 +46,10 @@ FROM (
     UNION ALL SELECT 'rpt.vw_cw_gap_close',        (SELECT COUNT(*) FROM rpt.vw_cw_gap_close), 21665
     UNION ALL SELECT 'rpt.vw_cw_gap_rate_close',   (SELECT COUNT(*) FROM rpt.vw_cw_gap_rate_close), 27324
     UNION ALL SELECT 'rpt.vw_itsm_ticket_close',   (SELECT COUNT(*) FROM rpt.vw_itsm_ticket_close), 16446
-    UNION ALL SELECT 'Custom SQL rows',            (SELECT COUNT(*) FROM #d6), 65435
+    UNION ALL SELECT 'Custom SQL rows',            (SELECT COUNT(*) FROM #d6), 67623
+    UNION ALL SELECT 'Custom SQL Sankey scaffold', (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Sankey'), 2188
+    UNION ALL SELECT 'Custom SQL Sankey links',    (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Sankey' AND sk_part = 'Link'), 2100
+    UNION ALL SELECT 'Gap rows with a short name', (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND flag_short IS NOT NULL), 21665
 ) AS c;
 GO
 

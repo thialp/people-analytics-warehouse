@@ -1,0 +1,117 @@
+"""Run the native Sankey's Tableau formulas on the DuckDB mart and draw what Tableau should draw.
+
+  python3 verify_sankey.py 2026-06-30 "" > sankey.svg          (close, p_Functions value)
+
+Each calc is translated to SQL (FIXED LODs become window aggregates over the whole table, which is
+what a FIXED LOD is when no context filter applies) and computed in dependency order, one column
+per calc. Only the numeric and boolean fields the geometry needs are translated, so a pass is
+evidence that the formulas place every point where the design says.
+"""
+import os, re, sys
+import duckdb
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import spec, spec_sankey
+
+CLOSE = sys.argv[1] if len(sys.argv) > 1 else '2026-06-30'
+FUNCS = sys.argv[2] if len(sys.argv) > 2 else ''
+PARAM = {'p_Close': f"DATE '{CLOSE}'", 'p_Functions': f"'{FUNCS}'", 'p_Departments': "''", 'p_Countries': "''",
+         'p_SkFlag': "''", 'p_SkRisk': "''", 'p_SkPlace': "''"}
+F = {c[0]: c[3] for c in spec.C + spec_sankey.C}
+ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
+
+
+def match(s, i, o='(', c=')'):
+    d = 0
+    for j in range(i, len(s)):
+        if s[j] == o: d += 1
+        elif s[j] == c:
+            d -= 1
+            if d == 0: return j
+    raise ValueError(s)
+
+
+def split_args(s):
+    out, d, cur = [], 0, ''
+    for ch in s:
+        if ch in '({': d += 1
+        if ch in ')}': d -= 1
+        if ch == ',' and d == 0: out.append(cur); cur = ''
+        else: cur += ch
+    return out + [cur]
+
+
+def fn(s, name, conv):
+    while True:
+        m = re.search(r'\b' + name + r'\(', s)
+        if not m: return s
+        a = m.end() - 1; b = match(s, a)
+        s = s[:m.start()] + conv(split_args(s[a + 1:b])) + s[b + 1:]
+
+
+def to_sql(f, deps):
+    f = re.sub(r'//[^\n]*', '', f)
+    f = re.sub(r'"([^"]*)"', lambda m: "'" + m.group(1).replace("'", "''") + "'", f)
+    def ref(m):
+        n = m.group(1)
+        if n in PARAM: return PARAM[n]
+        if n in F: deps.add(n); return f'"{n}"'
+        return f'"{n}"'
+    f = re.sub(r'\[([^\[\]]+)\]', ref, f)
+    while '{' in f:                                    # FIXED LODs, innermost first is not needed: none nest
+        a = f.index('{'); b = match(f, a, '{', '}')
+        inner = f[a + 1:b]
+        dims, agg = inner.split(':', 1)
+        dims = dims.replace('FIXED', '').strip()
+        part = f' PARTITION BY {dims}' if dims else ''
+        agg = agg.strip()
+        f = f[:a] + f'({agg} OVER ({part.strip()}))' + f[b + 1:]
+    f = fn(f, 'IIF', lambda a: f'(CASE WHEN {a[0]} THEN {a[1]} ELSE {a[2]} END)')
+    f = fn(f, 'ZN', lambda a: f'COALESCE({a[0]}, 0)')
+    f = fn(f, 'IFNULL', lambda a: f'COALESCE({a[0]}, {a[1]})')
+    f = fn(f, 'FLOAT', lambda a: f'CAST({a[0]} AS DOUBLE)')
+    f = fn(f, 'INT', lambda a: f'CAST(TRUNC(CAST({a[0]} AS DOUBLE)) AS INTEGER)')
+    f = fn(f, 'MID', lambda a: f'SUBSTRING({a[0]}, {a[1]}, {a[2]})')
+    f = fn(f, 'CONTAINS', lambda a: f"contains({a[0].replace('+', '||')}, {a[1].replace('+', '||')})")
+    f = re.sub(r'\bELSEIF\b', 'WHEN', f)
+    f = re.sub(r'(?<![A-Z])IF\b', 'CASE WHEN', f)
+    return f
+
+
+NEED = ['Sk X', 'Sk Y', 'Sk Show', 'Sk Draw', 'Sk N']
+sql, order, seen = {}, [], set()
+def visit(n):
+    if n in seen: return
+    seen.add(n)
+    deps = set()
+    sql[n] = to_sql(F[n], deps)
+    for d in sorted(deps): visit(d)
+    order.append(n)
+for n in NEED: visit(n)
+
+con = duckdb.connect(os.path.join(ROOT, 'warehouse', 'arcadia.duckdb'), read_only=True)
+q = 'SELECT * FROM marts.mart_cw_reconciliation_dashboard'
+for i, n in enumerate(order):
+    q = f'SELECT *, {sql[n]} AS "{n}" FROM ({q}) AS t{i}'
+rows = con.execute(f"""SELECT sk_part, sk_level, flag_code, risk, place, sk_point, "Sk X", "Sk Y", "Sk Draw", "Sk N"
+                       FROM ({q}) WHERE row_type = 'Sankey' AND "Sk Show" ORDER BY "Sk Draw", sk_part, sk_level, flag_code, risk, place, sk_point""").fetchall()
+polys, labels = {}, []
+for part, lvl, f, r, p, pt, x, y, draw, n in rows:
+    if part in ('Link', 'Node'):
+        polys.setdefault((draw, part, lvl, f, r, p), []).append((pt, x, y))
+    else:
+        labels.append((part, lvl, f, r, p, x, y, n))
+TINT = {'Bridgeway': '#FBC37F', 'Keystone': '#B5B2DC', 'System feed': '#85D4BD'}
+SOLID = {'Bridgeway': '#F89217', 'Keystone': '#7873C0', 'System feed': '#21B087'}
+svg = []
+for key in sorted(polys, key=lambda k: (k[0], k[1])):
+    draw, part, lvl, f, r, p = key
+    pts = sorted(polys[key])
+    col = TINT[p] if part == 'Link' else (SOLID[p] if lvl == 3 else '#13233A')
+    svg.append(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for _, x, y in pts)}" fill="{col}"/>')
+for part, lvl, f, r, p, x, y, n in labels:
+    t = {1: 'What differs', 2: 'What it puts at risk', 3: 'Where it is aligned'}[lvl] if part == 'Header' else \
+        (f or '') + (r if lvl == 2 else '') + (p if lvl == 3 else '') + f' {n}'
+    svg.append(f'<text x="{x:.1f}" y="{y + 3:.1f}" font-size="9" fill="#13233A">{t}</text>')
+print(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 726 540" width="726" height="540" font-family="Helvetica"><rect width="726" height="540" fill="#fff"/>{"".join(svg)}</svg>')
+print(f'{len(order)} calcs computed; {len(polys)} polygons, {len(labels)} labels', file=sys.stderr)

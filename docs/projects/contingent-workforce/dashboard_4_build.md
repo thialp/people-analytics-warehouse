@@ -9,6 +9,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 1 | 2026-10-25 | First full plan, steps 0 to 16. Spikes S1, S2 and S3 passed. Two findings added while writing it: the Sankey's place order breaks under a group filter (section 9.2, spike S7), and a Sankey click cannot show a hidden gap list (spike S2b). The page grid moves onto Dashboard #2's (cards from x 246, KPI band at y 88). **The build starts at step 5** (the dashboard shell, with the Sankey in its final tile) so the Sankey can be judged in place before anything else is built |
 | 2 | 2026-10-25 | Steps 3 and 4 done by a generator (`tableau/build/d4_fields/`): every parameter and calc written into the workbook and checked. Small changes to make the formulas valid as written: `Has Prior` is an aggregate; `Main Subtitle` is an aggregate with `Top Flag Prior Rank` and `Clear Own Gaps`; one `Tick Shape` and one `List Row` per list; `p_Close` allows All, opening on `Latest Close` |
 | 3 | 2026-10-25 | Status marks: 🟢 in the workbook, 🔴 still to add by hand (only the `kpi_` set, step 9). Folder `4 Contingent Workforce Reconciliation` (no leading zero) |
+| 4 | 2026-10-25 | **Native Sankey (D15, section 9N).** The Custom SQL gains the Sankey scaffold (2,188 rows) and `flag_short`; 3 parameters and 142 `Sk` calcs written into the workbook and checked against the data (`verify_sankey.py`). Version A, the extension, kept as section 9 |
 
 ## Contents
 
@@ -46,7 +47,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 3 | Parameters | Claude | S | **Written into the workbook** 2026-10-25 (10; `kpi_` in step 9) |
 | 4 | Calculations | Claude | M | **Written into the workbook** 2026-10-25 (211 new; the 21 spike label and tooltip calcs rewritten in place) |
 | **5** | **Dashboard shell: rail, KPI band, three cards, footnote, with placeholders; the Sankey in its tile (section 8)** | Thiago | S | **Next** |
-| 6 | The Sankey: anchors (S7), levels, colours, labels, tooltip, tuned in its tile | Thiago | M | After 5 |
+| 6 | The Sankey, **native** (section 9N): extract refresh, the `Sankey Native` sheet, on the dashboard, actions. Version A, the extension (section 9), stays in the workbook | Thiago | M | **Next**: data and 142 fields written; the sheet is to build |
 | 7 | Rail controls | Thiago | M | |
 | 8 | Popovers: Point in time, Function, Department, Country, Info | Thiago | L | Needs S4 |
 | 9 | KPI band and hovers | Thiago | M | |
@@ -102,6 +103,7 @@ S is an hour or less, M a session, L more than one session. One screenshot per s
 | D12 | Every text on the page is a calculation (L3); every empty state has words (L12): "No gaps in this selection", N/A for a zero denominator | Lessons from the published dashboards |
 | D13 | No arrows or glyphs in viewer text; tooltip command buttons off on every sheet; every clickable or text sheet has a deselect action | Standing rules |
 | D14 | Tickets with no linked contractor (95 of 361 at the June close) have no group, so they leave the ticket card when any group is chosen | They cannot be placed in a function or country; the info text says so |
+| D15 | The Sankey on the page is native Tableau (polygons on a 2,188-row scaffold, FIXED LODs), not the viz extension | The extension draws labels only inside nodes and colours a link only by its source; native gives thin nodes, labels beside them and ribbons in the place colours. Version A stays in the workbook for reference (section 9). Short flag names (`flag_short`) everywhere a viewer reads a flag |
 
 ---
 
@@ -576,7 +578,7 @@ Presentation mode: the rail runs the full height with the logo, four headings an
 
 ---
 
-## 9. Step 6: the Sankey
+## 9. Version A: the extension Sankey (kept in the workbook, not on the page; the page uses 9N)
 
 **Before:** the parameters `p_Close`, `p_Functions`, `p_Departments`, `p_Countries` (section 6) and the calcs of 7.1, 7.6, 7.7 and 7.8. The rail controls are not needed yet: set a parameter by hand to test (right-click it > Show Parameter, then remove the control).
 
@@ -647,6 +649,115 @@ Expected, Current, no group: hover flag "Bridgeway ID missing or different": "49
 ### 9.6 Main card title sheet (`Main Title`)
 
 Text mark, `Main Title` and `Main Subtitle` on Label: line 1 Tableau Semibold 12 navy, line 2 Tableau Book 9 slate `#5A6170`; alignment Left, Middle; Worksheet shading None; Fit Entire View; tooltip off; `zzTrue`, `zzFalse` on Detail (deselect, section 17). Replaces the title placeholder in `Card: Main` (726 × 44). Expected: 7.8.
+
+---
+
+## 9N. Step 6: the native Sankey (the one on the page)
+
+**Why (D15).** The viz extension draws labels only inside the nodes and colours a link only by its source. In the 726 × 540 tile that gave wide nodes, spilt labels and a second link in one grey ([options board](img/sankey_options.png)). A native Sankey gives thin nodes, labels beside them, and every ribbon in the colour of the place that aligns it, the same amber, violet and teal as the ticket card. Version A (section 9, the extension on the `Sankey` sheet) stays in the workbook, unchanged, for reference; it is not on the page.
+
+**What is already done (🟢).**
+- **Data.** The Custom SQL has a fourth row type, `Sankey`: 2,188 scaffold rows built from the flag, risk and place taxonomy, with no close and no group. `sk_part` is `Link` (`sk_level` 1 runs flag to risk, 2 runs risk to place; `sk_point` 0 to 49 runs along the ribbon's two edges), `Node` (`sk_point` 0 to 3, the corners), `Label` or `Header`. Gap and Sankey rows also carry `flag_short`, the short name every viewer sees. The DuckDB mart has the same rows; `check_tsql_in_duckdb.py` matches them row for row (67,623), and `15_validate` checks the new counts.
+- **Workbook.** `tableau/build/d4_fields/build_sankey.py` wrote the new Custom SQL (both copies), registered the four new columns, and added 3 parameters and 142 `Sk` calcs (`spec_sankey.py`). Existing fields are only read, never changed.
+- **Proof.** `verify_sankey.py` runs the `Sk` formulas themselves on the mart (FIXED LODs as window aggregates) and draws the result. It matches the design at Jun 2026, Dec 2024 and Jun 2026 with Marketing ([check](img/native_sankey_check.png); flag codes stand in for the names, because the check skips text fields).
+
+**How it works.** Every point is a FIXED LOD of the selection (`Sankey Gap` = `Gap Now`, so the close and the groups apply), evaluated on scaffold rows that carry the keys. No table calcs, so nothing depends on Compute Using.
+
+| Piece | Fields |
+|---|---|
+| Node counts | `Sk F1`–`F9`, `Sk R1`–`R5`, `Sk P1`–`P3`: gaps per flag, risk and place in the selection (the taxonomy is fixed at 9 / 5 / 3) |
+| Scale | `Sk Scale` = (height − `Sk Pad` × (nodes in the fullest column − 1)) / total gaps. Each column spreads its nodes over the full height (`Sk Gap F`, `R`, `P`), so a column with fewer nodes has wider gaps and the ribbons slant |
+| Node tops | `Sk Y Flag`, `Sk Y Risk`, `Sk Y Place`: gaps before the node × scale + non-empty nodes before it × the column gap. Empty nodes take no space |
+| Ribbons | Flag to risk, one band per flag × place (`Sk FP`), so each band already has its place colour. Risk to place, one per risk × place (`Sk RP`). Offsets in each node: `Sk FP Before`, `Sk RP Before`, `Sk PR Before` |
+| Curve | `Sk T Along` runs 0 to 1 on the top edge and back on the bottom edge; `Sk Ease` = 3t² − 2t³ |
+| Coordinates | `Sk X`, `Sk Y` for every part. `Sk Y Shape` (links and nodes) and `Sk Y Text` (labels and headers) split them over the two axes |
+
+### 9N.1 Refresh the extract (SQL Server running in Docker)
+
+1. Open the workbook. If Tableau warns that `flag_short` or `sk_…` columns are missing, the extract is older than the SQL. Continue.
+2. Data > CW Reconciliation > Extract > Refresh.
+3. Expected on `CHK Rows`: **Gap 21,665 · Population 27,324 · Sankey 2,188 · Ticket 16,446** (67,623). The other sheets do not change, because no existing field reads the new rows.
+
+### 9N.2 Sheet `Sankey Native`
+
+1. New worksheet `Sankey Native`. Right-click `sk_point` in the Data pane > Convert to Dimension.
+2. Filters: `Sk Show` = True.
+3. Columns: `Sk X` (AVG). Rows: `Sk Y Shape` (AVG), then `Sk Y Text` (AVG). Right-click the second pill > Dual Axis; right-click its axis > Synchronize Axis.
+4. Axes: `Sk X` Fixed **0 to 726**. `Sk Y Shape` Fixed **0 to 540**, **Reversed** (check the right axis follows; set it the same if not). Then uncheck Show Header on all three. Right-click the null indicator, bottom right > Hide Indicator.
+5. Marks card **AVG(Sk Y Shape)**: Polygon. Detail `Sk Mark`; Path `sk_point`; Color `Sk Colour` (table below), opacity **100%**, border None. On the `Sk Mark` pill: Sort > Field `Sk Draw`, Minimum, Ascending (wide ribbons first, thin ones on top, nodes last).
+6. Marks card **AVG(Sk Y Text)**: Circle, size smallest, opacity **0%**. Detail `Sk Mark`. Label: `Sk Lbl Header`, `Sk Lbl Place`, `Sk Lbl Name`, `Sk Lbl Count`, `Sk Lbl Sub`, written as:
+   ```
+   <Sk Lbl Header><Sk Lbl Place><Sk Lbl Name> <Sk Lbl Count>
+   <Sk Lbl Sub>
+   ```
+   Fonts: Header Tableau Book 8 `#6B7079`; Place Tableau Semibold 10 navy `#13233A`; Name Tableau Book 9 navy; Count Tableau Book 9 `#6B7079`; Sub Tableau Book 9 `#5A6170`. Alignment: horizontal **Right** (the text starts right of the point), vertical **Middle**. Options: **Allow labels to overlap other marks** on. Tooltip: off on this card.
+7. Format: grid lines, zero lines and axis rulers None; borders None; worksheet shading None.
+
+| `Sk Colour` | Hex | What |
+|---|---|---|
+| Bridgeway ribbon | `#FBC37F` | Amber at 55% on white |
+| Keystone ribbon | `#B5B2DC` | Violet at 55% |
+| System feed ribbon | `#85D4BD` | Teal at 55% |
+| Bridgeway | `#F89217` | Place node |
+| Keystone | `#7873C0` | |
+| System feed | `#21B087` | |
+| Node | `#13233A` | Flag and risk nodes, navy |
+
+**Tooltip** (the polygon card; command buttons off), one line each:
+```
+<Sk Tip Title>                                                   Tableau Semibold 12 navy
+<Sk Tip Full>                                                    Book 9 #5A6170 italic (the flag's full wording)
+<Sk Tip N> gaps, <Sk Tip Share> of all gaps                      Book 9 #5A6170; the numbers Semibold navy
+<Sk Tip Rank> <Sk Tip Rank Worse><Sk Tip Rank Better><Sk Tip Rank Same>     worse coral #B8401F, better teal #0E7D5F, same #5A6170
+<Sk Tip Year Ago>
+<Sk Tip Puts At Risk>
+<Sk Tip From>
+<Sk Tip Aligned In> <Sk Tip Bridgeway>  <Sk Tip Keystone>  <Sk Tip System Feed>   #B86400, #5650A0, #0E7D5F
+<Sk Tip Feed Causes>
+<Sk Tip No Ticket>  <Sk Tip Over 90>                              no ticket coral
+<Sk Tip Next Step>                                               #5A6170 italic
+```
+Ranks and year-ago lines show only with no group chosen (D10), as on version A.
+
+### 9N.3 On the dashboard
+
+1. In `Card: Main`, remove `Sankey` (the sheet stays in the workbook) and drop `Sankey Native` in its place: **726 × 546, outer padding top 6** (drawn 726 × 540), Fit **Entire View**.
+2. `Main Title` sheet: replace `Main Title` and `Main Subtitle` with **`Sk Main Title`** and **`Sk Main Subtitle`** (the same sentences, with short flag names).
+3. Actions (Dashboard > Actions > Change Parameter, source `Sankey Native`, Run on **Select**, clearing **Set value to** empty):
+
+| Name | Target | Field |
+|---|---|---|
+| Sankey picks a flag | `p_SkFlag` | `Sk Pick Flag` |
+| Sankey picks a risk | `p_SkRisk` | `Sk Pick Risk` |
+| Sankey picks a place | `p_SkPlace` | `Sk Pick Place` |
+| Sankey opens the gap list | `p_ShowList` | `Show List On Click` (parameter actions work on a native sheet, so S2b holds) |
+
+   A click on a flag-to-risk ribbon picks its flag and place; on a risk-to-place ribbon, its risk and place; on a node or its label, that node. The gap list filters on **`Sk Pick Match` = True** (with `Gap List Row`, 13.2), replacing the extension's filter action (13.4). **Reset** also sets `p_SkFlag`, `p_SkRisk` and `p_SkPlace` to `Empty Text` (section 17).
+4. The gap list's WHAT DIFFERS column shows `flag_short`, so it uses the chart's names; `flag_name` stays in its tooltip.
+
+### 9N.4 Expected
+
+| State | Flags (01 to 09) | Risks | Places | Headline |
+|---|---|---|---|---|
+| Current (Jun 2026), all groups | 28 · 49 · 25 · 100 · 69 · 48 · 22 · 54 · 12 | 102 · 100 · 69 · 70 · 66 | Bridgeway 194 · Keystone 151 · System feed 62 | "Bridgeway holds 194 of 407 gaps. Largest flag: Billed after end date (100)" |
+| Dec 2024 | 22 · 36 · 18 · 126 · 66 · 33 · 30 · 50 · 5 | 76 · 126 · 66 · 63 · 55 | 210 · 118 · 58 | "…210 of 386…(126)" |
+| Jun 2026, `|Marketing|` | 02: 1 · 04: 2 · 05: 1 · 06: 2 (no others) | 1 · 2 · 1 · 2 (no Status) | Bridgeway 3 · Keystone 3 (no System feed) | "Bridgeway holds 3 of 6 gaps…" |
+
+The places read Bridgeway, Keystone, System feed in every state, and the flags 01 to 09, by construction: no anchor rows are needed.
+
+### 9N.5 Tune in place (constants are calcs; edit the number)
+
+| Calc | Now | What it moves |
+|---|---:|---|
+| `Sk Pad` | 8 | Smallest gap between nodes in the fullest column |
+| `Sk Node W` | 10 | Node width |
+| `Sk X3` | 566 | Left edge of the place nodes; the place labels use the 150 px to its right |
+| `Sk Top` | 26 | Room for the headers |
+| `Sk Label DX` | 5 | Gap between a node and its label |
+| `Sk Label DY` | 0 | Nudge if the one-line labels sit high (the template's empty second line can lift them) |
+| Ribbon tints | 55% | The three ribbon colours in the table above |
+
+Record the values you settle on here.
 
 ---
 
