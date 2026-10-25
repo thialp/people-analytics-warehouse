@@ -41,7 +41,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | Step | What | Who | Size | State |
 |---:|---|---|---|---|
 | 0 | Data: generator, warehouse, SQL Server, Custom SQL, check tables, prototype (release plan phases 1 to 6) | Claude, Thiago on the Mac | | **Done** (88 of 88 tests, 35 of 35 SQL Server checks, prototype approved) |
-| 1 | Spikes S1 to S7 | Both | S | S1, S2, S3 **passed**. S7 in section 9.2, S2b in 13.4; S4, S5, S6 in their sections |
+| 1 | Spikes S1 to S7 | Both | S | S1, S2, S3, S7 **passed**. S2b in 13.4; S4, S5, S6 in their sections |
 | 2 | Workbook and data source | Thiago | S | Done in the spike workbook; step 2 makes it the real one |
 | 3 | Parameters | Claude | S | **Written into the workbook** 2026-10-25 (10; `kpi_` in step 9) |
 | 4 | Calculations | Claude | M | **Written into the workbook** 2026-10-25 (211 new; the 21 spike label and tooltip calcs rewritten in place) |
@@ -138,7 +138,7 @@ Expected: the latest squash commit, then `same`. On `DIFF`, copy it: `cp tableau
 | S2 | Sankey click filters a sheet | **Passed** 2026-10-25 | A filter action from the Sankey filters a table on the same dashboard (screenshots: Bridgeway 194, Status mismatch 66, In Bridgeway, not in Keystone 25) |
 | S3 | Colours, labels, tooltip | **Passed** 2026-10-25 | Colours per node from built-in palettes; label colour Automatic; the colour-coded tooltip renders in the extension |
 | S2b | A Sankey click while the gap list is hidden | Section 13.4 | Can the Sankey run a **parameter** action (switch to the gap list)? If not, the filter waits for the toggle |
-| S7 | Sankey order under a group filter, with anchors | Section 9.2 | Do zero-weight rows keep the place order? |
+| S7 | Sankey order under a group filter, with anchors | **Passed** 2026-10-25 | Weight 0 works (no 0.001 needed). `|Marketing|` at Jun 2026: Bridgeway (3) above Keystone (3), although Marketing's first flag is aligned in Keystone; flags 1 · 2 · 1 · 2 match the data; System feed has no gaps, so no empty node |
 | S4 | Multi-select by string parameter, on the web | Section 11.3 | A click toggles a name; the capsule and every card follow; quick on Tableau Public |
 | S5 | Ticket dots at 141 per cell | Section 15 | Readable; hover finds the right dot |
 | S6 | Extract size and load time | Section 19 | Publishes; the page loads in under 5 seconds |
@@ -594,6 +594,8 @@ Presentation mode: the rail runs the full height with the logo, four headings an
 **The finding.** The extension orders places by first appearance, reading rows in flag order. With every group, flag 01 reaches Bridgeway first. With one function, flag 01 may have only Keystone gaps (a conversion), and then Keystone comes first. Checked on the data with the rule that matched S1: the order breaks for **253 of 487 function × close combinations, 408 of 1,173 country × close, 656 of 1,722 department × close** (at the June close: Marketing, Finance, People, Commercial, Legal & Compliance, and six countries).
 
 **The fix.** Three extra rows, one per place, with weight 0, whose flag and risk are the **first flag and first risk in the current selection**. They sort before every real row of that flag, so the first three appearances are always Bridgeway, Keystone, System feed. They need no change to the data: they are three existing Ticket rows (`Is Anchor`, one per place, the same three at every close and scope), relabelled by the 7.6 calcs. An anchor is used only if its place has gaps in the selection (`Sankey Anchor`), so an empty place never shows as a zero node.
+
+**S7 passed 2026-10-25** (section 4). The test, for the record:
 
 **Test (on the `Sankey` sheet, in its tile).**
 1. Before the fix, confirm the finding: set `p_Functions` to `|Marketing|` (right-click the parameter > Show Parameter, type it). Expected with the spike filters: Keystone above Bridgeway. If it shows Bridgeway first, tell me (the rule would be different from S1).
