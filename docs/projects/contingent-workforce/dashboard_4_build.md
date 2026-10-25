@@ -367,16 +367,17 @@ Hover texts (`KPI n Tip`, one tooltip per cover in section 12.4):
 // 🟢 Flag Text            [flag_name] + " (" + STR([Flag Gaps]) + ")"
 // 🟢 First Flag           { FIXED : MIN(IF [Sankey Gap Row] THEN [flag_label] END) }
 // 🟢 First Flag Text      { FIXED : MIN(IF [Sankey Gap Row] AND [flag_label] = [First Flag] THEN [Flag Text] END) }
-// 🟢 What differs         IF [Sankey Anchor] THEN [First Flag Text] ELSE [Flag Text] END
+// 🟢 First Flag Name      { FIXED : MIN(IF [Sankey Gap Row] AND [flag_label] = [First Flag] THEN [flag_name] END) }
+// 🟢 What differs         IF [Sankey Anchor] THEN [First Flag Name] ELSE [flag_name] END        (no count: see 9.3)
 // 🟢 Flag Sort            IF [Sankey Anchor] THEN [First Flag] ELSE [flag_label] END
 
 // 🟢 Risk Gaps            { FIXED [risk] : SUM([Sankey Gap]) }
 // 🟢 Risk Text            [risk] + " (" + STR([Risk Gaps]) + ")"
 // 🟢 First Risk           { FIXED : MIN(IF [Sankey Gap Row] THEN [risk] END) }
 // 🟢 First Risk Text      { FIXED : MIN(IF [Sankey Gap Row] AND [risk] = [First Risk] THEN [Risk Text] END) }
-// 🟢 What it puts at risk IF [Sankey Anchor] THEN [First Risk Text] ELSE [Risk Text] END
+// 🟢 What it puts at risk IF [Sankey Anchor] THEN [First Risk] ELSE [risk] END                  (no count: see 9.3)
 
-// 🟢 Where it is aligned  [place_label] + " (" + STR([Place Gaps]) + ")"
+// 🟢 Where it is aligned  [place_label]                                                         (no count: see 9.3)
 ```
 
 The three level names are the extension's column headers, so they are named as the prototype's headers. They replace `Flag Label (n)`, `Risk Label (n)` and `Place Label (n)` from the spikes (rename those to these names and edit the formulas, so nothing that uses them breaks).
@@ -615,7 +616,9 @@ Format Extension > Edit Colors, per level and node (pick the palette, then the s
 | What it puts at risk | all five | Miller Stone | 1st, slate `#4F6980` |
 | Where it is aligned | Bridgeway (vendor system) · Keystone (HR system) · System feed (integration) | Hue Circle | 10th amber `#F89217` · 18th violet `#7873C0` · 4th teal `#21B087` |
 
-The node text now includes the count, so a node's name changes when the count changes ("(407)" becomes "(386)" at Dec 2024). **Check whether the colours follow a node when its count changes** (choose Dec 2024 by setting `p_Close` to Dec 31, 2024): if a node goes grey, colours are keyed to the full text, and the colour must be set on a field without the count. Fallback: keep the count out of the level field (levels `flag_name`, `risk`, `place_label`) and turn on the extension's own value label (it shows the same counts, from `Sankey Weight`).
+**The persistence test failed on 2026-10-25, and the levels lost their counts.** The extension saves each colour under the node's full text, so with the count in the text ("One person, two IDs (28)") the same flag at Dec 2024 ("(22)") or under `|Marketing|` ("Order open or billed after the end date (2)") is a new node with a default colour. The three level fields are therefore plain names (7.6): `What differs` = `flag_name`, `What it puts at risk` = `risk`, `Where it is aligned` = `place_label`, each with its anchor version. A node keeps its colour at every close and under every filter. `tableau/build/d4_fields/patch_levels.py` made the change in the workbook and carried the nine flag, five risk and three place colours already chosen over to the new names.
+
+The count now comes from the extension's own value label (Format Extension, the level label setting; it shows the node size from `Sankey Weight`, anchors weigh 0). `Flag Text`, `Risk Text`, `First Flag Text` and `First Risk Text` no longer feed the levels; leave them, they are harmless.
 
 ### 9.4 Labels, sizes and the header
 
