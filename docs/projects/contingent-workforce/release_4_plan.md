@@ -36,11 +36,11 @@ This page tracks the release from top to bottom, from the data the generator wri
 | 4 | The Custom SQL | Claude | **Done** (revision 3) | `tableau/custom_sql_cw_reconciliation_dashboard.sql` returns the 65,435 rows of `mart_cw_reconciliation_dashboard` |
 | 5 | Check tables (section 7) | Claude | **Done** (revision 3) | Numbers for Current (Jun 2026), May 2026, Jun 2025 and the Dec 2024 replay, from the marts |
 | 6 | Prototype with real numbers | Claude, reviewed by Thiago | Approved 2026-10-25; **revision 3 to review** (vertical rail, new Sankey) | Thiago approves the layout, the wording and the numbers on the canvas |
-| 7 | Spikes S1 to S6 on Tableau Public | Both | S1 **done** (led to revision 3); S2 to S6 to do | Each passes or has its fallback chosen (section 10) |
+| 7 | Spikes S1 to S7 on Tableau Public | Both | S1, S2, S3 **passed** 2026-10-25; S7 and S2b added (order under a filter; a click while the gap list is hidden); S4 to S7 run inside the build ([dashboard_4_build.md](dashboard_4_build.md) section 4) | Each passes or has its fallback chosen (section 10) |
 | 8 | Multi-select design session (function, department, country) | Both | To do | Mechanics agreed: set actions, the empty-set rule, the dim rule |
 | 9 | Figma: palette page and the mock | Thiago, with Claude | To do | Palette checked for colour blindness; the mock matches the prototype |
-| 10 | Build plan, step by step (like `release_3_rebuild_dashboard_3.md`) | Claude | To do, after 7 and 8 | Every sheet, calculation, action and zone written down, with screenshots to compare |
-| 11 | Build in Tableau | Thiago (Mac) | To do | Check tables and click tests pass; the saved .twb reviewed before publishing |
+| 10 | Build plan, step by step | Claude | **Written** 2026-10-25: [dashboard_4_build.md](dashboard_4_build.md), steps 0 to 16; the multi-select design (phase 8) is in it as a proposal for spike S4 | Every sheet, calculation, action and zone written down, with screenshots to compare |
+| 11 | Build in Tableau | Thiago (Mac) | **Started** with step 5 (the dashboard shell, so the Sankey is tuned in its tile) | Check tables and click tests pass; the saved .twb reviewed before publishing |
 | 12 | Publish: Tableau Public, README, screenshot, profile row, project docs | Both | To do | Live link in the README; the case study 4 section shows the page |
 
 ---
