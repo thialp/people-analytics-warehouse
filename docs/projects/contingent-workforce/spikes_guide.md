@@ -56,17 +56,19 @@ The extension (version 2.0, December 2025) sets colours per node, per level, in 
    - `risk`, from **Miller Stone**: the 1st swatch, slate `#4F6980`, for every risk
    - `place_label`, from **Hue Circle**: Bridgeway amber `#F89217` (10th), Keystone violet `#7873C0` (18th), System feed teal `#21B087` (4th)
    Check each swatch's hex in the colour picker; if one differs, send a screenshot of the palette and I will match it.
-2. **Font:** one colour for every label in the extension, so keep it **black**. White would vanish on the light flags. Black on the slate middle is 3.7:1; if it reads weak on Tableau Public, switch the risks to Miller Stone's 2nd swatch, `#849DB1`.
+2. **Font:** leave the extension's label colour on **Automatic**. It picks white on the slate risks and black on the flags, amber, violet and teal, which is the best contrast on every level (white on slate is about 5.7:1). Do not set one colour for all levels.
 3. Look for a setting that colours links by their **target** node. The ribbons from a risk to a place should take the place's colour; by default a ribbon takes the colour of the node it leaves (slate here). Record which it is.
 4. Level width about 150 so the labels sit inside the nodes; node labels show the value and the percentage of total (version 2.0 option).
 5. **Tooltip.** The design is the board *Sankey tooltips* on the prototype canvas: three cards (a flag, a risk, a place). Each system's name is written in its own colour, so the tooltip ties back to the Sankey: Bridgeway `#B86400`, Keystone `#5650A0`, System feed `#0E7D5F` (darker shades of the place colours, readable on white). Worse or missing in coral `#B8401F`, unchanged in gray `#5A6170`, titles navy `#13233A`. All calculations work on the Gap rows; keep the dashboard filters **in context** (right-click > Add to Context) so the FIXED totals follow them.
 
    | Calculation | Formula |
    |---|---|
+   The flag number is only for ordering (`flag_label` keeps the sort alphabetical), so no label or tooltip shows it: the title uses `flag_name`, and the rank line is the only number a reader sees.
+
    | `Tip Gaps` | `SUM([gaps])` |
    | `Tip Share` | `SUM([gaps]) / MIN({FIXED : SUM([gaps])})` (format as percentage, 0 decimals) |
    | `Tip Is Flag` | `COUNTD([flag_label]) = 1` (the mark is one flag) |
-   | `Tip Title` | `IF [Tip Is Flag] THEN MIN([flag_label]) ELSEIF COUNTD([risk]) = 1 AND COUNTD([place]) > 1 THEN MIN([risk]) ELSE MIN([place_label]) END` |
+   | `Tip Title` | `IF [Tip Is Flag] THEN MIN([flag_name]) ELSEIF COUNTD([risk]) = 1 AND COUNTD([place]) > 1 THEN MIN([risk]) ELSE MIN([place_label]) END` |
    | `Tip Rank` | `IF [Tip Is Flag] THEN "Rank " + STR(MIN([flag_rank])) + " of 9" END` |
    | `Tip Rank Worse` (coral) | `IF [Tip Is Flag] AND MIN([flag_rank]) < MIN([flag_rank_prior_close]) THEN "up from " + STR(MIN([flag_rank_prior_close])) + " at the prior close (" + STR(MIN([flag_count_prior_close])) + ")" END` |
    | `Tip Rank Better` (teal `#0E7D5F`) | same, with `>` and "down from" |
@@ -82,6 +84,11 @@ The extension (version 2.0, December 2025) sets colours per node, per level, in 
    | `Tip Next Step` | `IF [Tip Is Flag] THEN "Next step: " + MIN([next_step]) ELSEIF MIN([place]) = "System feed" AND MAX([place]) = "System feed" THEN "Worked by Data Engineering" ELSE "Next steps differ by gap: see the gap list" END` |
 
    Layout (Tooltip editor, one field per line; empty fields leave no line): **Tip Title** (navy, bold, 13) / **Tip Gaps** gaps, **Tip Share** of all gaps / Tip Rank + Tip Rank Worse + Tip Rank Better + Tip Rank Same on one line / Tip Year Ago / Tip Puts At Risk / "Aligned in:" + Tip Bridgeway + Tip Keystone + Tip System Feed, each in its colour / Tip From / Tip Feed Causes / Tip No Ticket, Tip Over 90 / Tip Next Step (gray, italic). Command buttons off. If the extension's tooltip takes only fields (no rich text), put the colours on the Gap list's tooltip instead and record it.
+
+6. **Labels without the number, order kept.** The pill is still ordered by `flag_label` (the number makes the order alphabetical), but the text readers see drops it:
+   - `Flag Label (n)` = `[flag_name] + " (" + STR({FIXED [flag_label] : SUM([gaps])}) + ")"` (the same calculation as before, with `flag_name` in place of `flag_label`).
+   - Because the text no longer starts with the number, order the pill explicitly: right-click `Flag Label (n)` > **Sort** > Sort by **Field**, `flag_code`, Minimum, Ascending. Risks and places keep their current sort.
+7. **Small flags (flag 09, 12 gaps).** Its node is about 25 pixels tall, so two label lines overlap. In Format Extension, turn off the percentage on the node labels (one line each; the share is in the tooltip) and set the font to 9 or 10. The font size is one setting for every level, so check that the risk and place labels still read.
 
 **Pass:** the colours hold after a filter change (version 2.0 fixed colour persistence), risk-to-place ribbons can take the place's colour, flag 09's label is readable, and the tooltip shows the rank, the prior close and the colours per system. Send a screenshot of the Edit Colors panel too.
 

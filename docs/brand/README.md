@@ -58,7 +58,7 @@ Every categorical order was checked for color-blind separation (protanopia, deut
 | Keystone (HR system) | `#7873C0` | Hue Circle, violet (18th) |
 | System feed (integration) | `#21B087` | Hue Circle, teal (4th) |
 
-The extension has one font color for every label, so keep it black: white would vanish on the light flags. Black on Miller slate is 3.7:1, readable at the label size but below the 4.5:1 rule for small text; if it reads weak on the web, use Miller Stone's lighter slate `#849DB1` (2nd) instead.
+Leave the extension's label color on *Automatic*: it picks white on the slate risks and black on the flags and places.
 
 The ticket card's rows use *Arcadia 4 Systems*, the same three colors.
 
