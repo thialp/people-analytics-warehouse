@@ -20,35 +20,33 @@ The logo is original, so it is safe to publish; Tableau Public's Viz of the Day 
 
 ## Colors
 
-Every color has one job. The categorical order below passed a color-blindness check in this order (protanopia, deuteranopia, tritanopia), so keep it.
+**One source:** [`Preferences.tps`](Preferences.tps). Every Arcadia color lives there as a Tableau palette; pick colors from those palettes under **Edit Colors**, never with the eyedropper or a typed shade. The three published workbooks show why: picked by eye, the navy drifted into nine near-copies (`#13223A`, `#13243A`, `#122137`, `#14213A`, ...), the slate into two, the coral into three. The palettes are numbered so Tableau lists them together and in order.
 
-| Role | Color | Hex | Used for |
-|---|---|---|---|
-| Brand ink | Navy | `#13233A` | Header band, titles, the logo |
-| Series 1 / growth | Teal | `#00938D` | Hires, increases, the sequential ramp's anchor |
-| Series 2 / decline | Coral | `#E4572E` | Leavers, decreases |
-| Series 3 / movement | Violet | `#5B4FB3` | Internal moves, relocation lines on the map |
-| Accent | Amber | `#D98E04` | One highlighted mark at most. Always label it: it is under 3:1 contrast on the page |
-| Totals | Warm gray | `#8C8A84` | Opening and Closing bars in a waterfall |
-| Secondary text | Slate | `#5A6170` | Subtitles, axis labels, notes |
-| Gridlines | Light gray | `#E4E3DD` | Hairlines only |
-| Card | Off-white | `#FBFBF8` | Chart backgrounds |
-| Page | Stone | `#F3F3EF` | Dashboard background behind the cards |
+![Arcadia palettes](arcadia_palettes.png)
 
-Ramps for magnitude and change:
-
-| Ramp | Steps |
+| Palette | Use it for |
 |---|---|
-| Teal sequential | `#CDEDEA` `#9ED8D2` `#5FBFB7` `#2BA69E` `#00938D` `#007A75` `#00524F` |
-| Coral to teal diverging | `#B8401F` `#E4572E` `#F2A68C` `#EFEEEA` `#8ACFC9` `#00938D` `#00615D` |
+| **Arcadia 1 Categorical** | Roles that mean the same on every dashboard: teal growth and hires, coral decline and leavers, violet internal moves, amber one highlight (label it: under 3:1 on the page) |
+| **Arcadia 2 Categorical Extended** | Identity for up to nine groups: the four roles, then blue, green, rose, sky, brown. More than nine: fold into "Other" |
+| **Arcadia 3 Categorical Light** | The same nine as light fills for large labelled areas with navy text on them (Sankey nodes, treemaps). Navy text is at least 4.7:1 on every one. Always labelled: as fills they are harder to tell apart than the full colors |
+| **Arcadia 4 Systems** | Bridgeway (vendor system) amber, Keystone (HR system) violet, the system feed teal. Color follows the system on every dashboard |
+| **Arcadia 5 Status** | On track, watch, at risk, no status. Always with a word |
+| **Arcadia 6 Neutrals** | Dark to light: navy (brand ink, the rail, titles), navy 2 (controls on the rail), slate (borders on navy), text gray (subtitles, axis labels), steel, silver (dividers on navy), mist, warm gray (Opening and Closing totals), hairline (gridlines), page (behind the cards), card (chart backgrounds), white |
+| **Arcadia 7 Teal Sequential** | Magnitude on one hue (growth %, headcount on a map) |
+| **Arcadia 8 Navy Sequential** | Magnitude that should stay quiet (counts, age bands) |
+| **Arcadia 9 Coral-Teal Diverging** | Decline to growth, gray at zero |
 
-### Install the palettes in Tableau Public
+Every categorical order was checked for color-blind separation (protanopia, deuteranopia, tritanopia) in this order against the card color, so keep the order. Regenerate the picture after any change: `python3 docs/brand/build/make_palette_sheet.py`.
 
-1. Open [`Preferences.tps`](Preferences.tps) and click **Download raw file**.
-2. Save it as `Documents/My Tableau Public Repository/Preferences.tps`. If a file with that name is already there, copy only the `<color-palette>` blocks into it.
-3. Restart Tableau Public. The palettes appear under **Edit Colors** as *Arcadia Categorical*, *Arcadia Teal Sequential*, *Arcadia Coral-Teal Diverging* and *Arcadia Neutrals*.
+**Dashboard #4, Contingent Workforce Reconciliation:** Sankey flags 01 to 09 in *Arcadia 3 Categorical Light* (in order), risks in steel (*Arcadia 6 Neutrals*), places in *Arcadia 4 Systems*; the ticket card's rows in *Arcadia 4 Systems* too.
 
-Recent versions (2025.3 and later) also let you create custom palettes from inside Tableau; the file above is the same palettes, ready made.
+### Install the palettes
+
+1. Download [`Preferences.tps`](Preferences.tps) (or copy it from your clone of this repository).
+2. Save it as `Documents/My Tableau Repository/Preferences.tps` for Tableau Desktop, and `Documents/My Tableau Public Repository/Preferences.tps` for Tableau Public. It replaces an older Arcadia file; if the file holds palettes of your own, copy only the `<color-palette>` blocks into it.
+3. Restart Tableau. The nine palettes appear under **Edit Colors**, from *Arcadia 1 Categorical* to *Arcadia 9 Coral-Teal Diverging*.
+
+Older workbooks keep their colors: a workbook stores the colors themselves, not the palette name.
 
 ### Save the look as a theme
 

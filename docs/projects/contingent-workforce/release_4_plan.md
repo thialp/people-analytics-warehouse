@@ -32,7 +32,7 @@ This page tracks the release from top to bottom, from the data the generator wri
 |---:|---|---|---|---|
 | 1 | Data creation: times, Keystone job data, load log, Helix tickets | Claude | **Done** 2026-10-25 (revision 3: job data and tickets regenerated) | Every pre-release-4 raw row identical (checked by hash); only release 4 tables and the registry change; generator deterministic |
 | 2 | Warehouse (DuckDB): staging, flags and routing, ticket replay, 4 marts, tests 82 to 88 | Claude | **Done** 2026-10-25 (revision 3) | 88 of 88 tests pass, including the Sankey's alphabetical order at all 61 closes; every mart of Dashboards #1 to #3 unchanged (checked by hash) |
-| 3 | SQL Server twin: `03d`, `04c`, `15_validate`, `build_all` | Claude, then Thiago on the Mac | Checker **done** (revision 3); Mac **re-run to do** | `check_tsql_in_duckdb.py` matches every view and the Custom SQL row for row; on the Mac, `build_all.sql` runs and `15_validate` says PASS on every row |
+| 3 | SQL Server twin: `03d`, `04c`, `15_validate`, `build_all` | Claude, then Thiago on the Mac | **Done** (revision 3 checker and Mac run, 2026-10-25) | `check_tsql_in_duckdb.py` matches every view and the Custom SQL row for row; on the Mac, `build_all.sql` runs and `15_validate` says PASS on every row |
 | 4 | The Custom SQL | Claude | **Done** (revision 3) | `tableau/custom_sql_cw_reconciliation_dashboard.sql` returns the 65,435 rows of `mart_cw_reconciliation_dashboard` |
 | 5 | Check tables (section 7) | Claude | **Done** (revision 3) | Numbers for Current (Jun 2026), May 2026, Jun 2025 and the Dec 2024 replay, from the marts |
 | 6 | Prototype with real numbers | Claude, reviewed by Thiago | Approved 2026-10-25; **revision 3 to review** (vertical rail, new Sankey) | Thiago approves the layout, the wording and the numbers on the canvas |
@@ -178,7 +178,7 @@ Every row of 15 should say PASS. Record the run time of 03d and of the Custom SQ
 
 **Mac run, 2026-10-25:** done. The first build stopped at 04c with `Msg 113 Missing end comment mark` (a header comment held `data/marts/*.csv`, and T-SQL nests block comments); fixed in the comment, and the checker now flags any `/*` inside a block comment. After the fix, every script passes: 05, 08, 12 and all 35 checks of 15 (KPI 3 315, KPI 4 176, KPI 5 247, places 196 / 181 / 2, 330 open tickets, Dec 2024 358 gaps with 6 sent to Integration). The Dashboard #4 Custom SQL returned 62,808 rows in 1 second (the workforce cost bridge takes 25). A full `build_all.sql` run takes about 40 to 45 minutes under emulation (the first, partly interrupted run; Thiago's estimate).
 
-**Revision 3 needs one more Mac run** (`git pull`, then `build_all.sql`): 15 now expects 65,435 Custom SQL rows, KPI 2 383, gaps 407, KPI 3 342, KPI 4 177, KPI 5 277, places 194 / 151 / 62, 361 open tickets, Dec 2024 386 gaps with 6 load gaps in the system feed. The checker already matches them.
+**Revision 3 Mac run, 2026-10-25: done**, every check PASS (05, 08, 12 and all 35 of 15), Custom SQL 65,435 rows in 1 second, `build_all.sql` 45 minutes. 15 now expects 65,435 Custom SQL rows, KPI 2 383, gaps 407, KPI 3 342, KPI 4 177, KPI 5 277, places 194 / 151 / 62, 361 open tickets, Dec 2024 386 gaps with 6 load gaps in the system feed. The checker already matches them.
 
 ---
 
@@ -372,7 +372,7 @@ Three sets on the one data source; an empty set means All; a click adds or remov
 
 ### Phase 9: Figma
 
-An "Arcadia D4" palette page (3 places × 4 stops, the status chips, navy) and the mock, matching the prototype. Check the palette for colour blindness (amber, violet and teal stay apart).
+The mock, matching the prototype, in the Arcadia palettes (`docs/brand/Preferences.tps`, nine palettes, colour-blind checked): flags in *Arcadia 3 Categorical Light*, risks steel, places and the ticket card in *Arcadia 4 Systems*, the rail and text in *Arcadia 6 Neutrals*. The prototype's own shades (`#EF9F27`, `#7F77DD`, `#1D9E75`, page `#F3F4F6`) move to the brand ones.
 
 ### Phase 10: build plan
 

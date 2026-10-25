@@ -51,15 +51,16 @@ If the S1 workbook already exists, refresh its extract (Data > CW Reconciliation
 
 The extension (version 2.0, December 2025) sets colours per node, per level, in **Format Extension > Edit Colors**. A ribbon takes the colour of the node it leaves.
 
-1. **Edit Colors**, level by level:
-   - Flags, nine colours: 01 `#6A8FD0`, 02 `#4FB3A9`, 03 `#8CC07A`, 04 `#B5C95A`, 05 `#E48B6E`, 06 `#D77AA8`, 07 `#8F98DA`, 08 `#7FB8E6`, 09 `#C2A27A`
-   - Risks all grey `#6B7280`
-   - Places: Bridgeway `#EF9F27`, Keystone `#7F77DD`, System feed `#1D9E75`
+1. Install the Arcadia palettes first (`docs/brand/Preferences.tps`, see `docs/brand/README.md`) and restart Tableau. Then **Edit Colors**, level by level, choosing the palette in *Select Color Palette*:
+   - `flag_label`: *Arcadia 3 Categorical Light*, then **Assign To Level** (flags 01 to 09 take its nine colours in order)
+   - `risk`: *Arcadia 6 Neutrals*, click each risk and pick steel `#8FA1B8`
+   - `place_label`: *Arcadia 4 Systems*, **Assign To Level** (Bridgeway amber, Keystone violet, System feed teal)
+   If the Arcadia palettes do not appear in the extension's list (they do under Tableau's own Edit Colors), record it: that decides whether the build colours the Sankey from a built-in palette.
 2. Look for a setting that colours links by their **target** node. The ribbons from a risk to a place should take the place's colour; by default a ribbon takes the colour of the node it leaves (grey here). Record which it is.
 3. Level width about 150 so the labels sit inside the nodes; node labels show the value and the percentage of total (version 2.0 option).
 4. Tooltip: `flag_label`, `flag_rank`, `flag_rank_prior_close`, `flag_count_prior_close`, `SUM(gaps)`.
 
-**Pass:** the colours hold after a filter change (version 2.0 fixed colour persistence), risk-to-place ribbons can take the place's colour, flag 09's label is readable, and the tooltip shows the rank and the prior close. Send a screenshot of the Edit Colors panel too.
+**Pass:** the Arcadia palettes are offered, the colours hold after a filter change (version 2.0 fixed colour persistence), risk-to-place ribbons can take the place's colour, flag 09's label is readable, and the tooltip shows the rank and the prior close. Send a screenshot of the Edit Colors panel too.
 
 **Fallback:** risk-to-place ribbons stay grey; the place colour is on the place nodes only.
 
