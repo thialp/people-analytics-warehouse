@@ -3,9 +3,11 @@
 -- at that close (Jun 2021 to Jun 2026; the latest close is also Current). Dashboard #4's Sankey,
 -- gap list and KPIs read it through tableau/custom_sql_cw_reconciliation_dashboard.sql.
 --
---   flag, risk, place     the comparison (F01 to F12), the risk it creates (fixed order 1 to 6) and
---                         where it is fixed (Bridgeway, Keystone, Integration, in that order);
---                         place_key splits Integration into its two shades for colour
+--   flag, risk, place     the comparison (F01 to F09, flag_label "01 ..." in a fixed order), the
+--                         risk it creates (five, alphabetical) and where it is aligned (Bridgeway,
+--                         Keystone, System feed: alphabetical; place_label says what each one is).
+--                         The Sankey reads flag_label, risk and place_label: all three sort
+--                         alphabetically at every close (int_cw_flag_type explains why)
 --   flag_rank             rank of the flag by gaps at this close (1 = most), and at the prior close
 --                         and 12 closes earlier, so the page can say what moved
 --   is_counted            counts against the 3% target (everything but "Clears on its own")
@@ -100,7 +102,7 @@ SELECT
     sup.supplier_name,
     s.flag_code,
     s.flag_name,
-    LPAD(CAST(c.flag_rank AS VARCHAR), 2, '0') || ' ' || s.flag_name                 AS flag_rank_label,
+    s.flag_label,
     c.flag_count,
     c.flag_rank,
     cp.flag_count                                                                     AS flag_count_prior_close,
@@ -111,9 +113,9 @@ SELECT
     s.risk_order,
     s.place,
     CASE s.place WHEN 'Bridgeway' THEN 1 WHEN 'Keystone' THEN 2 ELSE 3 END           AS place_order,
-    CASE WHEN s.place <> 'Integration' THEN s.place
-         WHEN s.timing_class = 'Clears on its own' THEN 'Integration: clears on its own'
-         ELSE 'Integration: alert data engineering' END                              AS place_key,
+    CASE s.place WHEN 'Bridgeway' THEN 'Bridgeway (vendor system)'
+                 WHEN 'Keystone' THEN 'Keystone (HR system)'
+                 ELSE 'System feed (integration)' END                                 AS place_label,
     s.cause_code,
     cz.cause_name,
     s.root_cause_code,
@@ -124,7 +126,7 @@ SELECT
     CASE WHEN s.days_open <= 30 THEN '0 to 30 days' WHEN s.days_open <= 90 THEN '31 to 90 days'
          ELSE 'Over 90 days' END                                                      AS open_band,
     s.days_open > 90                                                                  AS is_over_90_days,
-    CASE WHEN s.flag_code IN ('F08', 'F09') THEN s.month_end_date - s.since_date END AS days_since_end,
+    CASE WHEN s.flag_code IN ('F06', 'F09') THEN s.month_end_date - s.since_date END AS days_since_end,
     (EXISTS (SELECT 1 FROM scoped AS p WHERE p.month_end_date = cl.prior_month_end_date AND p.gap_id = s.gap_id)
      AND s.since_date <= cl.prior_month_end_date)                                     AS was_open_prior_close,
     (nd.gap_id IS NOT NULL

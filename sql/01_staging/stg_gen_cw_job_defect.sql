@@ -1,6 +1,6 @@
 -- stg_gen_cw_job_defect
 -- The answer key for Keystone job data: every period a person holds two active job records (F07)
--- or one active record on a PID the ledger shows they left (F08). A test fixture, never a business
+-- or one active record on a PID the ledger shows they left (F06). A test fixture, never a business
 -- source: only test 82 reads it.
 -- Source system: synthetic data generator (see generator/cw_operations.py). Added in release 4.
 CREATE OR REPLACE TABLE staging.stg_gen_cw_job_defect AS

@@ -271,7 +271,7 @@ RAW_COLUMNS.update({
     ],
     "gen_cw_job_defect": [
         ("defect_id", "VARCHAR", "Answer key row"),
-        ("flag_code", "VARCHAR", "F07 one person, two active PIDs; F08 PID still filled after the contract ended"),
+        ("flag_code", "VARCHAR", "F07 two active PID records; F06 PID still filled after the end date"),
         ("person_id", "VARCHAR", "EMPLID"),
         ("position_id", "VARCHAR", "The PID involved (the lower one for F07)"),
         ("start_date", "DATE", "First day it is true"),
@@ -322,7 +322,7 @@ RAW_COLUMNS.update({
         ("category_name", "VARCHAR", "Name"),
         ("subject_type", "VARCHAR", "What a ticket of this category is about"),
         ("default_group", "VARCHAR", "Group it is assigned to"),
-        ("flag_code", "VARCHAR", "The reconciliation flag it fixes, F01 to F12; empty for Integration categories"),
+        ("flag_code", "VARCHAR", "The reconciliation flag it fixes, F01 to F09; empty for the system feed categories"),
         ("risk", "VARCHAR", "The risk the flag creates"),
         ("priority", "VARCHAR", "Default priority"),
         ("title_template", "VARCHAR", "Ticket title before the subject"),

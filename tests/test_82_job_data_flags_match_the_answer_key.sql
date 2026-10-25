@@ -1,6 +1,6 @@
 -- Keystone job data: on every close, the warehouse finds exactly the people the answer key says
 -- hold two active job records (F07) or one active record on a PID the ledger shows they left
--- (F08), and no one else. The flags are built from Keystone and the PID ledger alone; the answer
+-- (F06), and no one else. The flags are built from Keystone and the PID ledger alone; the answer
 -- key (gen_cw_job_defect, computed in Python by the generator) is read only here.
 WITH truth AS (
     SELECT r.month_end_date, d.flag_code, d.person_id

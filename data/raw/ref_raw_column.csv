@@ -108,7 +108,7 @@ ks_cw_job,8,action,VARCHAR,"Assignment start, Return or Assignment end"
 ks_cw_job,9,change_source,VARCHAR,"Feed, or HR Ops for an end entered by hand late"
 ks_cw_job,10,assignment_id,VARCHAR,-> fact_position_assignment: the assignment the row was written for
 gen_cw_job_defect,1,defect_id,VARCHAR,Answer key row
-gen_cw_job_defect,2,flag_code,VARCHAR,"F07 one person, two active PIDs; F08 PID still filled after the contract ended"
+gen_cw_job_defect,2,flag_code,VARCHAR,F07 two active PID records; F06 PID still filled after the end date
 gen_cw_job_defect,3,person_id,VARCHAR,EMPLID
 gen_cw_job_defect,4,position_id,VARCHAR,The PID involved (the lower one for F07)
 gen_cw_job_defect,5,start_date,DATE,First day it is true
@@ -149,7 +149,7 @@ ref_ticket_category,1,category_code,VARCHAR,Category key
 ref_ticket_category,2,category_name,VARCHAR,Name
 ref_ticket_category,3,subject_type,VARCHAR,What a ticket of this category is about
 ref_ticket_category,4,default_group,VARCHAR,Group it is assigned to
-ref_ticket_category,5,flag_code,VARCHAR,"The reconciliation flag it fixes, F01 to F12; empty for Integration categories"
+ref_ticket_category,5,flag_code,VARCHAR,"The reconciliation flag it fixes, F01 to F09; empty for the system feed categories"
 ref_ticket_category,6,risk,VARCHAR,The risk the flag creates
 ref_ticket_category,7,priority,VARCHAR,Default priority
 ref_ticket_category,8,title_template,VARCHAR,Ticket title before the subject

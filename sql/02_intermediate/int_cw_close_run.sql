@@ -6,8 +6,8 @@
 -- 00:00. Both HR systems are read as full effective-dated extracts, so a late run still sees the
 -- month as it ended. A failed run reads nothing: the warehouse keeps that source's last good load,
 -- so the close runs on the source as it stood then (a day stale after one failed night, more after
--- an outage), and the gaps that creates are routed to Integration (int_cw_load_gap). Helix is then
--- as of its last good read.
+-- an outage), and the gaps that creates are routed to the system feed (int_cw_load_gap). Helix is
+-- then as of its last good read.
 --
 -- The latest close is also Current: the extract ends on Jun 30, 2026, a month-end.
 CREATE OR REPLACE TABLE intermediate.int_cw_close_run AS

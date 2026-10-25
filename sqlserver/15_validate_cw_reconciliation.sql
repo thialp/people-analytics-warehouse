@@ -33,20 +33,20 @@ SELECT check_name, actual, expected,
 FROM (
               SELECT 'dw.FeedEventDelivery' AS check_name, (SELECT COUNT(*) FROM dw.FeedEventDelivery) AS actual, 106357 AS expected
     UNION ALL SELECT 'dw.KsContingentWorkerAudit', (SELECT COUNT(*) FROM dw.KsContingentWorkerAudit), 141791
-    UNION ALL SELECT 'dw.KsCwJob',                 (SELECT COUNT(*) FROM dw.KsCwJob), 76247
-    UNION ALL SELECT 'dw.GenCwJobDefect',          (SELECT COUNT(*) FROM dw.GenCwJobDefect), 337
+    UNION ALL SELECT 'dw.KsCwJob',                 (SELECT COUNT(*) FROM dw.KsCwJob), 76219
+    UNION ALL SELECT 'dw.GenCwJobDefect',          (SELECT COUNT(*) FROM dw.GenCwJobDefect), 827
     UNION ALL SELECT 'dw.EtlLoadRun',              (SELECT COUNT(*) FROM dw.EtlLoadRun), 7428
-    UNION ALL SELECT 'dw.ItsmTicket',              (SELECT COUNT(*) FROM dw.ItsmTicket), 2967
-    UNION ALL SELECT 'dw.ItsmTicketEvent',         (SELECT COUNT(*) FROM dw.ItsmTicketEvent), 12895
-    UNION ALL SELECT 'dw.ItsmTicketLink',          (SELECT COUNT(*) FROM dw.ItsmTicketLink), 2967
-    UNION ALL SELECT 'dw.RefTicketCategory',       (SELECT COUNT(*) FROM dw.RefTicketCategory), 14
+    UNION ALL SELECT 'dw.ItsmTicket',              (SELECT COUNT(*) FROM dw.ItsmTicket), 3091
+    UNION ALL SELECT 'dw.ItsmTicketEvent',         (SELECT COUNT(*) FROM dw.ItsmTicketEvent), 13325
+    UNION ALL SELECT 'dw.ItsmTicketLink',          (SELECT COUNT(*) FROM dw.ItsmTicketLink), 3091
+    UNION ALL SELECT 'dw.RefTicketCategory',       (SELECT COUNT(*) FROM dw.RefTicketCategory), 11
     UNION ALL SELECT 'dw.CwCloseRun',              (SELECT COUNT(*) FROM dw.CwCloseRun), 61
     UNION ALL SELECT 'dw.CwLoadGap',               (SELECT COUNT(*) FROM dw.CwLoadGap), 8
-    UNION ALL SELECT 'dw.CwFlag',                  (SELECT COUNT(*) FROM dw.CwFlag), 19850
-    UNION ALL SELECT 'rpt.vw_cw_gap_close',        (SELECT COUNT(*) FROM rpt.vw_cw_gap_close), 19850
-    UNION ALL SELECT 'rpt.vw_cw_gap_rate_close',   (SELECT COUNT(*) FROM rpt.vw_cw_gap_rate_close), 27348
-    UNION ALL SELECT 'rpt.vw_itsm_ticket_close',   (SELECT COUNT(*) FROM rpt.vw_itsm_ticket_close), 15610
-    UNION ALL SELECT 'Custom SQL rows',            (SELECT COUNT(*) FROM #d6), 62808
+    UNION ALL SELECT 'dw.CwFlag',                  (SELECT COUNT(*) FROM dw.CwFlag), 21665
+    UNION ALL SELECT 'rpt.vw_cw_gap_close',        (SELECT COUNT(*) FROM rpt.vw_cw_gap_close), 21665
+    UNION ALL SELECT 'rpt.vw_cw_gap_rate_close',   (SELECT COUNT(*) FROM rpt.vw_cw_gap_rate_close), 27324
+    UNION ALL SELECT 'rpt.vw_itsm_ticket_close',   (SELECT COUNT(*) FROM rpt.vw_itsm_ticket_close), 16446
+    UNION ALL SELECT 'Custom SQL rows',            (SELECT COUNT(*) FROM #d6), 65435
 ) AS c;
 GO
 
@@ -59,23 +59,23 @@ FROM (
     UNION ALL SELECT 'KPI 1 active in Keystone',
                      (SELECT SUM(contractors_working_keystone) FROM #d6 WHERE row_type = 'Population' AND month_end_date = '2026-06-30'), 11875
     UNION ALL SELECT 'KPI 2 contractors with a gap',
-                     (SELECT SUM(contractors_with_gap) FROM #d6 WHERE row_type = 'Population' AND month_end_date = '2026-06-30'), 357
+                     (SELECT SUM(contractors_with_gap) FROM #d6 WHERE row_type = 'Population' AND month_end_date = '2026-06-30'), 383
     UNION ALL SELECT 'Gaps (Sankey total)',
-                     (SELECT SUM(gaps) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30'), 379
+                     (SELECT SUM(gaps) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30'), 407
     UNION ALL SELECT 'KPI 3 open at the prior close',
-                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND was_open_prior_close = 1 AND is_counted = 1), 315
+                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND was_open_prior_close = 1 AND is_counted = 1), 342
     UNION ALL SELECT 'KPI 4 no ticket',
-                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND has_ticket = 0 AND is_counted = 1), 176
+                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND has_ticket = 0 AND is_counted = 1), 177
     UNION ALL SELECT 'KPI 5 open over 90 days',
-                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND days_open > 90 AND is_counted = 1), 247
+                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND days_open > 90 AND is_counted = 1), 277
     UNION ALL SELECT 'Place Bridgeway',
-                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND place = 'Bridgeway'), 196
+                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND place = 'Bridgeway'), 194
     UNION ALL SELECT 'Place Keystone',
-                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND place = 'Keystone'), 181
-    UNION ALL SELECT 'Place Integration',
-                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND place = 'Integration'), 2
+                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND place = 'Keystone'), 151
+    UNION ALL SELECT 'Place System feed',
+                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND place = 'System feed'), 62
     UNION ALL SELECT 'Open tickets (ticket card)',
-                     (SELECT SUM(tickets) FROM #d6 WHERE row_type = 'Ticket' AND month_end_date = '2026-06-30'), 330
+                     (SELECT SUM(tickets) FROM #d6 WHERE row_type = 'Ticket' AND month_end_date = '2026-06-30'), 361
 ) AS c;
 GO
 
@@ -84,14 +84,14 @@ SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
               SELECT 'Dec 2024 gaps (Keystone load failed)' AS check_name,
-                     (SELECT SUM(gaps) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2024-12-31') AS actual, 358 AS expected
-    UNION ALL SELECT 'Dec 2024 load gaps, all to Integration',
+                     (SELECT SUM(gaps) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2024-12-31') AS actual, 386 AS expected
+    UNION ALL SELECT 'Dec 2024 load gaps, all to the system feed',
                      (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2024-12-31' AND cause_code = 'LOAD'
-                        AND place_key = 'Integration: alert data engineering'), 6
+                        AND place = 'System feed' AND timing_class = 'Load failed'), 6
     UNION ALL SELECT 'Sep 2023 load gaps (Bridgeway load failed)',
                      (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2023-09-30' AND cause_code = 'LOAD'), 2
     UNION ALL SELECT 'Jun 2025 contractors with a gap',
-                     (SELECT SUM(contractors_with_gap) FROM #d6 WHERE row_type = 'Population' AND month_end_date = '2025-06-30'), 291
+                     (SELECT SUM(contractors_with_gap) FROM #d6 WHERE row_type = 'Population' AND month_end_date = '2025-06-30'), 327
     UNION ALL SELECT 'Jun 2025 working in Bridgeway',
                      (SELECT SUM(contractors_working) FROM #d6 WHERE row_type = 'Population' AND month_end_date = '2025-06-30'), 10707
     UNION ALL SELECT 'Load gaps at closes whose loads worked',

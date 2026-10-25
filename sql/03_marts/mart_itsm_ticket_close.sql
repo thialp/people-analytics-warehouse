@@ -9,9 +9,9 @@
 --                the contractor's cost center on the close; empty for tickets not linked to a
 --                contractor (they show only when no group is chosen)
 --   dot_x, dot_y the dot's position: the age band's column (0, 1, 2) and the place's row (2 Bridgeway
---                at the top, 1 Keystone, 0 Integration), packed inside the cell 20 to a line, oldest
+--                at the top, 1 Keystone, 0 System feed), packed inside the cell 20 to a line, oldest
 --                first (dot_seq), so dots never overlap and a full cell reads as a count. Up to 160
---                per cell; the most at any close is 144
+--                per cell; the most at any close is 141
 -- Executive officers' department (D-901) is excluded.
 CREATE OR REPLACE TABLE marts.mart_itsm_ticket_close AS
 WITH open_t AS (
@@ -45,6 +45,9 @@ SELECT
     t.priority,
     t.place,
     CASE t.place WHEN 'Bridgeway' THEN 1 WHEN 'Keystone' THEN 2 ELSE 3 END           AS place_order,
+    CASE t.place WHEN 'Bridgeway' THEN 'Bridgeway (vendor system)'
+                 WHEN 'Keystone' THEN 'Keystone (HR system)'
+                 ELSE 'System feed (integration)' END                                 AS place_label,
     t.current_group,
     t.opened_at,
     t.age_days,

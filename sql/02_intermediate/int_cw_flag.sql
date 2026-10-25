@@ -2,36 +2,38 @@
 -- Grain: one row per month-end close x contractor x flag: a gap.
 --
 -- The reconciliation as Finance's report meets it. A gap is a comparison between the systems on
--- the close (int_cw_flag_type: F01 to F12), with the cause behind it (the CW codes of
--- int_cw_discrepancy, or JOB, CONV, LOAD below), and the place it is fixed.
+-- the close (int_cw_flag_type: F01 to F09), with the cause behind it (the CW codes of
+-- int_cw_discrepancy, or JOB, CONV, LOAD below), and the place it is aligned.
 --
 -- Where the flags come from:
 --   int_cw_discrepancy     the field differences and the structural rules, as comparisons:
---                          cost center (F01, F02: by function), contract status (F09 ended in
---                          Bridgeway and active in Keystone, F11 the reverse; a difference in
---                          dates alone, both active, is not a flag), order open after the end
---                          (F03), billed after the end (F04), two Bridgeway IDs (F05), the stored
---                          ID (F06), Keystone only (F10), missing in Keystone (F12). Manager,
---                          office and the 48-month cap are not flags: they do not move Finance's
---                          numbers.
---   conversions (CONV)     an F09 contractor who is now an employee: one person on two EMPLIDs,
---                          the contractor record and the employee one (F05, fixed in Keystone).
---                          The employee is found by name, hired within 31 days after the
---                          Bridgeway last day and still employed on the close.
---   Keystone job data (JOB) two active job records for one person (F07); one active record on a
---                          PID the PID ledger shows they are no longer in (F08).
---   a failed load (LOAD)   int_cw_load_gap: differences that exist only because a source is a
+--                          two Bridgeway IDs (F01), the stored ID (F02), missing in Keystone (F03),
+--                          order open or billed after the end (F04), cost center (F05), contract
+--                          status (F08 working in Bridgeway and ended in Keystone, F09 the reverse,
+--                          or active in Keystone only; a difference in dates alone, both active, is
+--                          not a flag). Manager, office and the 48-month cap are not flags: they do
+--                          not move Finance's numbers.
+--   conversions (CONV)     a contractor who is now an employee and still active as a contractor:
+--                          one person on two EMPLIDs (F01, aligned in Keystone). The employee is
+--                          found by name, hired within 31 days after the Bridgeway last day and
+--                          still employed on the close.
+--   Keystone job data (JOB) one active record on a PID the PID ledger shows they are no longer in
+--                          (F06); two active job records for one person (F07).
+--   a failed load (LOAD)   int_cw_load_gap: differences that exist only because a source is
 --                          stale. Gaps the stale source hides are dropped (a hand edit after the
 --                          stale date when Keystone is stale; a change sent after it when
 --                          Bridgeway is).
 --
--- The routing rule (one CASE):
---   1. A feed change still waiting at the close (CW00, CW01) goes to Integration: "Clears on its
---      own" when it was sent within the 24 hours before the close run, "Alert data engineering"
---      when it has waited longer (the feed is stuck).
---   2. A gap that exists because a load failed goes to Integration, "Alert data engineering".
---   3. Otherwise by flag: F01 to F05 to Bridgeway (F05 to Keystone when it is a conversion),
---      F06 to F12 to Keystone.
+-- The routing rule (one CASE), following who release 3 names to fix each cause
+-- (ref_cw_discrepancy_type.who_can_fix_it):
+--   1. A feed change still waiting at the close (CW00, CW01) goes to the system feed: "Clears on
+--      its own" when it was sent within the 24 hours before the close run, "Feed stuck" when it has
+--      waited longer.
+--   2. A feed event that failed (CW02 extension, CW08 new worker, CW12 attribute change) goes to the
+--      system feed, "Feed event failed": data engineering replays it. When it failed because
+--      Keystone holds a wrong Bridgeway ID (root cause CW06), Keystone aligns the record instead.
+--   3. A gap that exists because a load failed goes to the system feed, "Load failed".
+--   4. Otherwise the flag's default place (a conversion's two IDs are aligned in Keystone).
 -- is_counted: the gap counts against the 3% target unless it clears on its own by the next run.
 CREATE OR REPLACE TABLE intermediate.int_cw_flag AS
 WITH runs AS (SELECT * FROM intermediate.int_cw_close_run),
@@ -49,7 +51,7 @@ d AS (
 -- 1. comparisons from the reconciliation ------------------------------------------------------
 cost_center AS (
     SELECT d.month_end_date, d.identity_id, d.bw_worker_id, d.person_id,
-           CASE WHEN bc.function_name IS DISTINCT FROM kc.function_name THEN 'F01' ELSE 'F02' END AS flag_code,
+           'F05' AS flag_code,
            d.discrepancy_code AS cause_code, d.root_cause_code, d.since_date, d.service_order_id, d.feed_event_id,
            NULL::VARCHAR AS position_id, d.evidence,
            'Cost center ' || d.ks_cost_center_id || ' (' || kd.department_name || ', ' || kc.function_name || ')' AS keystone_shows,
@@ -63,7 +65,7 @@ cost_center AS (
 ),
 contract AS (
     SELECT d.month_end_date, d.identity_id, d.bw_worker_id, d.person_id,
-           CASE WHEN d.bw_active THEN 'F11' ELSE 'F09' END AS flag_code,
+           CASE WHEN d.bw_active THEN 'F08' ELSE 'F09' END AS flag_code,
            d.discrepancy_code AS cause_code, d.root_cause_code,
            CASE WHEN d.bw_active THEN d.since_date ELSE LEAST(d.since_date, d.bw_contract_end_date + 1) END AS since_date,
            d.service_order_id, d.feed_event_id, NULL::VARCHAR AS position_id, d.evidence,
@@ -77,8 +79,8 @@ contract AS (
 ),
 structural AS (
     SELECT d.month_end_date, d.identity_id, d.bw_worker_id, d.person_id,
-           CASE d.discrepancy_code WHEN 'CW04' THEN 'F03' WHEN 'CW11' THEN 'F04' WHEN 'CW07' THEN 'F05'
-                WHEN 'CW06' THEN 'F06' WHEN 'CW09' THEN 'F10' ELSE 'F12' END AS flag_code,
+           CASE d.discrepancy_code WHEN 'CW04' THEN 'F04' WHEN 'CW11' THEN 'F04' WHEN 'CW07' THEN 'F01'
+                WHEN 'CW06' THEN 'F02' WHEN 'CW09' THEN 'F09' ELSE 'F03' END AS flag_code,
            d.discrepancy_code, d.root_cause_code, d.since_date, d.service_order_id, d.feed_event_id, NULL, d.evidence,
            CASE d.discrepancy_code
                 WHEN 'CW04' THEN 'Not held in Keystone'
@@ -117,7 +119,7 @@ reconciliation AS (
     SELECT * FROM cost_center
     UNION ALL
     SELECT c.month_end_date, c.identity_id, c.bw_worker_id, c.person_id,
-           CASE WHEN v.identity_id IS NOT NULL THEN 'F05' ELSE c.flag_code END,
+           CASE WHEN v.identity_id IS NOT NULL THEN 'F01' ELSE c.flag_code END,
            CASE WHEN v.identity_id IS NOT NULL THEN 'CONV' ELSE c.cause_code END,
            c.root_cause_code, c.since_date, c.service_order_id, c.feed_event_id, NULL,
            CASE WHEN v.identity_id IS NOT NULL
@@ -164,7 +166,7 @@ left_pid AS (    -- the day the person left the PID, by the ledger
 ),
 job_flags AS (
     SELECT p.month_end_date, i.identity_id, i.bw_worker_id, p.person_id,
-           CASE WHEN p.active_records >= 2 THEN 'F07' ELSE 'F08' END,
+           CASE WHEN p.active_records >= 2 THEN 'F07' ELSE 'F06' END,
            'JOB', 'JOB',
            CASE WHEN p.active_records >= 2 THEN p.second_since ELSE COALESCE(l.left_on, p.second_since) END,
            NULL, NULL, p.position_id,
@@ -209,6 +211,7 @@ SELECT
     COALESCE(g.person_id, i.person_id)                                                 AS person_id,
     g.flag_code,
     t.flag_name,
+    t.flag_label,
     t.risk,
     t.risk_order,
     g.cause_code,
@@ -220,12 +223,14 @@ SELECT
     g.feed_event_id,
     fd.sent_at                                                                         AS feed_sent_at,
     g.position_id,
-    CASE WHEN g.cause_code IN ('CW00', 'CW01') THEN 'Integration'
-         WHEN g.cause_code = 'LOAD' THEN 'Integration'
-         WHEN g.flag_code = 'F05' AND g.cause_code = 'CONV' THEN 'Keystone'
+    CASE WHEN g.cause_code IN ('CW00', 'CW01', 'LOAD') THEN 'System feed'
+         WHEN g.cause_code IN ('CW02', 'CW08', 'CW12') AND g.root_cause_code IS DISTINCT FROM 'CW06' THEN 'System feed'
+         WHEN g.cause_code IN ('CW02', 'CW08', 'CW12') THEN 'Keystone'
+         WHEN g.flag_code = 'F01' AND g.cause_code = 'CONV' THEN 'Keystone'
          ELSE t.default_place END                                                      AS place,
     CASE WHEN g.cause_code IN ('CW00', 'CW01') AND fd.sent_at > r.close_run_at - INTERVAL 24 HOUR THEN 'Clears on its own'
          WHEN g.cause_code IN ('CW00', 'CW01') THEN 'Feed stuck'
+         WHEN g.cause_code IN ('CW02', 'CW08', 'CW12') AND g.root_cause_code IS DISTINCT FROM 'CW06' THEN 'Feed event failed'
          WHEN g.cause_code = 'LOAD' THEN 'Load failed' END                             AS timing_class,
     g.keystone_shows,
     g.bridgeway_has,
@@ -234,9 +239,12 @@ SELECT
                 THEN '. Sent ' || STRFTIME(fd.sent_at, '%Y-%m-%d %H:%M') || ' GMT, '
                      || CAST(DATE_DIFF('hour', fd.sent_at, r.close_run_at) AS VARCHAR) || ' hours before the close run'
                 ELSE '' END                                                            AS evidence,
-    CASE WHEN g.flag_code = 'F05' AND g.cause_code = 'CONV' THEN 'End the contractor record in Keystone; the person is now an employee'
+    CASE WHEN g.flag_code = 'F01' AND g.cause_code = 'CONV' THEN 'End the contractor record in Keystone; the person is now an employee'
          WHEN g.cause_code IN ('CW00', 'CW01') AND fd.sent_at > r.close_run_at - INTERVAL 24 HOUR THEN 'None: the change lands with the next feed batch'
          WHEN g.cause_code IN ('CW00', 'CW01') THEN 'Data engineering: release the stuck feed change'
+         WHEN g.cause_code IN ('CW02', 'CW08', 'CW12') AND g.root_cause_code IS DISTINCT FROM 'CW06'
+              THEN 'Data engineering: replay the failed feed event, then check Keystone'
+         WHEN g.cause_code IN ('CW02', 'CW08', 'CW12') THEN 'Align the Bridgeway ID stored in Keystone, then replay the feed event'
          WHEN g.cause_code = 'LOAD' THEN 'Data engineering: the next run reloads the source; check it cleared'
          ELSE t.next_step END                                                          AS next_step
 FROM one_per_contractor AS g

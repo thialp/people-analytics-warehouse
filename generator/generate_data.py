@@ -1924,7 +1924,7 @@ _rows_ks = _counter(list(cw_tables["ks_contingent_worker"]["effective_start_date
 _runs = cw_operations.load_log(domain_stream("load_log"), {"BW": _rows_bw, "KS": _rows_ks, "HLX": lambda t: 0})
 _helix = helix_service_desk.simulate(
     stream=domain_stream("helix"), tables=cw_tables, job_defects=_job_defect, load_runs=_runs,
-    conversions=cw_program.conversions, cc_function={c["cost_center_id"]: DEPT[c["department_id"]]["function"] for c in cost_center_rows})
+    conversions=cw_program.conversions)
 _ev = _counter(_helix["itsm_ticket_event"]["event_at"])
 _ok = _runs["source_system"].eq("HLX") & _runs["status"].ne("Failed")
 _runs.loc[_ok, "rows_read"] = [_ev(t) for t in _runs.loc[_ok, "started_at"]]

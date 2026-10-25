@@ -2,7 +2,7 @@
 -- Keystone job data for contingent workers (SCD Type 2): which PID each job record (EMPLID x
 -- record number) holds, Active or Terminated. A person should hold one active record, on the
 -- PID the PID ledger (stg_cw_position_assignment) shows them in; the reconciliation flags the
--- rest (F07 two active records, F08 still in a PID after leaving it).
+-- rest (F07 two active records, F06 still in a PID after leaving it).
 -- Source system: Keystone HR (see generator/source_systems.py). Added in release 4.
 CREATE OR REPLACE TABLE staging.stg_ks_cw_job AS
 SELECT
