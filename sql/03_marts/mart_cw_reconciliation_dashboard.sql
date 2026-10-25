@@ -83,4 +83,5 @@ FROM (SELECT 'Link' AS sk_part, l.*, n.sk_point FROM (SELECT CAST(1 AS INTEGER) 
        CROSS JOIN (VALUES ('Node', 0), ('Node', 1), ('Node', 2), ('Node', 3), ('Label', 0)) AS k(sk_part, sk_point)
      UNION ALL
      SELECT 'Header', h.sk_level, NULL::VARCHAR, NULL::VARCHAR, NULL::VARCHAR, NULL::VARCHAR, NULL::INTEGER, NULL::VARCHAR, NULL::INTEGER, NULL::VARCHAR, CAST(0 AS INTEGER)
-       FROM (VALUES (1), (2), (3)) AS h(sk_level)) AS s;
+       FROM (VALUES (1), (2), (3)) AS h(sk_level)) AS s
+ORDER BY ALL;   -- the scaffold (DISTINCT, CROSS JOIN) has no natural order: sort so the CSV is the same on every run
