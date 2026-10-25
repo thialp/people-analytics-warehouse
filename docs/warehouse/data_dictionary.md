@@ -4,7 +4,7 @@ Arcadia Systems is fictional and all data is synthetic. History runs from 2021-0
 
 ## Raw tables (`data/raw/`)
 
-Thirty-eight tables in seven groups: people and their history, the organization, the pay structure, seats, requisitions and the plan, external reference data, the **contingent workforce** (release 3) and the **lineage registry** (release 3). Every raw table comes from one source system: **Keystone HR**, **Bridgeway VMS**, the integration log between them, or public reference data; the map is in [source systems and lineage](source_systems.md) and in the raw table `ref_raw_table_lineage` (test 60). The raw files call the 1–12 ladder **job level**; from staging onward it is called `grade`, the name the published marts and dashboards use.
+Forty-nine tables in eight groups: people and their history, the organization, the pay structure, seats, requisitions and the plan, external reference data, the **contingent workforce** (release 3), the **lineage registry** (release 3) and the **reconciliation operations** (release 4). Every raw table comes from one source system: **Keystone HR**, **Bridgeway VMS**, the integration log between them, **Helix Service Desk**, the warehouse's load log, or public reference data; the map is in [source systems and lineage](source_systems.md) and in the raw table `ref_raw_table_lineage` (test 60). The raw files call the 1–12 ladder **job level**; from staging onward it is called `grade`, the name the published marts and dashboards use.
 
 ### People and history
 
@@ -150,7 +150,7 @@ Pay ranges in local currency by fiscal year (FY21–FY26), level and country: `r
 
 ### Seats, requisitions and plan
 
-The position (seat) layer of case study 1. How it is simulated and used: [Workforce Planning](../projects/workforce-planning/workforce_planning.md).
+The position (seat) layer of case study 3. How it is simulated and used: [Workforce Planning](../projects/workforce-planning/workforce_planning.md).
 
 #### dim_position
 PID (seat) history (SCD Type 2): a new record whenever a PID changes status, grade, office or department. Release 3.1 adds the contingent workers' PIDs: every contractor holds a PID in Keystone, like an employee. 222,161 records: 99,689 for 33,650 employee PIDs and 122,472 for 31,264 contingent PIDs (`P800001` onward).
@@ -399,7 +399,7 @@ Every change Bridgeway sent to Keystone: one event per revision Keystone cares a
 | `error_text` | VARCHAR | Integration message for failures and partial loads |
 
 #### gen_cw_discrepancy_truth
-**The answer key. A test fixture, not a business source** (system `GEN`). Every discrepancy the generator seeded, with its cause and the days it was true: one row per cause and continuous period. The warehouse detects discrepancies from Bridgeway, Keystone and the feed alone; this table only scores what it finds (case study 6). A Keystone-side discrepancy counts only on days when either system shows the worker working. How it is built: [Keystone and the feed](../projects/contingent-workforce/keystone_feed.md#the-answer-key).
+**The answer key. A test fixture, not a business source** (system `GEN`). Every discrepancy the generator seeded, with its cause and the days it was true: one row per cause and continuous period. The warehouse detects discrepancies from Bridgeway, Keystone and the feed alone; this table only scores what it finds (case study 4). A Keystone-side discrepancy counts only on days when either system shows the worker working. How it is built: [Keystone and the feed](../projects/contingent-workforce/keystone_feed.md#the-answer-key).
 
 | Column | Type | Description |
 |---|---|---|
@@ -438,6 +438,126 @@ Written by [`generator/source_systems.py`](../../generator/source_systems.py) wi
 | `ref_source_system` | source system (6) | `system_code`, `system_name`, `system_type`, `record_of`, `used_by`, `extract` |
 | `ref_raw_table_lineage` | raw table (40) | `table_name`, `system_code`, `module`, `grain`, `history_type`, `added_in_release` |
 | `ref_raw_column` | release 3 raw table × column | `table_name`, `column_order`, `column_name`, `data_type`, `description` |
+
+### Reconciliation operations (release 4)
+
+Case study 4's month-end close view needs times, Keystone's job data, the warehouse's own load log and the tickets people raise. All new tables, each from its own random stream: no release 1 to 3 row changed. How they are used: [release 4 plan](../projects/contingent-workforce/release_4_plan.md).
+
+#### feed_event_delivery
+The hour each feed change was sent (the hourly batch that picked it up) and applied, GMT: one row per row of `feed_bridgeway_keystone_event`, on the same days (test 88).
+
+| Column | Type | Description |
+|---|---|---|
+| `feed_event_id` | VARCHAR | → feed_bridgeway_keystone_event |
+| `sent_at` | TIMESTAMP | GMT hour of the hourly batch that sent the change; on sent_date |
+| `applied_at` | TIMESTAMP | GMT hour Keystone applied it, on applied_date; empty if it failed or is still queued |
+
+#### ks_contingent_worker_audit
+When each Keystone contingent version was written, GMT, and by whom: the feed at the hour it applied, Keystone's nightly job at 00:05, a manager in their office's working hours, or HR Operations (Bangalore).
+
+| Column | Type | Description |
+|---|---|---|
+| `ks_record_id` | VARCHAR | → ks_contingent_worker |
+| `changed_at` | TIMESTAMP | GMT time the version was written, on its effective start date |
+| `changed_by` | VARCHAR | Integration, Keystone nightly job, Manager or HR Operations |
+
+#### ks_cw_job
+Keystone job data (SCD Type 2): which PID each contingent job record (EMPLID × record number) holds. It follows the PID ledger (`fact_position_assignment`), with two seeded imperfections fixed by HR Ops on the day they notice, never backdated: an old record left active on a return (one person, two active PID records, F07) and a record ended late or never (still in the PID after the contract ended, F08).
+
+| Column | Type | Description |
+|---|---|---|
+| `job_record_id` | VARCHAR | Row key |
+| `person_id` | VARCHAR | EMPLID: the Keystone person (→ ks_contingent_worker) |
+| `empl_rcd` | INTEGER | Job record number of the person: 0 for the first PID, 1 for the next, ... |
+| `position_id` | VARCHAR | PID the job holds (→ dim_position) |
+| `effective_start_date` | DATE | First day the row applies |
+| `effective_end_date` | DATE | Last day (inclusive); empty for the current row |
+| `job_status` | VARCHAR | Active or Terminated |
+| `action` | VARCHAR | Assignment start, Return or Assignment end |
+| `change_source` | VARCHAR | Feed, or HR Ops for an end entered by hand late |
+| `assignment_id` | VARCHAR | → fact_position_assignment: the assignment the row was written for |
+
+#### gen_cw_job_defect
+**The answer key for Keystone job data. A test fixture, not a business source** (system `GEN`): every period a person holds two active job records or one record on a PID the ledger shows they left, computed by the generator from the rows themselves. Only test 82 reads it.
+
+| Column | Type | Description |
+|---|---|---|
+| `defect_id` | VARCHAR | Answer key row |
+| `flag_code` | VARCHAR | F07 one person, two active PIDs; F08 PID still filled after the contract ended |
+| `person_id` | VARCHAR | EMPLID |
+| `position_id` | VARCHAR | The PID involved (the lower one for F07) |
+| `start_date` | DATE | First day it is true |
+| `end_date` | DATE | Last day it is true; empty if still open on the extract date |
+| `origin` | VARCHAR | Seeded (a job end entered late or never) or PID ledger (the ledger itself overlaps) |
+| `resolution` | VARCHAR | Ended, or Open at extract |
+| `detail` | VARCHAR | The facts behind it, in a sentence |
+
+#### etl_load_run
+The warehouse's own load log (system `ETL`): every scheduled read of Bridgeway (00:00 GMT), Keystone (about 00:20, after Bridgeway) and Helix (00:00 and 12:00), Jun 1, 2021 to Jul 1, 2026. A failed run reads nothing and the warehouse keeps that source's last good load. Three close runs had an outage on purpose: Bridgeway at the Sep 2023 close, Keystone at the Dec 2024 close (three nights), Helix at the Mar 2026 close.
+
+| Column | Type | Description |
+|---|---|---|
+| `run_id` | VARCHAR | Run key |
+| `source_system` | VARCHAR | BW, KS or HLX (→ ref_source_system) |
+| `scheduled_at` | TIMESTAMP | GMT: Bridgeway 00:00, Keystone 00:20 (after Bridgeway), Helix 00:00 and 12:00 |
+| `started_at` | TIMESTAMP | GMT |
+| `finished_at` | TIMESTAMP | GMT |
+| `status` | VARCHAR | Succeeded, Late (started more than an hour after schedule) or Failed (read nothing) |
+| `rows_read` | INTEGER | Rows in the extract; empty when the run failed |
+| `error_text` | VARCHAR | Why a run failed |
+
+#### itsm_ticket
+Helix Service Desk tickets (system `HLX`, fictional), as the last read holds them. Contingent worker tickets only so far; the design is generic. 2,967 tickets from January 2021.
+
+| Column | Type | Description |
+|---|---|---|
+| `ticket_number` | VARCHAR | HLX-100001 upward, in the order tickets were opened |
+| `title` | VARCHAR | Category title and the subject (ID, or name, or nothing) |
+| `short_description` | VARCHAR | What the person who raised it wrote |
+| `category_code` | VARCHAR | → ref_ticket_category |
+| `priority` | VARCHAR | P1 to P4 |
+| `assignment_group` | VARCHAR | Group working it now: Vendor Management, HR Operations or Data Engineering |
+| `opened_at` | TIMESTAMP | GMT |
+| `resolved_at` | TIMESTAMP | GMT of the current resolution; empty while open or after a reopen |
+| `closed_at` | TIMESTAMP | GMT; Helix closes a resolved ticket after 3 days |
+| `close_code` | VARCHAR | Fixed in source, No longer reproducible, Credit requested from supplier, Source fixed; next run reloads |
+
+#### itsm_ticket_event
+Every state change of every ticket. The state at any moment is the last event at or before it, which is how a close is replayed (test 85).
+
+| Column | Type | Description |
+|---|---|---|
+| `ticket_number` | VARCHAR | → itsm_ticket |
+| `event_at` | TIMESTAMP | GMT |
+| `from_state` | VARCHAR | Empty for the opening event |
+| `to_state` | VARCHAR | New, In progress, Pending, Resolved, Reopened or Closed (a reassignment keeps the state) |
+| `actor_group` | VARCHAR | Group that made the change; Helix for automatic closes |
+| `note` | VARCHAR | What happened |
+
+#### itsm_ticket_link
+What each ticket is about, as the person who raised it entered it: 7 in 10 carry the IDs, 2 in 10 only the name in the description, 1 in 10 nothing.
+
+| Column | Type | Description |
+|---|---|---|
+| `ticket_number` | VARCHAR | → itsm_ticket |
+| `subject_type` | VARCHAR | Contingent worker or Data load (later: Employee, Position) |
+| `subject_id` | VARCHAR | Bridgeway worker ID, or the load run ID; empty when not entered |
+| `secondary_id` | VARCHAR | Keystone EMPLID, when entered |
+| `link_quality` | VARCHAR | ID field, Name in text (the name is in the description) or None |
+
+#### ref_ticket_category
+Helix ticket categories: one per reconciliation flag (F01 to F12) and two for Integration.
+
+| Column | Type | Description |
+|---|---|---|
+| `category_code` | VARCHAR | Category key |
+| `category_name` | VARCHAR | Name |
+| `subject_type` | VARCHAR | What a ticket of this category is about |
+| `default_group` | VARCHAR | Group it is assigned to |
+| `flag_code` | VARCHAR | The reconciliation flag it fixes, F01 to F12; empty for Integration categories |
+| `risk` | VARCHAR | The risk the flag creates |
+| `priority` | VARCHAR | Default priority |
+| `title_template` | VARCHAR | Ticket title before the subject |
 
 ## Marts (`data/marts/`)
 
@@ -567,7 +687,7 @@ Grain: **date pair × view × group × region.** A headcount walk per region ins
 Grain: **date pair × view × group × move type × from grade × to grade.** Promotions and demotions between two month-ends, from grade changes in the job history, for people present at both ends, in the group they belong to at the To date: `move_type`, `from_grade`, `from_grade_level`, `to_grade`, `to_grade_level`, `director_and_above` (grade 7 or above on either side), `into_director` (from grade 6 or below to 7 or above), `moves` and `workers`. The people promoted and demoted agree with the compensation walk, which counts them from pay records (test 58). The DuckDB twin of `tableau/custom_sql_career_moves.sql`.
 
 ### mart_position_fill
-Grain: **seat fill** (external hire or internal move), 30,575 rows from FY22. The core table of case study 1 ([field guide](../projects/workforce-planning/workforce_planning.md)).
+Grain: **seat fill** (external hire or internal move), 30,575 rows from FY22. The core table of case study 3 ([field guide](../projects/workforce-planning/workforce_planning.md)).
 
 | Column | Description |
 |---|---|
@@ -593,9 +713,9 @@ Grain: **month-end × vacant PID** (Open or Frozen; 439,286 rows, employee and c
 ### mart_plan_vs_actual
 Grain: **plan version × cost center × fiscal quarter** (29,415 rows; the 615 contingent-only cost center rows are zero on every employee measure). The plan (`planned_*`) beside the actuals: `actual_ending_headcount`, `actual_ending_fte`, `actual_net_new`, `actual_net_new_reuse_candidates`, `actual_backfills`, `actual_external_hires`, `actual_internal_moves`, `actual_cost_usd_plan_fx` (comparable with `planned_cost_usd`) and `actual_cost_usd_constant`; plus `version_order`, `is_latest_version` and the cost center's department, function, country and region. For every version and quarter, the actual headcount sums to the company and the actual fills to the seat fills (test 56). Attainment = actual ÷ planned. Release 3 adds the contingent line: `planned_cw_headcount` beside `actual_cw_headcount` (Bridgeway on the quarter-end), and `planned_cw_spend_usd` beside `actual_cw_spend_usd_plan_fx` (annualized bill run-rate at the plan's FX) and `actual_cw_spend_usd_constant` (test 74).
 
-### Case study 6 marts (release 3)
+### Case study 4 marts (release 3)
 
-How they work and what they find: [case study 6](../projects/contingent-workforce/case_study_6.md).
+How they work and what they find: [case study 4](../projects/contingent-workforce/case_study_4.md).
 
 | Mart | Grain | Columns |
 |---|---|---|
@@ -603,6 +723,17 @@ How they work and what they find: [case study 6](../projects/contingent-workforc
 | `mart_cw_reconciliation` | month-end × function × supplier (× discrepancy type) | `row_type` Population (`cw_working_bridgeway`, `cw_working_keystone`, `workers_with_any_discrepancy`) or Discrepancy (`discrepancy_code`, `discrepancy_name`, `severity`, `who_can_fix_it`, `workers_affected`, `new_this_month`, `aged_0_7`, `aged_8_30`, `aged_31_90`, `aged_over_90`); never sum the two row types together |
 | `mart_cw_engagement_cap` | Bridgeway worker who started | `original_start_date`, `last_day`, `is_working_at_extract`, `engagement_status`, `months_engaged`, `extensions`, `renewals`, `cap_date`, `months_left_at_extract`, `is_over_cap`, `cap_band`, plus identity, name, type, supplier |
 | `mart_cw_detection_score` | month-end × discrepancy type | `injected`, `detected`, `missed`, `false_flags`, `recall`, `precision`: the rules scored against the answer key (test 73) |
+
+### Dashboard #4 marts (release 4)
+
+The month-end close view of case study 4: [release 4 plan](../projects/contingent-workforce/release_4_plan.md). Executive officers (D-901) excluded. All 61 closes, Jun 2021 to Jun 2026; `is_latest_close` marks Current (Jun 30, 2026).
+
+| Mart | Grain | Columns |
+|---|---|---|
+| `mart_cw_gap_close` | close × contractor × flag (19,850) | `gap_id`, `contractor_key`, `bw_worker_id`, `person_id`, `contractor_name`, `cw_type`, `supplier_name`; the flag (`flag_code`, `flag_name`, `flag_rank`, `flag_rank_label`, `flag_count`, and rank and count at the prior close and 12 closes earlier); `risk`, `risk_order`; `place` (Bridgeway, Keystone, Integration), `place_order`, `place_key` (Integration split into "clears on its own" and "alert data engineering"); `cause_code`, `cause_name`, `root_cause_code`, `timing_class`, `is_counted`; `since_date`, `days_open`, `open_band`, `is_over_90_days`, `days_since_end`, `was_open_prior_close`, `fixed_day_after_close`, `items`; the order, feed event and PID involved; the group (`cost_center_id`, `department_id`, `department_name`, `function_name`, `country_code`, `country_name`: Bridgeway's billed cost center, Keystone's when Bridgeway has none); `keystone_shows`, `bridgeway_has`, `evidence`, `next_step`; the ticket (`ticket_number`, `ticket_title`, `ticket_state`, `ticket_status`, `has_ticket`) |
+| `mart_cw_gap_rate_close` | close × cost center (27,348) | `contractors_working` (the gap rate's denominator: working in Bridgeway), `contractors_working_keystone`, `working_bridgeway_only`, `working_keystone_only`, `contractors_with_gap` (counted gaps), `contractors_with_any_gap`, `gaps`, `gaps_counted`, `gaps_clear_on_own`, `gaps_no_ticket`, `gaps_over_90_days`, `gaps_open_prior_close`, `gaps_fixed_day_after`, `gap_rate_target` (0.03), `load_note`, plus the group. Additive across any choice of function, department and country |
+| `mart_itsm_ticket_close` | close × open Helix ticket (15,610) | `ticket_number`, `title`, `state`, `category_code`, `category_name`, `flag_code`, `risk`, `priority`, `place` (from the group working it), `place_order`, `current_group`, `opened_at`, `age_days`, `age_band` (0 to 5 days, 6 to 30 days, over 30 days), `age_band_order`, `times_reopened`, `times_reassigned`, `link_tier`, `contractor_key`, `linked_gap_id`, the group, `dot_seq`, `dot_x`, `dot_y` (the dot's place on the ticket card, packed 20 to a line, oldest first) |
+| `mart_cw_reconciliation_dashboard` | row_type × its grain (62,808) | The three above in one union (`row_type` Gap, Population, Ticket; `gaps` and `tickets` count rows): Dashboard #4's one data source, the same rows as `tableau/custom_sql_cw_reconciliation_dashboard.sql` |
 
 ### mart_cw_spend
 Grain: **month-end × cost center × supplier × contingent worker type × role family × billing currency** (release 3). What contingent workers cost, two ways side by side: **billed in the month** (`workers_billed`, `billed_hours`, `billed_units`, `billed_amount_local`, `billed_usd_nominal` at the month-end rate, `billed_usd_constant`) and **working at the month-end** (`workers_at_month_end`, `run_rate_local`, `run_rate_usd_nominal`, `run_rate_usd_constant`: hourly rate × contracted hours × 52, or monthly rate × 12). Also `fiscal_year`, `fiscal_quarter_label`, `department_id`, `country_code`, `supplier_name`. A month's billing is placed on the order revision in effect at the month-end. Billing ties to `bw_timesheet_month` to the cent and the month-end columns to the Bridgeway snapshot (test 71). Billed spend runs below the run-rate because timesheets carry time off and partial months.
@@ -634,7 +765,28 @@ One row per identity: a Keystone contingent person matched to a Bridgeway worker
 One row per identity per month-end on which either system shows the person working: what Keystone should hold (everything Bridgeway had sent by then, applied the day it was sent) beside what it holds, with `contract_differs`, `cost_center_differs`, `manager_differs`, `office_differs` and `link_differs`.
 
 ### int_cw_discrepancy
-One row per month-end × identity (or order, or timesheet) × discrepancy type, found from the two systems and the feed log alone (never the answer key): `discrepancy_code`, `root_cause_code`, `fields_affected`, `since_date`, `age_days`, `evidence`, and the order, feed event or timesheet involved. Rules: [case study 6](../projects/contingent-workforce/case_study_6.md#3-why-they-differ-the-rules-int_cw_discrepancy).
+One row per month-end × identity (or order, or timesheet) × discrepancy type, found from the two systems and the feed log alone (never the answer key): `discrepancy_code`, `root_cause_code`, `fields_affected`, `since_date`, `age_days`, `evidence`, and the order, feed event or timesheet involved. Rules: [case study 4](../projects/contingent-workforce/case_study_4.md#3-why-they-differ-the-rules-int_cw_discrepancy).
+
+### int_cw_close_run
+One row per month-end close: the 00:00 GMT run on the 1st. Each source's run and status, how fresh each source was (`bw_data_as_of`, `ks_data_as_of`: the month-end, or earlier after a failed load; `hlx_read_at`), the failed run if any and the `load_note` the page shows.
+
+### int_cw_flag_type
+The 12 flags (F01 to F12): name, risk (fixed order 1 to 6), default place and next step.
+
+### int_cw_load_gap
+Gaps that exist only because a load failed at the close: a stale source compared as it stood at its last good load, keeping only differences the true data does not have (cause `LOAD`).
+
+### int_cw_flag
+One row per close × contractor × flag: the comparisons from `int_cw_discrepancy` as flags, conversions still active as contractors (F05, cause `CONV`), Keystone job data against the PID ledger (F07, F08, cause `JOB`) and the load gaps, with the routing rule (`place`, `timing_class`), `keystone_shows`, `bridgeway_has`, `evidence` and `next_step`.
+
+### int_itsm_ticket_state
+One row per close × ticket existing at the close's Helix read: its state rebuilt from the events, the group working it, age and age band.
+
+### int_itsm_ticket_subject
+One row per ticket: the contractor it is about, linked in tiers (the IDs, else exactly one identity named in the description).
+
+### int_itsm_ticket_gap_link
+One row per close × gap: the ticket working on it (same contractor, opened no more than 7 days before the gap began, same risk or a stuck-feed ticket; latest wins) and `ticket_status` (No ticket, Open, Fix pending next run, Closed, gap still open).
 
 ### int_cw_month_end_snapshot
 One row per contingent worker (Bridgeway worker ID) per month-end on which they were working, **as Bridgeway held it that day**: the service order revision in effect on the month-end says the assignment has started and not ended. History is never restated, so an extension approved after the old end date counts from its approval. Carries the order, type, supplier, cost center (and so department and country), office, role, seniority, rate and its annualized run-rate in billing currency and in USD (month-end and constant rates). Test 70.

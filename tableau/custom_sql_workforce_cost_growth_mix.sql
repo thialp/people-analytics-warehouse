@@ -1,6 +1,6 @@
 /*
   custom_sql_workforce_cost_growth_mix.sql
-  Tableau Custom SQL for Dashboard #5, Workforce Cost Bridge: the growth mix (SQL Server, database ArcadiaHR).
+  Tableau Custom SQL for Dashboard #6, Workforce Cost Bridge: the growth mix (SQL Server, database ArcadiaHR).
   1,224 rows, the same columns and rows as data/marts/mart_workforce_cost_growth_mix.csv, so a workbook built on
   either can switch with Data > Replace Data Source.
 

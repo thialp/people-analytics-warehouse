@@ -7,7 +7,7 @@
 -- worker, or the Keystone person for a Keystone-only worker) that month-end; a flag with no seeded
 -- discrepancy behind it is a FALSE FLAG. Recall = detected / injected; precision = detected /
 -- (detected + false flags). The rules never read the answer key: this is the only place it is
--- used, and it is what case study 6's methodology page shows. Test 73 holds recall at 100%.
+-- used, and it is what case study 4's methodology page shows. Test 73 holds recall at 100%.
 CREATE OR REPLACE TABLE marts.mart_cw_detection_score AS
 WITH me AS (
     SELECT month_end_date FROM intermediate.int_month_end_calendar

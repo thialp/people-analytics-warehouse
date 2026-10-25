@@ -1,4 +1,4 @@
-# Case study 6: Contingent Workforce reconciliation
+# Case study 4: Contingent Workforce reconciliation
 
 Arcadia Systems, Keystone HR, Bridgeway VMS and every supplier and person here are fictional; all data is synthetic.
 
@@ -7,6 +7,8 @@ Arcadia Systems, Keystone HR, Bridgeway VMS and every supplier and person here a
 Arcadia runs its contingent workforce in **Bridgeway VMS**, the vendor management system and source of truth: who is engaged, on which order, until when, at what rate. Managers never open Bridgeway. They see contractors in **Keystone HR**, which a one-way feed fills from Bridgeway. When the feed is late or fails, or someone edits Keystone by hand, the two disagree. A manager may then think a contractor has left who is still working (and still billing), or still has access when they left weeks ago.
 
 The warehouse cannot fix either system. It **finds every disagreement, says why it happened and who can fix it**, from the two systems and the feed log alone. Because the data is synthetic, the generator also wrote an answer key of everything it seeded ([Keystone and the feed](keystone_feed.md)), and the warehouse's findings are scored against it.
+
+**Release 4** recasts these findings as Finance meets them at a month-end close: 12 comparisons, 6 risks, 3 places to fix them, the warehouse's own load log and a ticket system, for Dashboard #4. See the [release 4 plan](release_4_plan.md).
 
 ## How it works
 

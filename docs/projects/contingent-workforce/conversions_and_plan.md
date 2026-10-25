@@ -81,7 +81,7 @@ Two problems were found and fixed while building it:
 
 ## What it sets up
 
-Phase 6 brings the contingent workforce into the marts of case studies 1–5:
+Phase 6 brings the contingent workforce into the marts of case studies 1–3, 5 and 6:
 
 - **Headcount walk:** worker type, with conversions moving between columns.
 - **Plan versus actual:** the contingent line beside the employee plan.

@@ -1,0 +1,15 @@
+category_code|category_name|subject_type|default_group|flag_code|risk|priority|title_template
+CW-F01|Function different|Contingent worker|Vendor Management|F01|Wrong cost center|P3|Cost center in another function
+CW-F02|Department different, same function|Contingent worker|Vendor Management|F02|Wrong cost center|P3|Cost center in another department
+CW-F03|Order open after the end date|Contingent worker|Vendor Management|F03|Paying after the end|P3|Order open after the end date
+CW-F04|Billed after the end date|Contingent worker|Vendor Management|F04|Paying after the end|P3|Billed after the end date
+CW-F05|One person, two IDs|Contingent worker|Vendor Management|F05|Wrong headcount|P4|Duplicate contractor IDs
+CW-F06|Bridgeway ID missing or wrong|Contingent worker|HR Operations|F06|Wrong headcount|P4|Bridgeway ID missing or wrong
+CW-F07|One person, two active PIDs|Contingent worker|HR Operations|F07|Wrong PID|P4|Two active PIDs
+CW-F08|PID still filled after the contract ended|Contingent worker|HR Operations|F08|Wrong PID|P4|PID still filled after contract end
+CW-F09|Ended in Bridgeway, still active in Keystone|Contingent worker|HR Operations|F09|Access kept|P2|Contractor active after end date
+CW-F10|In Keystone only|Contingent worker|HR Operations|F10|Access kept|P2|Contractor in Keystone only
+CW-F11|Working in Bridgeway, ended in Keystone|Contingent worker|HR Operations|F11|Access lost|P2|Contractor ended in Keystone while working
+CW-F12|In Bridgeway, missing in Keystone|Contingent worker|HR Operations|F12|Access lost|P2|Contractor missing in Keystone
+INT-FEED|Feed change stuck|Contingent worker|Data Engineering|||P2|Feed change stuck in the queue
+INT-LOAD|Warehouse load failed|Data load|Data Engineering|||P1|Warehouse load failed

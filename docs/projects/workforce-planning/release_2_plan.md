@@ -143,7 +143,7 @@ Let `mid(level, zone, FY)` be the salary range midpoint.
 | Market effect | `mid(new level, new zone, hire FY) − mid(new level, new zone, exit FY)` |
 | Positioning | `(new pay − mid(new level, new zone, hire FY)) − (prior pay − mid(old level, old zone, exit FY))` |
 
-The four steps add up exactly to `new pay − prior pay` (tested). The order is level, then location, then market. A Shapley version that removes order bias can come later, when case study 5 is built.
+The four steps add up exactly to `new pay − prior pay` (tested). The order is level, then location, then market. A Shapley version that removes order bias can come later, when case study 6 is built.
 
 ## 7. Plan vs actual
 
@@ -200,7 +200,7 @@ Built in phase 3: test 41 (plan item 1), 42 (3), 43 (every job record sits in it
 | 6 | SQL Server twin; `05_validate` extended; new `08_validate_workforce_planning.sql` | PASS |
 | 7 | Part A query changes and part B career moves; `06`, `07`, new `09_validate_career_moves.sql` | PASS; marts match the Custom SQL row for row |
 | 8 | New expected-values tables for Dashboards #1 and #2; refresh extracts; republish both | Check tables match |
-| 9 | Docs: data dictionary, `docs/projects/workforce-planning/`, README case study 1 | Done 2026-10-13 |
+| 9 | Docs: data dictionary, `docs/projects/workforce-planning/`, README case study 3 | Done 2026-10-13 |
 
 ## 11. Still open
 
@@ -209,7 +209,7 @@ Built in phase 3: test 41 (plan item 1), 42 (3), 43 (every job record sits in it
 - **Pay zones:** settled. Offices already carry a pay-zone factor (`dim_location.pay_zone_factor`), so no new reference table is needed.
 - **Market effect in the seat pay walk:** settled in phase 4: ranges move every July 1, so the market step is real.
 - **The plan is written around the actuals (simulation shortcut):** the generator draws each version from what happened, with an error that shrinks per reforecast, instead of letting the plan drive hiring. Honest to say so in the case study; the version mechanics, variance and attainment are what the dashboard shows.
-- **Grade creep from backfills (phase 3):** a backfill hires at the leaver's level, while net-new hires follow the junior-leaning hire mix, so the average grade drifts from 3.62 to 3.71 over five years and FY26 loaded cost is 4.5% above phase 2. Kept as is: it is a real effect and feeds case study 5 ("hiring shifted toward higher grades"). Lever if it should be smaller: `SEAT_DECISION` re-level share and `RELEVEL_DOWN_SHARE` in `generator/reference_data.py`.
+- **Grade creep from backfills (phase 3):** a backfill hires at the leaver's level, while net-new hires follow the junior-leaning hire mix, so the average grade drifts from 3.62 to 3.71 over five years and FY26 loaded cost is 4.5% above phase 2. Kept as is: it is a real effect and feeds case study 6 ("hiring shifted toward higher grades"). Lever if it should be smaller: `SEAT_DECISION` re-level share and `RELEVEL_DOWN_SHARE` in `generator/reference_data.py`.
 - **Not built in phase 3:** short overlaps (two incumbents for up to 30 days, flagged) and rehires. Seats never overlap today (test 42).
 - **Hires on Jul 1, 2026:** team splits at the last month-end hire a few managers the day after history ends (existing behaviour, 3 in this build); they are outside every snapshot.
 - **2021 fringe rates:** carried back from 2022 and flagged. A researched 2021 set (OECD Taxing Wages 2022 edition, BLS ECEC March 2021) can replace them later.

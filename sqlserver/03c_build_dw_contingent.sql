@@ -620,7 +620,7 @@ GO
    late), a feed change that failed (CW02 extension, CW03 early end, CW12 attribute), or a hand
    edit in Keystone (CW05). Structural rules: CW06 link, CW07 second ID, CW08 never reached
    Keystone, CW09 Keystone only, CW10 over the cap, CW04 not closed, CW11 billed after the end.
-   Methodology: docs/projects/contingent-workforce/case_study_6.md */
+   Methodology: docs/projects/contingent-workforce/case_study_4.md */
 DROP TABLE IF EXISTS #Events;
 SELECT f.FeedEventID, f.BwWorkerID, f.EventType, f.SentDate, f.AppliedDate, f.Outcome, f.ErrorText,
        CASE WHEN f.EventType IN ('New Worker', 'Renewal', 'Extension', 'Early End') THEN 1 ELSE 0 END AS GContract,

@@ -4,7 +4,7 @@ Read this first in a new conversation about Dashboard #3, then the plan: `claude
 
 ## What this dashboard is
 
-**Workforce Planning** (case study 1), not the Global Workforce Footprint. Unit everywhere: **PID** (position). Question: how many PIDs do we have, how many are vacant, how well do we fill them against the Budget, and what changes when we refill one (seat vs. butt: the PID's level and office before and after).
+**Workforce Planning** (case study 3), not the Global Workforce Footprint. Unit everywhere: **PID** (position). Question: how many PIDs do we have, how many are vacant, how well do we fill them against the Budget, and what changes when we refill one (seat vs. butt: the PID's level and office before and after).
 
 ## Done
 

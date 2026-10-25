@@ -608,3 +608,68 @@ CW_CONVERSION_FROM = "2021-07-01"        # requisitions (and so conversions) are
 PLAN_CW_ERROR = {"Budget": (0.030, 0.080), "RF1": (0.020, 0.060), "RF2": (0.010, 0.040), "RF3": (0.005, 0.025)}
 PLAN_CW_COST_EXTRA_SD = 0.020
 PLAN_CW_FY_BUDGET_SHIFT = {2024: 0.050}  # the FY24 budget did not foresee the February 2024 contractor cuts
+
+
+# ======================================================================================
+# Reconciliation operations (release 4, case study 4): times, Keystone job data, the
+# warehouse load log and the Helix Service Desk
+# ======================================================================================
+# Each piece draws from its own random stream after everything above, so no earlier table moves.
+# The warehouse runs on GMT (Bangalore): it reads Bridgeway at 00:00, Keystone when Bridgeway is
+# done (about 00:20) and Helix at 00:00 and 12:00. A month-end close is the 00:00 run on the 1st.
+OPS_LOG_FROM = "2021-06-01"               # the first run in the load log (it reads May 31, 2021)
+OPS_LOG_TO = "2026-07-01"                 # the last run: reads the extract date, Jun 30, 2026
+
+# Hours (GMT) people and systems work in. A change is sent by the hourly feed batch that picks it up.
+OPS_SEND_HOURS = {"Americas": (14, 23, 0.55), "EMEA": (7, 16, 0.30), "APAC": (1, 9, 0.15)}   # first, last, share
+OPS_OFFICE_HOURS = {"North America": (14, 23), "Latin America": (13, 22), "Europe": (7, 16),
+                    "Middle East & Africa": (6, 15), "Asia Pacific": (1, 9)}
+OPS_HR_OPS_HOURS = (3, 12)                # HR Operations sits in Bangalore: 09:00 to 18:00 IST
+OPS_VENDOR_MGMT_HOURS = (14, 23)          # Vendor Management sits in Austin
+OPS_DATA_ENG_HOURS = (3, 13)              # Data engineering sits in Bangalore
+
+# Load log: share of daily runs that start late (more than an hour after schedule) or fail.
+# A failed run reads nothing; the warehouse keeps the source's previous load, one day stale.
+OPS_LOAD_LATE = {"BW": 0.015, "KS": 0.020, "HLX": 0.010}
+OPS_LOAD_FAIL = {"BW": 0.003, "KS": 0.003, "HLX": 0.003}
+# Failures on a close run are not left to chance (random failures skip close runs): these closes
+# had an outage of that many nights, so the page can show what a stale source does to Finance's
+# report. The close then runs on the source as it stood before the outage.
+OPS_CLOSE_FAILURES = {"2023-09-30": ("BW", 2), "2024-12-31": ("KS", 3), "2026-03-31": ("HLX", 2)}
+OPS_LOAD_ERRORS = {"BW": "Extract not delivered: SFTP transfer timed out after 3 retries",
+                   "KS": "Extract job failed: snapshot lock not released by the nightly batch",
+                   "HLX": "API read failed: HTTP 503 from the Helix export endpoint"}
+
+# Keystone job data: the PID each contingent worker's job record holds (EMPLID x record number).
+# Normally a job row starts on the assignment's first day and is terminated the day after its last
+# day. Two seeded imperfections, fixed by HR Ops on the day they notice (never backdated):
+CW_JOB_RETURN_KEEP_OLD = 0.55             # a return on another PID within 120 days leaves the old job active
+CW_JOB_RETURN_KEEP_DAYS = (10, 240)       # until HR Ops ends it this many days after the return
+CW_JOB_RETURN_NEVER = 0.08                # ... or never
+CW_JOB_SAME_PID_NEW_RECORD = 0.06         # a return to the same PID entered as a new record, the old one left active
+CW_JOB_LATE_END = 0.004                   # any other end: the job stays active after the last day
+CW_JOB_LATE_END_DAYS = (16, 180)
+CW_JOB_LATE_END_NEVER = 0.05
+
+# Helix Service Desk (fictional): contingent worker tickets only; the tables are generic.
+HLX_START = "2021-01-01"                  # Helix went live; gaps already open then get a ticket later, if at all
+HLX_LEGACY_MEAN_DAYS = 300                # ... after this many days on average
+HLX_FIRST_NUMBER = 100001
+# Per risk: share of gaps that get a ticket, and the delay in days from the gap's first day
+HLX_TICKET_RULES = {
+    "Access lost":          (0.90, (1, 3)),
+    "Access kept":          (0.60, (3, 20)),
+    "Wrong cost center":    (0.40, None),          # mostly 1 to 5 days after the next close (Finance notices)
+    "Paying after the end": (0.50, None),          # F03 at Vendor Management's review on the 10th; F04 when the invoice comes in
+    "Wrong headcount":      (0.30, (5, 45)),
+    "Wrong PID":            (0.30, (10, 60)),
+    "Feed stuck":           (0.15, (1, 2)),        # data engineering's monitoring
+}
+HLX_COST_CENTER_AFTER_CLOSE = 0.75
+HLX_LATE_NOTICE_MEAN_DAYS = 150           # a gap nobody raised at first is noticed later (a review, an audit), if it lasts
+HLX_MISROUTED = 0.10                      # first assigned to the wrong group, reassigned within 1 to 4 days
+HLX_RESOLVED_IN_ERROR = 0.08              # resolved while the gap is still there
+HLX_REOPENED = 0.70                       # ... and reopened 3 to 15 days later
+HLX_NO_LONGER_REPRODUCIBLE_DAYS = (10, 60)
+HLX_PENDING_SUPPLIER = 0.35               # Bridgeway tickets that wait on the supplier for a while
+HLX_LINK_QUALITY = {"ID field": 0.70, "Name in text": 0.20, "None": 0.10}
