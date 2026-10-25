@@ -1,18 +1,24 @@
 # Dashboard #4 spikes (phase 7): Tableau Public
 
-Six small tests, run before any page is built, so a limit of the Sankey extension or of Tableau Public is found now and not in the middle of the build. One throw-away workbook, `D4 Spikes`, on the dashboard's one data file. Each spike has a pass condition and a fallback chosen in advance ([release 4 plan](release_4_plan.md), phase 7). A failure is written down with its fallback; the story is never changed quietly.
+Six small tests, run before any page is built, so a limit of the Sankey extension or of Tableau Public is found now and not in the middle of the build. One throw-away workbook, `D4 Spikes`, on the dashboard's one Custom SQL data source. Each spike has a pass condition and a fallback chosen in advance ([release 4 plan](release_4_plan.md), phase 7). A failure is written down with its fallback; the story is never changed quietly.
 
 Arcadia Systems, Keystone HR, Bridgeway VMS and Helix Service Desk are fictional; all data is synthetic.
 
 ## Setup (once)
 
-1. Tableau Public Desktop, new workbook, **Text file**, choose `data/marts/mart_cw_reconciliation_dashboard.csv` (24.8 MB, 62,808 rows). Keep the connection as **Extract**.
-2. Three row types share the file, so every sheet filters `row_type` first:
+Same route as Dashboards #1 to #3: Tableau Desktop on the local SQL Server, one Custom SQL data source, published as an extract (Tableau Public cannot reach a local SQL Server).
+
+1. SQL Server must be up with the warehouse built (`docker start arcadia-sql`; the 2026-10-25 build is current).
+2. Tableau Desktop, **Connect > Microsoft SQL Server**: server `localhost`, port `1433`, database `ArcadiaHR`, SQL Server Authentication, user `sa`, the password from `docker exec arcadia-sql printenv MSSQL_SA_PASSWORD`.
+3. Drag **New Custom SQL** onto the canvas and paste the whole of `tableau/custom_sql_cw_reconciliation_dashboard.sql`. **Extract** it (62,808 rows; it ran in 1 second on SQL Server).
+4. Three row types share the source, so every sheet filters `row_type` first:
    - `Gap`: the Sankey, the gap list (`gaps` = 1)
    - `Ticket`: the ticket card (`tickets` = 1, one dot at `dot_x`, `dot_y`)
    - `Population`: the gap rate (not needed for the spikes)
-3. Add `is_latest_close` = 1 as a filter too (Current, 30 Jun 2026).
-4. Name the workbook `D4 Spikes` and save it as a local `.twbx` (not published yet, except S6).
+5. Add `is_latest_close` = 1 as a filter too (Current, 30 Jun 2026).
+6. Save the workbook as `D4 Spikes` (local `.twbx`; S6 publishes it).
+
+The CSV `data/marts/mart_cw_reconciliation_dashboard.csv` holds the same columns and rows, and is only a fallback if the SQL Server connection misbehaves; the build uses the Custom SQL.
 
 Expected on Current: 379 Gap rows (flags F01 to F12: 54, 15, 99, 1, 28, 49, 10, 32, 6, 6, 54, 25), 330 Ticket rows.
 
@@ -74,10 +80,10 @@ Record: can two Integration shades (clears on its own; needs data engineering) b
 
 ## S6. Extract size and speed
 
-1. Publish `D4 Spikes` to Tableau Public (File > Save to Tableau Public As...) with S1 to S5 on separate sheets.
+1. Publish `D4 Spikes` to Tableau Public (Server > Tableau Public > Save to Tableau Public As...) as an extract, with S1 to S5 on separate sheets.
 2. Open it on the web in a private window; time from opening to the Sankey drawn. Repeat once warm.
 
-**Pass:** it publishes (all 62,808 rows, 24.8 MB file) and the page loads in under 5 seconds.
+**Pass:** it publishes (all 62,808 rows; the CSV is 24.8 MB, so the extract is of that order) and the page loads in under 5 seconds.
 **Fallback:** drop the Gap rows of closes older than 25 months from the extract (the replay keeps two years).
 
 ## Send back

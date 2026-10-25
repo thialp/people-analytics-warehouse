@@ -328,7 +328,7 @@ An outside review of the three published dashboards (Headcount & FTE Walk, Compe
 
 Step-by-step: [spikes_guide.md](spikes_guide.md).
 
-Run on a small workbook against `mart_cw_reconciliation_dashboard.csv` before any page is built.
+Run on a small workbook on the dashboard's Custom SQL (local SQL Server, extracted) before any page is built.
 
 | # | Spike | Pass when | Fallback |
 |---|---|---|---|
