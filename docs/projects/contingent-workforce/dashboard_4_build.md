@@ -8,6 +8,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 |---|---|---|
 | 1 | 2026-10-25 | First full plan, steps 0 to 16. Spikes S1, S2 and S3 passed. Two findings added while writing it: the Sankey's place order breaks under a group filter (section 9.2, spike S7), and a Sankey click cannot show a hidden gap list (spike S2b). The page grid moves onto Dashboard #2's (cards from x 246, KPI band at y 88). **The build starts at step 5** (the dashboard shell, with the Sankey in its final tile) so the Sankey can be judged in place before anything else is built |
 | 2 | 2026-10-25 | Steps 3 and 4 done by a generator (`tableau/build/d4_fields/`): every parameter and calc written into the workbook and checked. Small changes to make the formulas valid as written: `Has Prior` is an aggregate; `Main Subtitle` is an aggregate with `Top Flag Prior Rank` and `Clear Own Gaps`; one `Tick Shape` and one `List Row` per list; `p_Close` allows All, opening on `Latest Close` |
+| 3 | 2026-10-25 | Status marks: 🟢 in the workbook, 🔴 still to add by hand (only the `kpi_` set, step 9). Folder `4 Contingent Workforce Reconciliation` (no leading zero) |
 
 ## Contents
 
@@ -121,11 +122,11 @@ Release plan phases 1 to 6, all done (sections 3 to 8 of [release_4_plan.md](rel
 ```bash
 cd ~/GitHub/people-analytics-warehouse
 git checkout main && git pull && git log --oneline -1
-D="$HOME/Documents/Tableau/Tableau Public/ArcadiaHR/04 Contingent Workforce Reconciliation/Custom SQL"
+D="$HOME/Documents/Tableau/Tableau Public/ArcadiaHR/4 Contingent Workforce Reconciliation/Custom SQL"
 cmp -s tableau/custom_sql_cw_reconciliation_dashboard.sql "$D/custom_sql_cw_reconciliation_dashboard.sql" && echo same || echo DIFF
 ```
 
-Expected: the latest squash commit, then `same`. On `DIFF`, copy it: `cp tableau/custom_sql_cw_reconciliation_dashboard.sql "$D/"`. (If your folder has another name, `ls "$HOME/Documents/Tableau/Tableau Public/ArcadiaHR"` shows it.)
+Expected: the latest squash commit, then `same`. On `DIFF`, copy it: `cp tableau/custom_sql_cw_reconciliation_dashboard.sql "$D/"`. (The project folders are `1` to `6`, with no leading zero: the workbooks' extract paths use those names. Rename a folder only with Tableau closed, or the next save recreates the old one.)
 
 ---
 
@@ -151,7 +152,7 @@ You built the spikes in `Arcadia CW Reconciliation.twb`. Its data source, the Sa
 1. Close Tableau. Archive a copy of the spike state:
 
 ```bash
-W="$HOME/Documents/Tableau/Tableau Public/ArcadiaHR/04 Contingent Workforce Reconciliation"
+W="$HOME/Documents/Tableau/Tableau Public/ArcadiaHR/4 Contingent Workforce Reconciliation"
 ls "$W"/*.twb
 mkdir -p "$W/_archive/2026-10-25"
 cp "$W/Arcadia CW Reconciliation.twb" "$W/_archive/2026-10-25/Arcadia CW Reconciliation - spikes.twb"
@@ -170,21 +171,21 @@ ls "$W/_archive/2026-10-25"
 
 ## 6. Step 3: parameters
 
-| Name | Type | Allowable values | Current | Notes |
-|---|---|---|---|---|
-| `p_Close` | Date | **All** (the close grid and Reset set it, so no list is needed) | **Value when workbook opens: `Latest Close`** (7.1) | The close the page shows. Opens on the newest close after a refresh |
-| `p_Functions` | String | All | empty | `|Commercial|Technology|`; empty = All functions |
-| `p_Departments` | String | All | empty | Same pattern |
-| `p_Countries` | String | All | empty | Same pattern |
-| `p_ShowList` | Boolean | | False | False = Overview (Sankey), True = Gap list |
-| `p_CloseOpen` | Boolean | | False | Popover open flags |
-| `p_FunctionOpen` | Boolean | | False | |
-| `p_DepartmentOpen` | Boolean | | False | |
-| `p_CountryOpen` | Boolean | | False | |
-| `p_InfoOpen` | Boolean | | False | |
-| `kpi_` (16) | Float | | Dashboard #2's | Pasted with the KPI calcs in section 12 |
+| | Name | Type | Allowable values | Current | Notes |
+|---|---|---|---|---|---|
+| 🟢 | `p_Close` | Date | **All** (the close grid and Reset set it, so no list is needed) | **Value when workbook opens: `Latest Close`** (7.1) | The close the page shows. Opens on the newest close after a refresh |
+| 🟢 | `p_Functions` | String | All | empty | `|Commercial|Technology|`; empty = All functions |
+| 🟢 | `p_Departments` | String | All | empty | Same pattern |
+| 🟢 | `p_Countries` | String | All | empty | Same pattern |
+| 🟢 | `p_ShowList` | Boolean | | False | False = Overview (Sankey), True = Gap list |
+| 🟢 | `p_CloseOpen` | Boolean | | False | Popover open flags |
+| 🟢 | `p_FunctionOpen` | Boolean | | False | |
+| 🟢 | `p_DepartmentOpen` | Boolean | | False | |
+| 🟢 | `p_CountryOpen` | Boolean | | False | |
+| 🟢 | `p_InfoOpen` | Boolean | | False | |
+| 🔴 | `kpi_` (16) | Float | | Dashboard #2's | Pasted with the KPI calcs in section 12 |
 
-Create `Latest Close` (7.1) before `p_Close`, so it can be chosen as the opening value.
+🟢 The ten `p_` parameters are in the workbook, and `p_Close` already opens on `Latest Close`. 🔴 The 16 `kpi_` parameters come with the KPI calcs in step 9 (12.1).
 
 ---
 
@@ -192,42 +193,44 @@ Create `Latest Close` (7.1) before `p_Close`, so it can be chosen as the opening
 
 All on **CW Reconciliation**. Field names are the SQL columns as Tableau shows them (`month_end_date`); calcs keep the names below.
 
+**Status marks.** 🟢 already in the workbook (written by the generator, nothing to type). 🔴 still to add by hand. A 🟢 field still needs its sheet, shelf, format and action work in its step; only the typing is done.
+
 **Written into the workbook, 2026-10-25.** The 10 parameters of section 6 and every calc in sections 7, 10, 11, 12.4, 13, 14, 15 and 16 (211 new, 21 spike calcs rewritten in place) were added to `Arcadia CW Reconciliation.twb` by [`tableau/build/d4_fields/`](../../../tableau/build/d4_fields/README.md), which also checks each formula for balanced brackets, IF and END, and mixed aggregate and row-level parts. Not included: the `kpi_` calcs and parameters (copied from Dashboard #2 in step 9). The formulas below are the source; the generator follows them.
 
 ### 7.1 Close and scope
 
 ```
-// Latest Close         { MAX([month_end_date]) }
-// First Close          { MIN([month_end_date]) }
-// Prior Close          DATEADD('day', -1, DATETRUNC('month', [p_Close]))
-// Year Ago Close       DATEADD('day', -1, DATEADD('month', -11, DATETRUNC('month', [p_Close])))
-// Is Selected Close    [month_end_date] = [p_Close]
-// Is Prior Close       [month_end_date] = [Prior Close]
-// Is Current           [p_Close] = [Latest Close]
-// Has Prior            [p_Close] > MIN([First Close])                                      (aggregate, so it sits with the K strings on the KPI cards)
-// Close Month          DATENAME('month', [p_Close])                                        "June"
-// Close Name           DATENAME('month', [p_Close]) + " " + STR(YEAR([p_Close]))          "June 2026"
-// Close Short          LEFT(DATENAME('month', [p_Close]), 3) + " " + STR(YEAR([p_Close])) "Jun 2026"
-// Prior Month          DATENAME('month', [Prior Close])                                    "May"
-// Prior Short          LEFT(DATENAME('month', [Prior Close]), 3)                           "May"
+// 🟢 Latest Close         { MAX([month_end_date]) }
+// 🟢 First Close          { MIN([month_end_date]) }
+// 🟢 Prior Close          DATEADD('day', -1, DATETRUNC('month', [p_Close]))
+// 🟢 Year Ago Close       DATEADD('day', -1, DATEADD('month', -11, DATETRUNC('month', [p_Close])))
+// 🟢 Is Selected Close    [month_end_date] = [p_Close]
+// 🟢 Is Prior Close       [month_end_date] = [Prior Close]
+// 🟢 Is Current           [p_Close] = [Latest Close]
+// 🟢 Has Prior            [p_Close] > MIN([First Close])                                      (aggregate, so it sits with the K strings on the KPI cards)
+// 🟢 Close Month          DATENAME('month', [p_Close])                                        "June"
+// 🟢 Close Name           DATENAME('month', [p_Close]) + " " + STR(YEAR([p_Close]))          "June 2026"
+// 🟢 Close Short          LEFT(DATENAME('month', [p_Close]), 3) + " " + STR(YEAR([p_Close])) "Jun 2026"
+// 🟢 Prior Month          DATENAME('month', [Prior Close])                                    "May"
+// 🟢 Prior Short          LEFT(DATENAME('month', [Prior Close]), 3)                           "May"
 
-// In Function          [p_Functions] = "" OR CONTAINS([p_Functions], "|" + [function_name] + "|")
-// In Department        [p_Departments] = "" OR CONTAINS([p_Departments], "|" + [department_name] + "|")
-// In Country           [p_Countries] = "" OR CONTAINS([p_Countries], "|" + [country_name] + "|")
-// In Scope             [In Function] AND [In Department] AND [In Country]
-// Scope Is All         [p_Functions] = "" AND [p_Departments] = "" AND [p_Countries] = ""
+// 🟢 In Function          [p_Functions] = "" OR CONTAINS([p_Functions], "|" + [function_name] + "|")
+// 🟢 In Department        [p_Departments] = "" OR CONTAINS([p_Departments], "|" + [department_name] + "|")
+// 🟢 In Country           [p_Countries] = "" OR CONTAINS([p_Countries], "|" + [country_name] + "|")
+// 🟢 In Scope             [In Function] AND [In Department] AND [In Country]
+// 🟢 Scope Is All         [p_Functions] = "" AND [p_Departments] = "" AND [p_Countries] = ""
 
-// Is Gap               [row_type] = "Gap"
-// Is Pop               [row_type] = "Population"
-// Is Ticket            [row_type] = "Ticket"
-// Gap Now              [Is Gap] AND [Is Selected Close] AND [In Scope]
-// Pop Now              [Is Pop] AND [Is Selected Close] AND [In Scope]
-// Pop Prior            [Is Pop] AND [Is Prior Close] AND [In Scope]
-// Ticket Now           [Is Ticket] AND [Is Selected Close] AND [In Scope]
+// 🟢 Is Gap               [row_type] = "Gap"
+// 🟢 Is Pop               [row_type] = "Population"
+// 🟢 Is Ticket            [row_type] = "Ticket"
+// 🟢 Gap Now              [Is Gap] AND [Is Selected Close] AND [In Scope]
+// 🟢 Pop Now              [Is Pop] AND [Is Selected Close] AND [In Scope]
+// 🟢 Pop Prior            [Is Pop] AND [Is Prior Close] AND [In Scope]
+// 🟢 Ticket Now           [Is Ticket] AND [Is Selected Close] AND [In Scope]
 
-// zzTrue               TRUE
-// zzFalse              FALSE
-// Close Panel          FALSE
+// 🟢 zzTrue               TRUE
+// 🟢 zzFalse              FALSE
+// 🟢 Close Panel          FALSE
 ```
 
 A ticket with no linked contractor has no `function_name`, so `In Function` is False for it as soon as a function is chosen (D14).
@@ -235,14 +238,14 @@ A ticket with no linked contractor has no `function_name`, so `In Function` is F
 ### 7.2 Scope words (rail capsules, subtitle)
 
 ```
-// Function Count       IF [p_Functions] = "" THEN 0 ELSE LEN([p_Functions]) - LEN(REPLACE([p_Functions], "|", "")) - 1 END
-// Department Count     (same, on p_Departments)
-// Country Count        (same, on p_Countries)
-// Function Field Text  IF [Function Count] = 0 THEN "All"
+// 🟢 Function Count       IF [p_Functions] = "" THEN 0 ELSE LEN([p_Functions]) - LEN(REPLACE([p_Functions], "|", "")) - 1 END
+// 🟢 Department Count     (same, on p_Departments)
+// 🟢 Country Count        (same, on p_Countries)
+// 🟢 Function Field Text  IF [Function Count] = 0 THEN "All"
 //                      ELSEIF [Function Count] = 1 THEN MID([p_Functions], 2, LEN([p_Functions]) - 2)
 //                      ELSE STR([Function Count]) + " selected" END
-// Department Field Text, Country Field Text   (same pattern; cut a single name over 20 letters: LEFT(name, 19) + "…")
-// Scope Text           (used in the subtitle; empty when nothing is chosen)
+// 🟢 Department Field Text, Country Field Text   (same pattern; cut a single name over 20 letters: LEFT(name, 19) + "…")
+// 🟢 Scope Text           (used in the subtitle; empty when nothing is chosen)
 IF [Scope Is All] THEN ""
 ELSE " · " + (IF [Function Count] = 0 THEN "" ELSEIF [Function Count] = 1 THEN [Function Field Text] ELSE STR([Function Count]) + " functions" END)
    + (IF [Department Count] = 0 THEN "" ELSE (IF [Function Count] > 0 THEN ", " ELSE "" END)
@@ -257,24 +260,24 @@ Expected: nothing chosen "", Technology " · Technology", Commercial and Technol
 ### 7.3 Toggles (multi-select, D5)
 
 ```
-// Function Toggle      (the new value of p_Functions when this function is clicked)
+// 🟢 Function Toggle      (the new value of p_Functions when this function is clicked)
 IF CONTAINS([p_Functions], "|" + [function_name] + "|")
 THEN (IF [p_Functions] = "|" + [function_name] + "|" THEN "" ELSE REPLACE([p_Functions], "|" + [function_name] + "|", "|") END)
 ELSE (IF [p_Functions] = "" THEN "|" + [function_name] + "|" ELSE [p_Functions] + [function_name] + "|" END) END
-// Department Toggle, Country Toggle   (same, on department_name / p_Departments and country_name / p_Countries)
-// Function Is On       CONTAINS([p_Functions], "|" + [function_name] + "|")
-// Department Is On, Country Is On     (same)
-// Dept In Functions    [p_Functions] = "" OR CONTAINS([p_Functions], "|" + [function_name] + "|")
-// Function State       IF [Function Is On] THEN "on" ELSE "off" END
-// Department State     IF [Department Is On] THEN "on" ELSEIF [Dept In Functions] THEN "off" ELSE "dim" END
-// Country State        IF [Country Is On] THEN "on" ELSE "off" END
-// Function Tick Shape    IF [Function Is On] THEN "d4_tick_on" ELSE "d4_tick_off" END     (values match the shape file names)
-// Department Tick Shape  IF [Department Is On] THEN "d4_tick_on" ELSEIF [Dept In Functions] THEN "d4_tick_off" ELSE "d4_tick_dim" END
-// Country Tick Shape     IF [Country Is On] THEN "d4_tick_on" ELSE "d4_tick_off" END
-// Empty Text           ""
-// Toggle Close Panel   NOT [p_CloseOpen]
-// Toggle Function Panel  NOT [p_FunctionOpen]      (Department, Country, Info the same)
-// Show Pick            (on the toggle sheet, one mark per option; see 10.2)
+// 🟢 Department Toggle, Country Toggle   (same, on department_name / p_Departments and country_name / p_Countries)
+// 🟢 Function Is On       CONTAINS([p_Functions], "|" + [function_name] + "|")
+// 🟢 Department Is On, Country Is On     (same)
+// 🟢 Dept In Functions    [p_Functions] = "" OR CONTAINS([p_Functions], "|" + [function_name] + "|")
+// 🟢 Function State       IF [Function Is On] THEN "on" ELSE "off" END
+// 🟢 Department State     IF [Department Is On] THEN "on" ELSEIF [Dept In Functions] THEN "off" ELSE "dim" END
+// 🟢 Country State        IF [Country Is On] THEN "on" ELSE "off" END
+// 🟢 Function Tick Shape    IF [Function Is On] THEN "d4_tick_on" ELSE "d4_tick_off" END     (values match the shape file names)
+// 🟢 Department Tick Shape  IF [Department Is On] THEN "d4_tick_on" ELSEIF [Dept In Functions] THEN "d4_tick_off" ELSE "d4_tick_dim" END
+// 🟢 Country Tick Shape     IF [Country Is On] THEN "d4_tick_on" ELSE "d4_tick_off" END
+// 🟢 Empty Text           ""
+// 🟢 Toggle Close Panel   NOT [p_CloseOpen]
+// 🟢 Toggle Function Panel  NOT [p_FunctionOpen]      (Department, Country, Info the same)
+// 🟢 Show Pick            (on the toggle sheet, one mark per option; see 10.2)
 ```
 
 Walk-through: `|A|B|` and a click on B gives `|A|`; on A gives `|B|`; on C gives `|A|B|C|`; on the only member gives empty.
@@ -282,46 +285,46 @@ Walk-through: `|A|B|` and a click on B gives `|A|`; on A gives `|B|`; on C gives
 ### 7.4 KPI numbers (Population rows; one formula per name)
 
 ```
-// K Working        SUM(IF [Pop Now] THEN [contractors_working] END)
-// K Keystone       SUM(IF [Pop Now] THEN [contractors_working_keystone] END)
-// K BW Only        SUM(IF [Pop Now] THEN [working_bridgeway_only] END)
-// K KS Only        SUM(IF [Pop Now] THEN [working_keystone_only] END)
-// K Net            [K Working] - [K Keystone]
-// K With Gap       SUM(IF [Pop Now] THEN [contractors_with_gap] END)
-// K Rate           IF ZN([K Working]) = 0 THEN NULL ELSE [K With Gap] / [K Working] END
-// K Rate Prior     IF ZN(SUM(IF [Pop Prior] THEN [contractors_working] END)) = 0 THEN NULL
+// 🟢 K Working        SUM(IF [Pop Now] THEN [contractors_working] END)
+// 🟢 K Keystone       SUM(IF [Pop Now] THEN [contractors_working_keystone] END)
+// 🟢 K BW Only        SUM(IF [Pop Now] THEN [working_bridgeway_only] END)
+// 🟢 K KS Only        SUM(IF [Pop Now] THEN [working_keystone_only] END)
+// 🟢 K Net            [K Working] - [K Keystone]
+// 🟢 K With Gap       SUM(IF [Pop Now] THEN [contractors_with_gap] END)
+// 🟢 K Rate           IF ZN([K Working]) = 0 THEN NULL ELSE [K With Gap] / [K Working] END
+// 🟢 K Rate Prior     IF ZN(SUM(IF [Pop Prior] THEN [contractors_working] END)) = 0 THEN NULL
 //                  ELSE SUM(IF [Pop Prior] THEN [contractors_with_gap] END) / SUM(IF [Pop Prior] THEN [contractors_working] END) END
-// K Target         MIN(IF [Is Pop] THEN [gap_rate_target] END)
-// K Gaps           SUM(IF [Pop Now] THEN [gaps_counted] END)
-// K Clear Own      SUM(IF [Pop Now] THEN [gaps_clear_on_own] END)
-// K Carry          SUM(IF [Pop Now] THEN [gaps_open_prior_close] END)
-// K No Ticket      SUM(IF [Pop Now] THEN [gaps_no_ticket] END)
-// K Over 90        SUM(IF [Pop Now] THEN [gaps_over_90_days] END)
-// K Oldest         MAX(IF [Gap Now] AND [is_counted] THEN [days_open] END)
-// K Tickets        SUM(IF [Ticket Now] THEN [tickets] END)
+// 🟢 K Target         MIN(IF [Is Pop] THEN [gap_rate_target] END)
+// 🟢 K Gaps           SUM(IF [Pop Now] THEN [gaps_counted] END)
+// 🟢 K Clear Own      SUM(IF [Pop Now] THEN [gaps_clear_on_own] END)
+// 🟢 K Carry          SUM(IF [Pop Now] THEN [gaps_open_prior_close] END)
+// 🟢 K No Ticket      SUM(IF [Pop Now] THEN [gaps_no_ticket] END)
+// 🟢 K Over 90        SUM(IF [Pop Now] THEN [gaps_over_90_days] END)
+// 🟢 K Oldest         MAX(IF [Gap Now] AND [is_counted] THEN [days_open] END)
+// 🟢 K Tickets        SUM(IF [Ticket Now] THEN [tickets] END)
 ```
 
 Text twins use the comma and percent patterns from Dashboard #3 (G3 7.2), typed fresh:
 
 ```
-// Comma pattern, shown for K Working Str (copy for K Keystone, K With Gap, K Gaps, K Carry, K No Ticket, K Over 90, K Oldest, K BW Only, K KS Only)
+// 🟢 Comma pattern, shown for K Working Str (copy for K Keystone, K With Gap, K Gaps, K Carry, K No Ticket, K Over 90, K Oldest, K BW Only, K KS Only)
 IF ISNULL([K Working]) THEN "N/A"
 ELSEIF [K Working] >= 1000 THEN STR(DIV(INT([K Working]), 1000)) + "," + RIGHT("00" + STR(INT([K Working]) % 1000), 3)
 ELSE STR(INT([K Working])) END
 
-// Rate pattern, two decimals (K Rate Str; copy for K Rate Prior Str)
+// 🟢 Rate pattern, two decimals (K Rate Str; copy for K Rate Prior Str)
 IF ISNULL([K Rate]) THEN "N/A" ELSE
 STR(DIV(INT(ROUND([K Rate] * 10000, 0)), 100)) + "." + RIGHT("0" + STR(INT(ROUND([K Rate] * 10000, 0)) % 100), 2) + "%" END
 
-// Share pattern, no decimals (K Carry Pct Str: K Carry / K Gaps; K No Ticket Pct Str: K No Ticket / K Gaps)
+// 🟢 Share pattern, no decimals (K Carry Pct Str: K Carry / K Gaps; K No Ticket Pct Str: K No Ticket / K Gaps)
 IF ZN([K Gaps]) = 0 THEN "N/A" ELSE STR(INT(ROUND([K Carry] / [K Gaps] * 100, 0))) + "%" END
 
-// K Net Str        (IF [K Net] > 0 THEN "+" ELSEIF [K Net] < 0 THEN "−" ELSE "" END) + STR(ABS(INT([K Net])))
-// K Points Str     distance from the target in points, for the KPI 2 hover: "0.21 pts above" / "0.04 pts below" / "on"
+// 🟢 K Net Str        (IF [K Net] > 0 THEN "+" ELSEIF [K Net] < 0 THEN "−" ELSE "" END) + STR(ABS(INT([K Net])))
+// 🟢 K Points Str     distance from the target in points, for the KPI 2 hover: "0.21 pts above" / "0.04 pts below" / "on"
 IF ISNULL([K Rate]) THEN "" ELSE
   STR(DIV(INT(ROUND(ABS([K Rate] - [K Target]) * 10000, 0)), 100)) + "." + RIGHT("0" + STR(INT(ROUND(ABS([K Rate] - [K Target]) * 10000, 0)) % 100), 2)
   + IF ROUND([K Rate] - [K Target], 4) > 0 THEN " pts above" ELSEIF ROUND([K Rate] - [K Target], 4) < 0 THEN " pts below" ELSE " pts: on" END END
-// K Target Str     STR(INT(ROUND([K Target] * 100, 0))) + "%"
+// 🟢 K Target Str     STR(INT(ROUND([K Target] * 100, 0))) + "%"
 ```
 
 ### 7.5 KPI card texts
@@ -334,44 +337,46 @@ IF ISNULL([K Rate]) THEN "" ELSE
 | 4 | `"No linked ticket"` | `[K No Ticket Str]` (coral `#712B13`) | `[K No Ticket Pct Str] + " of the gaps"` | `"No Helix ticket linked to the gap"` |
 | 5 | `"Open over 90 days"` | `[K Over 90 Str]` | `"of " + [K Gaps Str] + " gaps"` | `"Oldest gap " + [K Oldest Str] + " days"` |
 
+🟢 Every text in this table is in the workbook: `KPI 1`–`5 Title`, `Value`, `Note`, `KPI 1`, `3`, `4`, `5 Unit`, `KPI 2 Known` and `KPI 2 Low`.
+
 Hover texts (`KPI n Tip`, one tooltip per cover in section 12.4):
 
 ```
-// KPI 1 Tip   [K BW Only Str] + " working in Bridgeway but not active in Keystone, " + [K KS Only Str] + " the other way. Contractors, not gaps."
-// KPI 2 Tip   "Contractors with at least one gap in the rate, divided by contractors working in Bridgeway. " + [K Points Str]
+// 🟢 KPI 1 Tip   [K BW Only Str] + " working in Bridgeway but not active in Keystone, " + [K KS Only Str] + " the other way. Contractors, not gaps."
+// 🟢 KPI 2 Tip   "Contractors with at least one gap in the rate, divided by contractors working in Bridgeway. " + [K Points Str]
 //             + " a provisional " + [K Target Str] + " target. The target flags risk; it does not certify the report."
 //             + IF ZN([K Clear Own]) > 0 THEN " " + STR([K Clear Own]) + " gaps clear on their own by the next run and are left out." ELSE "" END
-// KPI 3 Tip   "A gap open at the " + [Prior Month] + " close and still open now, as one continuous episode. A flag that cleared and came back is a new gap."
-// KPI 4 Tip   "No Helix ticket carries an ID that links it to the gap. A ticket may exist without one: 'no linked ticket' does not mean nobody is working on it."
-// KPI 5 Tip   "Days since the gap began, strictly over 90. Gap age, not ticket age: a gap can be older than its ticket."
+// 🟢 KPI 3 Tip   "A gap open at the " + [Prior Month] + " close and still open now, as one continuous episode. A flag that cleared and came back is a new gap."
+// 🟢 KPI 4 Tip   "No Helix ticket carries an ID that links it to the gap. A ticket may exist without one: 'no linked ticket' does not mean nobody is working on it."
+// 🟢 KPI 5 Tip   "Days since the gap began, strictly over 90. Gap age, not ticket age: a gap can be older than its ticket."
 ```
 
 ### 7.6 Sankey (section 9 builds the sheet; D6, D7)
 
 ```
-// Sankey Gap Row       [Gap Now]
-// Sankey Gap           IIF([Sankey Gap Row], 1, 0)
-// Anchor Key           STR([month_end_date]) + "|" + [ticket_number]
-// Is Anchor            [Is Ticket] AND [Anchor Key] = { FIXED [place] : MIN(IF [Is Ticket] THEN [Anchor Key] END) }
-// Place Gaps           { FIXED [place] : SUM([Sankey Gap]) }
-// Sankey Anchor        [Is Anchor] AND [Place Gaps] > 0
-// Sankey Row           [Sankey Gap Row] OR [Sankey Anchor]
-// Sankey Weight        IF [Sankey Anchor] THEN 0 ELSE [Sankey Gap] END              (S7: 0.001 if the extension drops zero rows)
+// 🟢 Sankey Gap Row       [Gap Now]
+// 🟢 Sankey Gap           IIF([Sankey Gap Row], 1, 0)
+// 🟢 Anchor Key           STR([month_end_date]) + "|" + [ticket_number]
+// 🟢 Is Anchor            [Is Ticket] AND [Anchor Key] = { FIXED [place] : MIN(IF [Is Ticket] THEN [Anchor Key] END) }
+// 🟢 Place Gaps           { FIXED [place] : SUM([Sankey Gap]) }
+// 🟢 Sankey Anchor        [Is Anchor] AND [Place Gaps] > 0
+// 🟢 Sankey Row           [Sankey Gap Row] OR [Sankey Anchor]
+// 🟢 Sankey Weight        IF [Sankey Anchor] THEN 0 ELSE [Sankey Gap] END              (S7: 0.001 if the extension drops zero rows)
 
-// Flag Gaps            { FIXED [flag_label] : SUM([Sankey Gap]) }
-// Flag Text            [flag_name] + " (" + STR([Flag Gaps]) + ")"
-// First Flag           { FIXED : MIN(IF [Sankey Gap Row] THEN [flag_label] END) }
-// First Flag Text      { FIXED : MIN(IF [Sankey Gap Row] AND [flag_label] = [First Flag] THEN [Flag Text] END) }
-// What differs         IF [Sankey Anchor] THEN [First Flag Text] ELSE [Flag Text] END
-// Flag Sort            IF [Sankey Anchor] THEN [First Flag] ELSE [flag_label] END
+// 🟢 Flag Gaps            { FIXED [flag_label] : SUM([Sankey Gap]) }
+// 🟢 Flag Text            [flag_name] + " (" + STR([Flag Gaps]) + ")"
+// 🟢 First Flag           { FIXED : MIN(IF [Sankey Gap Row] THEN [flag_label] END) }
+// 🟢 First Flag Text      { FIXED : MIN(IF [Sankey Gap Row] AND [flag_label] = [First Flag] THEN [Flag Text] END) }
+// 🟢 What differs         IF [Sankey Anchor] THEN [First Flag Text] ELSE [Flag Text] END
+// 🟢 Flag Sort            IF [Sankey Anchor] THEN [First Flag] ELSE [flag_label] END
 
-// Risk Gaps            { FIXED [risk] : SUM([Sankey Gap]) }
-// Risk Text            [risk] + " (" + STR([Risk Gaps]) + ")"
-// First Risk           { FIXED : MIN(IF [Sankey Gap Row] THEN [risk] END) }
-// First Risk Text      { FIXED : MIN(IF [Sankey Gap Row] AND [risk] = [First Risk] THEN [Risk Text] END) }
-// What it puts at risk IF [Sankey Anchor] THEN [First Risk Text] ELSE [Risk Text] END
+// 🟢 Risk Gaps            { FIXED [risk] : SUM([Sankey Gap]) }
+// 🟢 Risk Text            [risk] + " (" + STR([Risk Gaps]) + ")"
+// 🟢 First Risk           { FIXED : MIN(IF [Sankey Gap Row] THEN [risk] END) }
+// 🟢 First Risk Text      { FIXED : MIN(IF [Sankey Gap Row] AND [risk] = [First Risk] THEN [Risk Text] END) }
+// 🟢 What it puts at risk IF [Sankey Anchor] THEN [First Risk Text] ELSE [Risk Text] END
 
-// Where it is aligned  [place_label] + " (" + STR([Place Gaps]) + ")"
+// 🟢 Where it is aligned  [place_label] + " (" + STR([Place Gaps]) + ")"
 ```
 
 The three level names are the extension's column headers, so they are named as the prototype's headers. They replace `Flag Label (n)`, `Risk Label (n)` and `Place Label (n)` from the spikes (rename those to these names and edit the formulas, so nothing that uses them breaks).
@@ -379,41 +384,41 @@ The three level names are the extension's column headers, so they are named as t
 ### 7.7 Sankey tooltip (replaces the S3 table in the spike guide)
 
 ```
-// Tip Gaps            SUM([Sankey Gap])
-// Tip Share           SUM([Sankey Gap]) / MIN({ FIXED : SUM([Sankey Gap]) })                      (format: percentage, 0 decimals)
-// Tip Flags           COUNTD(IF [Sankey Gap Row] THEN [flag_label] END)
-// Tip Risks           COUNTD(IF [Sankey Gap Row] THEN [risk] END)
-// Tip Places          COUNTD(IF [Sankey Gap Row] THEN [place] END)
-// Tip Is Flag         [Tip Flags] = 1
-// Tip Title           IF [Tip Is Flag] THEN MIN(IF [Sankey Gap Row] THEN [flag_name] END)
+// 🟢 Tip Gaps            SUM([Sankey Gap])
+// 🟢 Tip Share           SUM([Sankey Gap]) / MIN({ FIXED : SUM([Sankey Gap]) })                      (format: percentage, 0 decimals)
+// 🟢 Tip Flags           COUNTD(IF [Sankey Gap Row] THEN [flag_label] END)
+// 🟢 Tip Risks           COUNTD(IF [Sankey Gap Row] THEN [risk] END)
+// 🟢 Tip Places          COUNTD(IF [Sankey Gap Row] THEN [place] END)
+// 🟢 Tip Is Flag         [Tip Flags] = 1
+// 🟢 Tip Title           IF [Tip Is Flag] THEN MIN(IF [Sankey Gap Row] THEN [flag_name] END)
 //                     ELSEIF [Tip Risks] = 1 AND [Tip Places] = 1
 //                       THEN MIN(IF [Sankey Gap Row] THEN [risk] END) + ", aligned in " + MIN(IF [Sankey Gap Row] THEN [place] END)
 //                     ELSEIF [Tip Risks] = 1 THEN MIN(IF [Sankey Gap Row] THEN [risk] END)
 //                     ELSE MIN(IF [Sankey Gap Row] THEN [place_label] END) END
-// Tip Ranked          [Tip Is Flag] AND MIN([Scope Is All])                                       (D10)
-// Tip Rank            IF [Tip Ranked] THEN "Rank " + STR(MIN([flag_rank])) + " of 9" END
-// Tip Rank Worse      IF [Tip Ranked] AND MIN([flag_rank]) < MIN([flag_rank_prior_close])
+// 🟢 Tip Ranked          [Tip Is Flag] AND MIN([Scope Is All])                                       (D10)
+// 🟢 Tip Rank            IF [Tip Ranked] THEN "Rank " + STR(MIN([flag_rank])) + " of 9" END
+// 🟢 Tip Rank Worse      IF [Tip Ranked] AND MIN([flag_rank]) < MIN([flag_rank_prior_close])
 //                     THEN "up from " + STR(MIN([flag_rank_prior_close])) + " at the prior close (" + STR(MIN([flag_count_prior_close])) + ")" END
-// Tip Rank Better     (same with >, "down from")
-// Tip Rank Same       IF [Tip Ranked] AND MIN([flag_rank]) = MIN([flag_rank_prior_close])
+// 🟢 Tip Rank Better     (same with >, "down from")
+// 🟢 Tip Rank Same       IF [Tip Ranked] AND MIN([flag_rank]) = MIN([flag_rank_prior_close])
 //                     THEN "same rank as the prior close (" + STR(MIN([flag_count_prior_close])) + ")" END
-// Tip Year Ago        IF [Tip Ranked] AND NOT ISNULL(MIN([flag_rank_year_ago]))
+// 🟢 Tip Year Ago        IF [Tip Ranked] AND NOT ISNULL(MIN([flag_rank_year_ago]))
 //                     THEN "A year ago: " + STR(MIN([flag_count_year_ago])) + " gaps, rank " + STR(MIN([flag_rank_year_ago])) END
-// Tip Puts At Risk    IF [Tip Is Flag] THEN "Puts at risk: " + MIN(IF [Sankey Gap Row] THEN [risk] END) END
-// Tip Bridgeway       IF SUM(IF [Sankey Gap Row] AND [place] = "Bridgeway" THEN 1 END) > 0
+// 🟢 Tip Puts At Risk    IF [Tip Is Flag] THEN "Puts at risk: " + MIN(IF [Sankey Gap Row] THEN [risk] END) END
+// 🟢 Tip Bridgeway       IF SUM(IF [Sankey Gap Row] AND [place] = "Bridgeway" THEN 1 END) > 0
 //                     THEN "Bridgeway (vendor system) " + STR(SUM(IF [Sankey Gap Row] AND [place] = "Bridgeway" THEN 1 END)) END
-// Tip Keystone        (same for "Keystone", "Keystone (HR system) ")
-// Tip System Feed     (same for "System feed", "System feed (integration) ")
-// Tip From            IF NOT [Tip Is Flag] THEN "From " + STR([Tip Flags]) + " flags" END
-// Tip Feed Causes     IF [Tip Places] = 1 AND MIN(IF [Sankey Gap Row] THEN [place] END) = "System feed"
+// 🟢 Tip Keystone        (same for "Keystone", "Keystone (HR system) ")
+// 🟢 Tip System Feed     (same for "System feed", "System feed (integration) ")
+// 🟢 Tip From            IF NOT [Tip Is Flag] THEN "From " + STR([Tip Flags]) + " flags" END
+// 🟢 Tip Feed Causes     IF [Tip Places] = 1 AND MIN(IF [Sankey Gap Row] THEN [place] END) = "System feed"
 //                     THEN STR(SUM(IF [Sankey Gap Row] AND [timing_class] = "Feed event failed" THEN 1 ELSE 0 END)) + " failed feed events, "
 //                        + STR(SUM(IF [Sankey Gap Row] AND [timing_class] = "Load failed" THEN 1 ELSE 0 END)) + " failed loads, "
 //                        + STR(SUM(IF [Sankey Gap Row] AND [timing_class] = "Feed stuck" THEN 1 ELSE 0 END)) + " stuck" END
-// Tip No Ticket       IF SUM(IF [Sankey Gap Row] AND NOT [has_ticket] THEN 1 END) > 0
+// 🟢 Tip No Ticket       IF SUM(IF [Sankey Gap Row] AND NOT [has_ticket] THEN 1 END) > 0
 //                     THEN STR(SUM(IF [Sankey Gap Row] AND NOT [has_ticket] THEN 1 END)) + " with no ticket" END
-// Tip Over 90         IF SUM(IF [Sankey Gap Row] AND [days_open] > 90 THEN 1 END) > 0
+// 🟢 Tip Over 90         IF SUM(IF [Sankey Gap Row] AND [days_open] > 90 THEN 1 END) > 0
 //                     THEN STR(SUM(IF [Sankey Gap Row] AND [days_open] > 90 THEN 1 END)) + " open more than 90 days" END
-// Tip Next Step       IF [Tip Is Flag] THEN "Next step: " + MIN(IF [Sankey Gap Row] THEN [next_step] END)
+// 🟢 Tip Next Step       IF [Tip Is Flag] THEN "Next step: " + MIN(IF [Sankey Gap Row] THEN [next_step] END)
 //                     ELSEIF [Tip Places] = 1 AND MIN(IF [Sankey Gap Row] THEN [place] END) = "System feed" THEN "Worked by Data Engineering"
 //                     ELSE "Next steps differ by gap: see the gap list" END
 ```
@@ -423,28 +428,28 @@ Every Tip calc counts only `Sankey Gap Row`, so the anchors (section 9.2) never 
 ### 7.8 Main card headline and subtitle
 
 ```
-// Total Gaps          { FIXED : SUM([Sankey Gap]) }
-// Top Place Gaps      { FIXED : MAX(IF [Sankey Gap Row] THEN [Place Gaps] END) }
-// Top Place           { FIXED : MIN(IF [Sankey Gap Row] AND [Place Gaps] = [Top Place Gaps] THEN [place] END) }
-// Top Flag Gaps       { FIXED : MAX(IF [Sankey Gap Row] THEN [Flag Gaps] END) }
-// Top Flag            { FIXED : MIN(IF [Sankey Gap Row] AND [Flag Gaps] = [Top Flag Gaps] THEN [flag_name] END) }
-// Top Flag Prior Rank { FIXED : MIN(IF [Sankey Gap Row] AND [flag_name] = [Top Flag] THEN [flag_rank_prior_close] END) }
-// Clear Own Gaps      { FIXED : SUM(IF [Sankey Gap Row] AND NOT [is_counted] THEN 1 ELSE 0 END) }
-// Move                ABS([flag_rank_year_ago] - [flag_rank])
-// Max Move            { FIXED : MAX(IF [Sankey Gap Row] THEN [Move] END) }
-// Mover               { FIXED : MIN(IF [Sankey Gap Row] AND [Move] = [Max Move] THEN [flag_label] END) }
-// Mover Text          { FIXED : MIN(IF [Sankey Gap Row] AND [flag_label] = [Mover] THEN
+// 🟢 Total Gaps          { FIXED : SUM([Sankey Gap]) }
+// 🟢 Top Place Gaps      { FIXED : MAX(IF [Sankey Gap Row] THEN [Place Gaps] END) }
+// 🟢 Top Place           { FIXED : MIN(IF [Sankey Gap Row] AND [Place Gaps] = [Top Place Gaps] THEN [place] END) }
+// 🟢 Top Flag Gaps       { FIXED : MAX(IF [Sankey Gap Row] THEN [Flag Gaps] END) }
+// 🟢 Top Flag            { FIXED : MIN(IF [Sankey Gap Row] AND [Flag Gaps] = [Top Flag Gaps] THEN [flag_name] END) }
+// 🟢 Top Flag Prior Rank { FIXED : MIN(IF [Sankey Gap Row] AND [flag_name] = [Top Flag] THEN [flag_rank_prior_close] END) }
+// 🟢 Clear Own Gaps      { FIXED : SUM(IF [Sankey Gap Row] AND NOT [is_counted] THEN 1 ELSE 0 END) }
+// 🟢 Move                ABS([flag_rank_year_ago] - [flag_rank])
+// 🟢 Max Move            { FIXED : MAX(IF [Sankey Gap Row] THEN [Move] END) }
+// 🟢 Mover               { FIXED : MIN(IF [Sankey Gap Row] AND [Move] = [Max Move] THEN [flag_label] END) }
+// 🟢 Mover Text          { FIXED : MIN(IF [Sankey Gap Row] AND [flag_label] = [Mover] THEN
 //                       [flag_name] + ": " + [Ordinal YA] + " a year ago (" + STR([flag_count_year_ago]) + "), "
 //                       + [Ordinal Now] + " now (" + STR([Flag Gaps]) + ")" END) }
-// Ordinal Now         STR([flag_rank]) + CASE [flag_rank] WHEN 1 THEN "st" WHEN 2 THEN "nd" WHEN 3 THEN "rd" ELSE "th" END
-// Ordinal YA          (same on flag_rank_year_ago)
-// Comma helper        Total Gaps Str, Top Place Gaps Str, Top Flag Gaps Str: the comma pattern of 7.4
+// 🟢 Ordinal Now         STR([flag_rank]) + CASE [flag_rank] WHEN 1 THEN "st" WHEN 2 THEN "nd" WHEN 3 THEN "rd" ELSE "th" END
+// 🟢 Ordinal YA          (same on flag_rank_year_ago)
+// 🟢 Comma helper        Total Gaps Str, Top Place Gaps Str, Top Flag Gaps Str: the comma pattern of 7.4
 
-// Main Title
+// 🟢 Main Title
 IF ZN([Total Gaps]) = 0 THEN "No gaps in this selection"
 ELSE [Top Place] + " holds " + [Top Place Gaps Str] + " of " + [Total Gaps Str] + " gaps. Largest flag: " + [Top Flag] + " (" + [Top Flag Gaps Str] + ")" END
 
-// Main Subtitle       (aggregate: every LOD inside MIN(), so it can use Has Prior)
+// 🟢 Main Subtitle       (aggregate: every LOD inside MIN(), so it can use Has Prior)
 (IF ZN(MIN([Total Gaps])) = 0 THEN "Choose another close or fewer groups"
 ELSEIF NOT [Scope Is All] THEN "Ranks and year-ago comparisons cover all of Arcadia: choose All in the rail to see them"
 ELSEIF NOT [Has Prior] THEN "First close in the data"
@@ -657,6 +662,8 @@ Shapes from section 20 (`Arcadia D4` palette). Every control: a worksheet whose 
 
 `Day Text` = `LEFT(DATENAME('month', x), 3) + " " + STR(DAY(x)) + ", " + STR(YEAR(x))`, written once for `[p_Close]` (`Close Day Text`) and once for `DATEADD('day', 1, [p_Close])` (`Run Day Text`). Expected: Current "Data as of Jun 30, 2026" / "The 00:00 GMT run on Jul 1, 2026"; Dec 2024 "Replaying the Dec 2024 close" / "The 00:00 GMT run on Jan 1, 2025".
 
+🟢 In the workbook: `Close Field Text`, `Close Day Text`, `Run Day Text`, `Rail As Of Line 1` and `Rail As Of Line 2` (the two `Rail As Of` lines above), `Info Shape`, `Default Close`, `Rail One`, and the `Toggle … Panel` and `Toggle Info` fields (7.3).
+
 `Default Close` = `[Latest Close]`. Reset targets: `p_Close` ← `Default Close`; `p_Functions`, `p_Departments`, `p_Countries` ← `Empty Text`; `p_ShowList` ← `zzFalse`; the five open flags ← `Close Panel`.
 
 ### 10.2 The Overview · Gap list toggle
@@ -664,10 +671,10 @@ Shapes from section 20 (`Arcadia D4` palette). Every control: a worksheet whose 
 Two marks, one per option. The data has no two-row list, so borrow two values of `place` on Gap rows (Bridgeway for Overview, Keystone for Gap list): any column with at least two values would do.
 
 ```
-// Toggle Option        IF [place] = "Bridgeway" THEN "Overview" ELSEIF [place] = "Keystone" THEN "Gap list" END
-// Toggle Row           [Is Gap] AND [month_end_date] = [Latest Close] AND NOT ISNULL([Toggle Option])
-// Show Pick            [Toggle Option] = "Gap list"                          (the new value of p_ShowList)
-// Show Shape           IF [Toggle Option] = "Overview" THEN (IF [p_ShowList] THEN "d4_show_overview_off" ELSE "d4_show_overview_on" END)
+// 🟢 Toggle Option        IF [place] = "Bridgeway" THEN "Overview" ELSEIF [place] = "Keystone" THEN "Gap list" END
+// 🟢 Toggle Row           [Is Gap] AND [month_end_date] = [Latest Close] AND NOT ISNULL([Toggle Option])
+// 🟢 Show Pick            [Toggle Option] = "Gap list"                          (the new value of p_ShowList)
+// 🟢 Show Shape           IF [Toggle Option] = "Overview" THEN (IF [p_ShowList] THEN "d4_show_overview_off" ELSE "d4_show_overview_on" END)
 //                      ELSE (IF [p_ShowList] THEN "d4_show_gaplist_on" ELSE "d4_show_gaplist_off" END) END
 ```
 
@@ -696,13 +703,13 @@ Bottoms: 381, 475, 631, 631, 464, all above the footnote.
 A grid: years down (2026 on top), months across. 61 closes, Jun 2021 to Jun 2026.
 
 ```
-// Close Slot          2 * (2026 - YEAR([month_end_date])) + 1                (2026 = 1 … 2021 = 11)
-// Close Col           2 * MONTH([month_end_date]) - 1                        (Jan = 1 … Dec = 23)
-// Close Cell          LEFT(DATENAME('month', [month_end_date]), 3)
-// Close State         IF [month_end_date] = [p_Close] THEN "current" ELSE "on" END
-// Close Pick          [month_end_date]
-// Close Year Label    STR(YEAR([month_end_date]))
-// Close Grid Row      [Is Pop] AND { FIXED [month_end_date] : MIN([cost_center_id]) } = [cost_center_id]   (one row per close)
+// 🟢 Close Slot          2 * (2026 - YEAR([month_end_date])) + 1                (2026 = 1 … 2021 = 11)
+// 🟢 Close Col           2 * MONTH([month_end_date]) - 1                        (Jan = 1 … Dec = 23)
+// 🟢 Close Cell          LEFT(DATENAME('month', [month_end_date]), 3)
+// 🟢 Close State         IF [month_end_date] = [p_Close] THEN "current" ELSE "on" END
+// 🟢 Close Pick          [month_end_date]
+// 🟢 Close Year Label    STR(YEAR([month_end_date]))
+// 🟢 Close Grid Row      [Is Pop] AND { FIXED [month_end_date] : MIN([cost_center_id]) } = [cost_center_id]   (one row per close)
 ```
 
 | Item | Type | w × h | Build |
@@ -717,9 +724,9 @@ Filter on both sheets: `Close Grid Row` = True. 2021 shows Jun to Dec; 2026 Jan 
 ### 11.2 Function (`Function Popover`)
 
 ```
-// Function Slot       (table calc) 2 * (INDEX() - 1) + 1     Compute Using function_name
-// Function List Row   [Is Pop] AND { FIXED [function_name] : MIN([cost_center_id]) } = [cost_center_id]   (one row per function; Department List Row and Country List Row the same)
-// Tick X              MIN(0.6)
+// 🟢 Function Slot       (table calc) 2 * (INDEX() - 1) + 1     Compute Using function_name
+// 🟢 Function List Row   [Is Pop] AND { FIXED [function_name] : MIN([cost_center_id]) } = [cost_center_id]   (one row per function; Department List Row and Country List Row the same)
+// 🟢 Tick X              MIN(0.6)
 ```
 
 Header: "Choose functions" 492 × 44, `Function Clear` 80 × 44 (Text mark "Clear all", Book 9 `#B8C0CC`, Detail `Empty Text`, `zzTrue`, `zzFalse`), ✕ 44 × 44 (w 312 total: use 188 + 80 + 44). Body `Function List` 312 × 224 (padding top 8, bottom 8, left 16): Rows `Function Slot` (continuous, axis 0 to 16, reversed); Columns `Tick X` (continuous, axis fixed 0 to 10, header hidden); Marks Shape `Function Tick Shape` (`d4_tick_on`, `d4_tick_off`), size small (12 px); Label `function_name` Right, Tableau Book 10, colour by `Function State` (on white `#FFFFFF`, off `#B8C0CC`), allow overlap; Detail `function_name`, `Function Toggle`, `zzTrue`, `zzFalse`; sort `function_name` ascending; filter `Function List Row` = True. Footer: `Choose one or more. None chosen means all functions.`
@@ -731,8 +738,8 @@ A click toggles the function and **keeps the popover open**, so several can be t
 Three columns on fixed slots, as Dashboard #3's group panel (G3 9.2) with the D2 table calcs:
 
 ```
-// Pick Rows   INT((SIZE() + 2) / 3)          Pick Col   INT((INDEX() - 1) / [Pick Rows])
-// Pick Row    2 * ((INDEX() - 1) - [Pick Col] * [Pick Rows]) + 1
+// 🟢 Pick Rows   INT((SIZE() + 2) / 3)          Pick Col   INT((INDEX() - 1) / [Pick Rows])
+// 🟢 Pick Row    2 * ((INDEX() - 1) - [Pick Col] * [Pick Rows]) + 1
 ```
 
 Columns `Pick Col` (discrete, header hidden), then `Tick X` (continuous 0 to 10, header hidden); Rows `Pick Row` continuous (axis 0 to 22 for departments, 0 to 16 for countries; reversed); Compute Using `department_name` (or `country_name`) on every nested calc. Shape `Department Tick Shape` or `Country Tick Shape` (the Department one adds `d4_tick_dim`); filter `Department List Row` or `Country List Row` = True, label the name Right, Book 9; Color by `Department State`: on white, off `#B8C0CC`, **dim `#56657E`** (outside the chosen functions: still clickable, D in the release plan's phase 8); Detail the name, its `Toggle`, `zzTrue`, `zzFalse`. Header "Choose departments" / "Choose countries" with `Clear all` and ✕; footer `Dim: outside the chosen functions. None chosen means all.` (country: `None chosen means all countries.`).
@@ -765,6 +772,8 @@ Check on Tableau Public that the last line is not cut (Dashboard #1 needed 29 px
 
 ### 12.1 Copy the geometry from Dashboard #2
 
+🔴 **Still to add by hand: the `kpi_` calcs and the 16 `kpi_` parameters**, by copy and paste from Dashboard #2 as below (the generator left them out on purpose, so #2's calibrated values come with them).
+
 The grid is Dashboard #2's (D3), so copy, do not rebuild: in the Compensation Walk workbook select the `kpi_` calcs (`kpi_lat Title/Value/Sub`, `kpi_lon C1`–`C5`, `kpi_pt Title/Value/Note 1`–`5`, `kpi_Corner TL/BR`) in the Data pane, Ctrl+C; in this workbook select **CW Reconciliation**, Ctrl+V. Tableau brings the 16 `kpi_` parameters with #2's calibrated values (GridLeft 246, CardW 212, GapX 16). Then set **`kpi_PadX` 16** (left-aligned text, D11) if #2's is centred (106).
 
 | Layer | Point | Label | Font, colour | Alignment |
@@ -793,7 +802,7 @@ As G3 10.2 "Calibrate", against Dashboard #2's grid: card 1's text starts 16 px 
 
 ### 12.4 Hover covers
 
-Five transparent sheets `KPI Hover 1`–`5` (G3 10.4): `Hover Cell` = `"."` on Columns and Rows, headers hidden, Square at 0% opacity, size far right; filter `Is Selected Close` True and `Rail One` True (one mark); tooltip `<KPI n Title>` Semibold 10 navy / `<KPI n Tip>` Book 9 `#4A5A73`; Responsive; command buttons off. Floating at x 246, 474, 702, 930, 1158; y 88; 212 × 86; corner radius 5; above `KPI Cards`, behind the rail and popovers.
+Five transparent sheets `KPI Hover 1`–`5` (G3 10.4): 🟢 `Hover Cell` = `"."` on Columns and Rows, headers hidden, Square at 0% opacity, size far right; filter `Is Selected Close` True and `Rail One` True (one mark); tooltip `<KPI n Title>` Semibold 10 navy / `<KPI n Tip>` Book 9 `#4A5A73`; Responsive; command buttons off. Floating at x 246, 474, 702, 930, 1158; y 88; 212 × 86; corner radius 5; above `KPI Cards`, behind the rail and popovers.
 
 Expected (Current): card 1 "79 working in Bridgeway but not active in Keystone, 13 the other way. Contractors, not gaps." Card 2 "… 0.21 pts above a provisional 3% target. The target flags risk; it does not certify the report."
 
@@ -804,18 +813,20 @@ Expected (Current): card 1 "79 working in Bridgeway but not active in Keystone, 
 ### 13.1 Calcs
 
 ```
-// Gap List Row        [Gap Now]
-// Aligned In          [place] + CHAR(10) + STR([Place Gaps]) + " gaps"      (name the calc exactly: WHERE ALIGNED)
-// Flag                [flag_name]                                            (name: WHAT DIFFERS)
-// Contractor          [contractor_name] + " · " + [bw_worker_id]            (name: CONTRACTOR)
-// Keystone Shows      [keystone_shows]                                       (name: KEYSTONE SHOWS)
-// Bridgeway Has       [bridgeway_has]                                        (name: BRIDGEWAY HAS)
-// Ticket              IFNULL([ticket_number], "No ticket")                  (name: TICKET)
-// Days Band           IF [days_open] > 90 THEN "over 90" ELSE "90 or less" END
-// Gap List Title      IF ZN([Total Gaps]) = 0 THEN "No gaps in this selection"
+// 🟢 Gap List Row        [Gap Now]
+// 🟢 Aligned In          [place] + CHAR(10) + STR([Place Gaps]) + " gaps"      (name the calc exactly: WHERE ALIGNED)
+// 🟢 Flag                [flag_name]                                            (name: WHAT DIFFERS)
+// 🟢 Contractor          [contractor_name] + " · " + [bw_worker_id]            (name: CONTRACTOR)
+// 🟢 Keystone Shows      [keystone_shows]                                       (name: KEYSTONE SHOWS)
+// 🟢 Bridgeway Has       [bridgeway_has]                                        (name: BRIDGEWAY HAS)
+// 🟢 Ticket              IFNULL([ticket_number], "No ticket")                  (name: TICKET)
+// 🟢 Days Band           IF [days_open] > 90 THEN "over 90" ELSE "90 or less" END
+// 🟢 Gap List Title      IF ZN([Total Gaps]) = 0 THEN "No gaps in this selection"
 //                     ELSE [Total Gaps Str] + " gaps at the " + [Close Month] + " close, by where they are aligned" END
-// Gap List Subtitle   "Oldest first. Hover a row for the evidence, the next step and the ticket. Click a node in the Overview to narrow the list."
+// 🟢 Gap List Subtitle   "Oldest first. Hover a row for the evidence, the next step and the ticket. Click a node in the Overview to narrow the list."
 ```
+
+🟢 Created under their header names: `WHERE ALIGNED`, `WHAT DIFFERS`, `CONTRACTOR`, `KEYSTONE SHOWS`, `BRIDGEWAY HAS`, `TICKET`, and `DAYS OPEN` (13.2).
 
 If the line break in `WHERE ALIGNED` does not show in a header, use `[place]` alone and put the count in the Gap List Title.
 
@@ -832,7 +843,7 @@ If the line break in `WHERE ALIGNED` does not show in a header, use `[place]` al
 ### 13.3 The swap (dynamic zone visibility)
 
 ```
-// Show Overview       NOT [p_ShowList]
+// 🟢 Show Overview       NOT [p_ShowList]
 ```
 
 In `Card: Main`, add `Gap List Title` (726 × 44) and `Gap List` (726 × 546, outer padding top 6) below the Sankey pair. Control visibility: `Main Title` and `Sankey` by **`Show Overview`**; `Gap List Title` and `Gap List` by **`p_ShowList`**. The hidden pair collapses, so the visible pair takes the tile.
@@ -840,7 +851,7 @@ In `Card: Main`, add `Gap List Title` (726 × 44) and `Gap List` (726 × 546, ou
 ### 13.4 The Sankey click (S2 and S2b)
 
 - **Filter action** `Sankey filters the gap list` (S2, passed): source `Sankey`, target `Gap List`, Run on Select, Selected Fields `What differs`, `What it puts at risk`, `Where it is aligned` (each to the same field), Clearing: **Show all values**.
-- **S2b, test now:** Dashboard > Actions > Add Action > Change Parameter: source `Sankey`. If Tableau lists the Sankey as a source, set target `p_ShowList`, field `Show List On Click` = `TRUE` (a calc), Run on Select: a click on a node then opens the gap list already filtered. If the Sankey is not offered as a source for parameter actions, keep the filter only: the list is filtered when the reader switches to it, and the Gap List Subtitle says so. Record which.
+- **S2b, test now:** Dashboard > Actions > Add Action > Change Parameter: source `Sankey`. If Tableau lists the Sankey as a source, set target `p_ShowList`, field 🟢 `Show List On Click` = `TRUE` (a calc), Run on Select: a click on a node then opens the gap list already filtered. If the Sankey is not offered as a source for parameter actions, keep the filter only: the list is filtered when the reader switches to it, and the Gap List Subtitle says so. Record which.
 
 ---
 
@@ -849,20 +860,20 @@ In `Card: Main`, add `Gap List Title` (726 × 44) and `Gap List` (726 × 546, ou
 ### 14.1 Calcs
 
 ```
-// Timeline Row        [Is Pop] AND [In Scope] AND DATEDIFF('month', [month_end_date], [p_Close]) >= 0
+// 🟢 Timeline Row        [Is Pop] AND [In Scope] AND DATEDIFF('month', [month_end_date], [p_Close]) >= 0
 //                     AND DATEDIFF('month', [month_end_date], [p_Close]) <= 12
-// TL Rate             IF SUM([contractors_working]) = 0 THEN NULL ELSE SUM([contractors_with_gap]) / SUM([contractors_working]) END
-// TL Is Selected      MIN([month_end_date]) = [p_Close]          (aggregate, for Color and Size)
-// TL Label            IF [TL Is Selected] THEN [TL Rate Str] END  (TL Rate Str: the rate pattern of 7.4 on TL Rate)
-// TL Target           MIN([gap_rate_target])
-// Timeline Subtitle   "Contractors with a gap divided by contractors working in Bridgeway · last 13 closes" + [Scope Text]
+// 🟢 TL Rate             IF SUM([contractors_working]) = 0 THEN NULL ELSE SUM([contractors_with_gap]) / SUM([contractors_working]) END
+// 🟢 TL Is Selected      MIN([month_end_date]) = [p_Close]          (aggregate, for Color and Size)
+// 🟢 TL Label            IF [TL Is Selected] THEN [TL Rate Str] END  (🟢 TL Rate Str: the rate pattern of 7.4 on TL Rate)
+// 🟢 TL Target           MIN([gap_rate_target])
+// 🟢 Timeline Subtitle   "Contractors with a gap divided by contractors working in Bridgeway · last 13 closes" + [Scope Text]
 ```
 
 ### 14.2 Sheet `Timeline` (318 × 202)
 
 - Filter `Timeline Row` = True.
 - Columns `month_end_date` continuous, **Exact Date**; axis ticks every 3 months, format `mmm yy`, Book 8 `#6B7079`; no axis title.
-- Rows `TL Rate`, then `TL Rate` again; Dual Axis, Synchronize. First: Line, navy `#13233A`, size 2. Second: Circle, Color `TL Is Selected` (True `#B8401F` when above target, else `#0E7D5F`: use a calc `TL Dot` = `IF [TL Is Selected] THEN (IF [TL Rate] > [TL Target] THEN "selected above" ELSE "selected below" END) ELSE "other" END`; other white with a navy border), Size `TL Is Selected` (True large, False small), Label `TL Label` Semibold 10 in its colour.
+- Rows `TL Rate`, then `TL Rate` again; Dual Axis, Synchronize. First: Line, navy `#13233A`, size 2. Second: Circle, Color `TL Is Selected` (True `#B8401F` when above target, else `#0E7D5F`: use the calc 🟢 `TL Dot` = `IF [TL Is Selected] THEN (IF [TL Rate] > [TL Target] THEN "selected above" ELSE "selected below" END) ELSE "other" END`; other white with a navy border), Size `TL Is Selected` (True large, False small), Label `TL Label` Semibold 10 in its colour.
 - Y axis: Percentage, 1 decimal; not including zero; hide the second axis.
 - Reference line on the first axis: Per Table, value `TL Target` (put it on Detail first), line dashed `#8C8A84`, label "Target 3%" (Custom: `Target <Value>`), Book 8.
 - Grid lines `#E4E3DD`, zero line none; Worksheet shading None; tooltip: `<Close of the point>` "close: " `<TL Rate>` · `<SUM(contractors_with_gap)>` of `<SUM(contractors_working)>` contractors; command buttons off.
@@ -877,13 +888,13 @@ Expected, Current: Jun 25 3.05% · Jul 3.85% · Aug 3.79% · Sep 3.87% · Oct 3.
 ### 15.1 Calcs
 
 ```
-// Ticket Card Row     [Ticket Now]
-// Ticket Row Y        3.5 - [place_order]                         (Bridgeway 2.5, Keystone 1.5, System feed 0.5)
-// Band X              [age_band_order] - 0.5                     (0.5, 1.5, 2.5)
-// Place Open          { FIXED [place] : SUM(IF [Ticket Card Row] THEN [tickets] END) }
-// Band Open           { FIXED [age_band] : SUM(IF [Ticket Card Row] THEN [tickets] END) }
-// Place Sub           CASE [place] WHEN "Bridgeway" THEN "vendor system" WHEN "Keystone" THEN "HR system" ELSE "integration" END
-// Tickets Subtitle    "One dot per Helix ticket open at the close" + [Scope Text]
+// 🟢 Ticket Card Row     [Ticket Now]
+// 🟢 Ticket Row Y        3.5 - [place_order]                         (Bridgeway 2.5, Keystone 1.5, System feed 0.5)
+// 🟢 Band X              [age_band_order] - 0.5                     (0.5, 1.5, 2.5)
+// 🟢 Place Open          { FIXED [place] : SUM(IF [Ticket Card Row] THEN [tickets] END) }
+// 🟢 Band Open           { FIXED [age_band] : SUM(IF [Ticket Card Row] THEN [tickets] END) }
+// 🟢 Place Sub           CASE [place] WHEN "Bridgeway" THEN "vendor system" WHEN "Keystone" THEN "HR system" ELSE "integration" END
+// 🟢 Tickets Subtitle    "One dot per Helix ticket open at the close" + [Scope Text]
 ```
 
 ### 15.2 Sheets (body 318 × 240: a horizontal container with two vertical stacks)
@@ -906,10 +917,10 @@ Expected, Current: 361 dots; Bridgeway 149, Keystone 124, System feed 88; 0 to 5
 ## 16. Step 13: title, subtitle, load note, footnote, info
 
 ```
-// Page Subtitle       "Where Bridgeway and Keystone " + (IF [Is Current] THEN "disagree" ELSE "disagreed" END)
+// 🟢 Page Subtitle       "Where Bridgeway and Keystone " + (IF [Is Current] THEN "disagree" ELSE "disagreed" END)
 //                     + " at the " + [Close Name] + " close, and where each gap is aligned" + [Scope Text]
-// Load Note           MIN(IF [Is Pop] AND [Is Selected Close] THEN [load_note] END)
-// Show Load Note      { FIXED : MAX(IF [Is Pop] AND [Is Selected Close] AND CONTAINS([load_note], "failed") THEN 1 ELSE 0 END) } = 1
+// 🟢 Load Note           MIN(IF [Is Pop] AND [Is Selected Close] THEN [load_note] END)
+// 🟢 Show Load Note      { FIXED : MAX(IF [Is Pop] AND [Is Selected Close] AND CONTAINS([load_note], "failed") THEN 1 ELSE 0 END) } = 1
 ```
 
 - `Page Title` (246, 14, 760 × 60): Text, line 1 `Contingent Workforce Reconciliation` Tableau Bold 18 navy, line 2 `<Page Subtitle>` Tableau Book 10 slate. Tooltip off; deselect. Replaces the placeholder.
