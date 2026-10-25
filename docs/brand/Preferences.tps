@@ -38,26 +38,29 @@
       <color>#A8692A</color>
     </color-palette>
 
-    <!-- 3. The same nine as light fills, for large labelled areas with navy text on them
-            (Sankey nodes, treemaps): navy text is at least 4.7:1 on every one. Always label. -->
+    <!-- 3. Nine colours for large labelled fills with navy text (Sankey flags, treemaps).
+            Only Tableau 10 and Tableau 20 colours: viz extensions such as the Sankey list
+            Tableau's own palettes, never custom ones, so these can be picked there too.
+            Order checked for color-blind separation. Always label. -->
     <color-palette name="Arcadia 3 Categorical Light" type="regular">
-      <color>#4CB3AF</color>
-      <color>#EC896D</color>
-      <color>#8C84CA</color>
-      <color>#E4B04F</color>
-      <color>#6DA0D6</color>
-      <color>#83B86D</color>
-      <color>#E295B8</color>
-      <color>#84C8E9</color>
-      <color>#C2966A</color>
+      <color>#FF9D9A</color>
+      <color>#59A14F</color>
+      <color>#FFBE7D</color>
+      <color>#E15759</color>
+      <color>#FABFD2</color>
+      <color>#8CD17D</color>
+      <color>#D4A6C8</color>
+      <color>#F1CE63</color>
+      <color>#A0CBE8</color>
     </color-palette>
 
-    <!-- 4. The systems, wherever they appear: Bridgeway (vendor system), Keystone (HR system),
-            the system feed between them. Color follows the system on every dashboard. -->
+    <!-- 4. The systems, wherever they appear: Bridgeway (vendor system) orange, Keystone
+            (HR system) blue, the system feed teal. Tableau 10 colours, so the Sankey extension
+            can use them; checked for color-blind separation as a set. White text on Keystone. -->
     <color-palette name="Arcadia 4 Systems" type="regular">
-      <color>#D98E04</color>
-      <color>#5B4FB3</color>
-      <color>#00938D</color>
+      <color>#F28E2B</color>
+      <color>#4E79A7</color>
+      <color>#76B7B2</color>
     </color-palette>
 
     <!-- 5. Status: on track, watch, at risk, no status. Always with a word ("Low risk"). -->
@@ -70,7 +73,8 @@
 
     <!-- 6. Neutrals, dark to light: navy (brand ink, rail), navy 2 (controls on the rail),
             slate (borders on navy, secondary bars), text gray, steel, silver (dividers on navy),
-            mist, warm gray (totals), hairline, page, card, white. -->
+            mist, warm gray (totals), Tableau gray (the Sankey's middle column; in Tableau 10 too),
+            hairline, page, card, white. -->
     <color-palette name="Arcadia 6 Neutrals" type="regular">
       <color>#13233A</color>
       <color>#243A57</color>
@@ -80,6 +84,7 @@
       <color>#B8C0CD</color>
       <color>#D5DBE4</color>
       <color>#8C8A84</color>
+      <color>#BAB0AC</color>
       <color>#E4E3DD</color>
       <color>#F3F3EF</color>
       <color>#FBFBF8</color>

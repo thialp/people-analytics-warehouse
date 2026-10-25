@@ -28,17 +28,37 @@ The logo is original, so it is safe to publish; Tableau Public's Viz of the Day 
 |---|---|
 | **Arcadia 1 Categorical** | Roles that mean the same on every dashboard: teal growth and hires, coral decline and leavers, violet internal moves, amber one highlight (label it: under 3:1 on the page) |
 | **Arcadia 2 Categorical Extended** | Identity for up to nine groups: the four roles, then blue, green, rose, sky, brown. More than nine: fold into "Other" |
-| **Arcadia 3 Categorical Light** | The same nine as light fills for large labelled areas with navy text on them (Sankey nodes, treemaps). Navy text is at least 4.7:1 on every one. Always labelled: as fills they are harder to tell apart than the full colors |
-| **Arcadia 4 Systems** | Bridgeway (vendor system) amber, Keystone (HR system) violet, the system feed teal. Color follows the system on every dashboard |
+| **Arcadia 3 Categorical Light** | Nine colors for large labelled fills with navy text (Sankey flags, treemaps), taken only from Tableau 10 and Tableau 20, so they can be picked inside viz extensions too. Always labelled |
+| **Arcadia 4 Systems** | Bridgeway (vendor system) orange, Keystone (HR system) blue, the system feed teal: Tableau 10 colors, checked for color-blind separation as a set. Color follows the system on every dashboard; white text on Keystone |
 | **Arcadia 5 Status** | On track, watch, at risk, no status. Always with a word |
-| **Arcadia 6 Neutrals** | Dark to light: navy (brand ink, the rail, titles), navy 2 (controls on the rail), slate (borders on navy), text gray (subtitles, axis labels), steel, silver (dividers on navy), mist, warm gray (Opening and Closing totals), hairline (gridlines), page (behind the cards), card (chart backgrounds), white |
+| **Arcadia 6 Neutrals** | Dark to light: navy (brand ink, the rail, titles), navy 2 (controls on the rail), slate (borders on navy), text gray (subtitles, axis labels), steel, silver (dividers on navy), mist, warm gray (Opening and Closing totals), Tableau gray (the Sankey's middle column), hairline (gridlines), page (behind the cards), card (chart backgrounds), white |
 | **Arcadia 7 Teal Sequential** | Magnitude on one hue (growth %, headcount on a map) |
 | **Arcadia 8 Navy Sequential** | Magnitude that should stay quiet (counts, age bands) |
 | **Arcadia 9 Coral-Teal Diverging** | Decline to growth, gray at zero |
 
 Every categorical order was checked for color-blind separation (protanopia, deuteranopia, tritanopia) in this order against the card color, so keep the order. Regenerate the picture after any change: `python3 docs/brand/build/make_palette_sheet.py`.
 
-**Dashboard #4, Contingent Workforce Reconciliation:** Sankey flags 01 to 09 in *Arcadia 3 Categorical Light* (in order), risks in steel (*Arcadia 6 Neutrals*), places in *Arcadia 4 Systems*; the ticket card's rows in *Arcadia 4 Systems* too.
+**Viz extensions use Tableau's palettes only.** The Sankey extension (and Tableau's other viz extensions) lists Tableau's built-in palettes, never the ones in `Preferences.tps`. So the palettes an extension needs, 3 and 4, are made only of Tableau 10 and Tableau 20 colors: the same hex in both places, picked from the built-in palette inside the extension and from the Arcadia palette everywhere else.
+
+**Dashboard #4, Contingent Workforce Reconciliation:** in the Sankey's Edit Colors (choose the palette, then the swatch; the number is its place in the palette's order, which runs down each column of swatches):
+
+| Node | Color | In the extension |
+|---|---|---|
+| 01 One person, two IDs | `#FF9D9A` | Tableau 20, light red (12th) |
+| 02 Bridgeway ID missing or different | `#59A14F` | Tableau 20, green (5th) |
+| 03 In Bridgeway, not in Keystone | `#FFBE7D` | Tableau 20, light orange (4th) |
+| 04 Order open or billed after the end date | `#E15759` | Tableau 20, red (11th) |
+| 05 Cost center differs | `#FABFD2` | Tableau 20, light pink (16th) |
+| 06 PID still filled after the end date | `#8CD17D` | Tableau 20, light green (6th) |
+| 07 Two active PID records | `#D4A6C8` | Tableau 20, light purple (18th) |
+| 08 Working in Bridgeway, ended in Keystone | `#F1CE63` | Tableau 20, yellow (8th) |
+| 09 Active in Keystone, not working in Bridgeway | `#A0CBE8` | Tableau 20, light blue (2nd) |
+| Every risk | `#BAB0AC` | Tableau 10, gray (10th) |
+| Bridgeway (vendor system) | `#F28E2B` | Tableau 10, orange (2nd) |
+| Keystone (HR system) | `#4E79A7` | Tableau 10, blue (1st) |
+| System feed (integration) | `#76B7B2` | Tableau 10, teal (4th) |
+
+The ticket card's rows use *Arcadia 4 Systems*, the same three colors.
 
 ### Install the palettes
 
