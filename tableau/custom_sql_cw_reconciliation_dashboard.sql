@@ -3,7 +3,7 @@
   Tableau Custom SQL for Dashboard #4, Contingent Workforce Reconciliation (SQL Server, database ArcadiaHR).
   ONE data source for the whole page, because multi-select sets (function, department, country)
   work only inside one: the same columns and rows as data/marts/mart_cw_reconciliation_dashboard.csv
-  (about 63,000 rows), so a workbook built on either can switch with Data > Replace Data Source.
+  (about 65,000 rows), so a workbook built on either can switch with Data > Replace Data Source.
 
   Three row types, never summed together: filter row_type in every calculation.
     Gap         one per close x contractor x flag (rpt.vw_cw_gap_close): the Sankey (flag, risk,
@@ -40,7 +40,7 @@ SELECT
     v.flag_code                              AS flag_code,
     v.flag_name                              AS flag_name,
     v.flag_rank                              AS flag_rank,
-    v.flag_rank_label                        AS flag_rank_label,
+    v.flag_label                             AS flag_label,
     v.flag_count                             AS flag_count,
     v.flag_rank_prior_close                  AS flag_rank_prior_close,
     v.flag_count_prior_close                 AS flag_count_prior_close,
@@ -50,7 +50,7 @@ SELECT
     v.risk_order                             AS risk_order,
     v.place                                  AS place,
     v.place_order                            AS place_order,
-    v.place_key                              AS place_key,
+    v.place_label                            AS place_label,
     v.cause_code                             AS cause_code,
     v.cause_name                             AS cause_name,
     v.timing_class                           AS timing_class,
@@ -204,7 +204,7 @@ SELECT
     CAST(NULL AS INT),
     v.place,
     v.place_order,
-    v.place,
+    v.place_label,
     CAST(NULL AS VARCHAR(400)),
     CAST(NULL AS VARCHAR(400)),
     CAST(NULL AS VARCHAR(400)),

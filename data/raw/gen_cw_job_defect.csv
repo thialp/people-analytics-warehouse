@@ -1,338 +1,828 @@
 defect_id,flag_code,person_id,position_id,start_date,end_date,origin,resolution,detail
-JD000001,F07,W506576,P806440,2020-03-23,2021-12-22,PID ledger,Ended,W506576 holds two active job records (PID P806440)
-JD000002,F07,W503795,P803701,2020-06-14,2022-05-27,Seeded,Ended,W503795 holds two active job records (PID P803701)
-JD000003,F08,W500256,P800256,2020-07-26,,Seeded,Open at extract,W500256's job on P800256 is still active; the PID ledger shows them out of it
-JD000004,F08,W501143,P801142,2020-10-24,,Seeded,Open at extract,W501143's job on P801142 is still active; the PID ledger shows them out of it
-JD000005,F07,W506446,P806458,2020-11-03,2021-07-31,Seeded,Ended,W506446 holds two active job records (PID P806458)
-JD000006,F08,W503254,P803267,2021-01-22,2021-07-12,Seeded,Ended,W503254's job on P803267 is still active; the PID ledger shows them out of it
-JD000007,F07,W503944,P803967,2021-01-26,2021-09-13,Seeded,Ended,W503944 holds two active job records (PID P803967)
-JD000008,F07,W505834,P805843,2021-02-02,2021-07-21,Seeded,Ended,W505834 holds two active job records (PID P805843)
-JD000009,F07,W505604,P805593,2021-02-07,2021-10-27,Seeded,Ended,W505604 holds two active job records (PID P805593)
-JD000010,F08,W503106,P803117,2021-03-11,2021-07-02,Seeded,Ended,W503106's job on P803117 is still active; the PID ledger shows them out of it
-JD000011,F07,W507440,P807429,2021-03-21,2021-09-14,Seeded,Ended,W507440 holds two active job records (PID P807429)
-JD000012,F07,W503117,P803132,2021-04-27,2021-10-02,Seeded,Ended,W503117 holds two active job records (PID P803132)
-JD000013,F08,W500801,P800799,2021-05-31,2021-07-18,Seeded,Ended,W500801's job on P800799 is still active; the PID ledger shows them out of it
-JD000014,F07,W507471,P807483,2021-05-31,2021-08-06,Seeded,Ended,W507471 holds two active job records (PID P807483)
-JD000015,F07,W510595,P810019,2021-06-16,2021-11-08,Seeded,Ended,W510595 holds two active job records (PID P810019)
-JD000016,F08,W509027,P808883,2021-06-21,2021-11-28,Seeded,Ended,W509027's job on P808883 is still active; the PID ledger shows them out of it
-JD000017,F08,W506784,P806791,2021-07-01,2021-07-05,Seeded,Ended,W506784's job on P806791 is still active; the PID ledger shows them out of it
-JD000018,F08,W509717,P809393,2021-07-02,2021-11-27,Seeded,Ended,W509717's job on P809393 is still active; the PID ledger shows them out of it
-JD000019,F07,W506784,P806791,2021-07-06,2022-02-10,Seeded,Ended,W506784 holds two active job records (PID P806791)
-JD000020,F08,W503889,P803910,2021-07-08,2021-07-24,Seeded,Ended,W503889's job on P803910 is still active; the PID ledger shows them out of it
-JD000021,F08,W505266,P805252,2021-07-10,,Seeded,Open at extract,W505266's job on P805252 is still active; the PID ledger shows them out of it
-JD000022,F08,W503371,P803385,2021-07-18,2021-09-14,Seeded,Ended,W503371's job on P803385 is still active; the PID ledger shows them out of it
-JD000023,F07,W503889,P803910,2021-07-25,2021-12-31,Seeded,Ended,W503889 holds two active job records (PID P803910)
-JD000024,F08,W506446,P806458,2021-08-01,,Seeded,Open at extract,W506446's job on P806458 is still active; the PID ledger shows them out of it
-JD000025,F08,W504124,P804129,2021-08-12,2021-08-15,Seeded,Ended,W504124's job on P804129 is still active; the PID ledger shows them out of it
-JD000026,F07,W504124,P804129,2021-08-16,2022-02-11,Seeded,Ended,W504124 holds two active job records (PID P804129)
-JD000027,F08,W507440,P807429,2021-09-15,2021-10-19,Seeded,Ended,W507440's job on P807429 is still active; the PID ledger shows them out of it
-JD000028,F08,W502867,P802880,2021-09-18,2021-10-27,Seeded,Ended,W502867's job on P802880 is still active; the PID ledger shows them out of it
-JD000029,F08,W510231,P802498,2021-10-18,2022-01-24,Seeded,Ended,W510231's job on P802498 is still active; the PID ledger shows them out of it
-JD000030,F08,W505604,P805593,2021-10-28,,Seeded,Open at extract,W505604's job on P805593 is still active; the PID ledger shows them out of it
-JD000031,F08,W508968,P808806,2021-10-30,2022-02-03,Seeded,Ended,W508968's job on P808806 is still active; the PID ledger shows them out of it
-JD000032,F08,W503268,P803193,2021-11-10,2021-12-11,Seeded,Ended,W503268's job on P803193 is still active; the PID ledger shows them out of it
-JD000033,F08,W512482,P806518,2021-12-11,2022-01-06,Seeded,Ended,W512482's job on P806518 is still active; the PID ledger shows them out of it
-JD000034,F08,W508918,P808790,2022-01-09,2022-01-18,Seeded,Ended,W508918's job on P808790 is still active; the PID ledger shows them out of it
-JD000035,F08,W511515,P810674,2022-01-09,2022-04-11,Seeded,Ended,W511515's job on P810674 is still active; the PID ledger shows them out of it
-JD000036,F08,W504048,P804058,2022-01-10,2022-01-12,Seeded,Ended,W504048's job on P804058 is still active; the PID ledger shows them out of it
-JD000037,F07,W504048,P804058,2022-01-13,2022-01-27,Seeded,Ended,W504048 holds two active job records (PID P804058)
-JD000038,F08,W504597,P804610,2022-01-14,2022-01-28,Seeded,Ended,W504597's job on P804610 is still active; the PID ledger shows them out of it
-JD000039,F07,W508918,P808790,2022-01-19,2022-06-04,Seeded,Ended,W508918 holds two active job records (PID P808790)
-JD000040,F08,W504179,P804181,2022-01-23,2022-01-23,Seeded,Ended,W504179's job on P804181 is still active; the PID ledger shows them out of it
-JD000041,F07,W504179,P804181,2022-01-24,2022-07-03,Seeded,Ended,W504179 holds two active job records (PID P804181)
-JD000042,F08,W508199,P808207,2022-01-28,2022-01-31,Seeded,Ended,W508199's job on P808207 is still active; the PID ledger shows them out of it
-JD000043,F07,W504597,P804610,2022-01-29,2022-03-21,Seeded,Ended,W504597 holds two active job records (PID P804610)
-JD000044,F07,W508199,P808207,2022-02-01,2022-07-10,Seeded,Ended,W508199 holds two active job records (PID P808207)
-JD000045,F08,W504124,P804129,2022-02-12,2022-02-21,Seeded,Ended,W504124's job on P804129 is still active; the PID ledger shows them out of it
-JD000046,F08,W509520,P803820,2022-02-24,2022-05-26,Seeded,Ended,W509520's job on P803820 is still active; the PID ledger shows them out of it
-JD000047,F08,W511960,P802702,2022-03-02,2022-07-01,Seeded,Ended,W511960's job on P802702 is still active; the PID ledger shows them out of it
-JD000048,F08,W501288,P801293,2022-03-19,2022-05-17,Seeded,Ended,W501288's job on P801293 is still active; the PID ledger shows them out of it
-JD000049,F08,W511103,P810372,2022-03-20,2022-04-24,Seeded,Ended,W511103's job on P810372 is still active; the PID ledger shows them out of it
-JD000050,F08,W506941,P806956,2022-04-07,2022-04-25,Seeded,Ended,W506941's job on P806956 is still active; the PID ledger shows them out of it
-JD000051,F08,W511072,P800721,2022-04-08,2022-07-12,Seeded,Ended,W511072's job on P800721 is still active; the PID ledger shows them out of it
-JD000052,F08,W508739,P808630,2022-04-09,2022-04-22,Seeded,Ended,W508739's job on P808630 is still active; the PID ledger shows them out of it
-JD000053,F08,W503117,P803132,2022-04-23,2022-07-12,Seeded,Ended,W503117's job on P803132 is still active; the PID ledger shows them out of it
-JD000054,F07,W508739,P808630,2022-04-23,2023-04-08,Seeded,Ended,W508739 holds two active job records (PID P808630)
-JD000055,F07,W506941,P806956,2022-04-26,2022-12-14,Seeded,Ended,W506941 holds two active job records (PID P806956)
-JD000056,F08,W512748,P811505,2022-04-26,,Seeded,Open at extract,W512748's job on P811505 is still active; the PID ledger shows them out of it
-JD000057,F08,W503996,P803998,2022-05-09,2022-05-22,Seeded,Ended,W503996's job on P803998 is still active; the PID ledger shows them out of it
-JD000058,F08,W503958,P803972,2022-05-12,2022-07-02,Seeded,Ended,W503958's job on P803972 is still active; the PID ledger shows them out of it
-JD000059,F08,W513371,P811933,2022-05-16,2022-05-30,Seeded,Ended,W513371's job on P811933 is still active; the PID ledger shows them out of it
-JD000060,F08,W514326,P812560,2022-05-22,2022-11-10,Seeded,Ended,W514326's job on P812560 is still active; the PID ledger shows them out of it
-JD000061,F07,W503996,P803998,2022-05-23,2022-12-03,Seeded,Ended,W503996 holds two active job records (PID P803998)
-JD000062,F08,W507013,P807026,2022-05-25,2022-06-15,Seeded,Ended,W507013's job on P807026 is still active; the PID ledger shows them out of it
-JD000063,F08,W503795,P803701,2022-05-28,,Seeded,Open at extract,W503795's job on P803701 is still active; the PID ledger shows them out of it
-JD000064,F08,W503383,P803391,2022-05-30,2022-05-31,Seeded,Ended,W503383's job on P803391 is still active; the PID ledger shows them out of it
-JD000065,F07,W513371,P811933,2022-05-31,2022-06-21,Seeded,Ended,W513371 holds two active job records (PID P811933)
-JD000066,F07,W503383,P803391,2022-06-01,2022-07-11,Seeded,Ended,W503383 holds two active job records (PID P803391)
-JD000067,F08,W503550,P803564,2022-06-11,2022-11-13,Seeded,Ended,W503550's job on P803564 is still active; the PID ledger shows them out of it
-JD000068,F08,W505609,P805626,2022-06-13,2022-06-20,Seeded,Ended,W505609's job on P805626 is still active; the PID ledger shows them out of it
-JD000069,F08,W506121,P806133,2022-06-16,2022-06-24,Seeded,Ended,W506121's job on P806133 is still active; the PID ledger shows them out of it
-JD000070,F08,W514827,P812854,2022-06-20,2022-07-08,Seeded,Ended,W514827's job on P812854 is still active; the PID ledger shows them out of it
-JD000071,F07,W505609,P805626,2022-06-21,2022-09-27,Seeded,Ended,W505609 holds two active job records (PID P805626)
-JD000072,F07,W506121,P806133,2022-06-25,2023-02-01,Seeded,Ended,W506121 holds two active job records (PID P806133)
-JD000073,F08,W512535,P809561,2022-06-28,2022-07-09,Seeded,Ended,W512535's job on P809561 is still active; the PID ledger shows them out of it
-JD000074,F08,W500046,P800044,2022-07-01,2022-07-19,Seeded,Ended,W500046's job on P800044 is still active; the PID ledger shows them out of it
-JD000075,F08,W501183,P801186,2022-07-01,2022-07-10,Seeded,Ended,W501183's job on P801186 is still active; the PID ledger shows them out of it
-JD000076,F08,W502026,P802036,2022-07-01,2022-07-02,Seeded,Ended,W502026's job on P802036 is still active; the PID ledger shows them out of it
-JD000077,F08,W503478,P803483,2022-07-01,2022-07-13,Seeded,Ended,W503478's job on P803483 is still active; the PID ledger shows them out of it
-JD000078,F08,W507615,P807592,2022-07-01,2022-07-13,Seeded,Ended,W507615's job on P807592 is still active; the PID ledger shows them out of it
-JD000079,F08,W512734,P804042,2022-07-01,2022-08-28,Seeded,Ended,W512734's job on P804042 is still active; the PID ledger shows them out of it
-JD000080,F08,W513552,P801112,2022-07-01,2022-07-03,Seeded,Ended,W513552's job on P801112 is still active; the PID ledger shows them out of it
-JD000081,F08,W513947,P812318,2022-07-01,2022-07-18,Seeded,Ended,W513947's job on P812318 is still active; the PID ledger shows them out of it
-JD000082,F07,W502026,P802036,2022-07-03,2022-11-07,Seeded,Ended,W502026 holds two active job records (PID P802036)
-JD000083,F07,W513552,P801112,2022-07-04,2022-07-31,Seeded,Ended,W513552 holds two active job records (PID P801112)
-JD000084,F07,W514827,P812854,2022-07-09,2022-10-10,Seeded,Ended,W514827 holds two active job records (PID P812854)
-JD000085,F07,W512535,P809561,2022-07-10,2022-10-13,Seeded,Ended,W512535 holds two active job records (PID P809561)
-JD000086,F07,W501183,P801186,2022-07-11,2022-12-10,Seeded,Ended,W501183 holds two active job records (PID P801186)
-JD000087,F07,W503478,P803483,2022-07-14,2022-10-19,Seeded,Ended,W503478 holds two active job records (PID P803483)
-JD000088,F07,W507615,P807592,2022-07-14,2023-01-10,Seeded,Ended,W507615 holds two active job records (PID P807592)
-JD000089,F07,W513947,P812318,2022-07-19,2022-10-18,Seeded,Ended,W513947 holds two active job records (PID P812318)
-JD000090,F07,W500046,P800044,2022-07-20,2022-10-29,Seeded,Ended,W500046 holds two active job records (PID P800044)
-JD000091,F08,W515561,P805092,2022-07-24,2022-10-21,Seeded,Ended,W515561's job on P805092 is still active; the PID ledger shows them out of it
-JD000092,F08,W510634,P810036,2022-08-09,2022-08-25,Seeded,Ended,W510634's job on P810036 is still active; the PID ledger shows them out of it
-JD000093,F08,W508683,P808613,2022-08-21,2022-12-13,Seeded,Ended,W508683's job on P808613 is still active; the PID ledger shows them out of it
-JD000094,F07,W510634,P810036,2022-08-26,2023-02-11,Seeded,Ended,W510634 holds two active job records (PID P810036)
-JD000095,F08,W503465,P803470,2022-09-03,2022-09-08,Seeded,Ended,W503465's job on P803470 is still active; the PID ledger shows them out of it
-JD000096,F07,W503465,P803470,2022-09-09,2023-02-06,Seeded,Ended,W503465 holds two active job records (PID P803470)
-JD000097,F08,W515662,P813412,2022-09-14,2023-01-29,Seeded,Ended,W515662's job on P813412 is still active; the PID ledger shows them out of it
-JD000098,F08,W506205,P806212,2022-09-16,2022-09-21,Seeded,Ended,W506205's job on P806212 is still active; the PID ledger shows them out of it
-JD000099,F07,W506205,P806212,2022-09-22,2023-03-04,Seeded,Ended,W506205 holds two active job records (PID P806212)
-JD000100,F08,W505644,P805643,2022-10-09,2023-01-16,Seeded,Ended,W505644's job on P805643 is still active; the PID ledger shows them out of it
-JD000101,F07,W519491,P801111,2022-10-18,2024-10-03,PID ledger,Ended,W519491 holds two active job records (PID P801111)
-JD000102,F08,W502468,P802464,2022-10-21,2023-03-24,Seeded,Ended,W502468's job on P802464 is still active; the PID ledger shows them out of it
-JD000103,F08,W513273,P811844,2022-11-24,2022-12-02,Seeded,Ended,W513273's job on P811844 is still active; the PID ledger shows them out of it
-JD000104,F07,W513273,P811844,2022-12-03,2023-02-03,Seeded,Ended,W513273 holds two active job records (PID P811844)
-JD000105,F08,W501183,P801186,2022-12-11,2023-02-01,Seeded,Ended,W501183's job on P801186 is still active; the PID ledger shows them out of it
-JD000106,F08,W517610,P814663,2022-12-24,2023-01-06,Seeded,Ended,W517610's job on P814663 is still active; the PID ledger shows them out of it
-JD000107,F07,W517610,P814663,2023-01-07,2023-03-26,Seeded,Ended,W517610 holds two active job records (PID P814663)
-JD000108,F08,W515512,P813334,2023-01-18,2023-02-23,Seeded,Ended,W515512's job on P813334 is still active; the PID ledger shows them out of it
-JD000109,F08,W510486,P801365,2023-01-25,2023-01-25,Seeded,Ended,W510486's job on P801365 is still active; the PID ledger shows them out of it
-JD000110,F08,W510628,P801813,2023-01-25,2023-01-29,Seeded,Ended,W510628's job on P801813 is still active; the PID ledger shows them out of it
-JD000111,F07,W510486,P801365,2023-01-26,2023-06-04,Seeded,Ended,W510486 holds two active job records (PID P801365)
-JD000112,F07,W510628,P801813,2023-01-30,2023-07-06,Seeded,Ended,W510628 holds two active job records (PID P801813)
-JD000113,F08,W510449,P805203,2023-02-09,2023-02-11,Seeded,Ended,W510449's job on P805203 is still active; the PID ledger shows them out of it
-JD000114,F08,W510494,P809929,2023-02-10,,Seeded,Open at extract,W510494's job on P809929 is still active; the PID ledger shows them out of it
-JD000115,F07,W510449,P805203,2023-02-12,2023-08-08,Seeded,Ended,W510449 holds two active job records (PID P805203)
-JD000116,F08,W505118,P805122,2023-02-14,2023-02-21,Seeded,Ended,W505118's job on P805122 is still active; the PID ledger shows them out of it
-JD000117,F07,W505118,P805122,2023-02-22,2023-08-13,Seeded,Ended,W505118 holds two active job records (PID P805122)
-JD000118,F08,W511088,P810357,2023-03-03,2023-03-28,Seeded,Ended,W511088's job on P810357 is still active; the PID ledger shows them out of it
-JD000119,F08,W512835,P804640,2023-03-22,2023-08-10,Seeded,Ended,W512835's job on P804640 is still active; the PID ledger shows them out of it
-JD000120,F08,W519205,P810135,2023-03-22,2023-04-04,Seeded,Ended,W519205's job on P810135 is still active; the PID ledger shows them out of it
-JD000121,F07,W519205,P810135,2023-04-05,2023-10-04,Seeded,Ended,W519205 holds two active job records (PID P810135)
-JD000122,F08,W508739,P808630,2023-04-09,,Seeded,Open at extract,W508739's job on P808630 is still active; the PID ledger shows them out of it
-JD000123,F08,W511604,P800975,2023-05-07,2023-08-12,Seeded,Ended,W511604's job on P800975 is still active; the PID ledger shows them out of it
-JD000124,F08,W506904,P806909,2023-05-11,2023-05-16,Seeded,Ended,W506904's job on P806909 is still active; the PID ledger shows them out of it
-JD000125,F07,W506904,P806909,2023-05-17,2023-09-16,Seeded,Ended,W506904 holds two active job records (PID P806909)
-JD000126,F08,W503611,P803627,2023-06-04,2023-09-12,Seeded,Ended,W503611's job on P803627 is still active; the PID ledger shows them out of it
-JD000127,F08,W518960,P815546,2023-06-06,,Seeded,Open at extract,W518960's job on P815546 is still active; the PID ledger shows them out of it
-JD000128,F08,W512315,P805066,2023-06-21,2023-07-17,Seeded,Ended,W512315's job on P805066 is still active; the PID ledger shows them out of it
-JD000129,F08,W512443,P811293,2023-06-21,2023-07-06,Seeded,Ended,W512443's job on P811293 is still active; the PID ledger shows them out of it
-JD000130,F08,W500001,P800001,2023-07-01,2023-07-01,Seeded,Ended,W500001's job on P800001 is still active; the PID ledger shows them out of it
-JD000131,F08,W514699,P812779,2023-07-01,2023-07-18,Seeded,Ended,W514699's job on P812779 is still active; the PID ledger shows them out of it
-JD000132,F07,W500001,P800001,2023-07-02,2024-01-01,Seeded,Ended,W500001 holds two active job records (PID P800001)
-JD000133,F08,W512580,P800553,2023-07-06,2023-07-09,Seeded,Ended,W512580's job on P800553 is still active; the PID ledger shows them out of it
-JD000134,F07,W512443,P811293,2023-07-07,2023-10-20,Seeded,Ended,W512443 holds two active job records (PID P811293)
-JD000135,F07,W512580,P800553,2023-07-10,2023-07-29,Seeded,Ended,W512580 holds two active job records (PID P800553)
-JD000136,F08,W509931,P809551,2023-07-12,2023-07-19,Seeded,Ended,W509931's job on P809551 is still active; the PID ledger shows them out of it
-JD000137,F08,W510685,P810074,2023-07-18,2023-08-27,Seeded,Ended,W510685's job on P810074 is still active; the PID ledger shows them out of it
-JD000138,F07,W514699,P812779,2023-07-19,2023-08-14,Seeded,Ended,W514699 holds two active job records (PID P812779)
-JD000139,F07,W509931,P809551,2023-07-20,2023-12-22,Seeded,Ended,W509931 holds two active job records (PID P809551)
-JD000140,F08,W515353,P800797,2023-07-24,2023-11-17,Seeded,Ended,W515353's job on P800797 is still active; the PID ledger shows them out of it
-JD000141,F08,W521014,P811500,2023-08-08,2023-08-22,Seeded,Ended,W521014's job on P811500 is still active; the PID ledger shows them out of it
-JD000142,F08,W510449,P805203,2023-08-09,,Seeded,Open at extract,W510449's job on P805203 is still active; the PID ledger shows them out of it
-JD000143,F08,W505118,P805122,2023-08-14,,Seeded,Open at extract,W505118's job on P805122 is still active; the PID ledger shows them out of it
-JD000144,F08,W510624,P800782,2023-08-22,2023-09-09,Seeded,Ended,W510624's job on P800782 is still active; the PID ledger shows them out of it
-JD000145,F07,W521014,P811500,2023-08-23,2023-10-03,Seeded,Ended,W521014 holds two active job records (PID P811500)
-JD000146,F08,W512137,P811103,2023-08-27,2023-12-18,Seeded,Ended,W512137's job on P811103 is still active; the PID ledger shows them out of it
-JD000147,F07,W510624,P800782,2023-09-10,2023-10-02,Seeded,Ended,W510624 holds two active job records (PID P800782)
-JD000148,F08,W518598,P810138,2023-09-14,,Seeded,Open at extract,W518598's job on P810138 is still active; the PID ledger shows them out of it
-JD000149,F08,W510967,P800901,2023-09-15,2023-09-22,Seeded,Ended,W510967's job on P800901 is still active; the PID ledger shows them out of it
-JD000150,F08,W521573,P817279,2023-09-20,2023-10-07,Seeded,Ended,W521573's job on P817279 is still active; the PID ledger shows them out of it
-JD000151,F08,W522101,P817617,2023-09-21,2023-10-07,Seeded,Ended,W522101's job on P817617 is still active; the PID ledger shows them out of it
-JD000152,F07,W510967,P800901,2023-09-23,2023-10-07,Seeded,Ended,W510967 holds two active job records (PID P800901)
-JD000153,F08,W509200,P809016,2023-10-08,,Seeded,Open at extract,W509200's job on P809016 is still active; the PID ledger shows them out of it
-JD000154,F07,W521573,P817279,2023-10-08,2024-06-19,Seeded,Ended,W521573 holds two active job records (PID P817279)
-JD000155,F07,W522101,P817617,2023-10-08,2024-03-31,Seeded,Ended,W522101 holds two active job records (PID P817617)
-JD000156,F08,W511333,P810539,2023-10-12,2023-10-27,Seeded,Ended,W511333's job on P810539 is still active; the PID ledger shows them out of it
-JD000157,F07,W511333,P810539,2023-10-28,2023-11-15,Seeded,Ended,W511333 holds two active job records (PID P810539)
-JD000158,F08,W523208,P806705,2023-11-08,2024-02-09,Seeded,Ended,W523208's job on P806705 is still active; the PID ledger shows them out of it
-JD000159,F08,W512085,P811054,2023-11-20,2024-04-29,Seeded,Ended,W512085's job on P811054 is still active; the PID ledger shows them out of it
-JD000160,F08,W523706,P801508,2023-12-06,2023-12-14,Seeded,Ended,W523706's job on P801508 is still active; the PID ledger shows them out of it
-JD000161,F07,W523706,P801508,2023-12-15,2024-07-22,Seeded,Ended,W523706 holds two active job records (PID P801508)
-JD000162,F08,W505169,P805173,2023-12-16,2024-01-30,Seeded,Ended,W505169's job on P805173 is still active; the PID ledger shows them out of it
-JD000163,F08,W509867,P809512,2023-12-18,2024-04-13,Seeded,Ended,W509867's job on P809512 is still active; the PID ledger shows them out of it
-JD000164,F08,W523509,P818541,2023-12-26,2024-01-07,Seeded,Ended,W523509's job on P818541 is still active; the PID ledger shows them out of it
-JD000165,F08,W520370,P816437,2024-01-04,2024-02-12,Seeded,Ended,W520370's job on P816437 is still active; the PID ledger shows them out of it
-JD000166,F07,W523509,P818541,2024-01-08,2024-01-18,Seeded,Ended,W523509 holds two active job records (PID P818541)
-JD000167,F08,W521157,P816971,2024-01-16,2024-01-21,Seeded,Ended,W521157's job on P816971 is still active; the PID ledger shows them out of it
-JD000168,F08,W522089,P817625,2024-01-21,2024-01-25,Seeded,Ended,W522089's job on P817625 is still active; the PID ledger shows them out of it
-JD000169,F07,W521157,P816971,2024-01-22,2024-08-07,Seeded,Ended,W521157 holds two active job records (PID P816971)
-JD000170,F08,W505913,P805911,2024-01-23,2024-03-26,Seeded,Ended,W505913's job on P805911 is still active; the PID ledger shows them out of it
-JD000171,F08,W515611,P800263,2024-01-25,2024-02-07,Seeded,Ended,W515611's job on P800263 is still active; the PID ledger shows them out of it
-JD000172,F07,W522089,P817625,2024-01-26,2024-04-10,Seeded,Ended,W522089 holds two active job records (PID P817625)
-JD000173,F08,W515293,P813180,2024-02-02,2024-02-11,Seeded,Ended,W515293's job on P813180 is still active; the PID ledger shows them out of it
-JD000174,F07,W515611,P800263,2024-02-08,2024-04-11,Seeded,Ended,W515611 holds two active job records (PID P800263)
-JD000175,F07,W515293,P813180,2024-02-12,2024-08-18,Seeded,Ended,W515293 holds two active job records (PID P813180)
-JD000176,F08,W518659,P815355,2024-02-18,2024-03-06,Seeded,Ended,W518659's job on P815355 is still active; the PID ledger shows them out of it
-JD000177,F08,W525034,P808169,2024-02-22,2024-04-10,Seeded,Ended,W525034's job on P808169 is still active; the PID ledger shows them out of it
-JD000178,F08,W517168,P814389,2024-02-23,2024-02-24,Seeded,Ended,W517168's job on P814389 is still active; the PID ledger shows them out of it
-JD000179,F07,W517168,P814389,2024-02-25,2024-05-22,Seeded,Ended,W517168 holds two active job records (PID P814389)
-JD000180,F08,W515631,P813413,2024-03-02,2024-03-19,Seeded,Ended,W515631's job on P813413 is still active; the PID ledger shows them out of it
-JD000181,F08,W521374,P817140,2024-03-06,2024-03-11,Seeded,Ended,W521374's job on P817140 is still active; the PID ledger shows them out of it
-JD000182,F07,W521374,P817140,2024-03-12,2026-03-05,Seeded,Ended,W521374 holds two active job records (PID P817140)
-JD000183,F07,W515631,P813413,2024-03-20,2024-08-06,Seeded,Ended,W515631 holds two active job records (PID P813413)
-JD000184,F08,W524858,P819432,2024-03-27,2024-04-11,Seeded,Ended,W524858's job on P819432 is still active; the PID ledger shows them out of it
-JD000185,F08,W523197,P818335,2024-03-31,2024-08-12,Seeded,Ended,W523197's job on P818335 is still active; the PID ledger shows them out of it
-JD000186,F08,W507613,P807625,2024-04-01,2024-04-06,Seeded,Ended,W507613's job on P807625 is still active; the PID ledger shows them out of it
-JD000187,F07,W507613,P807625,2024-04-07,2024-04-30,Seeded,Ended,W507613 holds two active job records (PID P807625)
-JD000188,F08,W512489,P811324,2024-04-07,2024-07-20,Seeded,Ended,W512489's job on P811324 is still active; the PID ledger shows them out of it
-JD000189,F08,W514108,P812420,2024-04-11,2024-05-10,Seeded,Ended,W514108's job on P812420 is still active; the PID ledger shows them out of it
-JD000190,F07,W524858,P819432,2024-04-12,2025-03-26,Seeded,Ended,W524858 holds two active job records (PID P819432)
-JD000191,F08,W525517,P819888,2024-05-01,2024-08-14,Seeded,Ended,W525517's job on P819888 is still active; the PID ledger shows them out of it
-JD000192,F08,W519565,P808753,2024-05-07,2024-10-31,Seeded,Ended,W519565's job on P808753 is still active; the PID ledger shows them out of it
-JD000193,F08,W517168,P814389,2024-05-23,,Seeded,Open at extract,W517168's job on P814389 is still active; the PID ledger shows them out of it
-JD000194,F08,W518813,P802305,2024-06-08,2024-06-18,Seeded,Ended,W518813's job on P802305 is still active; the PID ledger shows them out of it
-JD000195,F07,W518813,P802305,2024-06-19,2024-09-15,Seeded,Ended,W518813 holds two active job records (PID P802305)
-JD000196,F08,W518091,P803944,2024-06-20,2024-10-31,Seeded,Ended,W518091's job on P803944 is still active; the PID ledger shows them out of it
-JD000197,F08,W521573,P817279,2024-06-20,,Seeded,Open at extract,W521573's job on P817279 is still active; the PID ledger shows them out of it
-JD000198,F08,W523360,P818431,2024-06-22,2024-06-27,Seeded,Ended,W523360's job on P818431 is still active; the PID ledger shows them out of it
-JD000199,F08,W507622,P807634,2024-06-26,2024-07-22,Seeded,Ended,W507622's job on P807634 is still active; the PID ledger shows them out of it
-JD000200,F07,W523360,P818431,2024-06-28,2025-01-12,Seeded,Ended,W523360 holds two active job records (PID P818431)
-JD000201,F08,W501868,P801871,2024-07-01,2024-11-25,Seeded,Ended,W501868's job on P801871 is still active; the PID ledger shows them out of it
-JD000202,F08,W503315,P803325,2024-07-01,2024-07-19,Seeded,Ended,W503315's job on P803325 is still active; the PID ledger shows them out of it
-JD000203,F08,W504642,P804661,2024-07-01,2024-07-06,Seeded,Ended,W504642's job on P804661 is still active; the PID ledger shows them out of it
-JD000204,F08,W522526,P817884,2024-07-01,2024-10-03,Seeded,Ended,W522526's job on P817884 is still active; the PID ledger shows them out of it
-JD000205,F07,W504642,P804661,2024-07-07,2025-06-30,Seeded,Ended,W504642 holds two active job records (PID P804661)
-JD000206,F08,W525215,P819674,2024-07-16,2024-07-29,Seeded,Ended,W525215's job on P819674 is still active; the PID ledger shows them out of it
-JD000207,F07,W503315,P803325,2024-07-20,,Seeded,Open at extract,W503315 holds two active job records (PID P803325)
-JD000208,F08,W513092,P811739,2024-07-27,2024-08-07,Seeded,Ended,W513092's job on P811739 is still active; the PID ledger shows them out of it
-JD000209,F07,W525215,P819674,2024-07-30,2024-11-25,Seeded,Ended,W525215 holds two active job records (PID P819674)
-JD000210,F07,W513092,P811739,2024-08-08,2024-10-26,Seeded,Ended,W513092 holds two active job records (PID P811739)
-JD000211,F08,W515969,P800243,2024-09-01,2024-09-19,Seeded,Ended,W515969's job on P800243 is still active; the PID ledger shows them out of it
-JD000212,F08,W526759,P820704,2024-09-06,2025-01-03,Seeded,Ended,W526759's job on P820704 is still active; the PID ledger shows them out of it
-JD000213,F07,W515969,P800243,2024-09-20,2024-12-17,Seeded,Ended,W515969 holds two active job records (PID P800243)
-JD000214,F08,W524840,P819421,2024-09-21,2024-09-21,Seeded,Ended,W524840's job on P819421 is still active; the PID ledger shows them out of it
-JD000215,F07,W524840,P819421,2024-09-22,2025-03-20,Seeded,Ended,W524840 holds two active job records (PID P819421)
-JD000216,F08,W519630,P807980,2024-09-26,2024-10-27,Seeded,Ended,W519630's job on P807980 is still active; the PID ledger shows them out of it
-JD000217,F08,W519077,P810329,2024-10-03,2024-10-10,Seeded,Ended,W519077's job on P810329 is still active; the PID ledger shows them out of it
-JD000218,F08,W522173,P807573,2024-10-07,2025-03-08,Seeded,Ended,W522173's job on P807573 is still active; the PID ledger shows them out of it
-JD000219,F07,W519077,P810329,2024-10-11,2025-05-13,Seeded,Ended,W519077 holds two active job records (PID P810329)
-JD000220,F08,W527609,P821287,2024-10-12,,Seeded,Open at extract,W527609's job on P821287 is still active; the PID ledger shows them out of it
-JD000221,F08,W513092,P811739,2024-10-27,2025-01-04,Seeded,Ended,W513092's job on P811739 is still active; the PID ledger shows them out of it
-JD000222,F08,W513943,P800702,2024-10-27,2024-10-31,Seeded,Ended,W513943's job on P800702 is still active; the PID ledger shows them out of it
-JD000223,F07,W513943,P800702,2024-11-01,2025-06-08,Seeded,Ended,W513943 holds two active job records (PID P800702)
-JD000224,F08,W522780,P818058,2024-11-08,2025-01-23,Seeded,Ended,W522780's job on P818058 is still active; the PID ledger shows them out of it
-JD000225,F08,W520282,P816404,2024-12-02,2025-05-29,Seeded,Ended,W520282's job on P816404 is still active; the PID ledger shows them out of it
-JD000226,F08,W526745,P820697,2024-12-07,2025-05-21,Seeded,Ended,W526745's job on P820697 is still active; the PID ledger shows them out of it
-JD000227,F08,W517319,P814483,2024-12-23,2025-04-06,Seeded,Ended,W517319's job on P814483 is still active; the PID ledger shows them out of it
-JD000228,F08,W509862,P809503,2024-12-25,2025-02-05,Seeded,Ended,W509862's job on P809503 is still active; the PID ledger shows them out of it
-JD000229,F08,W527123,P820959,2024-12-29,2025-03-20,Seeded,Ended,W527123's job on P820959 is still active; the PID ledger shows them out of it
-JD000230,F08,W523331,P808301,2025-01-03,2025-01-16,Seeded,Ended,W523331's job on P808301 is still active; the PID ledger shows them out of it
-JD000231,F08,W521960,P817534,2025-01-17,2025-07-14,Seeded,Ended,W521960's job on P817534 is still active; the PID ledger shows them out of it
-JD000232,F07,W523331,P808301,2025-01-17,2025-08-23,Seeded,Ended,W523331 holds two active job records (PID P808301)
-JD000233,F08,W527729,P821353,2025-01-18,2025-03-11,Seeded,Ended,W527729's job on P821353 is still active; the PID ledger shows them out of it
-JD000234,F08,W526738,P820694,2025-02-19,2025-02-28,Seeded,Ended,W526738's job on P820694 is still active; the PID ledger shows them out of it
-JD000235,F07,W532748,P824526,2025-02-27,2026-02-26,PID ledger,Ended,W532748 holds two active job records (PID P824526)
-JD000236,F07,W526738,P820694,2025-03-01,2025-04-01,Seeded,Ended,W526738 holds two active job records (PID P820694)
-JD000237,F08,W526997,P814086,2025-03-11,2025-03-19,Seeded,Ended,W526997's job on P814086 is still active; the PID ledger shows them out of it
-JD000238,F08,W512771,P801651,2025-03-14,2025-09-01,Seeded,Ended,W512771's job on P801651 is still active; the PID ledger shows them out of it
-JD000239,F08,W517987,P800614,2025-03-17,2025-03-26,Seeded,Ended,W517987's job on P800614 is still active; the PID ledger shows them out of it
-JD000240,F07,W526997,P814086,2025-03-20,2025-09-04,Seeded,Ended,W526997 holds two active job records (PID P814086)
-JD000241,F08,W524840,P819421,2025-03-21,2025-05-15,Seeded,Ended,W524840's job on P819421 is still active; the PID ledger shows them out of it
-JD000242,F08,W521609,P817305,2025-03-24,2025-07-07,Seeded,Ended,W521609's job on P817305 is still active; the PID ledger shows them out of it
-JD000243,F07,W517987,P800614,2025-03-27,2025-05-19,Seeded,Ended,W517987 holds two active job records (PID P800614)
-JD000244,F08,W524858,P819432,2025-03-27,,Seeded,Open at extract,W524858's job on P819432 is still active; the PID ledger shows them out of it
-JD000245,F08,W518149,P814896,2025-03-28,2025-03-30,Seeded,Ended,W518149's job on P814896 is still active; the PID ledger shows them out of it
-JD000246,F07,W518149,P814896,2025-03-31,2025-08-13,Seeded,Ended,W518149 holds two active job records (PID P814896)
-JD000247,F08,W524880,P803666,2025-04-16,2025-04-18,Seeded,Ended,W524880's job on P803666 is still active; the PID ledger shows them out of it
-JD000248,F07,W524880,P803666,2025-04-19,2025-06-12,Seeded,Ended,W524880 holds two active job records (PID P803666)
-JD000249,F08,W531040,P823645,2025-04-29,2025-05-18,Seeded,Ended,W531040's job on P823645 is still active; the PID ledger shows them out of it
-JD000250,F08,W522715,P807120,2025-05-03,2025-05-12,Seeded,Ended,W522715's job on P807120 is still active; the PID ledger shows them out of it
-JD000251,F08,W527849,P821459,2025-05-03,2025-05-18,Seeded,Ended,W527849's job on P821459 is still active; the PID ledger shows them out of it
-JD000252,F08,W522412,P817825,2025-05-05,2025-09-30,Seeded,Ended,W522412's job on P817825 is still active; the PID ledger shows them out of it
-JD000253,F08,W530860,P813830,2025-05-06,2025-09-26,Seeded,Ended,W530860's job on P813830 is still active; the PID ledger shows them out of it
-JD000254,F08,W530921,P816228,2025-05-11,2025-05-24,Seeded,Ended,W530921's job on P816228 is still active; the PID ledger shows them out of it
-JD000255,F07,W522715,P807120,2025-05-13,2025-05-23,Seeded,Ended,W522715 holds two active job records (PID P807120)
-JD000256,F07,W527849,P821459,2025-05-19,2025-06-14,Seeded,Ended,W527849 holds two active job records (PID P821459)
-JD000257,F07,W530921,P816228,2025-05-25,2025-06-12,Seeded,Ended,W530921 holds two active job records (PID P816228)
-JD000258,F08,W500205,P800204,2025-07-01,2025-11-12,Seeded,Ended,W500205's job on P800204 is still active; the PID ledger shows them out of it
-JD000259,F08,W504642,P804661,2025-07-01,2025-07-19,Seeded,Ended,W504642's job on P804661 is still active; the PID ledger shows them out of it
-JD000260,F08,W507864,P807879,2025-07-01,2025-07-06,Seeded,Ended,W507864's job on P807879 is still active; the PID ledger shows them out of it
-JD000261,F08,W516344,P813876,2025-07-01,2025-07-01,Seeded,Ended,W516344's job on P813876 is still active; the PID ledger shows them out of it
-JD000262,F08,W524601,P819259,2025-07-01,2025-07-06,Seeded,Ended,W524601's job on P819259 is still active; the PID ledger shows them out of it
-JD000263,F08,W531597,P824022,2025-07-01,2025-07-13,Seeded,Ended,W531597's job on P824022 is still active; the PID ledger shows them out of it
-JD000264,F07,W516344,P813876,2025-07-02,2026-02-02,Seeded,Ended,W516344 holds two active job records (PID P813876)
-JD000265,F07,W507864,P807879,2025-07-07,2025-11-03,Seeded,Ended,W507864 holds two active job records (PID P807879)
-JD000266,F07,W524601,P819259,2025-07-07,2025-09-30,Seeded,Ended,W524601 holds two active job records (PID P819259)
-JD000267,F07,W531597,P824022,2025-07-14,2025-10-22,Seeded,Ended,W531597 holds two active job records (PID P824022)
-JD000268,F07,W504642,P804661,2025-07-20,,Seeded,Open at extract,W504642 holds two active job records (PID P804661)
-JD000269,F08,W531630,P815901,2025-07-27,2026-01-08,Seeded,Ended,W531630's job on P815901 is still active; the PID ledger shows them out of it
-JD000270,F08,W530504,P811278,2025-07-29,2025-08-06,Seeded,Ended,W530504's job on P811278 is still active; the PID ledger shows them out of it
-JD000271,F08,W527815,P821419,2025-08-02,2025-08-10,Seeded,Ended,W527815's job on P821419 is still active; the PID ledger shows them out of it
-JD000272,F07,W530504,P811278,2025-08-07,2026-02-18,Seeded,Ended,W530504 holds two active job records (PID P811278)
-JD000273,F07,W527815,P821419,2025-08-11,2025-11-05,Seeded,Ended,W527815 holds two active job records (PID P821419)
-JD000274,F08,W529682,P822672,2025-08-29,2025-08-31,Seeded,Ended,W529682's job on P822672 is still active; the PID ledger shows them out of it
-JD000275,F07,W529682,P822672,2025-09-01,2025-10-08,Seeded,Ended,W529682 holds two active job records (PID P822672)
-JD000276,F08,W516157,P813744,2025-10-06,2026-03-14,Seeded,Ended,W516157's job on P813744 is still active; the PID ledger shows them out of it
-JD000277,F08,W529093,P813376,2025-10-11,2025-10-16,Seeded,Ended,W529093's job on P813376 is still active; the PID ledger shows them out of it
-JD000278,F08,W533258,P825197,2025-10-16,2025-11-11,Seeded,Ended,W533258's job on P825197 is still active; the PID ledger shows them out of it
-JD000279,F07,W529093,P813376,2025-10-17,2025-11-08,Seeded,Ended,W529093 holds two active job records (PID P813376)
-JD000280,F08,W531804,P824180,2025-10-24,2025-11-02,Seeded,Ended,W531804's job on P824180 is still active; the PID ledger shows them out of it
-JD000281,F07,W531804,P824180,2025-11-03,2026-05-08,Seeded,Ended,W531804 holds two active job records (PID P824180)
-JD000282,F08,W530546,P823273,2025-11-04,,Seeded,Open at extract,W530546's job on P823273 is still active; the PID ledger shows them out of it
-JD000283,F08,W529093,P813376,2025-11-09,2026-05-01,Seeded,Ended,W529093's job on P813376 is still active; the PID ledger shows them out of it
-JD000284,F08,W520446,P801716,2025-11-21,2025-12-08,Seeded,Ended,W520446's job on P801716 is still active; the PID ledger shows them out of it
-JD000285,F08,W523221,P818347,2025-11-23,2025-12-02,Seeded,Ended,W523221's job on P818347 is still active; the PID ledger shows them out of it
-JD000286,F07,W523221,P818347,2025-12-03,2026-04-27,Seeded,Ended,W523221 holds two active job records (PID P818347)
-JD000287,F08,W531692,P824085,2025-12-04,2025-12-15,Seeded,Ended,W531692's job on P824085 is still active; the PID ledger shows them out of it
-JD000288,F08,W534203,P825907,2025-12-09,2026-03-28,Seeded,Ended,W534203's job on P825907 is still active; the PID ledger shows them out of it
-JD000289,F08,W534575,P826148,2025-12-09,2025-12-17,Seeded,Ended,W534575's job on P826148 is still active; the PID ledger shows them out of it
-JD000290,F08,W524299,P819052,2025-12-12,2025-12-27,Seeded,Ended,W524299's job on P819052 is still active; the PID ledger shows them out of it
-JD000291,F08,W520350,P816454,2025-12-14,2026-03-05,Seeded,Ended,W520350's job on P816454 is still active; the PID ledger shows them out of it
-JD000292,F07,W531692,P824085,2025-12-16,2026-01-25,Seeded,Ended,W531692 holds two active job records (PID P824085)
-JD000293,F07,W534575,P826148,2025-12-18,,Seeded,Open at extract,W534575 holds two active job records (PID P826148)
-JD000294,F08,W532694,P813448,2025-12-21,2025-12-27,Seeded,Ended,W532694's job on P813448 is still active; the PID ledger shows them out of it
-JD000295,F07,W524299,P819052,2025-12-28,2026-02-25,Seeded,Ended,W524299 holds two active job records (PID P819052)
-JD000296,F07,W532694,P813448,2025-12-28,,Seeded,Open at extract,W532694 holds two active job records (PID P813448)
-JD000297,F08,W526251,P820378,2026-01-10,2026-06-08,Seeded,Ended,W526251's job on P820378 is still active; the PID ledger shows them out of it
-JD000298,F08,W517840,P814820,2026-01-15,2026-01-24,Seeded,Ended,W517840's job on P814820 is still active; the PID ledger shows them out of it
-JD000299,F08,W528977,P806730,2026-01-16,2026-02-05,Seeded,Ended,W528977's job on P806730 is still active; the PID ledger shows them out of it
-JD000300,F08,W515177,P813109,2026-01-25,2026-01-30,Seeded,Ended,W515177's job on P813109 is still active; the PID ledger shows them out of it
-JD000301,F07,W517840,P814820,2026-01-25,2026-03-16,Seeded,Ended,W517840 holds two active job records (PID P814820)
-JD000302,F07,W515177,P813109,2026-01-31,2026-02-13,Seeded,Ended,W515177 holds two active job records (PID P813109)
-JD000303,F08,W526568,P820596,2026-02-05,2026-02-08,Seeded,Ended,W526568's job on P820596 is still active; the PID ledger shows them out of it
-JD000304,F07,W526568,P820596,2026-02-09,2026-05-04,Seeded,Ended,W526568 holds two active job records (PID P820596)
-JD000305,F08,W535836,P822882,2026-02-18,2026-04-18,Seeded,Ended,W535836's job on P822882 is still active; the PID ledger shows them out of it
-JD000306,F08,W524761,P811626,2026-03-01,2026-03-06,Seeded,Ended,W524761's job on P811626 is still active; the PID ledger shows them out of it
-JD000307,F08,W521374,P817140,2026-03-06,,Seeded,Open at extract,W521374's job on P817140 is still active; the PID ledger shows them out of it
-JD000308,F07,W524761,P811626,2026-03-07,2026-04-27,Seeded,Ended,W524761 holds two active job records (PID P811626)
-JD000309,F08,W531724,P824111,2026-03-11,2026-05-02,Seeded,Ended,W531724's job on P824111 is still active; the PID ledger shows them out of it
-JD000310,F08,W527577,P821257,2026-03-21,2026-03-26,Seeded,Ended,W527577's job on P821257 is still active; the PID ledger shows them out of it
-JD000311,F07,W527577,P821257,2026-03-27,,Seeded,Open at extract,W527577 holds two active job records (PID P821257)
-JD000312,F08,W532583,P824730,2026-03-27,2026-03-28,Seeded,Ended,W532583's job on P824730 is still active; the PID ledger shows them out of it
-JD000313,F07,W532583,P824730,2026-03-29,2026-05-02,Seeded,Ended,W532583 holds two active job records (PID P824730)
-JD000314,F08,W530712,P823407,2026-04-04,,Seeded,Open at extract,W530712's job on P823407 is still active; the PID ledger shows them out of it
-JD000315,F08,W530174,P822995,2026-04-07,,Seeded,Open at extract,W530174's job on P822995 is still active; the PID ledger shows them out of it
-JD000316,F08,W530092,P800893,2026-04-14,2026-06-03,Seeded,Ended,W530092's job on P800893 is still active; the PID ledger shows them out of it
-JD000317,F08,W527432,P821167,2026-04-15,,Seeded,Open at extract,W527432's job on P821167 is still active; the PID ledger shows them out of it
-JD000318,F08,W524266,P818837,2026-04-17,2026-04-22,Seeded,Ended,W524266's job on P818837 is still active; the PID ledger shows them out of it
-JD000319,F08,W526011,P820220,2026-04-17,2026-04-25,Seeded,Ended,W526011's job on P820220 is still active; the PID ledger shows them out of it
-JD000320,F07,W524266,P818837,2026-04-23,,Seeded,Open at extract,W524266 holds two active job records (PID P818837)
-JD000321,F07,W526011,P820220,2026-04-26,,Seeded,Open at extract,W526011 holds two active job records (PID P820220)
-JD000322,F08,W532583,P824730,2026-05-03,2026-05-22,Seeded,Ended,W532583's job on P824730 is still active; the PID ledger shows them out of it
-JD000323,F08,W522358,P817792,2026-05-04,,Seeded,Open at extract,W522358's job on P817792 is still active; the PID ledger shows them out of it
-JD000324,F08,W535681,P814554,2026-05-04,,Seeded,Open at extract,W535681's job on P814554 is still active; the PID ledger shows them out of it
-JD000325,F08,W539006,P829076,2026-05-04,,Seeded,Open at extract,W539006's job on P829076 is still active; the PID ledger shows them out of it
-JD000326,F08,W526568,P820596,2026-05-05,,Seeded,Open at extract,W526568's job on P820596 is still active; the PID ledger shows them out of it
-JD000327,F08,W533685,P816461,2026-05-14,2026-05-22,Seeded,Ended,W533685's job on P816461 is still active; the PID ledger shows them out of it
-JD000328,F08,W530509,P823247,2026-05-21,,Seeded,Open at extract,W530509's job on P823247 is still active; the PID ledger shows them out of it
-JD000329,F08,W535627,P821726,2026-05-22,2026-06-03,Seeded,Ended,W535627's job on P821726 is still active; the PID ledger shows them out of it
-JD000330,F07,W533685,P816461,2026-05-23,,Seeded,Open at extract,W533685 holds two active job records (PID P816461)
-JD000331,F08,W527785,P821409,2026-05-30,2026-06-17,Seeded,Ended,W527785's job on P821409 is still active; the PID ledger shows them out of it
-JD000332,F07,W535627,P821726,2026-06-04,,Seeded,Open at extract,W535627 holds two active job records (PID P821726)
-JD000333,F08,W537334,P828100,2026-06-08,,Seeded,Open at extract,W537334's job on P828100 is still active; the PID ledger shows them out of it
-JD000334,F08,W530077,P822934,2026-06-17,,Seeded,Open at extract,W530077's job on P822934 is still active; the PID ledger shows them out of it
-JD000335,F07,W527785,P821409,2026-06-18,,Seeded,Open at extract,W527785 holds two active job records (PID P821409)
-JD000336,F08,W528658,P822010,2026-06-18,,Seeded,Open at extract,W528658's job on P822010 is still active; the PID ledger shows them out of it
-JD000337,F08,W534765,P826286,2026-06-20,,Seeded,Open at extract,W534765's job on P826286 is still active; the PID ledger shows them out of it
+JD000001,F07,W502316,P802315,2020-03-03,2022-05-25,Seeded,Ended,W502316 holds two active job records (PID P802315)
+JD000002,F07,W506576,P806440,2020-03-23,2021-12-22,PID ledger,Ended,W506576 holds two active job records (PID P806440)
+JD000003,F06,W503057,P802874,2020-11-11,,Seeded,Open at extract,W503057's job on P802874 is still active; the PID ledger shows them out of it
+JD000004,F06,W505140,P805158,2020-11-11,,Seeded,Open at extract,W505140's job on P805158 is still active; the PID ledger shows them out of it
+JD000005,F07,W501938,P801942,2020-12-08,2022-09-02,Seeded,Ended,W501938 holds two active job records (PID P801942)
+JD000006,F07,W502376,P802382,2021-01-11,2021-08-03,Seeded,Ended,W502376 holds two active job records (PID P802382)
+JD000007,F07,W503939,P803953,2021-02-02,2021-09-02,Seeded,Ended,W503939 holds two active job records (PID P803953)
+JD000008,F07,W505604,P805593,2021-02-07,2021-10-27,Seeded,Ended,W505604 holds two active job records (PID P805593)
+JD000009,F07,W502712,P802726,2021-02-08,2021-08-06,Seeded,Ended,W502712 holds two active job records (PID P802726)
+JD000010,F07,W504028,P804032,2021-02-19,2021-08-04,Seeded,Ended,W504028 holds two active job records (PID P804032)
+JD000011,F07,W501847,P801856,2021-02-22,2021-07-12,Seeded,Ended,W501847 holds two active job records (PID P801856)
+JD000012,F06,W508524,P806531,2021-03-11,2021-07-03,Seeded,Ended,W508524's job on P806531 is still active; the PID ledger shows them out of it
+JD000013,F07,W508373,P808339,2021-03-24,2021-08-21,Seeded,Ended,W508373 holds two active job records (PID P808339)
+JD000014,F07,W506296,P806304,2021-04-11,2024-01-05,Seeded,Ended,W506296 holds two active job records (PID P806304)
+JD000015,F06,W501182,P801018,2021-04-15,2021-09-03,Seeded,Ended,W501182's job on P801018 is still active; the PID ledger shows them out of it
+JD000016,F06,W501173,P801176,2021-04-22,,Seeded,Open at extract,W501173's job on P801176 is still active; the PID ledger shows them out of it
+JD000017,F06,W500907,P800907,2021-04-23,,Seeded,Open at extract,W500907's job on P800907 is still active; the PID ledger shows them out of it
+JD000018,F07,W506582,P806582,2021-05-04,2021-07-25,Seeded,Ended,W506582 holds two active job records (PID P806582)
+JD000019,F07,W502281,P802283,2021-05-09,2021-12-31,Seeded,Ended,W502281 holds two active job records (PID P802283)
+JD000020,F07,W504051,P804062,2021-05-09,2021-11-30,Seeded,Ended,W504051 holds two active job records (PID P804062)
+JD000021,F06,W509348,P809125,2021-05-11,2021-08-10,Seeded,Ended,W509348's job on P809125 is still active; the PID ledger shows them out of it
+JD000022,F06,W500595,P800580,2021-05-16,,Seeded,Open at extract,W500595's job on P800580 is still active; the PID ledger shows them out of it
+JD000023,F06,W509535,P809268,2021-05-24,2021-10-19,Seeded,Ended,W509535's job on P809268 is still active; the PID ledger shows them out of it
+JD000024,F07,W502327,P802328,2021-05-25,2021-12-02,Seeded,Ended,W502327 holds two active job records (PID P802328)
+JD000025,F07,W506992,P807003,2021-05-30,2021-09-01,Seeded,Ended,W506992 holds two active job records (PID P807003)
+JD000026,F07,W508115,P808116,2021-05-31,2021-07-12,Seeded,Ended,W508115 holds two active job records (PID P808116)
+JD000027,F06,W503442,P803453,2021-06-06,2021-11-08,Seeded,Ended,W503442's job on P803453 is still active; the PID ledger shows them out of it
+JD000028,F06,W510868,P810198,2021-06-09,2021-09-12,Seeded,Ended,W510868's job on P810198 is still active; the PID ledger shows them out of it
+JD000029,F07,W504491,P804503,2021-06-17,2021-11-22,Seeded,Ended,W504491 holds two active job records (PID P804503)
+JD000030,F06,W501448,P801456,2021-06-18,2021-07-06,Seeded,Ended,W501448's job on P801456 is still active; the PID ledger shows them out of it
+JD000031,F06,W502925,P802942,2021-06-18,2021-08-27,Seeded,Ended,W502925's job on P802942 is still active; the PID ledger shows them out of it
+JD000032,F07,W505182,P805183,2021-06-19,2021-11-24,Seeded,Ended,W505182 holds two active job records (PID P805183)
+JD000033,F06,W507244,P807241,2021-06-22,2021-07-04,Seeded,Ended,W507244's job on P807241 is still active; the PID ledger shows them out of it
+JD000034,F06,W503155,P803169,2021-06-25,2021-07-03,Seeded,Ended,W503155's job on P803169 is still active; the PID ledger shows them out of it
+JD000035,F06,W507452,P807466,2021-06-30,2021-07-05,Seeded,Ended,W507452's job on P807466 is still active; the PID ledger shows them out of it
+JD000036,F06,W500743,P800747,2021-07-01,2021-07-05,Seeded,Ended,W500743's job on P800747 is still active; the PID ledger shows them out of it
+JD000037,F06,W500873,P800875,2021-07-01,2021-07-03,Seeded,Ended,W500873's job on P800875 is still active; the PID ledger shows them out of it
+JD000038,F06,W500966,P800966,2021-07-01,2021-07-03,Seeded,Ended,W500966's job on P800966 is still active; the PID ledger shows them out of it
+JD000039,F06,W501333,P801340,2021-07-01,2021-07-16,Seeded,Ended,W501333's job on P801340 is still active; the PID ledger shows them out of it
+JD000040,F06,W501477,P801483,2021-07-01,2021-07-15,Seeded,Ended,W501477's job on P801483 is still active; the PID ledger shows them out of it
+JD000041,F06,W501916,P801919,2021-07-01,2021-07-12,Seeded,Ended,W501916's job on P801919 is still active; the PID ledger shows them out of it
+JD000042,F06,W503635,P803652,2021-07-01,2021-07-09,Seeded,Ended,W503635's job on P803652 is still active; the PID ledger shows them out of it
+JD000043,F06,W506013,P806010,2021-07-01,2021-07-13,Seeded,Ended,W506013's job on P806010 is still active; the PID ledger shows them out of it
+JD000044,F06,W506394,P806377,2021-07-01,2021-07-11,Seeded,Ended,W506394's job on P806377 is still active; the PID ledger shows them out of it
+JD000045,F06,W510937,P810158,2021-07-01,2021-07-03,Seeded,Ended,W510937's job on P810158 is still active; the PID ledger shows them out of it
+JD000046,F07,W500873,P800875,2021-07-04,2021-08-02,Seeded,Ended,W500873 holds two active job records (PID P800875)
+JD000047,F07,W500966,P800966,2021-07-04,2021-07-20,Seeded,Ended,W500966 holds two active job records (PID P800966)
+JD000048,F07,W503155,P803169,2021-07-04,2021-10-03,Seeded,Ended,W503155 holds two active job records (PID P803169)
+JD000049,F07,W510937,P810158,2021-07-04,2021-10-06,Seeded,Ended,W510937 holds two active job records (PID P810158)
+JD000050,F07,W507244,P807241,2021-07-05,2021-09-21,Seeded,Ended,W507244 holds two active job records (PID P807241)
+JD000051,F07,W500743,P800747,2021-07-06,2021-08-27,Seeded,Ended,W500743 holds two active job records (PID P800747)
+JD000052,F07,W507452,P807466,2021-07-06,2022-01-15,Seeded,Ended,W507452 holds two active job records (PID P807466)
+JD000053,F07,W501448,P801456,2021-07-07,2022-02-02,Seeded,Ended,W501448 holds two active job records (PID P801456)
+JD000054,F06,W502437,P802444,2021-07-07,2021-07-22,Seeded,Ended,W502437's job on P802444 is still active; the PID ledger shows them out of it
+JD000055,F07,W503635,P803652,2021-07-10,2022-02-21,Seeded,Ended,W503635 holds two active job records (PID P803652)
+JD000056,F07,W506394,P806377,2021-07-12,2021-12-08,Seeded,Ended,W506394 holds two active job records (PID P806377)
+JD000057,F07,W501916,P801919,2021-07-13,2023-06-30,Seeded,Ended,W501916 holds two active job records (PID P801919)
+JD000058,F07,W506013,P806010,2021-07-14,2022-02-09,Seeded,Ended,W506013 holds two active job records (PID P806010)
+JD000059,F06,W510044,P809631,2021-07-15,2021-10-21,Seeded,Ended,W510044's job on P809631 is still active; the PID ledger shows them out of it
+JD000060,F07,W501477,P801483,2021-07-16,2021-08-11,Seeded,Ended,W501477 holds two active job records (PID P801483)
+JD000061,F07,W501333,P801340,2021-07-17,2022-01-08,Seeded,Ended,W501333 holds two active job records (PID P801340)
+JD000062,F07,W502437,P802444,2021-07-23,2021-08-30,Seeded,Ended,W502437 holds two active job records (PID P802444)
+JD000063,F06,W502724,P802733,2021-07-23,2021-08-08,Seeded,Ended,W502724's job on P802733 is still active; the PID ledger shows them out of it
+JD000064,F06,W509082,P808919,2021-07-23,2021-07-31,Seeded,Ended,W509082's job on P808919 is still active; the PID ledger shows them out of it
+JD000065,F07,W509082,P808919,2021-08-01,2022-06-07,Seeded,Ended,W509082 holds two active job records (PID P808919)
+JD000066,F06,W504028,P804032,2021-08-05,2021-09-19,Seeded,Ended,W504028's job on P804032 is still active; the PID ledger shows them out of it
+JD000067,F06,W502712,P802726,2021-08-07,2021-08-08,Seeded,Ended,W502712's job on P802726 is still active; the PID ledger shows them out of it
+JD000068,F07,W502724,P802733,2021-08-09,2022-01-19,Seeded,Ended,W502724 holds two active job records (PID P802733)
+JD000069,F06,W500955,P800957,2021-08-14,2021-08-14,Seeded,Ended,W500955's job on P800957 is still active; the PID ledger shows them out of it
+JD000070,F06,W502218,P802227,2021-08-14,2021-08-17,Seeded,Ended,W502218's job on P802227 is still active; the PID ledger shows them out of it
+JD000071,F07,W500955,P800957,2021-08-15,2021-11-13,Seeded,Ended,W500955 holds two active job records (PID P800957)
+JD000072,F07,W502218,P802227,2021-08-18,2021-10-31,Seeded,Ended,W502218 holds two active job records (PID P802227)
+JD000073,F06,W508478,P808442,2021-08-20,2021-08-23,Seeded,Ended,W508478's job on P808442 is still active; the PID ledger shows them out of it
+JD000074,F07,W508478,P808442,2021-08-24,2021-12-29,Seeded,Ended,W508478 holds two active job records (PID P808442)
+JD000075,F06,W501809,P801819,2021-09-02,2022-01-27,Seeded,Ended,W501809's job on P801819 is still active; the PID ledger shows them out of it
+JD000076,F06,W507133,P807133,2021-09-02,2021-09-17,Seeded,Ended,W507133's job on P807133 is still active; the PID ledger shows them out of it
+JD000077,F06,W505961,P805966,2021-09-03,2021-09-19,Seeded,Ended,W505961's job on P805966 is still active; the PID ledger shows them out of it
+JD000078,F07,W507133,P807133,2021-09-18,2022-01-16,Seeded,Ended,W507133 holds two active job records (PID P807133)
+JD000079,F07,W505961,P805966,2021-09-20,2022-03-02,Seeded,Ended,W505961 holds two active job records (PID P805966)
+JD000080,F06,W507244,P807241,2021-09-22,2021-10-15,Seeded,Ended,W507244's job on P807241 is still active; the PID ledger shows them out of it
+JD000081,F06,W509842,P806343,2021-09-23,2021-10-07,Seeded,Ended,W509842's job on P806343 is still active; the PID ledger shows them out of it
+JD000082,F06,W500813,P800814,2021-09-26,2022-01-12,Seeded,Ended,W500813's job on P800814 is still active; the PID ledger shows them out of it
+JD000083,F07,W509842,P806343,2021-10-08,2021-12-22,Seeded,Ended,W509842 holds two active job records (PID P806343)
+JD000084,F06,W508806,P801263,2021-10-12,2022-01-16,Seeded,Ended,W508806's job on P801263 is still active; the PID ledger shows them out of it
+JD000085,F06,W505701,P805716,2021-10-27,2021-10-27,Seeded,Ended,W505701's job on P805716 is still active; the PID ledger shows them out of it
+JD000086,F06,W505604,P805593,2021-10-28,,Seeded,Open at extract,W505604's job on P805593 is still active; the PID ledger shows them out of it
+JD000087,F07,W505701,P805716,2021-10-28,2022-04-16,Seeded,Ended,W505701 holds two active job records (PID P805716)
+JD000088,F06,W511862,P810924,2021-11-06,2022-04-16,Seeded,Ended,W511862's job on P810924 is still active; the PID ledger shows them out of it
+JD000089,F06,W509752,P800565,2021-11-09,2021-11-20,Seeded,Ended,W509752's job on P800565 is still active; the PID ledger shows them out of it
+JD000090,F06,W511410,P810594,2021-11-10,2021-11-11,Seeded,Ended,W511410's job on P810594 is still active; the PID ledger shows them out of it
+JD000091,F07,W511410,P810594,2021-11-12,2022-01-06,Seeded,Ended,W511410 holds two active job records (PID P810594)
+JD000092,F06,W502315,P802323,2021-11-13,2021-11-30,Seeded,Ended,W502315's job on P802323 is still active; the PID ledger shows them out of it
+JD000093,F06,W500955,P800957,2021-11-14,2022-03-08,Seeded,Ended,W500955's job on P800957 is still active; the PID ledger shows them out of it
+JD000094,F06,W509689,P803047,2021-11-20,2022-01-01,Seeded,Ended,W509689's job on P803047 is still active; the PID ledger shows them out of it
+JD000095,F07,W509752,P800565,2021-11-21,2022-02-08,Seeded,Ended,W509752 holds two active job records (PID P800565)
+JD000096,F06,W501231,P801234,2021-11-26,2022-01-24,Seeded,Ended,W501231's job on P801234 is still active; the PID ledger shows them out of it
+JD000097,F06,W510796,P801245,2021-11-26,2021-11-27,Seeded,Ended,W510796's job on P801245 is still active; the PID ledger shows them out of it
+JD000098,F06,W509528,P809252,2021-11-27,2021-12-14,Seeded,Ended,W509528's job on P809252 is still active; the PID ledger shows them out of it
+JD000099,F07,W510796,P801245,2021-11-28,2021-12-14,Seeded,Ended,W510796 holds two active job records (PID P801245)
+JD000100,F06,W512547,P811375,2021-11-30,2022-05-20,Seeded,Ended,W512547's job on P811375 is still active; the PID ledger shows them out of it
+JD000101,F07,W502315,P802323,2021-12-01,2022-03-06,Seeded,Ended,W502315 holds two active job records (PID P802323)
+JD000102,F06,W501509,P801518,2021-12-04,2021-12-14,Seeded,Ended,W501509's job on P801518 is still active; the PID ledger shows them out of it
+JD000103,F07,W501509,P801518,2021-12-15,2022-01-16,Seeded,Ended,W501509 holds two active job records (PID P801518)
+JD000104,F07,W509528,P809252,2021-12-15,2022-02-03,Seeded,Ended,W509528 holds two active job records (PID P809252)
+JD000105,F06,W509696,P809386,2021-12-17,2022-04-13,Seeded,Ended,W509696's job on P809386 is still active; the PID ledger shows them out of it
+JD000106,F06,W512835,P804640,2021-12-22,2022-01-04,Seeded,Ended,W512835's job on P804640 is still active; the PID ledger shows them out of it
+JD000107,F06,W509842,P806343,2021-12-23,2022-02-12,Seeded,Ended,W509842's job on P806343 is still active; the PID ledger shows them out of it
+JD000108,F06,W513035,P804759,2021-12-30,2022-01-16,Seeded,Ended,W513035's job on P804759 is still active; the PID ledger shows them out of it
+JD000109,F06,W503952,P803962,2022-01-05,2022-02-01,Seeded,Ended,W503952's job on P803962 is still active; the PID ledger shows them out of it
+JD000110,F07,W512835,P804640,2022-01-05,2022-07-04,Seeded,Ended,W512835 holds two active job records (PID P804640)
+JD000111,F06,W505754,P805755,2022-01-06,2022-01-06,Seeded,Ended,W505754's job on P805755 is still active; the PID ledger shows them out of it
+JD000112,F07,W505754,P805755,2022-01-07,2022-04-04,Seeded,Ended,W505754 holds two active job records (PID P805755)
+JD000113,F06,W508795,P808692,2022-01-09,2022-01-14,Seeded,Ended,W508795's job on P808692 is still active; the PID ledger shows them out of it
+JD000114,F06,W508918,P808790,2022-01-09,2022-01-18,Seeded,Ended,W508918's job on P808790 is still active; the PID ledger shows them out of it
+JD000115,F06,W505780,P805782,2022-01-10,2022-03-14,Seeded,Ended,W505780's job on P805782 is still active; the PID ledger shows them out of it
+JD000116,F06,W509931,P809551,2022-01-12,2022-01-18,Seeded,Ended,W509931's job on P809551 is still active; the PID ledger shows them out of it
+JD000117,F06,W504597,P804610,2022-01-14,2022-01-28,Seeded,Ended,W504597's job on P804610 is still active; the PID ledger shows them out of it
+JD000118,F07,W508795,P808692,2022-01-15,2022-04-08,Seeded,Ended,W508795 holds two active job records (PID P808692)
+JD000119,F07,W513035,P804759,2022-01-17,2022-06-29,Seeded,Ended,W513035 holds two active job records (PID P804759)
+JD000120,F07,W508918,P808790,2022-01-19,2022-07-15,Seeded,Ended,W508918 holds two active job records (PID P808790)
+JD000121,F07,W509931,P809551,2022-01-19,2023-07-11,Seeded,Ended,W509931 holds two active job records (PID P809551)
+JD000122,F06,W504099,P804114,2022-01-23,2022-05-30,Seeded,Ended,W504099's job on P804114 is still active; the PID ledger shows them out of it
+JD000123,F06,W504179,P804181,2022-01-23,2022-01-23,Seeded,Ended,W504179's job on P804181 is still active; the PID ledger shows them out of it
+JD000124,F07,W504179,P804181,2022-01-24,2022-05-23,Seeded,Ended,W504179 holds two active job records (PID P804181)
+JD000125,F06,W512722,P804187,2022-01-27,2022-02-14,Seeded,Ended,W512722's job on P804187 is still active; the PID ledger shows them out of it
+JD000126,F06,W510145,P809708,2022-01-28,2022-02-07,Seeded,Ended,W510145's job on P809708 is still active; the PID ledger shows them out of it
+JD000127,F07,W504597,P804610,2022-01-29,2022-06-10,Seeded,Ended,W504597 holds two active job records (PID P804610)
+JD000128,F06,W506807,P806809,2022-02-05,2022-02-14,Seeded,Ended,W506807's job on P806809 is still active; the PID ledger shows them out of it
+JD000129,F07,W510145,P809708,2022-02-08,2022-07-28,Seeded,Ended,W510145 holds two active job records (PID P809708)
+JD000130,F06,W509752,P800565,2022-02-09,2022-05-10,Seeded,Ended,W509752's job on P800565 is still active; the PID ledger shows them out of it
+JD000131,F07,W506807,P806809,2022-02-15,2022-05-04,Seeded,Ended,W506807 holds two active job records (PID P806809)
+JD000132,F06,W510904,P802122,2022-02-15,2022-03-22,Seeded,Ended,W510904's job on P802122 is still active; the PID ledger shows them out of it
+JD000133,F07,W512722,P804187,2022-02-15,2022-07-26,Seeded,Ended,W512722 holds two active job records (PID P804187)
+JD000134,F06,W502866,P802878,2022-02-18,2022-03-08,Seeded,Ended,W502866's job on P802878 is still active; the PID ledger shows them out of it
+JD000135,F06,W512190,P811145,2022-02-21,2022-03-11,Seeded,Ended,W512190's job on P811145 is still active; the PID ledger shows them out of it
+JD000136,F06,W510439,P804629,2022-02-22,2022-03-04,Seeded,Ended,W510439's job on P804629 is still active; the PID ledger shows them out of it
+JD000137,F06,W510832,P810178,2022-02-22,2022-02-23,Seeded,Ended,W510832's job on P810178 is still active; the PID ledger shows them out of it
+JD000138,F07,W510832,P810178,2022-02-24,2022-04-11,Seeded,Ended,W510832 holds two active job records (PID P810178)
+JD000139,F06,W508530,P808474,2022-02-28,2022-03-04,Seeded,Ended,W508530's job on P808474 is still active; the PID ledger shows them out of it
+JD000140,F06,W511625,P810748,2022-02-28,2022-03-14,Seeded,Ended,W511625's job on P810748 is still active; the PID ledger shows them out of it
+JD000141,F06,W505961,P805966,2022-03-03,,Seeded,Open at extract,W505961's job on P805966 is still active; the PID ledger shows them out of it
+JD000142,F06,W511088,P810357,2022-03-03,2022-03-20,Seeded,Ended,W511088's job on P810357 is still active; the PID ledger shows them out of it
+JD000143,F07,W508530,P808474,2022-03-05,2022-04-08,Seeded,Ended,W508530 holds two active job records (PID P808474)
+JD000144,F07,W510439,P804629,2022-03-05,2022-08-11,Seeded,Ended,W510439 holds two active job records (PID P804629)
+JD000145,F06,W507046,P806960,2022-03-08,2022-03-12,Seeded,Ended,W507046's job on P806960 is still active; the PID ledger shows them out of it
+JD000146,F07,W502866,P802878,2022-03-09,2022-05-17,Seeded,Ended,W502866 holds two active job records (PID P802878)
+JD000147,F06,W506120,P806121,2022-03-10,2022-03-16,Seeded,Ended,W506120's job on P806121 is still active; the PID ledger shows them out of it
+JD000148,F07,W512190,P811145,2022-03-12,2022-10-29,Seeded,Ended,W512190 holds two active job records (PID P811145)
+JD000149,F07,W507046,P806960,2022-03-13,2022-04-06,Seeded,Ended,W507046 holds two active job records (PID P806960)
+JD000150,F06,W513597,P807884,2022-03-13,2022-03-25,Seeded,Ended,W513597's job on P807884 is still active; the PID ledger shows them out of it
+JD000151,F06,W512254,P801930,2022-03-14,2022-03-21,Seeded,Ended,W512254's job on P801930 is still active; the PID ledger shows them out of it
+JD000152,F07,W511625,P810748,2022-03-15,2022-05-27,Seeded,Ended,W511625 holds two active job records (PID P810748)
+JD000153,F07,W506120,P806121,2022-03-17,2022-08-17,Seeded,Ended,W506120 holds two active job records (PID P806121)
+JD000154,F07,W511088,P810357,2022-03-21,2022-06-20,Seeded,Ended,W511088 holds two active job records (PID P810357)
+JD000155,F07,W512254,P801930,2022-03-22,2022-04-05,Seeded,Ended,W512254 holds two active job records (PID P801930)
+JD000156,F06,W505381,P805391,2022-03-23,2022-04-02,Seeded,Ended,W505381's job on P805391 is still active; the PID ledger shows them out of it
+JD000157,F07,W513597,P807884,2022-03-26,2022-07-16,Seeded,Ended,W513597 holds two active job records (PID P807884)
+JD000158,F07,W505381,P805391,2022-04-03,2022-10-15,Seeded,Ended,W505381 holds two active job records (PID P805391)
+JD000159,F06,W512512,P803329,2022-04-05,2022-06-02,Seeded,Ended,W512512's job on P803329 is still active; the PID ledger shows them out of it
+JD000160,F06,W503009,P803023,2022-04-08,2022-07-30,Seeded,Ended,W503009's job on P803023 is still active; the PID ledger shows them out of it
+JD000161,F06,W508795,P808692,2022-04-09,2022-04-23,Seeded,Ended,W508795's job on P808692 is still active; the PID ledger shows them out of it
+JD000162,F06,W514085,P812396,2022-04-13,2022-04-26,Seeded,Ended,W514085's job on P812396 is still active; the PID ledger shows them out of it
+JD000163,F06,W513868,P804379,2022-04-14,2022-04-21,Seeded,Ended,W513868's job on P804379 is still active; the PID ledger shows them out of it
+JD000164,F06,W505486,P805488,2022-04-17,2022-05-03,Seeded,Ended,W505486's job on P805488 is still active; the PID ledger shows them out of it
+JD000165,F06,W506485,P806487,2022-04-20,2022-04-30,Seeded,Ended,W506485's job on P806487 is still active; the PID ledger shows them out of it
+JD000166,F07,W513868,P804379,2022-04-22,2022-05-26,Seeded,Ended,W513868 holds two active job records (PID P804379)
+JD000167,F07,W514085,P812396,2022-04-27,2024-01-12,Seeded,Ended,W514085 holds two active job records (PID P812396)
+JD000168,F07,W506485,P806487,2022-05-01,2022-05-15,Seeded,Ended,W506485 holds two active job records (PID P806487)
+JD000169,F07,W505486,P805488,2022-05-04,2022-07-24,Seeded,Ended,W505486 holds two active job records (PID P805488)
+JD000170,F06,W506807,P806809,2022-05-05,2022-10-05,Seeded,Ended,W506807's job on P806809 is still active; the PID ledger shows them out of it
+JD000171,F06,W503164,P803177,2022-05-06,2022-06-06,Seeded,Ended,W503164's job on P803177 is still active; the PID ledger shows them out of it
+JD000172,F06,W503996,P803998,2022-05-09,2022-05-22,Seeded,Ended,W503996's job on P803998 is still active; the PID ledger shows them out of it
+JD000173,F06,W503529,P803546,2022-05-16,2022-05-31,Seeded,Ended,W503529's job on P803546 is still active; the PID ledger shows them out of it
+JD000174,F06,W509370,P809135,2022-05-16,2022-06-15,Seeded,Ended,W509370's job on P809135 is still active; the PID ledger shows them out of it
+JD000175,F06,W511744,P810838,2022-05-17,2022-09-15,Seeded,Ended,W511744's job on P810838 is still active; the PID ledger shows them out of it
+JD000176,F06,W502866,P802878,2022-05-18,2022-06-23,Seeded,Ended,W502866's job on P802878 is still active; the PID ledger shows them out of it
+JD000177,F07,W503996,P803998,2022-05-23,2022-11-25,Seeded,Ended,W503996 holds two active job records (PID P803998)
+JD000178,F06,W509865,P800756,2022-05-25,2022-06-12,Seeded,Ended,W509865's job on P800756 is still active; the PID ledger shows them out of it
+JD000179,F06,W502316,P802315,2022-05-26,,Seeded,Open at extract,W502316's job on P802315 is still active; the PID ledger shows them out of it
+JD000180,F06,W508530,P808474,2022-05-28,2022-06-03,Seeded,Ended,W508530's job on P808474 is still active; the PID ledger shows them out of it
+JD000181,F06,W511625,P810748,2022-05-28,2022-09-22,Seeded,Ended,W511625's job on P810748 is still active; the PID ledger shows them out of it
+JD000182,F07,W503529,P803546,2022-06-01,2022-11-15,Seeded,Ended,W503529 holds two active job records (PID P803546)
+JD000183,F07,W508530,P808474,2022-06-04,2022-10-14,Seeded,Ended,W508530 holds two active job records (PID P808474)
+JD000184,F06,W509082,P808919,2022-06-08,,Seeded,Open at extract,W509082's job on P808919 is still active; the PID ledger shows them out of it
+JD000185,F06,W514609,P802608,2022-06-09,2022-06-17,Seeded,Ended,W514609's job on P802608 is still active; the PID ledger shows them out of it
+JD000186,F07,W509865,P800756,2022-06-13,2023-05-24,Seeded,Ended,W509865 holds two active job records (PID P800756)
+JD000187,F06,W505520,P805533,2022-06-16,2022-09-23,Seeded,Ended,W505520's job on P805533 is still active; the PID ledger shows them out of it
+JD000188,F07,W514609,P802608,2022-06-18,2022-12-14,Seeded,Ended,W514609 holds two active job records (PID P802608)
+JD000189,F06,W508769,P808673,2022-06-21,2022-07-01,Seeded,Ended,W508769's job on P808673 is still active; the PID ledger shows them out of it
+JD000190,F06,W513035,P804759,2022-06-30,,Seeded,Open at extract,W513035's job on P804759 is still active; the PID ledger shows them out of it
+JD000191,F06,W500158,P800158,2022-07-01,2022-07-01,Seeded,Ended,W500158's job on P800158 is still active; the PID ledger shows them out of it
+JD000192,F06,W500238,P800236,2022-07-01,2022-07-19,Seeded,Ended,W500238's job on P800236 is still active; the PID ledger shows them out of it
+JD000193,F06,W500744,P800748,2022-07-01,2022-07-06,Seeded,Ended,W500744's job on P800748 is still active; the PID ledger shows them out of it
+JD000194,F06,W503917,P803939,2022-07-01,2022-07-14,Seeded,Ended,W503917's job on P803939 is still active; the PID ledger shows them out of it
+JD000195,F06,W505300,P805309,2022-07-01,2022-07-18,Seeded,Ended,W505300's job on P805309 is still active; the PID ledger shows them out of it
+JD000196,F06,W507615,P807592,2022-07-01,2022-07-13,Seeded,Ended,W507615's job on P807592 is still active; the PID ledger shows them out of it
+JD000197,F06,W510246,P801853,2022-07-01,2022-07-04,Seeded,Ended,W510246's job on P801853 is still active; the PID ledger shows them out of it
+JD000198,F06,W510961,P810267,2022-07-01,2022-07-07,Seeded,Ended,W510961's job on P810267 is still active; the PID ledger shows them out of it
+JD000199,F06,W514404,P812589,2022-07-01,2022-07-01,Seeded,Ended,W514404's job on P812589 is still active; the PID ledger shows them out of it
+JD000200,F06,W516054,P813693,2022-07-01,2022-07-16,Seeded,Ended,W516054's job on P813693 is still active; the PID ledger shows them out of it
+JD000201,F07,W500158,P800158,2022-07-02,2022-11-24,Seeded,Ended,W500158 holds two active job records (PID P800158)
+JD000202,F07,W508769,P808673,2022-07-02,2023-01-20,Seeded,Ended,W508769 holds two active job records (PID P808673)
+JD000203,F07,W514404,P812589,2022-07-02,2022-10-14,Seeded,Ended,W514404 holds two active job records (PID P812589)
+JD000204,F06,W512526,P811357,2022-07-04,,Seeded,Open at extract,W512526's job on P811357 is still active; the PID ledger shows them out of it
+JD000205,F07,W510246,P801853,2022-07-05,2022-08-11,Seeded,Ended,W510246 holds two active job records (PID P801853)
+JD000206,F07,W500744,P800748,2022-07-07,2022-08-28,Seeded,Ended,W500744 holds two active job records (PID P800748)
+JD000207,F06,W503502,P803506,2022-07-08,2022-10-16,Seeded,Ended,W503502's job on P803506 is still active; the PID ledger shows them out of it
+JD000208,F07,W510961,P810267,2022-07-08,2022-09-16,Seeded,Ended,W510961 holds two active job records (PID P810267)
+JD000209,F06,W513039,P811701,2022-07-09,2022-07-15,Seeded,Ended,W513039's job on P811701 is still active; the PID ledger shows them out of it
+JD000210,F06,W504966,P804970,2022-07-14,2022-07-22,Seeded,Ended,W504966's job on P804970 is still active; the PID ledger shows them out of it
+JD000211,F07,W507615,P807592,2022-07-14,,Seeded,Open at extract,W507615 holds two active job records (PID P807592)
+JD000212,F07,W503917,P803939,2022-07-15,2022-09-19,Seeded,Ended,W503917 holds two active job records (PID P803939)
+JD000213,F06,W506548,P806559,2022-07-15,2022-12-23,Seeded,Ended,W506548's job on P806559 is still active; the PID ledger shows them out of it
+JD000214,F07,W513039,P811701,2022-07-16,2024-01-08,Seeded,Ended,W513039 holds two active job records (PID P811701)
+JD000215,F07,W516054,P813693,2022-07-17,2022-11-17,Seeded,Ended,W516054 holds two active job records (PID P813693)
+JD000216,F07,W505300,P805309,2022-07-19,2022-10-13,Seeded,Ended,W505300 holds two active job records (PID P805309)
+JD000217,F06,W510365,P809866,2022-07-19,2022-07-25,Seeded,Ended,W510365's job on P809866 is still active; the PID ledger shows them out of it
+JD000218,F07,W500238,P800236,2022-07-20,2022-08-04,Seeded,Ended,W500238 holds two active job records (PID P800236)
+JD000219,F07,W504966,P804970,2022-07-23,2022-08-22,Seeded,Ended,W504966 holds two active job records (PID P804970)
+JD000220,F07,W510365,P809866,2022-07-26,2022-11-23,Seeded,Ended,W510365 holds two active job records (PID P809866)
+JD000221,F06,W512722,P804187,2022-07-27,2022-09-29,Seeded,Ended,W512722's job on P804187 is still active; the PID ledger shows them out of it
+JD000222,F06,W509878,P809511,2022-08-18,2022-08-29,Seeded,Ended,W509878's job on P809511 is still active; the PID ledger shows them out of it
+JD000223,F06,W515881,P801305,2022-08-22,2022-08-30,Seeded,Ended,W515881's job on P801305 is still active; the PID ledger shows them out of it
+JD000224,F06,W517030,P814305,2022-08-23,2022-12-05,Seeded,Ended,W517030's job on P814305 is still active; the PID ledger shows them out of it
+JD000225,F06,W508125,P808141,2022-08-24,2022-09-02,Seeded,Ended,W508125's job on P808141 is still active; the PID ledger shows them out of it
+JD000226,F07,W509878,P809511,2022-08-30,2022-10-11,Seeded,Ended,W509878 holds two active job records (PID P809511)
+JD000227,F06,W513618,P804880,2022-08-30,2022-09-07,Seeded,Ended,W513618's job on P804880 is still active; the PID ledger shows them out of it
+JD000228,F07,W515881,P801305,2022-08-31,2023-03-04,Seeded,Ended,W515881 holds two active job records (PID P801305)
+JD000229,F06,W501938,P801942,2022-09-03,,Seeded,Open at extract,W501938's job on P801942 is still active; the PID ledger shows them out of it
+JD000230,F07,W508125,P808141,2022-09-03,2023-01-12,Seeded,Ended,W508125 holds two active job records (PID P808141)
+JD000231,F06,W518341,P815161,2022-09-07,2022-09-24,Seeded,Ended,W518341's job on P815161 is still active; the PID ledger shows them out of it
+JD000232,F07,W513618,P804880,2022-09-08,2023-02-12,Seeded,Ended,W513618 holds two active job records (PID P804880)
+JD000233,F06,W511914,P803383,2022-09-15,2023-01-06,Seeded,Ended,W511914's job on P803383 is still active; the PID ledger shows them out of it
+JD000234,F06,W512610,P811407,2022-09-21,2023-02-09,Seeded,Ended,W512610's job on P811407 is still active; the PID ledger shows them out of it
+JD000235,F06,W507925,P807921,2022-10-01,2022-10-09,Seeded,Ended,W507925's job on P807921 is still active; the PID ledger shows them out of it
+JD000236,F07,W507925,P807921,2022-10-10,2023-04-16,Seeded,Ended,W507925 holds two active job records (PID P807921)
+JD000237,F06,W503944,P803967,2022-10-17,2023-01-01,Seeded,Ended,W503944's job on P803967 is still active; the PID ledger shows them out of it
+JD000238,F07,W519491,P801111,2022-10-18,2024-10-03,PID ledger,Ended,W519491 holds two active job records (PID P801111)
+JD000239,F06,W510357,P809842,2022-10-19,2022-10-19,Seeded,Ended,W510357's job on P809842 is still active; the PID ledger shows them out of it
+JD000240,F07,W510357,P809842,2022-10-20,2022-12-21,Seeded,Ended,W510357 holds two active job records (PID P809842)
+JD000241,F06,W506612,P806621,2022-10-23,2022-10-26,Seeded,Ended,W506612's job on P806621 is still active; the PID ledger shows them out of it
+JD000242,F07,W506612,P806621,2022-10-27,2023-05-21,Seeded,Ended,W506612 holds two active job records (PID P806621)
+JD000243,F06,W509429,P809190,2022-10-28,2022-11-07,Seeded,Ended,W509429's job on P809190 is still active; the PID ledger shows them out of it
+JD000244,F06,W511565,P810704,2022-11-03,2022-11-07,Seeded,Ended,W511565's job on P810704 is still active; the PID ledger shows them out of it
+JD000245,F06,W511801,P810880,2022-11-05,2022-11-10,Seeded,Ended,W511801's job on P810880 is still active; the PID ledger shows them out of it
+JD000246,F07,W509429,P809190,2022-11-08,2023-06-27,Seeded,Ended,W509429 holds two active job records (PID P809190)
+JD000247,F07,W511565,P810704,2022-11-08,2023-01-12,Seeded,Ended,W511565 holds two active job records (PID P810704)
+JD000248,F06,W517147,P814388,2022-11-09,2022-11-10,Seeded,Ended,W517147's job on P814388 is still active; the PID ledger shows them out of it
+JD000249,F07,W511801,P810880,2022-11-11,2023-02-16,Seeded,Ended,W511801 holds two active job records (PID P810880)
+JD000250,F07,W517147,P814388,2022-11-11,2023-04-20,Seeded,Ended,W517147 holds two active job records (PID P814388)
+JD000251,F06,W512250,P811157,2022-11-13,2022-12-09,Seeded,Ended,W512250's job on P811157 is still active; the PID ledger shows them out of it
+JD000252,F06,W503529,P803546,2022-11-16,2022-12-12,Seeded,Ended,W503529's job on P803546 is still active; the PID ledger shows them out of it
+JD000253,F06,W516530,P813993,2022-11-17,2022-11-24,Seeded,Ended,W516530's job on P813993 is still active; the PID ledger shows them out of it
+JD000254,F07,W516530,P813993,2022-11-25,2023-03-30,Seeded,Ended,W516530 holds two active job records (PID P813993)
+JD000255,F06,W513558,P804702,2022-12-02,2022-12-02,Seeded,Ended,W513558's job on P804702 is still active; the PID ledger shows them out of it
+JD000256,F07,W513558,P804702,2022-12-03,2023-02-26,Seeded,Ended,W513558 holds two active job records (PID P804702)
+JD000257,F06,W507217,P807233,2022-12-18,2023-06-06,Seeded,Ended,W507217's job on P807233 is still active; the PID ledger shows them out of it
+JD000258,F06,W515243,P806982,2022-12-21,2023-01-26,Seeded,Ended,W515243's job on P806982 is still active; the PID ledger shows them out of it
+JD000259,F06,W511012,P810212,2022-12-22,2023-01-02,Seeded,Ended,W511012's job on P810212 is still active; the PID ledger shows them out of it
+JD000260,F06,W507524,P807539,2022-12-23,2022-12-24,Seeded,Ended,W507524's job on P807539 is still active; the PID ledger shows them out of it
+JD000261,F06,W515091,P813030,2022-12-23,2023-04-18,Seeded,Ended,W515091's job on P813030 is still active; the PID ledger shows them out of it
+JD000262,F07,W507524,P807539,2022-12-25,2023-05-21,Seeded,Ended,W507524 holds two active job records (PID P807539)
+JD000263,F06,W510294,P802053,2023-01-01,2023-04-11,Seeded,Ended,W510294's job on P802053 is still active; the PID ledger shows them out of it
+JD000264,F07,W511012,P810212,2023-01-03,2023-04-25,Seeded,Ended,W511012 holds two active job records (PID P810212)
+JD000265,F06,W514802,P803900,2023-01-03,2023-01-18,Seeded,Ended,W514802's job on P803900 is still active; the PID ledger shows them out of it
+JD000266,F06,W509036,P808864,2023-01-05,2023-01-13,Seeded,Ended,W509036's job on P808864 is still active; the PID ledger shows them out of it
+JD000267,F07,W509036,P808864,2023-01-14,2023-07-26,Seeded,Ended,W509036 holds two active job records (PID P808864)
+JD000268,F06,W510685,P810074,2023-01-18,2023-02-02,Seeded,Ended,W510685's job on P810074 is still active; the PID ledger shows them out of it
+JD000269,F06,W513163,P811785,2023-01-19,2023-02-02,Seeded,Ended,W513163's job on P811785 is still active; the PID ledger shows them out of it
+JD000270,F07,W514802,P803900,2023-01-19,2023-02-12,Seeded,Ended,W514802 holds two active job records (PID P803900)
+JD000271,F06,W513135,P811767,2023-01-29,2023-02-16,Seeded,Ended,W513135's job on P811767 is still active; the PID ledger shows them out of it
+JD000272,F06,W513283,P811869,2023-01-30,2023-02-08,Seeded,Ended,W513283's job on P811869 is still active; the PID ledger shows them out of it
+JD000273,F07,W510685,P810074,2023-02-03,2023-06-19,Seeded,Ended,W510685 holds two active job records (PID P810074)
+JD000274,F07,W513163,P811785,2023-02-03,2023-07-14,Seeded,Ended,W513163 holds two active job records (PID P811785)
+JD000275,F07,W513283,P811869,2023-02-09,2023-08-31,Seeded,Ended,W513283 holds two active job records (PID P811869)
+JD000276,F06,W513153,P811788,2023-02-10,2023-02-26,Seeded,Ended,W513153's job on P811788 is still active; the PID ledger shows them out of it
+JD000277,F06,W518275,P815111,2023-02-12,,Seeded,Open at extract,W518275's job on P815111 is still active; the PID ledger shows them out of it
+JD000278,F07,W513135,P811767,2023-02-17,2023-04-28,Seeded,Ended,W513135 holds two active job records (PID P811767)
+JD000279,F06,W510624,P800782,2023-02-22,2023-02-24,Seeded,Ended,W510624's job on P800782 is still active; the PID ledger shows them out of it
+JD000280,F07,W510624,P800782,2023-02-25,2023-08-21,Seeded,Ended,W510624 holds two active job records (PID P800782)
+JD000281,F07,W513153,P811788,2023-02-27,2023-03-18,Seeded,Ended,W513153 holds two active job records (PID P811788)
+JD000282,F06,W515894,P813582,2023-02-28,2023-08-06,Seeded,Ended,W515894's job on P813582 is still active; the PID ledger shows them out of it
+JD000283,F06,W515927,P813596,2023-03-04,2023-03-21,Seeded,Ended,W515927's job on P813596 is still active; the PID ledger shows them out of it
+JD000284,F06,W514836,P802236,2023-03-10,2023-03-26,Seeded,Ended,W514836's job on P802236 is still active; the PID ledger shows them out of it
+JD000285,F06,W516987,P814284,2023-03-10,2023-03-14,Seeded,Ended,W516987's job on P814284 is still active; the PID ledger shows them out of it
+JD000286,F06,W517260,P803824,2023-03-13,2023-03-23,Seeded,Ended,W517260's job on P803824 is still active; the PID ledger shows them out of it
+JD000287,F07,W516987,P814284,2023-03-15,2023-07-14,Seeded,Ended,W516987 holds two active job records (PID P814284)
+JD000288,F07,W515927,P813596,2023-03-22,2023-08-02,Seeded,Ended,W515927 holds two active job records (PID P813596)
+JD000289,F07,W517260,P803824,2023-03-24,2023-08-18,Seeded,Ended,W517260 holds two active job records (PID P803824)
+JD000290,F06,W518649,P804219,2023-03-26,2023-03-31,Seeded,Ended,W518649's job on P804219 is still active; the PID ledger shows them out of it
+JD000291,F07,W514836,P802236,2023-03-27,2023-04-06,Seeded,Ended,W514836 holds two active job records (PID P802236)
+JD000292,F06,W509826,P809484,2023-04-01,2023-04-12,Seeded,Ended,W509826's job on P809484 is still active; the PID ledger shows them out of it
+JD000293,F07,W518649,P804219,2023-04-01,2023-10-01,Seeded,Ended,W518649 holds two active job records (PID P804219)
+JD000294,F06,W517490,P810118,2023-04-04,2023-04-20,Seeded,Ended,W517490's job on P810118 is still active; the PID ledger shows them out of it
+JD000295,F06,W514836,P802236,2023-04-07,,Seeded,Open at extract,W514836's job on P802236 is still active; the PID ledger shows them out of it
+JD000296,F06,W516040,P813669,2023-04-08,2023-04-14,Seeded,Ended,W516040's job on P813669 is still active; the PID ledger shows them out of it
+JD000297,F07,W509826,P809484,2023-04-13,2023-07-06,Seeded,Ended,W509826 holds two active job records (PID P809484)
+JD000298,F07,W516040,P813669,2023-04-15,2023-06-16,Seeded,Ended,W516040 holds two active job records (PID P813669)
+JD000299,F06,W516524,P803932,2023-04-18,2023-04-25,Seeded,Ended,W516524's job on P803932 is still active; the PID ledger shows them out of it
+JD000300,F07,W517490,P810118,2023-04-21,2023-11-09,Seeded,Ended,W517490 holds two active job records (PID P810118)
+JD000301,F06,W511176,P801240,2023-04-22,2023-05-03,Seeded,Ended,W511176's job on P801240 is still active; the PID ledger shows them out of it
+JD000302,F06,W515396,P813248,2023-04-24,2023-04-27,Seeded,Ended,W515396's job on P813248 is still active; the PID ledger shows them out of it
+JD000303,F07,W516524,P803932,2023-04-26,2023-05-26,Seeded,Ended,W516524 holds two active job records (PID P803932)
+JD000304,F07,W515396,P813248,2023-04-28,2023-08-15,Seeded,Ended,W515396 holds two active job records (PID P813248)
+JD000305,F06,W513135,P811767,2023-04-29,,Seeded,Open at extract,W513135's job on P811767 is still active; the PID ledger shows them out of it
+JD000306,F06,W510767,P810114,2023-05-01,2023-05-09,Seeded,Ended,W510767's job on P810114 is still active; the PID ledger shows them out of it
+JD000307,F06,W507773,P807794,2023-05-03,2023-05-19,Seeded,Ended,W507773's job on P807794 is still active; the PID ledger shows them out of it
+JD000308,F07,W511176,P801240,2023-05-04,2023-07-21,Seeded,Ended,W511176 holds two active job records (PID P801240)
+JD000309,F06,W512082,P811068,2023-05-06,2023-06-01,Seeded,Ended,W512082's job on P811068 is still active; the PID ledger shows them out of it
+JD000310,F07,W510767,P810114,2023-05-10,2023-07-31,Seeded,Ended,W510767 holds two active job records (PID P810114)
+JD000311,F06,W520334,P811885,2023-05-14,2023-05-19,Seeded,Ended,W520334's job on P811885 is still active; the PID ledger shows them out of it
+JD000312,F06,W518754,P815425,2023-05-19,2023-05-30,Seeded,Ended,W518754's job on P815425 is still active; the PID ledger shows them out of it
+JD000313,F07,W507773,P807794,2023-05-20,2023-09-25,Seeded,Ended,W507773 holds two active job records (PID P807794)
+JD000314,F07,W520334,P811885,2023-05-20,2023-08-29,Seeded,Ended,W520334 holds two active job records (PID P811885)
+JD000315,F06,W519936,P816176,2023-05-23,2023-11-17,Seeded,Ended,W519936's job on P816176 is still active; the PID ledger shows them out of it
+JD000316,F06,W509865,P800756,2023-05-25,,Seeded,Open at extract,W509865's job on P800756 is still active; the PID ledger shows them out of it
+JD000317,F06,W514896,P803155,2023-05-25,2023-05-26,Seeded,Ended,W514896's job on P803155 is still active; the PID ledger shows them out of it
+JD000318,F07,W514896,P803155,2023-05-27,2023-09-06,Seeded,Ended,W514896 holds two active job records (PID P803155)
+JD000319,F06,W517293,P814457,2023-05-30,2023-05-30,Seeded,Ended,W517293's job on P814457 is still active; the PID ledger shows them out of it
+JD000320,F07,W517293,P814457,2023-05-31,2023-06-04,Seeded,Ended,W517293 holds two active job records (PID P814457)
+JD000321,F07,W518754,P815425,2023-05-31,2023-09-18,Seeded,Ended,W518754 holds two active job records (PID P815425)
+JD000322,F06,W517247,P814431,2023-06-01,2023-06-19,Seeded,Ended,W517247's job on P814431 is still active; the PID ledger shows them out of it
+JD000323,F06,W517293,P814457,2023-06-05,2023-08-20,Seeded,Ended,W517293's job on P814457 is still active; the PID ledger shows them out of it
+JD000324,F06,W511300,P810506,2023-06-08,2023-06-10,Seeded,Ended,W511300's job on P810506 is still active; the PID ledger shows them out of it
+JD000325,F07,W511300,P810506,2023-06-11,2023-09-07,Seeded,Ended,W511300 holds two active job records (PID P810506)
+JD000326,F06,W517833,P814759,2023-06-14,2023-06-21,Seeded,Ended,W517833's job on P814759 is still active; the PID ledger shows them out of it
+JD000327,F06,W517544,P814635,2023-06-15,2023-06-16,Seeded,Ended,W517544's job on P814635 is still active; the PID ledger shows them out of it
+JD000328,F07,W517544,P814635,2023-06-17,2023-10-25,Seeded,Ended,W517544 holds two active job records (PID P814635)
+JD000329,F07,W517247,P814431,2023-06-20,2023-08-01,Seeded,Ended,W517247 holds two active job records (PID P814431)
+JD000330,F07,W517833,P814759,2023-06-22,2023-11-06,Seeded,Ended,W517833 holds two active job records (PID P814759)
+JD000331,F06,W512350,P800958,2023-06-29,2023-07-21,Seeded,Ended,W512350's job on P800958 is still active; the PID ledger shows them out of it
+JD000332,F06,W500001,P800001,2023-07-01,2023-07-01,Seeded,Ended,W500001's job on P800001 is still active; the PID ledger shows them out of it
+JD000333,F06,W500019,P800019,2023-07-01,2023-07-14,Seeded,Ended,W500019's job on P800019 is still active; the PID ledger shows them out of it
+JD000334,F06,W501365,P801372,2023-07-01,2023-07-16,Seeded,Ended,W501365's job on P801372 is still active; the PID ledger shows them out of it
+JD000335,F06,W501779,P801787,2023-07-01,2023-07-09,Seeded,Ended,W501779's job on P801787 is still active; the PID ledger shows them out of it
+JD000336,F06,W501916,P801919,2023-07-01,,Seeded,Open at extract,W501916's job on P801919 is still active; the PID ledger shows them out of it
+JD000337,F06,W508609,P808478,2023-07-01,2023-07-14,Seeded,Ended,W508609's job on P808478 is still active; the PID ledger shows them out of it
+JD000338,F06,W508864,P805296,2023-07-01,2023-12-08,Seeded,Ended,W508864's job on P805296 is still active; the PID ledger shows them out of it
+JD000339,F06,W515047,P813014,2023-07-01,2023-07-10,Seeded,Ended,W515047's job on P813014 is still active; the PID ledger shows them out of it
+JD000340,F06,W516394,P813899,2023-07-01,2023-07-02,Seeded,Ended,W516394's job on P813899 is still active; the PID ledger shows them out of it
+JD000341,F06,W516919,P814227,2023-07-01,2023-07-17,Seeded,Ended,W516919's job on P814227 is still active; the PID ledger shows them out of it
+JD000342,F06,W519094,P815631,2023-07-01,2023-07-03,Seeded,Ended,W519094's job on P815631 is still active; the PID ledger shows them out of it
+JD000343,F06,W520580,P810316,2023-07-01,2023-07-09,Seeded,Ended,W520580's job on P810316 is still active; the PID ledger shows them out of it
+JD000344,F07,W500001,P800001,2023-07-02,2024-01-02,Seeded,Ended,W500001 holds two active job records (PID P800001)
+JD000345,F07,W516394,P813899,2023-07-03,2024-02-11,Seeded,Ended,W516394 holds two active job records (PID P813899)
+JD000346,F06,W509789,P800270,2023-07-04,2023-07-08,Seeded,Ended,W509789's job on P800270 is still active; the PID ledger shows them out of it
+JD000347,F07,W519094,P815631,2023-07-04,2023-11-19,Seeded,Ended,W519094 holds two active job records (PID P815631)
+JD000348,F07,W509789,P800270,2023-07-09,2023-11-23,Seeded,Ended,W509789 holds two active job records (PID P800270)
+JD000349,F07,W501779,P801787,2023-07-10,2023-09-02,Seeded,Ended,W501779 holds two active job records (PID P801787)
+JD000350,F06,W514890,P812902,2023-07-10,2023-07-14,Seeded,Ended,W514890's job on P812902 is still active; the PID ledger shows them out of it
+JD000351,F06,W514912,P812911,2023-07-10,2023-07-20,Seeded,Ended,W514912's job on P812911 is still active; the PID ledger shows them out of it
+JD000352,F06,W515401,P813252,2023-07-10,2023-11-24,Seeded,Ended,W515401's job on P813252 is still active; the PID ledger shows them out of it
+JD000353,F07,W520580,P810316,2023-07-10,2025-06-30,Seeded,Ended,W520580 holds two active job records (PID P810316)
+JD000354,F06,W510189,P809747,2023-07-11,2023-07-29,Seeded,Ended,W510189's job on P809747 is still active; the PID ledger shows them out of it
+JD000355,F07,W515047,P813014,2023-07-11,2023-08-02,Seeded,Ended,W515047 holds two active job records (PID P813014)
+JD000356,F06,W509931,P809551,2023-07-12,2023-07-19,Seeded,Ended,W509931's job on P809551 is still active; the PID ledger shows them out of it
+JD000357,F07,W500019,P800019,2023-07-15,2024-01-11,Seeded,Ended,W500019 holds two active job records (PID P800019)
+JD000358,F07,W508609,P808478,2023-07-15,2024-02-01,Seeded,Ended,W508609 holds two active job records (PID P808478)
+JD000359,F07,W514890,P812902,2023-07-15,2023-10-27,Seeded,Ended,W514890 holds two active job records (PID P812902)
+JD000360,F07,W501365,P801372,2023-07-17,2024-01-07,Seeded,Ended,W501365 holds two active job records (PID P801372)
+JD000361,F07,W516919,P814227,2023-07-18,2024-03-09,Seeded,Ended,W516919 holds two active job records (PID P814227)
+JD000362,F07,W509931,P809551,2023-07-20,2024-01-11,Seeded,Ended,W509931 holds two active job records (PID P809551)
+JD000363,F07,W514912,P812911,2023-07-21,2023-08-08,Seeded,Ended,W514912 holds two active job records (PID P812911)
+JD000364,F06,W511176,P801240,2023-07-22,,Seeded,Open at extract,W511176's job on P801240 is still active; the PID ledger shows them out of it
+JD000365,F06,W516303,P813855,2023-07-26,2023-08-06,Seeded,Ended,W516303's job on P813855 is still active; the PID ledger shows them out of it
+JD000366,F06,W520087,P816254,2023-07-27,2023-08-13,Seeded,Ended,W520087's job on P816254 is still active; the PID ledger shows them out of it
+JD000367,F07,W510189,P809747,2023-07-30,2023-08-24,Seeded,Ended,W510189 holds two active job records (PID P809747)
+JD000368,F06,W510767,P810114,2023-08-01,2023-08-08,Seeded,Ended,W510767's job on P810114 is still active; the PID ledger shows them out of it
+JD000369,F07,W516303,P813855,2023-08-07,2023-10-15,Seeded,Ended,W516303 holds two active job records (PID P813855)
+JD000370,F06,W514079,P812264,2023-08-09,2024-01-28,Seeded,Ended,W514079's job on P812264 is still active; the PID ledger shows them out of it
+JD000371,F06,W518450,P815224,2023-08-10,2023-08-11,Seeded,Ended,W518450's job on P815224 is still active; the PID ledger shows them out of it
+JD000372,F07,W518450,P815224,2023-08-12,2023-11-05,Seeded,Ended,W518450 holds two active job records (PID P815224)
+JD000373,F06,W521564,P817284,2023-08-15,2024-02-09,Seeded,Ended,W521564's job on P817284 is still active; the PID ledger shows them out of it
+JD000374,F06,W510624,P800782,2023-08-22,2023-09-09,Seeded,Ended,W510624's job on P800782 is still active; the PID ledger shows them out of it
+JD000375,F06,W513527,P811989,2023-09-03,2023-09-13,Seeded,Ended,W513527's job on P811989 is still active; the PID ledger shows them out of it
+JD000376,F06,W522770,P818052,2023-09-03,2024-01-15,Seeded,Ended,W522770's job on P818052 is still active; the PID ledger shows them out of it
+JD000377,F06,W509741,P802195,2023-09-07,2023-09-13,Seeded,Ended,W509741's job on P802195 is still active; the PID ledger shows them out of it
+JD000378,F06,W518974,P805993,2023-09-07,2023-09-07,Seeded,Ended,W518974's job on P805993 is still active; the PID ledger shows them out of it
+JD000379,F06,W511300,P810506,2023-09-08,,Seeded,Open at extract,W511300's job on P810506 is still active; the PID ledger shows them out of it
+JD000380,F07,W518974,P805993,2023-09-08,2024-02-06,Seeded,Ended,W518974 holds two active job records (PID P805993)
+JD000381,F07,W510624,P800782,2023-09-10,2024-02-21,Seeded,Ended,W510624 holds two active job records (PID P800782)
+JD000382,F07,W509741,P802195,2023-09-14,2023-10-26,Seeded,Ended,W509741 holds two active job records (PID P802195)
+JD000383,F07,W513527,P811989,2023-09-14,2024-01-06,Seeded,Ended,W513527 holds two active job records (PID P811989)
+JD000384,F06,W515725,P813477,2023-09-17,2023-09-30,Seeded,Ended,W515725's job on P813477 is still active; the PID ledger shows them out of it
+JD000385,F06,W513402,P811950,2023-09-20,2023-09-22,Seeded,Ended,W513402's job on P811950 is still active; the PID ledger shows them out of it
+JD000386,F06,W521573,P817279,2023-09-20,2023-10-07,Seeded,Ended,W521573's job on P817279 is still active; the PID ledger shows them out of it
+JD000387,F06,W519211,P815689,2023-09-21,2023-10-07,Seeded,Ended,W519211's job on P815689 is still active; the PID ledger shows them out of it
+JD000388,F07,W513402,P811950,2023-09-23,2023-11-20,Seeded,Ended,W513402 holds two active job records (PID P811950)
+JD000389,F06,W513688,P812150,2023-09-28,2023-10-01,Seeded,Ended,W513688's job on P812150 is still active; the PID ledger shows them out of it
+JD000390,F07,W515725,P813477,2023-10-01,2024-05-14,Seeded,Ended,W515725 holds two active job records (PID P813477)
+JD000391,F07,W513688,P812150,2023-10-02,2024-01-11,Seeded,Ended,W513688 holds two active job records (PID P812150)
+JD000392,F06,W522242,P810471,2023-10-04,2023-10-22,Seeded,Ended,W522242's job on P810471 is still active; the PID ledger shows them out of it
+JD000393,F06,W511225,P810461,2023-10-05,2023-10-20,Seeded,Ended,W511225's job on P810461 is still active; the PID ledger shows them out of it
+JD000394,F06,W519268,P807323,2023-10-05,2023-11-05,Seeded,Ended,W519268's job on P807323 is still active; the PID ledger shows them out of it
+JD000395,F07,W519211,P815689,2023-10-08,2024-05-31,Seeded,Ended,W519211 holds two active job records (PID P815689)
+JD000396,F07,W521573,P817279,2023-10-08,2024-06-19,Seeded,Ended,W521573 holds two active job records (PID P817279)
+JD000397,F06,W508181,P808192,2023-10-09,2023-12-13,Seeded,Ended,W508181's job on P808192 is still active; the PID ledger shows them out of it
+JD000398,F06,W516303,P813855,2023-10-16,2024-01-01,Seeded,Ended,W516303's job on P813855 is still active; the PID ledger shows them out of it
+JD000399,F06,W510495,P802991,2023-10-17,2023-11-26,Seeded,Ended,W510495's job on P802991 is still active; the PID ledger shows them out of it
+JD000400,F06,W522354,P811224,2023-10-17,2024-01-01,Seeded,Ended,W522354's job on P811224 is still active; the PID ledger shows them out of it
+JD000401,F06,W521234,P817033,2023-10-20,2024-02-02,Seeded,Ended,W521234's job on P817033 is still active; the PID ledger shows them out of it
+JD000402,F07,W511225,P810461,2023-10-21,2023-12-13,Seeded,Ended,W511225 holds two active job records (PID P810461)
+JD000403,F07,W522242,P810471,2023-10-23,2024-04-14,Seeded,Ended,W522242 holds two active job records (PID P810471)
+JD000404,F06,W509741,P802195,2023-10-27,2023-12-22,Seeded,Ended,W509741's job on P802195 is still active; the PID ledger shows them out of it
+JD000405,F06,W515280,P805021,2023-11-03,2023-11-09,Seeded,Ended,W515280's job on P805021 is still active; the PID ledger shows them out of it
+JD000406,F07,W515280,P805021,2023-11-10,2024-03-27,Seeded,Ended,W515280 holds two active job records (PID P805021)
+JD000407,F06,W514764,P812824,2023-11-22,2023-11-22,Seeded,Ended,W514764's job on P812824 is still active; the PID ledger shows them out of it
+JD000408,F07,W514764,P812824,2023-11-23,2024-01-21,Seeded,Ended,W514764 holds two active job records (PID P812824)
+JD000409,F06,W522561,P817915,2023-11-25,2023-12-10,Seeded,Ended,W522561's job on P817915 is still active; the PID ledger shows them out of it
+JD000410,F07,W522561,P817915,2023-12-11,2024-01-02,Seeded,Ended,W522561 holds two active job records (PID P817915)
+JD000411,F06,W522619,P817940,2023-12-12,2023-12-28,Seeded,Ended,W522619's job on P817940 is still active; the PID ledger shows them out of it
+JD000412,F06,W521544,P801660,2023-12-13,2023-12-23,Seeded,Ended,W521544's job on P801660 is still active; the PID ledger shows them out of it
+JD000413,F06,W520086,P801940,2023-12-14,2023-12-18,Seeded,Ended,W520086's job on P801940 is still active; the PID ledger shows them out of it
+JD000414,F06,W517544,P814635,2023-12-15,2024-01-02,Seeded,Ended,W517544's job on P814635 is still active; the PID ledger shows them out of it
+JD000415,F07,W520086,P801940,2023-12-19,2024-03-13,Seeded,Ended,W520086 holds two active job records (PID P801940)
+JD000416,F06,W514679,P804878,2023-12-20,2023-12-21,Seeded,Ended,W514679's job on P804878 is still active; the PID ledger shows them out of it
+JD000417,F06,W521948,P817524,2023-12-20,2024-04-13,Seeded,Ended,W521948's job on P817524 is still active; the PID ledger shows them out of it
+JD000418,F06,W521442,P801748,2023-12-21,2023-12-31,Seeded,Ended,W521442's job on P801748 is still active; the PID ledger shows them out of it
+JD000419,F07,W514679,P804878,2023-12-22,2024-03-19,Seeded,Ended,W514679 holds two active job records (PID P804878)
+JD000420,F06,W518199,P815050,2023-12-23,2023-12-26,Seeded,Ended,W518199's job on P815050 is still active; the PID ledger shows them out of it
+JD000421,F06,W518040,P800439,2023-12-24,2023-12-30,Seeded,Ended,W518040's job on P800439 is still active; the PID ledger shows them out of it
+JD000422,F07,W521544,P801660,2023-12-24,2024-01-31,Seeded,Ended,W521544 holds two active job records (PID P801660)
+JD000423,F07,W518199,P815050,2023-12-27,2024-03-29,Seeded,Ended,W518199 holds two active job records (PID P815050)
+JD000424,F06,W520024,P816233,2023-12-27,2024-02-04,Seeded,Ended,W520024's job on P816233 is still active; the PID ledger shows them out of it
+JD000425,F07,W522619,P817940,2023-12-29,2024-08-22,Seeded,Ended,W522619 holds two active job records (PID P817940)
+JD000426,F07,W518040,P800439,2023-12-31,2024-02-03,Seeded,Ended,W518040 holds two active job records (PID P800439)
+JD000427,F06,W514021,P804777,2024-01-01,2024-01-09,Seeded,Ended,W514021's job on P804777 is still active; the PID ledger shows them out of it
+JD000428,F07,W521442,P801748,2024-01-01,2024-02-11,Seeded,Ended,W521442 holds two active job records (PID P801748)
+JD000429,F07,W517544,P814635,2024-01-03,2024-02-19,Seeded,Ended,W517544 holds two active job records (PID P814635)
+JD000430,F06,W506296,P806304,2024-01-06,,Seeded,Open at extract,W506296's job on P806304 is still active; the PID ledger shows them out of it
+JD000431,F06,W511509,P802265,2024-01-06,2024-01-22,Seeded,Ended,W511509's job on P802265 is still active; the PID ledger shows them out of it
+JD000432,F06,W513039,P811701,2024-01-09,,Seeded,Open at extract,W513039's job on P811701 is still active; the PID ledger shows them out of it
+JD000433,F07,W514021,P804777,2024-01-10,2024-06-26,Seeded,Ended,W514021 holds two active job records (PID P804777)
+JD000434,F06,W510303,P809802,2024-01-11,,Seeded,Open at extract,W510303's job on P809802 is still active; the PID ledger shows them out of it
+JD000435,F06,W509931,P809551,2024-01-12,,Seeded,Open at extract,W509931's job on P809551 is still active; the PID ledger shows them out of it
+JD000436,F06,W521202,P801582,2024-01-12,2024-01-17,Seeded,Ended,W521202's job on P801582 is still active; the PID ledger shows them out of it
+JD000437,F06,W514085,P812396,2024-01-13,,Seeded,Open at extract,W514085's job on P812396 is still active; the PID ledger shows them out of it
+JD000438,F06,W509080,P808917,2024-01-16,2024-02-25,Seeded,Ended,W509080's job on P808917 is still active; the PID ledger shows them out of it
+JD000439,F06,W521359,P817118,2024-01-16,2024-02-01,Seeded,Ended,W521359's job on P817118 is still active; the PID ledger shows them out of it
+JD000440,F07,W521202,P801582,2024-01-18,2024-07-06,Seeded,Ended,W521202 holds two active job records (PID P801582)
+JD000441,F07,W511509,P802265,2024-01-23,2024-07-04,Seeded,Ended,W511509 holds two active job records (PID P802265)
+JD000442,F06,W522152,P817657,2024-01-28,2024-02-11,Seeded,Ended,W522152's job on P817657 is still active; the PID ledger shows them out of it
+JD000443,F07,W521359,P817118,2024-02-02,2024-06-25,Seeded,Ended,W521359 holds two active job records (PID P817118)
+JD000444,F06,W519756,P816051,2024-02-03,2024-02-07,Seeded,Ended,W519756's job on P816051 is still active; the PID ledger shows them out of it
+JD000445,F06,W521115,P816950,2024-02-06,2024-02-13,Seeded,Ended,W521115's job on P816950 is still active; the PID ledger shows them out of it
+JD000446,F06,W521593,P805843,2024-02-06,2024-02-17,Seeded,Ended,W521593's job on P805843 is still active; the PID ledger shows them out of it
+JD000447,F06,W502767,P802772,2024-02-08,2024-03-18,Seeded,Ended,W502767's job on P802772 is still active; the PID ledger shows them out of it
+JD000448,F07,W519756,P816051,2024-02-08,2024-09-04,Seeded,Ended,W519756 holds two active job records (PID P816051)
+JD000449,F07,W522152,P817657,2024-02-12,2024-04-05,Seeded,Ended,W522152 holds two active job records (PID P817657)
+JD000450,F07,W521115,P816950,2024-02-14,2024-05-05,Seeded,Ended,W521115 holds two active job records (PID P816950)
+JD000451,F07,W521593,P805843,2024-02-18,,Seeded,Open at extract,W521593 holds two active job records (PID P805843)
+JD000452,F06,W517544,P814635,2024-02-20,2024-08-18,Seeded,Ended,W517544's job on P814635 is still active; the PID ledger shows them out of it
+JD000453,F06,W510624,P800782,2024-02-22,,Seeded,Open at extract,W510624's job on P800782 is still active; the PID ledger shows them out of it
+JD000454,F06,W521374,P817140,2024-03-06,2024-03-11,Seeded,Ended,W521374's job on P817140 is still active; the PID ledger shows them out of it
+JD000455,F06,W510887,P810209,2024-03-10,2024-04-04,Seeded,Ended,W510887's job on P810209 is still active; the PID ledger shows them out of it
+JD000456,F07,W521374,P817140,2024-03-12,2024-10-09,Seeded,Ended,W521374 holds two active job records (PID P817140)
+JD000457,F06,W520086,P801940,2024-03-14,2024-04-29,Seeded,Ended,W520086's job on P801940 is still active; the PID ledger shows them out of it
+JD000458,F06,W521780,P817424,2024-03-20,2024-08-19,Seeded,Ended,W521780's job on P817424 is still active; the PID ledger shows them out of it
+JD000459,F06,W521582,P817264,2024-03-27,2024-04-01,Seeded,Ended,W521582's job on P817264 is still active; the PID ledger shows them out of it
+JD000460,F06,W517585,P814645,2024-03-29,2024-03-31,Seeded,Ended,W517585's job on P814645 is still active; the PID ledger shows them out of it
+JD000461,F06,W506879,P806880,2024-04-01,2024-04-22,Seeded,Ended,W506879's job on P806880 is still active; the PID ledger shows them out of it
+JD000462,F07,W517585,P814645,2024-04-01,2024-09-28,Seeded,Ended,W517585 holds two active job records (PID P814645)
+JD000463,F07,W521582,P817264,2024-04-02,,Seeded,Open at extract,W521582 holds two active job records (PID P817264)
+JD000464,F06,W522515,P817883,2024-04-14,2024-04-15,Seeded,Ended,W522515's job on P817883 is still active; the PID ledger shows them out of it
+JD000465,F06,W526193,P820346,2024-04-15,2024-09-27,Seeded,Ended,W526193's job on P820346 is still active; the PID ledger shows them out of it
+JD000466,F07,W522515,P817883,2024-04-16,2024-07-20,Seeded,Ended,W522515 holds two active job records (PID P817883)
+JD000467,F06,W522205,P817689,2024-04-18,2024-04-29,Seeded,Ended,W522205's job on P817689 is still active; the PID ledger shows them out of it
+JD000468,F06,W511246,P810462,2024-04-20,2024-04-24,Seeded,Ended,W511246's job on P810462 is still active; the PID ledger shows them out of it
+JD000469,F07,W511246,P810462,2024-04-25,2024-07-19,Seeded,Ended,W511246 holds two active job records (PID P810462)
+JD000470,F06,W525227,P819675,2024-04-25,2024-05-03,Seeded,Ended,W525227's job on P819675 is still active; the PID ledger shows them out of it
+JD000471,F07,W522205,P817689,2024-04-30,2024-09-10,Seeded,Ended,W522205 holds two active job records (PID P817689)
+JD000472,F07,W525227,P819675,2024-05-04,2024-10-31,Seeded,Ended,W525227 holds two active job records (PID P819675)
+JD000473,F06,W521115,P816950,2024-05-06,,Seeded,Open at extract,W521115's job on P816950 is still active; the PID ledger shows them out of it
+JD000474,F06,W524237,P818992,2024-05-21,2024-06-08,Seeded,Ended,W524237's job on P818992 is still active; the PID ledger shows them out of it
+JD000475,F06,W519050,P815601,2024-05-22,2024-06-03,Seeded,Ended,W519050's job on P815601 is still active; the PID ledger shows them out of it
+JD000476,F06,W525540,P819911,2024-05-27,2024-06-11,Seeded,Ended,W525540's job on P819911 is still active; the PID ledger shows them out of it
+JD000477,F06,W517161,P814400,2024-05-30,2024-06-11,Seeded,Ended,W517161's job on P814400 is still active; the PID ledger shows them out of it
+JD000478,F06,W525737,P811980,2024-06-01,2024-06-03,Seeded,Ended,W525737's job on P811980 is still active; the PID ledger shows them out of it
+JD000479,F07,W519050,P815601,2024-06-04,2024-07-21,Seeded,Ended,W519050 holds two active job records (PID P815601)
+JD000480,F06,W524640,P819280,2024-06-04,2024-06-15,Seeded,Ended,W524640's job on P819280 is still active; the PID ledger shows them out of it
+JD000481,F07,W525737,P811980,2024-06-04,2024-10-08,Seeded,Ended,W525737 holds two active job records (PID P811980)
+JD000482,F06,W527250,P821047,2024-06-04,2024-06-06,Seeded,Ended,W527250's job on P821047 is still active; the PID ledger shows them out of it
+JD000483,F06,W520344,P816452,2024-06-05,2024-06-06,Seeded,Ended,W520344's job on P816452 is still active; the PID ledger shows them out of it
+JD000484,F06,W516959,P814264,2024-06-06,2024-06-06,Seeded,Ended,W516959's job on P814264 is still active; the PID ledger shows them out of it
+JD000485,F07,W516959,P814264,2024-06-07,2025-06-05,Seeded,Ended,W516959 holds two active job records (PID P814264)
+JD000486,F07,W520344,P816452,2024-06-07,2024-11-01,Seeded,Ended,W520344 holds two active job records (PID P816452)
+JD000487,F07,W527250,P821047,2024-06-07,2024-11-26,Seeded,Ended,W527250 holds two active job records (PID P821047)
+JD000488,F07,W524237,P818992,2024-06-09,2024-08-20,Seeded,Ended,W524237 holds two active job records (PID P818992)
+JD000489,F07,W517161,P814400,2024-06-12,2024-11-01,Seeded,Ended,W517161 holds two active job records (PID P814400)
+JD000490,F07,W525540,P819911,2024-06-12,2024-09-25,Seeded,Ended,W525540 holds two active job records (PID P819911)
+JD000491,F06,W508391,P808359,2024-06-14,2024-06-20,Seeded,Ended,W508391's job on P808359 is still active; the PID ledger shows them out of it
+JD000492,F07,W524640,P819280,2024-06-16,2024-08-16,Seeded,Ended,W524640 holds two active job records (PID P819280)
+JD000493,F06,W521573,P817279,2024-06-20,,Seeded,Open at extract,W521573's job on P817279 is still active; the PID ledger shows them out of it
+JD000494,F07,W508391,P808359,2024-06-21,2024-09-13,Seeded,Ended,W508391 holds two active job records (PID P808359)
+JD000495,F06,W517870,P800523,2024-06-24,2024-06-28,Seeded,Ended,W517870's job on P800523 is still active; the PID ledger shows them out of it
+JD000496,F07,W517870,P800523,2024-06-29,2024-11-05,Seeded,Ended,W517870 holds two active job records (PID P800523)
+JD000497,F06,W500162,P800162,2024-07-01,2024-07-17,Seeded,Ended,W500162's job on P800162 is still active; the PID ledger shows them out of it
+JD000498,F06,W500305,P800305,2024-07-01,2024-07-06,Seeded,Ended,W500305's job on P800305 is still active; the PID ledger shows them out of it
+JD000499,F06,W503224,P803239,2024-07-01,2024-07-15,Seeded,Ended,W503224's job on P803239 is still active; the PID ledger shows them out of it
+JD000500,F06,W504472,P804481,2024-07-01,2024-07-14,Seeded,Ended,W504472's job on P804481 is still active; the PID ledger shows them out of it
+JD000501,F06,W507834,P807848,2024-07-01,2024-07-10,Seeded,Ended,W507834's job on P807848 is still active; the PID ledger shows them out of it
+JD000502,F06,W516290,P804638,2024-07-01,2024-07-03,Seeded,Ended,W516290's job on P804638 is still active; the PID ledger shows them out of it
+JD000503,F06,W517325,P814486,2024-07-01,2024-07-09,Seeded,Ended,W517325's job on P814486 is still active; the PID ledger shows them out of it
+JD000504,F06,W523860,P808594,2024-07-01,2024-07-06,Seeded,Ended,W523860's job on P808594 is still active; the PID ledger shows them out of it
+JD000505,F06,W526858,P820792,2024-07-01,2024-07-11,Seeded,Ended,W526858's job on P820792 is still active; the PID ledger shows them out of it
+JD000506,F07,W516290,P804638,2024-07-04,2025-02-18,Seeded,Ended,W516290 holds two active job records (PID P804638)
+JD000507,F07,W500305,P800305,2024-07-07,2024-08-24,Seeded,Ended,W500305 holds two active job records (PID P800305)
+JD000508,F07,W523860,P808594,2024-07-07,2024-10-23,Seeded,Ended,W523860 holds two active job records (PID P808594)
+JD000509,F07,W517325,P814486,2024-07-10,2024-10-19,Seeded,Ended,W517325 holds two active job records (PID P814486)
+JD000510,F07,W507834,P807848,2024-07-11,2024-12-10,Seeded,Ended,W507834 holds two active job records (PID P807848)
+JD000511,F07,W526858,P820792,2024-07-12,2024-12-24,Seeded,Ended,W526858 holds two active job records (PID P820792)
+JD000512,F06,W512433,P811298,2024-07-13,2024-07-22,Seeded,Ended,W512433's job on P811298 is still active; the PID ledger shows them out of it
+JD000513,F07,W504472,P804481,2024-07-15,2024-08-25,Seeded,Ended,W504472 holds two active job records (PID P804481)
+JD000514,F07,W503224,P803239,2024-07-16,2024-12-26,Seeded,Ended,W503224 holds two active job records (PID P803239)
+JD000515,F07,W500162,P800162,2024-07-18,,Seeded,Open at extract,W500162 holds two active job records (PID P800162)
+JD000516,F07,W512433,P811298,2024-07-23,2024-09-21,Seeded,Ended,W512433 holds two active job records (PID P811298)
+JD000517,F06,W524119,P818931,2024-07-28,2024-07-31,Seeded,Ended,W524119's job on P818931 is still active; the PID ledger shows them out of it
+JD000518,F06,W523774,P818717,2024-07-31,2024-08-06,Seeded,Ended,W523774's job on P818717 is still active; the PID ledger shows them out of it
+JD000519,F07,W524119,P818931,2024-08-01,2026-04-27,Seeded,Ended,W524119 holds two active job records (PID P818931)
+JD000520,F07,W523774,P818717,2024-08-07,2024-10-11,Seeded,Ended,W523774 holds two active job records (PID P818717)
+JD000521,F06,W524237,P818992,2024-08-21,2024-08-23,Seeded,Ended,W524237's job on P818992 is still active; the PID ledger shows them out of it
+JD000522,F06,W518770,P815426,2024-08-31,2024-09-17,Seeded,Ended,W518770's job on P815426 is still active; the PID ledger shows them out of it
+JD000523,F06,W520005,P816217,2024-09-02,2024-11-22,Seeded,Ended,W520005's job on P816217 is still active; the PID ledger shows them out of it
+JD000524,F06,W518725,P803941,2024-09-05,2024-09-23,Seeded,Ended,W518725's job on P803941 is still active; the PID ledger shows them out of it
+JD000525,F06,W525013,P819547,2024-09-12,2024-09-14,Seeded,Ended,W525013's job on P819547 is still active; the PID ledger shows them out of it
+JD000526,F06,W526889,P803818,2024-09-12,2024-09-26,Seeded,Ended,W526889's job on P803818 is still active; the PID ledger shows them out of it
+JD000527,F06,W523641,P810081,2024-09-13,2024-09-22,Seeded,Ended,W523641's job on P810081 is still active; the PID ledger shows them out of it
+JD000528,F06,W508391,P808359,2024-09-14,2024-09-17,Seeded,Ended,W508391's job on P808359 is still active; the PID ledger shows them out of it
+JD000529,F06,W516046,P813678,2024-09-14,2024-09-30,Seeded,Ended,W516046's job on P813678 is still active; the PID ledger shows them out of it
+JD000530,F06,W520381,P816468,2024-09-14,2024-09-24,Seeded,Ended,W520381's job on P816468 is still active; the PID ledger shows them out of it
+JD000531,F07,W525013,P819547,2024-09-15,2025-05-02,Seeded,Ended,W525013 holds two active job records (PID P819547)
+JD000532,F07,W518770,P815426,2024-09-18,2025-01-02,Seeded,Ended,W518770 holds two active job records (PID P815426)
+JD000533,F06,W520947,P803005,2024-09-21,2024-10-01,Seeded,Ended,W520947's job on P803005 is still active; the PID ledger shows them out of it
+JD000534,F06,W521933,P817497,2024-09-22,2024-09-27,Seeded,Ended,W521933's job on P817497 is still active; the PID ledger shows them out of it
+JD000535,F06,W513714,P812158,2024-09-23,2024-10-07,Seeded,Ended,W513714's job on P812158 is still active; the PID ledger shows them out of it
+JD000536,F07,W523641,P810081,2024-09-23,2025-06-12,Seeded,Ended,W523641 holds two active job records (PID P810081)
+JD000537,F07,W518725,P803941,2024-09-24,2025-06-04,Seeded,Ended,W518725 holds two active job records (PID P803941)
+JD000538,F06,W509862,P809503,2024-09-25,2024-09-25,Seeded,Ended,W509862's job on P809503 is still active; the PID ledger shows them out of it
+JD000539,F07,W520381,P816468,2024-09-25,,Seeded,Open at extract,W520381 holds two active job records (PID P816468)
+JD000540,F06,W527603,P821278,2024-09-25,2024-09-26,Seeded,Ended,W527603's job on P821278 is still active; the PID ledger shows them out of it
+JD000541,F07,W509862,P809503,2024-09-26,2024-12-24,Seeded,Ended,W509862 holds two active job records (PID P809503)
+JD000542,F06,W528750,P822068,2024-09-26,2024-10-07,Seeded,Ended,W528750's job on P822068 is still active; the PID ledger shows them out of it
+JD000543,F06,W517775,P814788,2024-09-27,2025-02-07,Seeded,Ended,W517775's job on P814788 is still active; the PID ledger shows them out of it
+JD000544,F06,W518758,P806695,2024-09-27,2024-10-02,Seeded,Ended,W518758's job on P806695 is still active; the PID ledger shows them out of it
+JD000545,F07,W526889,P803818,2024-09-27,2025-05-16,Seeded,Ended,W526889 holds two active job records (PID P803818)
+JD000546,F07,W527603,P821278,2024-09-27,2024-10-25,Seeded,Ended,W527603 holds two active job records (PID P821278)
+JD000547,F07,W521933,P817497,2024-09-28,2024-12-19,Seeded,Ended,W521933 holds two active job records (PID P817497)
+JD000548,F06,W524641,P819281,2024-09-28,2024-09-28,Seeded,Ended,W524641's job on P819281 is still active; the PID ledger shows them out of it
+JD000549,F06,W517585,P814645,2024-09-29,,Seeded,Open at extract,W517585's job on P814645 is still active; the PID ledger shows them out of it
+JD000550,F07,W524641,P819281,2024-09-29,2025-02-26,Seeded,Ended,W524641 holds two active job records (PID P819281)
+JD000551,F07,W516046,P813678,2024-10-01,2025-09-13,Seeded,Ended,W516046 holds two active job records (PID P813678)
+JD000552,F07,W520947,P803005,2024-10-02,2025-01-03,Seeded,Ended,W520947 holds two active job records (PID P803005)
+JD000553,F07,W518758,P806695,2024-10-03,2025-03-05,Seeded,Ended,W518758 holds two active job records (PID P806695)
+JD000554,F06,W516674,P805627,2024-10-06,2024-10-12,Seeded,Ended,W516674's job on P805627 is still active; the PID ledger shows them out of it
+JD000555,F06,W524938,P819402,2024-10-06,2024-10-09,Seeded,Ended,W524938's job on P819402 is still active; the PID ledger shows them out of it
+JD000556,F07,W513714,P812158,2024-10-08,2024-12-26,Seeded,Ended,W513714 holds two active job records (PID P812158)
+JD000557,F07,W528750,P822068,2024-10-08,2025-03-30,Seeded,Ended,W528750 holds two active job records (PID P822068)
+JD000558,F06,W525737,P811980,2024-10-09,2024-11-08,Seeded,Ended,W525737's job on P811980 is still active; the PID ledger shows them out of it
+JD000559,F07,W524938,P819402,2024-10-10,2025-01-21,Seeded,Ended,W524938 holds two active job records (PID P819402)
+JD000560,F07,W516674,P805627,2024-10-13,2025-03-16,Seeded,Ended,W516674 holds two active job records (PID P805627)
+JD000561,F06,W522225,P817701,2024-10-13,2024-10-31,Seeded,Ended,W522225's job on P817701 is still active; the PID ledger shows them out of it
+JD000562,F06,W509032,P804218,2024-10-15,,Seeded,Open at extract,W509032's job on P804218 is still active; the PID ledger shows them out of it
+JD000563,F06,W512714,P811477,2024-10-21,2024-10-22,Seeded,Ended,W512714's job on P811477 is still active; the PID ledger shows them out of it
+JD000564,F07,W512714,P811477,2024-10-23,2024-12-07,Seeded,Ended,W512714 holds two active job records (PID P811477)
+JD000565,F06,W519446,P815848,2024-10-28,2024-11-09,Seeded,Ended,W519446's job on P815848 is still active; the PID ledger shows them out of it
+JD000566,F07,W522225,P817701,2024-11-01,2025-04-23,Seeded,Ended,W522225 holds two active job records (PID P817701)
+JD000567,F06,W526718,P820677,2024-11-05,2024-11-17,Seeded,Ended,W526718's job on P820677 is still active; the PID ledger shows them out of it
+JD000568,F07,W519446,P815848,2024-11-10,2025-04-16,Seeded,Ended,W519446 holds two active job records (PID P815848)
+JD000569,F06,W521100,P816939,2024-11-15,2024-11-20,Seeded,Ended,W521100's job on P816939 is still active; the PID ledger shows them out of it
+JD000570,F06,W523039,P818226,2024-11-15,2024-12-01,Seeded,Ended,W523039's job on P818226 is still active; the PID ledger shows them out of it
+JD000571,F06,W524378,P819104,2024-11-15,2024-11-17,Seeded,Ended,W524378's job on P819104 is still active; the PID ledger shows them out of it
+JD000572,F07,W524378,P819104,2024-11-18,2024-12-11,Seeded,Ended,W524378 holds two active job records (PID P819104)
+JD000573,F07,W526718,P820677,2024-11-18,2025-08-04,Seeded,Ended,W526718 holds two active job records (PID P820677)
+JD000574,F07,W521100,P816939,2024-11-21,2025-04-29,Seeded,Ended,W521100 holds two active job records (PID P816939)
+JD000575,F06,W527112,P820954,2024-11-26,2024-12-13,Seeded,Ended,W527112's job on P820954 is still active; the PID ledger shows them out of it
+JD000576,F07,W523039,P818226,2024-12-02,2025-03-18,Seeded,Ended,W523039 holds two active job records (PID P818226)
+JD000577,F06,W525721,P805595,2024-12-12,2025-05-10,Seeded,Ended,W525721's job on P805595 is still active; the PID ledger shows them out of it
+JD000578,F06,W521992,P817523,2024-12-13,2024-12-28,Seeded,Ended,W521992's job on P817523 is still active; the PID ledger shows them out of it
+JD000579,F07,W527112,P820954,2024-12-14,2025-03-22,Seeded,Ended,W527112 holds two active job records (PID P820954)
+JD000580,F06,W522941,P818159,2024-12-16,2024-12-26,Seeded,Ended,W522941's job on P818159 is still active; the PID ledger shows them out of it
+JD000581,F06,W529126,P822291,2024-12-21,2024-12-25,Seeded,Ended,W529126's job on P822291 is still active; the PID ledger shows them out of it
+JD000582,F06,W509862,P809503,2024-12-25,2025-01-30,Seeded,Ended,W509862's job on P809503 is still active; the PID ledger shows them out of it
+JD000583,F06,W523809,P805206,2024-12-26,2024-12-31,Seeded,Ended,W523809's job on P805206 is still active; the PID ledger shows them out of it
+JD000584,F07,W529126,P822291,2024-12-26,2025-06-03,Seeded,Ended,W529126 holds two active job records (PID P822291)
+JD000585,F07,W522941,P818159,2024-12-27,,Seeded,Open at extract,W522941 holds two active job records (PID P818159)
+JD000586,F07,W521992,P817523,2024-12-29,2025-04-03,Seeded,Ended,W521992 holds two active job records (PID P817523)
+JD000587,F07,W523809,P805206,2025-01-01,2025-08-27,Seeded,Ended,W523809 holds two active job records (PID P805206)
+JD000588,F06,W526204,P812417,2025-01-02,2025-05-01,Seeded,Ended,W526204's job on P812417 is still active; the PID ledger shows them out of it
+JD000589,F06,W530804,P823478,2025-01-14,2025-01-28,Seeded,Ended,W530804's job on P823478 is still active; the PID ledger shows them out of it
+JD000590,F06,W526695,P820673,2025-01-26,2025-02-03,Seeded,Ended,W526695's job on P820673 is still active; the PID ledger shows them out of it
+JD000591,F06,W529305,P822422,2025-01-29,2025-03-20,Seeded,Ended,W529305's job on P822422 is still active; the PID ledger shows them out of it
+JD000592,F06,W529480,P822543,2025-01-29,2025-02-06,Seeded,Ended,W529480's job on P822543 is still active; the PID ledger shows them out of it
+JD000593,F07,W530804,P823478,2025-01-29,,Seeded,Open at extract,W530804 holds two active job records (PID P823478)
+JD000594,F07,W526695,P820673,2025-02-04,2025-07-25,Seeded,Ended,W526695 holds two active job records (PID P820673)
+JD000595,F07,W529480,P822543,2025-02-07,2025-05-05,Seeded,Ended,W529480 holds two active job records (PID P822543)
+JD000596,F06,W527129,P820974,2025-02-08,2025-04-01,Seeded,Ended,W527129's job on P820974 is still active; the PID ledger shows them out of it
+JD000597,F06,W529460,P815674,2025-02-08,2025-02-12,Seeded,Ended,W529460's job on P815674 is still active; the PID ledger shows them out of it
+JD000598,F07,W529460,P815674,2025-02-13,2025-07-01,Seeded,Ended,W529460 holds two active job records (PID P815674)
+JD000599,F06,W526686,P820667,2025-02-26,2025-03-12,Seeded,Ended,W526686's job on P820667 is still active; the PID ledger shows them out of it
+JD000600,F07,W532748,P824526,2025-02-27,2026-02-26,PID ledger,Ended,W532748 holds two active job records (PID P824526)
+JD000601,F06,W521888,P817494,2025-02-28,2025-02-28,Seeded,Ended,W521888's job on P817494 is still active; the PID ledger shows them out of it
+JD000602,F07,W521888,P817494,2025-03-01,2025-08-26,Seeded,Ended,W521888 holds two active job records (PID P817494)
+JD000603,F06,W528019,P821575,2025-03-12,2025-05-10,Seeded,Ended,W528019's job on P821575 is still active; the PID ledger shows them out of it
+JD000604,F07,W526686,P820667,2025-03-13,2025-05-23,Seeded,Ended,W526686 holds two active job records (PID P820667)
+JD000605,F06,W530188,P823024,2025-03-13,2025-04-01,Seeded,Ended,W530188's job on P823024 is still active; the PID ledger shows them out of it
+JD000606,F06,W511391,P810572,2025-03-15,2025-06-20,Seeded,Ended,W511391's job on P810572 is still active; the PID ledger shows them out of it
+JD000607,F06,W513685,P807557,2025-04-06,2025-04-09,Seeded,Ended,W513685's job on P807557 is still active; the PID ledger shows them out of it
+JD000608,F06,W522047,P807953,2025-04-07,2025-04-09,Seeded,Ended,W522047's job on P807953 is still active; the PID ledger shows them out of it
+JD000609,F07,W513685,P807557,2025-04-10,2025-10-05,Seeded,Ended,W513685 holds two active job records (PID P807557)
+JD000610,F07,W522047,P807953,2025-04-10,2025-07-09,Seeded,Ended,W522047 holds two active job records (PID P807953)
+JD000611,F06,W522410,P810877,2025-04-12,2025-04-19,Seeded,Ended,W522410's job on P810877 is still active; the PID ledger shows them out of it
+JD000612,F06,W519446,P815848,2025-04-17,2025-06-19,Seeded,Ended,W519446's job on P815848 is still active; the PID ledger shows them out of it
+JD000613,F06,W529397,P812307,2025-04-19,2025-07-24,Seeded,Ended,W529397's job on P812307 is still active; the PID ledger shows them out of it
+JD000614,F07,W522410,P810877,2025-04-20,2025-09-05,Seeded,Ended,W522410 holds two active job records (PID P810877)
+JD000615,F06,W522422,P817823,2025-04-24,2025-04-30,Seeded,Ended,W522422's job on P817823 is still active; the PID ledger shows them out of it
+JD000616,F07,W522422,P817823,2025-05-01,2025-08-24,Seeded,Ended,W522422 holds two active job records (PID P817823)
+JD000617,F06,W527849,P821459,2025-05-03,2025-05-18,Seeded,Ended,W527849's job on P821459 is still active; the PID ledger shows them out of it
+JD000618,F06,W521693,P810439,2025-05-09,2025-05-16,Seeded,Ended,W521693's job on P810439 is still active; the PID ledger shows them out of it
+JD000619,F06,W523007,P804065,2025-05-11,2025-05-25,Seeded,Ended,W523007's job on P804065 is still active; the PID ledger shows them out of it
+JD000620,F07,W521693,P810439,2025-05-17,2025-06-07,Seeded,Ended,W521693 holds two active job records (PID P810439)
+JD000621,F07,W527849,P821459,2025-05-19,2025-07-03,Seeded,Ended,W527849 holds two active job records (PID P821459)
+JD000622,F06,W526686,P820667,2025-05-24,2025-06-28,Seeded,Ended,W526686's job on P820667 is still active; the PID ledger shows them out of it
+JD000623,F07,W523007,P804065,2025-05-26,2025-11-10,Seeded,Ended,W523007 holds two active job records (PID P804065)
+JD000624,F06,W524640,P819280,2025-06-04,2025-06-11,Seeded,Ended,W524640's job on P819280 is still active; the PID ledger shows them out of it
+JD000625,F06,W530811,P804337,2025-06-04,2025-07-26,Seeded,Ended,W530811's job on P804337 is still active; the PID ledger shows them out of it
+JD000626,F06,W518725,P803941,2025-06-05,,Seeded,Open at extract,W518725's job on P803941 is still active; the PID ledger shows them out of it
+JD000627,F06,W522891,P818113,2025-06-05,2025-06-12,Seeded,Ended,W522891's job on P818113 is still active; the PID ledger shows them out of it
+JD000628,F06,W516959,P814264,2025-06-06,,Seeded,Open at extract,W516959's job on P814264 is still active; the PID ledger shows them out of it
+JD000629,F06,W521693,P810439,2025-06-08,2025-10-20,Seeded,Ended,W521693's job on P810439 is still active; the PID ledger shows them out of it
+JD000630,F06,W529863,P822790,2025-06-09,2025-06-10,Seeded,Ended,W529863's job on P822790 is still active; the PID ledger shows them out of it
+JD000631,F06,W527887,P821482,2025-06-10,2025-06-26,Seeded,Ended,W527887's job on P821482 is still active; the PID ledger shows them out of it
+JD000632,F07,W529863,P822790,2025-06-11,2025-09-08,Seeded,Ended,W529863 holds two active job records (PID P822790)
+JD000633,F07,W524640,P819280,2025-06-12,2025-08-29,Seeded,Ended,W524640 holds two active job records (PID P819280)
+JD000634,F07,W522891,P818113,2025-06-13,2026-01-17,Seeded,Ended,W522891 holds two active job records (PID P818113)
+JD000635,F06,W523641,P810081,2025-06-13,2025-06-25,Seeded,Ended,W523641's job on P810081 is still active; the PID ledger shows them out of it
+JD000636,F06,W522105,P801419,2025-06-16,2025-09-18,Seeded,Ended,W522105's job on P801419 is still active; the PID ledger shows them out of it
+JD000637,F06,W528957,P822198,2025-06-17,2025-06-20,Seeded,Ended,W528957's job on P822198 is still active; the PID ledger shows them out of it
+JD000638,F06,W528076,P821602,2025-06-18,2025-06-29,Seeded,Ended,W528076's job on P821602 is still active; the PID ledger shows them out of it
+JD000639,F07,W528957,P822198,2025-06-21,2025-07-23,Seeded,Ended,W528957 holds two active job records (PID P822198)
+JD000640,F06,W524652,P813530,2025-06-25,2025-07-06,Seeded,Ended,W524652's job on P813530 is still active; the PID ledger shows them out of it
+JD000641,F06,W526111,P812270,2025-06-25,2025-07-08,Seeded,Ended,W526111's job on P812270 is still active; the PID ledger shows them out of it
+JD000642,F07,W523641,P810081,2025-06-26,,Seeded,Open at extract,W523641 holds two active job records (PID P810081)
+JD000643,F07,W527887,P821482,2025-06-27,2026-02-10,Seeded,Ended,W527887 holds two active job records (PID P821482)
+JD000644,F07,W528076,P821602,2025-06-30,2025-09-28,Seeded,Ended,W528076 holds two active job records (PID P821602)
+JD000645,F06,W503224,P803239,2025-07-01,2025-07-01,Seeded,Ended,W503224's job on P803239 is still active; the PID ledger shows them out of it
+JD000646,F06,W509263,P809066,2025-07-01,2025-07-01,Seeded,Ended,W509263's job on P809066 is still active; the PID ledger shows them out of it
+JD000647,F06,W511444,P810607,2025-07-01,2025-07-12,Seeded,Ended,W511444's job on P810607 is still active; the PID ledger shows them out of it
+JD000648,F06,W512579,P811396,2025-07-01,2025-07-12,Seeded,Ended,W512579's job on P811396 is still active; the PID ledger shows them out of it
+JD000649,F06,W513488,P812004,2025-07-01,2025-07-10,Seeded,Ended,W513488's job on P812004 is still active; the PID ledger shows them out of it
+JD000650,F06,W517370,P814526,2025-07-01,2025-07-17,Seeded,Ended,W517370's job on P814526 is still active; the PID ledger shows them out of it
+JD000651,F06,W520580,P810316,2025-07-01,,Seeded,Open at extract,W520580's job on P810316 is still active; the PID ledger shows them out of it
+JD000652,F06,W524116,P818850,2025-07-01,2025-07-06,Seeded,Ended,W524116's job on P818850 is still active; the PID ledger shows them out of it
+JD000653,F06,W525011,P819537,2025-07-01,2025-10-14,Seeded,Ended,W525011's job on P819537 is still active; the PID ledger shows them out of it
+JD000654,F06,W526811,P820753,2025-07-01,2025-07-10,Seeded,Ended,W526811's job on P820753 is still active; the PID ledger shows them out of it
+JD000655,F06,W526825,P802152,2025-07-01,2025-07-08,Seeded,Ended,W526825's job on P802152 is still active; the PID ledger shows them out of it
+JD000656,F06,W528751,P822053,2025-07-01,2025-07-04,Seeded,Ended,W528751's job on P822053 is still active; the PID ledger shows them out of it
+JD000657,F06,W529705,P818911,2025-07-01,2025-10-01,Seeded,Ended,W529705's job on P818911 is still active; the PID ledger shows them out of it
+JD000658,F06,W530192,P823014,2025-07-01,2025-07-05,Seeded,Ended,W530192's job on P823014 is still active; the PID ledger shows them out of it
+JD000659,F06,W530334,P819847,2025-07-01,2025-07-11,Seeded,Ended,W530334's job on P819847 is still active; the PID ledger shows them out of it
+JD000660,F06,W531961,P824295,2025-07-01,2025-07-09,Seeded,Ended,W531961's job on P824295 is still active; the PID ledger shows them out of it
+JD000661,F06,W532451,P824643,2025-07-01,2025-07-07,Seeded,Ended,W532451's job on P824643 is still active; the PID ledger shows them out of it
+JD000662,F06,W533102,P825064,2025-07-01,2025-07-15,Seeded,Ended,W533102's job on P825064 is still active; the PID ledger shows them out of it
+JD000663,F07,W503224,P803239,2025-07-02,2026-02-01,Seeded,Ended,W503224 holds two active job records (PID P803239)
+JD000664,F07,W509263,P809066,2025-07-02,,Seeded,Open at extract,W509263 holds two active job records (PID P809066)
+JD000665,F07,W528751,P822053,2025-07-05,2025-08-17,Seeded,Ended,W528751 holds two active job records (PID P822053)
+JD000666,F07,W530192,P823014,2025-07-06,2026-02-27,Seeded,Ended,W530192 holds two active job records (PID P823014)
+JD000667,F07,W524116,P818850,2025-07-07,2025-10-18,Seeded,Ended,W524116 holds two active job records (PID P818850)
+JD000668,F07,W524652,P813530,2025-07-07,2026-01-09,Seeded,Ended,W524652 holds two active job records (PID P813530)
+JD000669,F07,W532451,P824643,2025-07-08,2026-01-08,Seeded,Ended,W532451 holds two active job records (PID P824643)
+JD000670,F07,W526111,P812270,2025-07-09,2025-12-11,Seeded,Ended,W526111 holds two active job records (PID P812270)
+JD000671,F07,W526825,P802152,2025-07-09,2026-02-17,Seeded,Ended,W526825 holds two active job records (PID P802152)
+JD000672,F07,W531961,P824295,2025-07-10,2025-12-08,Seeded,Ended,W531961 holds two active job records (PID P824295)
+JD000673,F07,W513488,P812004,2025-07-11,2026-02-11,Seeded,Ended,W513488 holds two active job records (PID P812004)
+JD000674,F07,W526811,P820753,2025-07-11,2025-08-19,Seeded,Ended,W526811 holds two active job records (PID P820753)
+JD000675,F07,W530334,P819847,2025-07-12,2025-09-20,Seeded,Ended,W530334 holds two active job records (PID P819847)
+JD000676,F07,W511444,P810607,2025-07-13,2026-01-16,Seeded,Ended,W511444 holds two active job records (PID P810607)
+JD000677,F07,W512579,P811396,2025-07-13,2025-12-17,Seeded,Ended,W512579 holds two active job records (PID P811396)
+JD000678,F06,W529309,P819304,2025-07-16,2025-07-16,Seeded,Ended,W529309's job on P819304 is still active; the PID ledger shows them out of it
+JD000679,F07,W533102,P825064,2025-07-16,2026-02-19,Seeded,Ended,W533102 holds two active job records (PID P825064)
+JD000680,F06,W528958,P822214,2025-07-17,2025-08-03,Seeded,Ended,W528958's job on P822214 is still active; the PID ledger shows them out of it
+JD000681,F07,W529309,P819304,2025-07-17,2025-12-08,Seeded,Ended,W529309 holds two active job records (PID P819304)
+JD000682,F07,W517370,P814526,2025-07-18,2025-10-30,Seeded,Ended,W517370 holds two active job records (PID P814526)
+JD000683,F06,W529088,P822275,2025-07-25,2025-08-04,Seeded,Ended,W529088's job on P822275 is still active; the PID ledger shows them out of it
+JD000684,F06,W526695,P820673,2025-07-26,2025-09-29,Seeded,Ended,W526695's job on P820673 is still active; the PID ledger shows them out of it
+JD000685,F06,W529218,P802903,2025-07-26,2025-08-06,Seeded,Ended,W529218's job on P802903 is still active; the PID ledger shows them out of it
+JD000686,F06,W532502,P818030,2025-07-30,2025-07-30,Seeded,Ended,W532502's job on P818030 is still active; the PID ledger shows them out of it
+JD000687,F07,W532502,P818030,2025-07-31,2026-03-16,Seeded,Ended,W532502 holds two active job records (PID P818030)
+JD000688,F07,W528958,P822214,2025-08-04,2026-03-01,Seeded,Ended,W528958 holds two active job records (PID P822214)
+JD000689,F06,W526718,P820677,2025-08-05,,Seeded,Open at extract,W526718's job on P820677 is still active; the PID ledger shows them out of it
+JD000690,F07,W529088,P822275,2025-08-05,2026-02-15,Seeded,Ended,W529088 holds two active job records (PID P822275)
+JD000691,F06,W525618,P802585,2025-08-06,2025-08-24,Seeded,Ended,W525618's job on P802585 is still active; the PID ledger shows them out of it
+JD000692,F06,W530663,P823366,2025-08-06,2025-08-24,Seeded,Ended,W530663's job on P823366 is still active; the PID ledger shows them out of it
+JD000693,F07,W529218,P802903,2025-08-07,2026-01-23,Seeded,Ended,W529218 holds two active job records (PID P802903)
+JD000694,F06,W529609,P822626,2025-08-09,2025-08-19,Seeded,Ended,W529609's job on P822626 is still active; the PID ledger shows them out of it
+JD000695,F06,W532144,P819584,2025-08-10,2025-08-10,Seeded,Ended,W532144's job on P819584 is still active; the PID ledger shows them out of it
+JD000696,F06,W533982,P825738,2025-08-10,2026-01-27,Seeded,Ended,W533982's job on P825738 is still active; the PID ledger shows them out of it
+JD000697,F07,W532144,P819584,2025-08-11,2026-04-03,Seeded,Ended,W532144 holds two active job records (PID P819584)
+JD000698,F06,W524540,P819219,2025-08-14,2025-08-26,Seeded,Ended,W524540's job on P819219 is still active; the PID ledger shows them out of it
+JD000699,F06,W525478,P819850,2025-08-20,2025-09-04,Seeded,Ended,W525478's job on P819850 is still active; the PID ledger shows them out of it
+JD000700,F07,W529609,P822626,2025-08-20,2026-04-14,Seeded,Ended,W529609 holds two active job records (PID P822626)
+JD000701,F06,W521522,P817236,2025-08-24,2025-09-03,Seeded,Ended,W521522's job on P817236 is still active; the PID ledger shows them out of it
+JD000702,F07,W525618,P802585,2025-08-25,2025-09-15,Seeded,Ended,W525618 holds two active job records (PID P802585)
+JD000703,F07,W530663,P823366,2025-08-25,2026-02-05,Seeded,Ended,W530663 holds two active job records (PID P823366)
+JD000704,F07,W524540,P819219,2025-08-27,2025-10-23,Seeded,Ended,W524540 holds two active job records (PID P819219)
+JD000705,F06,W529916,P822729,2025-08-29,2026-01-20,Seeded,Ended,W529916's job on P822729 is still active; the PID ledger shows them out of it
+JD000706,F07,W521522,P817236,2025-09-04,2025-11-02,Seeded,Ended,W521522 holds two active job records (PID P817236)
+JD000707,F07,W525478,P819850,2025-09-05,2025-09-28,Seeded,Ended,W525478 holds two active job records (PID P819850)
+JD000708,F06,W529863,P822790,2025-09-09,2026-01-12,Seeded,Ended,W529863's job on P822790 is still active; the PID ledger shows them out of it
+JD000709,F06,W530148,P822980,2025-09-09,2025-09-10,Seeded,Ended,W530148's job on P822980 is still active; the PID ledger shows them out of it
+JD000710,F06,W530156,P817660,2025-09-09,2025-09-18,Seeded,Ended,W530156's job on P817660 is still active; the PID ledger shows them out of it
+JD000711,F07,W530148,P822980,2025-09-11,2026-02-09,Seeded,Ended,W530148 holds two active job records (PID P822980)
+JD000712,F06,W516046,P813678,2025-09-14,,Seeded,Open at extract,W516046's job on P813678 is still active; the PID ledger shows them out of it
+JD000713,F06,W529740,P822700,2025-09-16,,Seeded,Open at extract,W529740's job on P822700 is still active; the PID ledger shows them out of it
+JD000714,F06,W526986,P820869,2025-09-18,2025-09-29,Seeded,Ended,W526986's job on P820869 is still active; the PID ledger shows them out of it
+JD000715,F07,W530156,P817660,2025-09-19,2026-03-08,Seeded,Ended,W530156 holds two active job records (PID P817660)
+JD000716,F06,W521687,P817349,2025-09-20,2025-10-07,Seeded,Ended,W521687's job on P817349 is still active; the PID ledger shows them out of it
+JD000717,F06,W522042,P801172,2025-09-20,2025-09-26,Seeded,Ended,W522042's job on P801172 is still active; the PID ledger shows them out of it
+JD000718,F06,W520947,P803005,2025-09-21,2025-10-08,Seeded,Ended,W520947's job on P803005 is still active; the PID ledger shows them out of it
+JD000719,F06,W523436,P807356,2025-09-26,2025-10-05,Seeded,Ended,W523436's job on P807356 is still active; the PID ledger shows them out of it
+JD000720,F06,W520422,P803551,2025-09-27,2025-10-06,Seeded,Ended,W520422's job on P803551 is still active; the PID ledger shows them out of it
+JD000721,F07,W522042,P801172,2025-09-27,2025-11-14,Seeded,Ended,W522042 holds two active job records (PID P801172)
+JD000722,F07,W526986,P820869,2025-09-30,2026-01-16,Seeded,Ended,W526986 holds two active job records (PID P820869)
+JD000723,F06,W519215,P800662,2025-10-03,2025-10-04,Seeded,Ended,W519215's job on P800662 is still active; the PID ledger shows them out of it
+JD000724,F07,W519215,P800662,2025-10-05,2026-04-02,Seeded,Ended,W519215 holds two active job records (PID P800662)
+JD000725,F06,W513685,P807557,2025-10-06,2025-11-03,Seeded,Ended,W513685's job on P807557 is still active; the PID ledger shows them out of it
+JD000726,F07,W523436,P807356,2025-10-06,2025-10-25,Seeded,Ended,W523436 holds two active job records (PID P807356)
+JD000727,F07,W520422,P803551,2025-10-07,2025-12-26,Seeded,Ended,W520422 holds two active job records (PID P803551)
+JD000728,F07,W521687,P817349,2025-10-08,2025-12-19,Seeded,Ended,W521687 holds two active job records (PID P817349)
+JD000729,F07,W520947,P803005,2025-10-09,2025-11-06,Seeded,Ended,W520947 holds two active job records (PID P803005)
+JD000730,F06,W529093,P813376,2025-10-11,2025-10-16,Seeded,Ended,W529093's job on P813376 is still active; the PID ledger shows them out of it
+JD000731,F07,W529093,P813376,2025-10-17,2025-11-08,Seeded,Ended,W529093 holds two active job records (PID P813376)
+JD000732,F06,W518141,P815015,2025-10-22,2025-11-03,Seeded,Ended,W518141's job on P815015 is still active; the PID ledger shows them out of it
+JD000733,F06,W532928,P814329,2025-10-23,2026-02-09,Seeded,Ended,W532928's job on P814329 is still active; the PID ledger shows them out of it
+JD000734,F06,W527794,P821425,2025-10-29,2025-10-29,Seeded,Ended,W527794's job on P821425 is still active; the PID ledger shows them out of it
+JD000735,F07,W527794,P821425,2025-10-30,2026-02-07,Seeded,Ended,W527794 holds two active job records (PID P821425)
+JD000736,F07,W518141,P815015,2025-11-04,2026-04-10,Seeded,Ended,W518141 holds two active job records (PID P815015)
+JD000737,F06,W520947,P803005,2025-11-07,2026-05-02,Seeded,Ended,W520947's job on P803005 is still active; the PID ledger shows them out of it
+JD000738,F06,W533405,P806703,2025-11-07,2025-12-20,Seeded,Ended,W533405's job on P806703 is still active; the PID ledger shows them out of it
+JD000739,F06,W529093,P813376,2025-11-09,2026-02-22,Seeded,Ended,W529093's job on P813376 is still active; the PID ledger shows them out of it
+JD000740,F06,W523007,P804065,2025-11-11,,Seeded,Open at extract,W523007's job on P804065 is still active; the PID ledger shows them out of it
+JD000741,F06,W531173,P813359,2025-11-13,2025-11-16,Seeded,Ended,W531173's job on P813359 is still active; the PID ledger shows them out of it
+JD000742,F07,W531173,P813359,2025-11-17,,Seeded,Open at extract,W531173 holds two active job records (PID P813359)
+JD000743,F06,W527013,P800331,2025-11-20,,Seeded,Open at extract,W527013's job on P800331 is still active; the PID ledger shows them out of it
+JD000744,F06,W522779,P818039,2025-11-22,2026-02-23,Seeded,Ended,W522779's job on P818039 is still active; the PID ledger shows them out of it
+JD000745,F06,W526604,P820618,2025-11-26,2026-02-15,Seeded,Ended,W526604's job on P820618 is still active; the PID ledger shows them out of it
+JD000746,F06,W522900,P818116,2025-11-30,2025-12-12,Seeded,Ended,W522900's job on P818116 is still active; the PID ledger shows them out of it
+JD000747,F06,W521420,P804343,2025-12-03,2025-12-09,Seeded,Ended,W521420's job on P804343 is still active; the PID ledger shows them out of it
+JD000748,F06,W536192,P827135,2025-12-03,2025-12-17,Seeded,Ended,W536192's job on P827135 is still active; the PID ledger shows them out of it
+JD000749,F06,W525687,P801943,2025-12-04,2025-12-17,Seeded,Ended,W525687's job on P801943 is still active; the PID ledger shows them out of it
+JD000750,F06,W522001,P804993,2025-12-06,2026-05-03,Seeded,Ended,W522001's job on P804993 is still active; the PID ledger shows them out of it
+JD000751,F06,W526762,P809491,2025-12-07,2025-12-15,Seeded,Ended,W526762's job on P809491 is still active; the PID ledger shows them out of it
+JD000752,F07,W521420,P804343,2025-12-10,,Seeded,Open at extract,W521420 holds two active job records (PID P804343)
+JD000753,F06,W534900,P826406,2025-12-10,2026-04-19,Seeded,Ended,W534900's job on P826406 is still active; the PID ledger shows them out of it
+JD000754,F07,W522900,P818116,2025-12-13,2026-03-30,Seeded,Ended,W522900 holds two active job records (PID P818116)
+JD000755,F07,W526762,P809491,2025-12-16,2026-05-14,Seeded,Ended,W526762 holds two active job records (PID P809491)
+JD000756,F07,W525687,P801943,2025-12-18,2026-03-03,Seeded,Ended,W525687 holds two active job records (PID P801943)
+JD000757,F07,W536192,P827135,2025-12-18,2026-05-27,Seeded,Ended,W536192 holds two active job records (PID P827135)
+JD000758,F06,W521687,P817349,2025-12-20,2026-03-24,Seeded,Ended,W521687's job on P817349 is still active; the PID ledger shows them out of it
+JD000759,F06,W521039,P811241,2025-12-26,2026-01-09,Seeded,Ended,W521039's job on P811241 is still active; the PID ledger shows them out of it
+JD000760,F06,W528328,P816077,2025-12-26,2025-12-31,Seeded,Ended,W528328's job on P816077 is still active; the PID ledger shows them out of it
+JD000761,F06,W520422,P803551,2025-12-27,2026-03-13,Seeded,Ended,W520422's job on P803551 is still active; the PID ledger shows them out of it
+JD000762,F06,W516073,P813702,2026-01-01,2026-01-05,Seeded,Ended,W516073's job on P813702 is still active; the PID ledger shows them out of it
+JD000763,F07,W528328,P816077,2026-01-01,2026-06-25,Seeded,Ended,W528328 holds two active job records (PID P816077)
+JD000764,F06,W531648,P824058,2026-01-03,2026-06-08,Seeded,Ended,W531648's job on P824058 is still active; the PID ledger shows them out of it
+JD000765,F07,W516073,P813702,2026-01-06,2026-03-31,Seeded,Ended,W516073 holds two active job records (PID P813702)
+JD000766,F06,W519490,P815884,2026-01-07,2026-01-07,Seeded,Ended,W519490's job on P815884 is still active; the PID ledger shows them out of it
+JD000767,F07,W519490,P815884,2026-01-08,2026-06-25,Seeded,Ended,W519490 holds two active job records (PID P815884)
+JD000768,F06,W531874,P802298,2026-01-08,2026-01-21,Seeded,Ended,W531874's job on P802298 is still active; the PID ledger shows them out of it
+JD000769,F06,W515290,P800767,2026-01-10,2026-04-09,Seeded,Ended,W515290's job on P800767 is still active; the PID ledger shows them out of it
+JD000770,F07,W521039,P811241,2026-01-10,,Seeded,Open at extract,W521039 holds two active job records (PID P811241)
+JD000771,F06,W529293,P822415,2026-01-15,2026-04-08,Seeded,Ended,W529293's job on P822415 is still active; the PID ledger shows them out of it
+JD000772,F07,W531874,P802298,2026-01-22,2026-02-19,Seeded,Ended,W531874 holds two active job records (PID P802298)
+JD000773,F06,W537027,P819800,2026-02-03,,Seeded,Open at extract,W537027's job on P819800 is still active; the PID ledger shows them out of it
+JD000774,F06,W530663,P823366,2026-02-06,2026-02-16,Seeded,Ended,W530663's job on P823366 is still active; the PID ledger shows them out of it
+JD000775,F06,W535594,P826887,2026-02-11,2026-06-21,Seeded,Ended,W535594's job on P826887 is still active; the PID ledger shows them out of it
+JD000776,F06,W532690,P805654,2026-02-14,2026-02-28,Seeded,Ended,W532690's job on P805654 is still active; the PID ledger shows them out of it
+JD000777,F06,W529655,P814639,2026-02-21,2026-03-04,Seeded,Ended,W529655's job on P814639 is still active; the PID ledger shows them out of it
+JD000778,F06,W530721,P823415,2026-02-27,,Seeded,Open at extract,W530721's job on P823415 is still active; the PID ledger shows them out of it
+JD000779,F07,W532690,P805654,2026-03-01,,Seeded,Open at extract,W532690 holds two active job records (PID P805654)
+JD000780,F06,W525687,P801943,2026-03-04,2026-06-12,Seeded,Ended,W525687's job on P801943 is still active; the PID ledger shows them out of it
+JD000781,F06,W529366,P822460,2026-03-05,2026-03-05,Seeded,Ended,W529366's job on P822460 is still active; the PID ledger shows them out of it
+JD000782,F07,W529655,P814639,2026-03-05,,Seeded,Open at extract,W529655 holds two active job records (PID P814639)
+JD000783,F07,W529366,P822460,2026-03-06,,Seeded,Open at extract,W529366 holds two active job records (PID P822460)
+JD000784,F06,W530156,P817660,2026-03-09,2026-03-23,Seeded,Ended,W530156's job on P817660 is still active; the PID ledger shows them out of it
+JD000785,F06,W530852,P820108,2026-03-09,2026-03-20,Seeded,Ended,W530852's job on P820108 is still active; the PID ledger shows them out of it
+JD000786,F06,W534480,P826092,2026-03-12,2026-03-15,Seeded,Ended,W534480's job on P826092 is still active; the PID ledger shows them out of it
+JD000787,F06,W533242,P825186,2026-03-13,2026-03-17,Seeded,Ended,W533242's job on P825186 is still active; the PID ledger shows them out of it
+JD000788,F07,W534480,P826092,2026-03-16,2026-06-11,Seeded,Ended,W534480 holds two active job records (PID P826092)
+JD000789,F06,W536456,P827514,2026-03-17,2026-06-15,Seeded,Ended,W536456's job on P827514 is still active; the PID ledger shows them out of it
+JD000790,F07,W533242,P825186,2026-03-18,2026-04-08,Seeded,Ended,W533242 holds two active job records (PID P825186)
+JD000791,F07,W530852,P820108,2026-03-21,2026-04-18,Seeded,Ended,W530852 holds two active job records (PID P820108)
+JD000792,F06,W523394,P818461,2026-03-27,2026-04-07,Seeded,Ended,W523394's job on P818461 is still active; the PID ledger shows them out of it
+JD000793,F06,W530057,P822906,2026-03-27,,Seeded,Open at extract,W530057's job on P822906 is still active; the PID ledger shows them out of it
+JD000794,F06,W516073,P813702,2026-04-01,,Seeded,Open at extract,W516073's job on P813702 is still active; the PID ledger shows them out of it
+JD000795,F06,W519215,P800662,2026-04-03,2026-04-20,Seeded,Ended,W519215's job on P800662 is still active; the PID ledger shows them out of it
+JD000796,F06,W536272,P827344,2026-04-03,2026-04-20,Seeded,Ended,W536272's job on P827344 is still active; the PID ledger shows them out of it
+JD000797,F07,W523394,P818461,2026-04-08,2026-06-11,Seeded,Ended,W523394 holds two active job records (PID P818461)
+JD000798,F06,W533228,P808817,2026-04-08,2026-04-14,Seeded,Ended,W533228's job on P808817 is still active; the PID ledger shows them out of it
+JD000799,F06,W522384,P805092,2026-04-10,2026-04-12,Seeded,Ended,W522384's job on P805092 is still active; the PID ledger shows them out of it
+JD000800,F07,W522384,P805092,2026-04-13,,Seeded,Open at extract,W522384 holds two active job records (PID P805092)
+JD000801,F06,W533475,P812542,2026-04-14,2026-04-16,Seeded,Ended,W533475's job on P812542 is still active; the PID ledger shows them out of it
+JD000802,F06,W532154,P824430,2026-04-15,2026-05-11,Seeded,Ended,W532154's job on P824430 is still active; the PID ledger shows them out of it
+JD000803,F07,W533228,P808817,2026-04-15,2026-06-24,Seeded,Ended,W533228 holds two active job records (PID P808817)
+JD000804,F07,W533475,P812542,2026-04-17,2026-06-15,Seeded,Ended,W533475 holds two active job records (PID P812542)
+JD000805,F06,W530529,P823252,2026-04-21,2026-04-25,Seeded,Ended,W530529's job on P823252 is still active; the PID ledger shows them out of it
+JD000806,F07,W530529,P823252,2026-04-26,,Seeded,Open at extract,W530529 holds two active job records (PID P823252)
+JD000807,F06,W524119,P818931,2026-04-28,,Seeded,Open at extract,W524119's job on P818931 is still active; the PID ledger shows them out of it
+JD000808,F06,W530565,P814484,2026-04-28,2026-05-06,Seeded,Ended,W530565's job on P814484 is still active; the PID ledger shows them out of it
+JD000809,F06,W536485,P821438,2026-05-03,,Seeded,Open at extract,W536485's job on P821438 is still active; the PID ledger shows them out of it
+JD000810,F06,W524575,P819231,2026-05-07,2026-06-24,Seeded,Ended,W524575's job on P819231 is still active; the PID ledger shows them out of it
+JD000811,F07,W530565,P814484,2026-05-07,,Seeded,Open at extract,W530565 holds two active job records (PID P814484)
+JD000812,F06,W533718,P816643,2026-05-08,2026-05-18,Seeded,Ended,W533718's job on P816643 is still active; the PID ledger shows them out of it
+JD000813,F06,W529098,P815090,2026-05-12,2026-05-24,Seeded,Ended,W529098's job on P815090 is still active; the PID ledger shows them out of it
+JD000814,F06,W534065,P825806,2026-05-12,,Seeded,Open at extract,W534065's job on P825806 is still active; the PID ledger shows them out of it
+JD000815,F07,W533718,P816643,2026-05-19,2026-06-13,Seeded,Ended,W533718 holds two active job records (PID P816643)
+JD000816,F06,W525244,P819696,2026-05-20,2026-06-03,Seeded,Ended,W525244's job on P819696 is still active; the PID ledger shows them out of it
+JD000817,F06,W528323,P821767,2026-05-20,2026-06-09,Seeded,Ended,W528323's job on P821767 is still active; the PID ledger shows them out of it
+JD000818,F07,W529098,P815090,2026-05-25,,Seeded,Open at extract,W529098 holds two active job records (PID P815090)
+JD000819,F07,W525244,P819696,2026-06-04,,Seeded,Open at extract,W525244 holds two active job records (PID P819696)
+JD000820,F06,W518634,P815348,2026-06-12,,Seeded,Open at extract,W518634's job on P815348 is still active; the PID ledger shows them out of it
+JD000821,F06,W534480,P826092,2026-06-12,,Seeded,Open at extract,W534480's job on P826092 is still active; the PID ledger shows them out of it
+JD000822,F06,W534791,P826328,2026-06-18,2026-06-25,Seeded,Ended,W534791's job on P826328 is still active; the PID ledger shows them out of it
+JD000823,F06,W528812,P804344,2026-06-19,2026-06-19,Seeded,Ended,W528812's job on P804344 is still active; the PID ledger shows them out of it
+JD000824,F07,W528812,P804344,2026-06-20,,Seeded,Open at extract,W528812 holds two active job records (PID P804344)
+JD000825,F06,W533228,P808817,2026-06-25,,Seeded,Open at extract,W533228's job on P808817 is still active; the PID ledger shows them out of it
+JD000826,F07,W534791,P826328,2026-06-26,,Seeded,Open at extract,W534791 holds two active job records (PID P826328)
+JD000827,F06,W537994,P828555,2026-06-30,,Seeded,Open at extract,W537994's job on P828555 is still active; the PID ledger shows them out of it

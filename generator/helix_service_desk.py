@@ -25,7 +25,6 @@ Own random stream; nothing that exists moves. All times are GMT.
 """
 from __future__ import annotations
 
-import bisect
 import datetime as dt
 from collections import defaultdict
 
@@ -39,27 +38,31 @@ EXTRACT = dt.date.fromisoformat(ref.CW_EXTRACT_DATE)
 CUTOFF = dt.datetime.combine(EXTRACT, dt.time(23, 59, 59))     # Helix as the last run reads it
 START = dt.date.fromisoformat(ref.HLX_START)
 
-GROUPS = {"Bridgeway": "Vendor Management", "Keystone": "HR Operations", "Integration": "Data Engineering"}
+GROUPS = {"Bridgeway": "Vendor Management", "Keystone": "HR Operations", "System feed": "Data Engineering"}
 GROUP_HOURS = {"Vendor Management": ref.OPS_VENDOR_MGMT_HOURS, "HR Operations": ref.OPS_HR_OPS_HOURS,
                "Data Engineering": ref.OPS_DATA_ENG_HOURS}
 
 # category: (name, flag, risk, place, priority, title)
 CATEGORIES = {
-    "CW-F01": ("Function different", "F01", "Wrong cost center", "Bridgeway", "P3", "Cost center in another function"),
-    "CW-F02": ("Department different, same function", "F02", "Wrong cost center", "Bridgeway", "P3", "Cost center in another department"),
-    "CW-F03": ("Order open after the end date", "F03", "Paying after the end", "Bridgeway", "P3", "Order open after the end date"),
-    "CW-F04": ("Billed after the end date", "F04", "Paying after the end", "Bridgeway", "P3", "Billed after the end date"),
-    "CW-F05": ("One person, two IDs", "F05", "Wrong headcount", "Bridgeway", "P4", "Duplicate contractor IDs"),
-    "CW-F06": ("Bridgeway ID missing or wrong", "F06", "Wrong headcount", "Keystone", "P4", "Bridgeway ID missing or wrong"),
-    "CW-F07": ("One person, two active PIDs", "F07", "Wrong PID", "Keystone", "P4", "Two active PIDs"),
-    "CW-F08": ("PID still filled after the contract ended", "F08", "Wrong PID", "Keystone", "P4", "PID still filled after contract end"),
-    "CW-F09": ("Ended in Bridgeway, still active in Keystone", "F09", "Access kept", "Keystone", "P2", "Contractor active after end date"),
-    "CW-F10": ("In Keystone only", "F10", "Access kept", "Keystone", "P2", "Contractor in Keystone only"),
-    "CW-F11": ("Working in Bridgeway, ended in Keystone", "F11", "Access lost", "Keystone", "P2", "Contractor ended in Keystone while working"),
-    "CW-F12": ("In Bridgeway, missing in Keystone", "F12", "Access lost", "Keystone", "P2", "Contractor missing in Keystone"),
-    "INT-FEED": ("Feed change stuck", None, None, "Integration", "P2", "Feed change stuck in the queue"),
-    "INT-LOAD": ("Warehouse load failed", None, None, "Integration", "P1", "Warehouse load failed"),
+    "CW-F01": ("One person, two IDs", "F01", "Active headcount mismatch", "Bridgeway", "P4", "Duplicate contractor IDs"),
+    "CW-F02": ("Bridgeway ID missing or different", "F02", "Active headcount mismatch", "Keystone", "P4", "Bridgeway ID missing or different"),
+    "CW-F03": ("In Bridgeway, not in Keystone", "F03", "Active headcount mismatch", "System feed", "P2", "Contractor not in Keystone"),
+    "CW-F04": ("Order open or billed after the end date", "F04", "Billing after the end date", "Bridgeway", "P3", "Order open or billed after the end date"),
+    "CW-F05": ("Cost center differs", "F05", "Cost center mismatch", "Bridgeway", "P3", "Cost center differs between systems"),
+    "CW-F06": ("PID still filled after the end date", "F06", "PID mismatch", "Keystone", "P4", "PID still filled after the end date"),
+    "CW-F07": ("Two active PID records", "F07", "PID mismatch", "Keystone", "P4", "Two active PIDs"),
+    "CW-F08": ("Working in Bridgeway, ended in Keystone", "F08", "Status mismatch", "System feed", "P2", "Contractor ended in Keystone while working"),
+    "CW-F09": ("Active in Keystone, not working in Bridgeway", "F09", "Status mismatch", "Keystone", "P2", "Contractor active in Keystone after the end"),
+    "INT-FEED": ("Feed change stuck", None, None, "System feed", "P2", "Feed change stuck in the queue"),
+    "INT-LOAD": ("Warehouse load failed", None, None, "System feed", "P1", "Warehouse load failed"),
 }
+# how quickly people raise a ticket, by what the gap does to them (reference_data.HLX_TICKET_RULES)
+BEHAVIOUR = {"CW-F01": "Headcount", "CW-F02": "Headcount", "CW-F03": "Access lost", "CW-F04": "Billing",
+             "CW-F05": "Cost center", "CW-F06": "PID", "CW-F07": "PID", "CW-F08": "Access lost",
+             "CW-F09": "Access kept", "INT-FEED": "Feed stuck"}
+# a failed feed event (CW02, CW08, CW12) is replayed by data engineering, unless it failed because
+# Keystone holds a wrong Bridgeway ID (root cause CW06): then HR Ops repairs the record
+FEED_FAILURES = {"CW02", "CW08", "CW12"}
 
 FIXED = {"Fixed by hand in Keystone", "Bridgeway changed to match", "Closed late in Bridgeway"}
 
@@ -78,24 +81,8 @@ def _d(x) -> dt.date | None:
     return x if isinstance(x, dt.date) and not isinstance(x, dt.datetime) else dt.date.fromisoformat(str(x)[:10])
 
 
-class _AsOf:
-    """Value of a field in effect on a day, from effective-dated rows."""
-
-    def __init__(self, df: pd.DataFrame, key: str, start: str, value: str):
-        self.rows = defaultdict(list)
-        for k, s, v in zip(df[key], df[start], df[value]):
-            self.rows[k].append((_d(s), v))
-        for k in self.rows:
-            self.rows[k].sort(key=lambda t: t[0])
-        self.starts = {k: [s for s, _ in v] for k, v in self.rows.items()}
-
-    def at(self, key, day):
-        i = bisect.bisect_right(self.starts.get(key, []), day) - 1
-        return self.rows[key][i][1] if i >= 0 else None
-
-
 def simulate(*, stream: np.random.Generator, tables: dict[str, pd.DataFrame], job_defects: pd.DataFrame,
-             load_runs: pd.DataFrame, conversions: dict, cc_function: dict[str, str]) -> dict[str, pd.DataFrame]:
+             load_runs: pd.DataFrame, conversions: dict) -> dict[str, pd.DataFrame]:
     rng = stream
     truth = tables["gen_cw_discrepancy_truth"]
     feed_type = dict(zip(tables["feed_bridgeway_keystone_event"]["feed_event_id"],
@@ -103,10 +90,6 @@ def simulate(*, stream: np.random.Generator, tables: dict[str, pd.DataFrame], jo
     bw = tables["bw_contingent_worker"].set_index("bw_worker_id")
     ks = tables["ks_contingent_worker"]
     ks_name = ks.drop_duplicates("person_id", keep="last").set_index("person_id")[["first_name", "last_name"]]
-    rev = tables["bw_service_order_revision"].merge(
-        tables["bw_service_order"][["service_order_id", "bw_worker_id"]], on="service_order_id")
-    bw_cc = _AsOf(rev[rev["status"].isin(["Approved", "Closed"])], "bw_worker_id", "effective_start_date", "cost_center_code")
-    ks_cc = _AsOf(ks, "person_id", "effective_start_date", "cost_center_id")
     person_of_bw = (ks.dropna(subset=["bw_worker_id"]).drop_duplicates("bw_worker_id")
                     .set_index("bw_worker_id")["person_id"].to_dict())
 
@@ -117,26 +100,31 @@ def simulate(*, stream: np.random.Generator, tables: dict[str, pd.DataFrame], jo
         start, end = _d(r.start_date), _d(r.end_date)
         person = r.person_id if isinstance(r.person_id, str) and r.person_id else None
         bwid = r.bw_worker_id if isinstance(r.bw_worker_id, str) and r.bw_worker_id else None
-        cat = None
+        cat, conv_case = None, False
         if code == "CW01":
             cat = "INT-FEED"
         elif code == "CW02":
-            cat = "CW-F11"
+            cat = "CW-F08"
         elif code == "CW03":
             conv = conversions.get(bwid)
-            cat = "CW-F05" if conv and conv["last_day"] < start else "CW-F09"
-        elif code == "CW04":
-            cat = "CW-F03"
+            conv_case = bool(conv and conv["last_day"] < start)
+            cat = "CW-F01" if conv_case else "CW-F09"
+        elif code in ("CW04", "CW11"):
+            cat = "CW-F04"
         elif code in ("CW05", "CW12") and "Cost center" in fields:
-            b, k = bw_cc.at(bwid, start), ks_cc.at(person, start)
-            cat = "CW-F01" if cc_function.get(b) != cc_function.get(k) else "CW-F02"
-        elif code in ("CW06", "CW07", "CW08", "CW09", "CW11"):
-            cat = {"CW06": "CW-F06", "CW07": "CW-F05", "CW08": "CW-F12", "CW09": "CW-F10", "CW11": "CW-F04"}[code]
+            cat = "CW-F05"
+        elif code in ("CW06", "CW07", "CW08", "CW09"):
+            cat = {"CW06": "CW-F02", "CW07": "CW-F01", "CW08": "CW-F03", "CW09": "CW-F09"}[code]
         if cat is None:
             continue
         kind = ("credit" if code == "CW11" else "open" if r.resolution == "Open at extract"
                 else "fix" if r.resolution in FIXED else "self")
-        place = "Keystone" if cat == "CW-F05" and code == "CW03" else CATEGORIES[cat][3]
+        if conv_case:
+            place = "Keystone"
+        elif code in FEED_FAILURES:
+            place = "Keystone" if r.root_cause_code == "CW06" else "System feed"
+        else:
+            place = "Bridgeway" if cat == "CW-F05" else CATEGORIES[cat][3]
         gaps.append({"cat": cat, "place": place, "bw": bwid, "person": person or person_of_bw.get(bwid),
                      "start": start, "end": end, "kind": kind, "code": code,
                      "order": r.service_order_id, "feed": r.feed_event_id, "detail": r.detail,
@@ -145,7 +133,7 @@ def simulate(*, stream: np.random.Generator, tables: dict[str, pd.DataFrame], jo
     bw_names = bw[["first_name", "last_name"]].to_dict("index")
     ks_names = ks_name.to_dict("index")
     for r in job_defects.itertuples(index=False):
-        gaps.append({"cat": "CW-F07" if r.flag_code == "F07" else "CW-F08", "place": "Keystone",
+        gaps.append({"cat": "CW-F07" if r.flag_code == "F07" else "CW-F06", "place": "Keystone",
                      "bw": bw_of_person.get(r.person_id), "person": r.person_id, "start": _d(r.start_date),
                      "end": _d(r.end_date), "kind": "open" if r.resolution == "Open at extract" else "fix",
                      "code": r.flag_code, "order": None, "feed": None, "detail": r.detail, "event_type": None,
@@ -166,7 +154,7 @@ def simulate(*, stream: np.random.Generator, tables: dict[str, pd.DataFrame], jo
         nm = bw_names.get(g["bw"]) or ks_names.get(g["person"])
         g["_name"] = f"{nm['first_name']} {nm['last_name']}" if nm else None
         name, flag, risk, _, priority, title = CATEGORIES[g["cat"]]
-        rule = HLX_RULE(g["cat"], risk)
+        rule = BEHAVIOUR[g["cat"]]
         share, window = ref.HLX_TICKET_RULES[rule]
         u = rng.random()
         start, end = g["start"], g["end"]
@@ -176,16 +164,16 @@ def simulate(*, stream: np.random.Generator, tables: dict[str, pd.DataFrame], jo
             open_day = START + dt.timedelta(days=int(rng.exponential(ref.HLX_LEGACY_MEAN_DAYS)))
         elif window is not None:
             open_day = start + dt.timedelta(days=int(rng.integers(window[0], window[1] + 1)))
-        elif g["cat"] in ("CW-F01", "CW-F02"):
+        elif g["cat"] == "CW-F05":
             if rng.random() < ref.HLX_COST_CENTER_AFTER_CLOSE:
                 me = (start.replace(day=28) + dt.timedelta(days=4)).replace(day=1)       # the 1st after the close
                 open_day = me + dt.timedelta(days=int(rng.integers(1, 6)))
             else:
                 open_day = start + dt.timedelta(days=int(rng.integers(2, 31)))
-        elif g["cat"] == "CW-F03":
+        elif g["code"] == "CW04":
             tenth = start.replace(day=10) if start.day <= 10 else (start.replace(day=28) + dt.timedelta(days=4)).replace(day=10)
             open_day = tenth + dt.timedelta(days=int(rng.integers(0, 3)))
-        else:                                                                         # CW-F04: the invoice
+        else:                                                                         # CW11: the invoice
             open_day = start + dt.timedelta(days=int(rng.integers(5, 26)))
         if u >= share and rule != "Feed stuck":         # nobody raised it at first: noticed later, if it lasts
             open_day = max(open_day, start) + dt.timedelta(days=int(1 + rng.exponential(ref.HLX_LATE_NOTICE_MEAN_DAYS)))
@@ -295,10 +283,6 @@ def simulate(*, stream: np.random.Generator, tables: dict[str, pd.DataFrame], jo
     }
 
 
-def HLX_RULE(cat: str, risk: str | None) -> str:
-    return "Feed stuck" if cat == "INT-FEED" else risk
-
-
 def _outcome(ev: list[tuple]) -> dict:
     """Ticket columns from the events as of the cutoff: the latest resolution (unless reopened since)."""
     resolved = closed = code = None
@@ -333,18 +317,17 @@ def _ticket(g: dict, ev: list[tuple], name: str, flag: str | None, title: str, p
         tail, lead = "", "A contractor"
         link = ("Contingent worker", None, None, q)
     what = {
-        "CW-F01": "the cost center in Keystone is in another function than the one Bridgeway bills",
-        "CW-F02": "the cost center in Keystone is in another department of the same function as the one Bridgeway bills",
-        "CW-F03": "the Bridgeway order is still open after the assignment ended",
-        "CW-F04": "time was billed for a month after the assignment ended",
-        "CW-F05": "the same person appears under two IDs",
-        "CW-F06": "the Bridgeway ID stored in Keystone is missing or belongs to someone else",
+        "CW-F01": "the same person appears under two IDs",
+        "CW-F02": "the Bridgeway ID stored in Keystone is missing or belongs to someone else",
+        "CW-F03": "Bridgeway shows the contractor working but Keystone has no record",
+        "CW-F04": ("time was billed for a month after the assignment ended" if g["code"] == "CW11"
+                   else "the Bridgeway order is still open after the assignment ended"),
+        "CW-F05": "the cost center in Keystone differs from the one Bridgeway bills",
+        "CW-F06": "Keystone still shows the PID filled after the contract ended",
         "CW-F07": "Keystone shows two active PIDs for one person",
-        "CW-F08": "Keystone still shows the PID filled after the contract ended",
-        "CW-F09": "Bridgeway ended the contract but Keystone still shows the contractor active",
-        "CW-F10": "Keystone shows the contractor active with no Bridgeway worker",
-        "CW-F11": "Keystone ended the contractor while Bridgeway shows the contract running",
-        "CW-F12": "Bridgeway shows the contractor working but Keystone has no record",
+        "CW-F08": "Keystone ended the contractor while Bridgeway shows the contract running",
+        "CW-F09": ("Keystone shows the contractor active with no Bridgeway worker" if g["code"] == "CW09"
+                   else "Bridgeway ended the contract but Keystone still shows the contractor active"),
         "INT-FEED": "a change from Bridgeway is still waiting in the integration queue",
     }[g["cat"]]
     desc = f"{lead}: {what}."

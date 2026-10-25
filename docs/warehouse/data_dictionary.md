@@ -462,7 +462,7 @@ When each Keystone contingent version was written, GMT, and by whom: the feed at
 | `changed_by` | VARCHAR | Integration, Keystone nightly job, Manager or HR Operations |
 
 #### ks_cw_job
-Keystone job data (SCD Type 2): which PID each contingent job record (EMPLID × record number) holds. It follows the PID ledger (`fact_position_assignment`), with two seeded imperfections fixed by HR Ops on the day they notice, never backdated: an old record left active on a return (one person, two active PID records, F07) and a record ended late or never (still in the PID after the contract ended, F08).
+Keystone job data (SCD Type 2): which PID each contingent job record (EMPLID × record number) holds. It follows the PID ledger (`fact_position_assignment`), with two seeded imperfections fixed by HR Ops on the day they notice, never backdated: an old record left active on a return (two active PID records, F07) and a record ended late or never (PID still filled after the end date, F06).
 
 | Column | Type | Description |
 |---|---|---|
@@ -483,7 +483,7 @@ Keystone job data (SCD Type 2): which PID each contingent job record (EMPLID × 
 | Column | Type | Description |
 |---|---|---|
 | `defect_id` | VARCHAR | Answer key row |
-| `flag_code` | VARCHAR | F07 one person, two active PIDs; F08 PID still filled after the contract ended |
+| `flag_code` | VARCHAR | F07 two active PID records; F06 PID still filled after the end date |
 | `person_id` | VARCHAR | EMPLID |
 | `position_id` | VARCHAR | The PID involved (the lower one for F07) |
 | `start_date` | DATE | First day it is true |
@@ -546,7 +546,7 @@ What each ticket is about, as the person who raised it entered it: 7 in 10 carry
 | `link_quality` | VARCHAR | ID field, Name in text (the name is in the description) or None |
 
 #### ref_ticket_category
-Helix ticket categories: one per reconciliation flag (F01 to F12) and two for Integration.
+Helix ticket categories: one per reconciliation flag (F01 to F09) and two for the system feed.
 
 | Column | Type | Description |
 |---|---|---|
@@ -554,7 +554,7 @@ Helix ticket categories: one per reconciliation flag (F01 to F12) and two for In
 | `category_name` | VARCHAR | Name |
 | `subject_type` | VARCHAR | What a ticket of this category is about |
 | `default_group` | VARCHAR | Group it is assigned to |
-| `flag_code` | VARCHAR | The reconciliation flag it fixes, F01 to F12; empty for Integration categories |
+| `flag_code` | VARCHAR | The reconciliation flag it fixes, F01 to F09; empty for the system feed categories |
 | `risk` | VARCHAR | The risk the flag creates |
 | `priority` | VARCHAR | Default priority |
 | `title_template` | VARCHAR | Ticket title before the subject |
@@ -730,10 +730,10 @@ The month-end close view of case study 4: [release 4 plan](../projects/contingen
 
 | Mart | Grain | Columns |
 |---|---|---|
-| `mart_cw_gap_close` | close × contractor × flag (19,850) | `gap_id`, `contractor_key`, `bw_worker_id`, `person_id`, `contractor_name`, `cw_type`, `supplier_name`; the flag (`flag_code`, `flag_name`, `flag_rank`, `flag_rank_label`, `flag_count`, and rank and count at the prior close and 12 closes earlier); `risk`, `risk_order`; `place` (Bridgeway, Keystone, Integration), `place_order`, `place_key` (Integration split into "clears on its own" and "alert data engineering"); `cause_code`, `cause_name`, `root_cause_code`, `timing_class`, `is_counted`; `since_date`, `days_open`, `open_band`, `is_over_90_days`, `days_since_end`, `was_open_prior_close`, `fixed_day_after_close`, `items`; the order, feed event and PID involved; the group (`cost_center_id`, `department_id`, `department_name`, `function_name`, `country_code`, `country_name`: Bridgeway's billed cost center, Keystone's when Bridgeway has none); `keystone_shows`, `bridgeway_has`, `evidence`, `next_step`; the ticket (`ticket_number`, `ticket_title`, `ticket_state`, `ticket_status`, `has_ticket`) |
-| `mart_cw_gap_rate_close` | close × cost center (27,348) | `contractors_working` (the gap rate's denominator: working in Bridgeway), `contractors_working_keystone`, `working_bridgeway_only`, `working_keystone_only`, `contractors_with_gap` (counted gaps), `contractors_with_any_gap`, `gaps`, `gaps_counted`, `gaps_clear_on_own`, `gaps_no_ticket`, `gaps_over_90_days`, `gaps_open_prior_close`, `gaps_fixed_day_after`, `gap_rate_target` (0.03), `load_note`, plus the group. Additive across any choice of function, department and country |
-| `mart_itsm_ticket_close` | close × open Helix ticket (15,610) | `ticket_number`, `title`, `state`, `category_code`, `category_name`, `flag_code`, `risk`, `priority`, `place` (from the group working it), `place_order`, `current_group`, `opened_at`, `age_days`, `age_band` (0 to 5 days, 6 to 30 days, over 30 days), `age_band_order`, `times_reopened`, `times_reassigned`, `link_tier`, `contractor_key`, `linked_gap_id`, the group, `dot_seq`, `dot_x`, `dot_y` (the dot's place on the ticket card, packed 20 to a line, oldest first) |
-| `mart_cw_reconciliation_dashboard` | row_type × its grain (62,808) | The three above in one union (`row_type` Gap, Population, Ticket; `gaps` and `tickets` count rows): Dashboard #4's one data source, the same rows as `tableau/custom_sql_cw_reconciliation_dashboard.sql` |
+| `mart_cw_gap_close` | close × contractor × flag (21,665) | `gap_id`, `contractor_key`, `bw_worker_id`, `person_id`, `contractor_name`, `cw_type`, `supplier_name`; the flag (`flag_code`, `flag_name`, `flag_label` "01 ..." in a fixed order, `flag_rank`, `flag_count`, and rank and count at the prior close and 12 closes earlier); `risk`, `risk_order`; `place` (Bridgeway, Keystone, System feed), `place_order`, `place_label` (Bridgeway (vendor system), Keystone (HR system), System feed (integration)); flag, risk and place label sort alphabetically in the Sankey at every close (test 83); `cause_code`, `cause_name`, `root_cause_code`, `timing_class`, `is_counted`; `since_date`, `days_open`, `open_band`, `is_over_90_days`, `days_since_end`, `was_open_prior_close`, `fixed_day_after_close`, `items`; the order, feed event and PID involved; the group (`cost_center_id`, `department_id`, `department_name`, `function_name`, `country_code`, `country_name`: Bridgeway's billed cost center, Keystone's when Bridgeway has none); `keystone_shows`, `bridgeway_has`, `evidence`, `next_step`; the ticket (`ticket_number`, `ticket_title`, `ticket_state`, `ticket_status`, `has_ticket`) |
+| `mart_cw_gap_rate_close` | close × cost center (27,324) | `contractors_working` (the gap rate's denominator: working in Bridgeway), `contractors_working_keystone`, `working_bridgeway_only`, `working_keystone_only`, `contractors_with_gap` (counted gaps), `contractors_with_any_gap`, `gaps`, `gaps_counted`, `gaps_clear_on_own`, `gaps_no_ticket`, `gaps_over_90_days`, `gaps_open_prior_close`, `gaps_fixed_day_after`, `gap_rate_target` (0.03), `load_note`, plus the group. Additive across any choice of function, department and country |
+| `mart_itsm_ticket_close` | close × open Helix ticket (16,446) | `ticket_number`, `title`, `state`, `category_code`, `category_name`, `flag_code`, `risk`, `priority`, `place` (from the group working it), `place_order`, `place_label`, `current_group`, `opened_at`, `age_days`, `age_band` (0 to 5 days, 6 to 30 days, over 30 days), `age_band_order`, `times_reopened`, `times_reassigned`, `link_tier`, `contractor_key`, `linked_gap_id`, the group, `dot_seq`, `dot_x`, `dot_y` (the dot's place on the ticket card, packed 20 to a line, oldest first) |
+| `mart_cw_reconciliation_dashboard` | row_type × its grain (65,435) | The three above in one union (`row_type` Gap, Population, Ticket; `gaps` and `tickets` count rows): Dashboard #4's one data source, the same rows as `tableau/custom_sql_cw_reconciliation_dashboard.sql` |
 
 ### mart_cw_spend
 Grain: **month-end × cost center × supplier × contingent worker type × role family × billing currency** (release 3). What contingent workers cost, two ways side by side: **billed in the month** (`workers_billed`, `billed_hours`, `billed_units`, `billed_amount_local`, `billed_usd_nominal` at the month-end rate, `billed_usd_constant`) and **working at the month-end** (`workers_at_month_end`, `run_rate_local`, `run_rate_usd_nominal`, `run_rate_usd_constant`: hourly rate × contracted hours × 52, or monthly rate × 12). Also `fiscal_year`, `fiscal_quarter_label`, `department_id`, `country_code`, `supplier_name`. A month's billing is placed on the order revision in effect at the month-end. Billing ties to `bw_timesheet_month` to the cent and the month-end columns to the Bridgeway snapshot (test 71). Billed spend runs below the run-rate because timesheets carry time off and partial months.
@@ -771,13 +771,13 @@ One row per month-end × identity (or order, or timesheet) × discrepancy type, 
 One row per month-end close: the 00:00 GMT run on the 1st. Each source's run and status, how fresh each source was (`bw_data_as_of`, `ks_data_as_of`: the month-end, or earlier after a failed load; `hlx_read_at`), the failed run if any and the `load_note` the page shows.
 
 ### int_cw_flag_type
-The 12 flags (F01 to F12): name, risk (fixed order 1 to 6), default place and next step.
+The 9 flags (F01 to F09): name, fixed label (`01 ...`), risk (five, alphabetical: Active headcount mismatch, Billing after the end date, Cost center mismatch, PID mismatch, Status mismatch), default place and next step. Numbered and named so the Sankey reads alphabetically in all three columns.
 
 ### int_cw_load_gap
 Gaps that exist only because a load failed at the close: a stale source compared as it stood at its last good load, keeping only differences the true data does not have (cause `LOAD`).
 
 ### int_cw_flag
-One row per close × contractor × flag: the comparisons from `int_cw_discrepancy` as flags, conversions still active as contractors (F05, cause `CONV`), Keystone job data against the PID ledger (F07, F08, cause `JOB`) and the load gaps, with the routing rule (`place`, `timing_class`), `keystone_shows`, `bridgeway_has`, `evidence` and `next_step`.
+One row per close × contractor × flag: the comparisons from `int_cw_discrepancy` as flags, conversions still active as contractors (F01, cause `CONV`), Keystone job data against the PID ledger (F06, F07, cause `JOB`) and the load gaps, with the routing rule (`place` Bridgeway, Keystone or System feed; `timing_class` for the system feed: Clears on its own, Feed stuck, Feed event failed, Load failed), `keystone_shows`, `bridgeway_has`, `evidence` and `next_step`.
 
 ### int_itsm_ticket_state
 One row per close × ticket existing at the close's Helix read: its state rebuilt from the events, the group working it, age and age band.

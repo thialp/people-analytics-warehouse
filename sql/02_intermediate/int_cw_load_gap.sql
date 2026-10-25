@@ -4,15 +4,15 @@
 -- When the close run's read of a source fails, the warehouse keeps that source's last good load:
 -- the source is stale, as of an earlier day (int_cw_close_run: a day after one failed night, more
 -- after an outage). Anything the source changed since then looks like a gap, although the two
--- systems agreed at the month-end. These are the gaps the routing rule sends to Integration with
--- "Alert data engineering":
+-- systems agreed at the month-end. These are the gaps the routing rule sends to the system feed,
+-- "Load failed":
 --
 --   Keystone stale   a contractor whose Keystone record changed after the stale date (the feed
 --                    applied a change, or someone fixed it) is compared to Bridgeway as Keystone
---                    stood then: not created yet (F12), status (F09, F11), cost center (F01, F02)
+--                    stood then: not created yet (F03), status (F08, F09), cost center (F05)
 --   Bridgeway stale  a worker Bridgeway sent a change for after the stale date that Keystone
 --                    applied by the month-end: Keystone is compared to what Bridgeway had sent by
---                    then: a new worker (F10), status (F09, F11), cost center (F01, F02)
+--                    then: a new worker (F09), status (F08, F09), cost center (F05)
 --
 -- Only differences the true data does not have are kept: a real gap stays a real gap.
 CREATE OR REPLACE TABLE intermediate.int_cw_load_gap AS
@@ -21,7 +21,6 @@ WITH runs AS (
     WHERE ks_data_as_of < month_end_date OR bw_data_as_of < month_end_date
 ),
 snap AS (SELECT * FROM intermediate.int_cw_reconciliation_snapshot),
-cc AS (SELECT cost_center_id, function_name FROM staging.stg_cost_center),
 
 -- Keystone a day stale ------------------------------------------------------------------------
 ks_changed AS (
@@ -36,13 +35,13 @@ ks_changed AS (
     WHERE r.ks_data_as_of < r.month_end_date AND s.ks_version_start_date > r.ks_data_as_of
 ),
 ks_gaps AS (
-    SELECT month_end_date, identity_id, bw_worker_id, person_id, 'F12' AS flag_code, ks_run_id AS run_id,
+    SELECT month_end_date, identity_id, bw_worker_id, person_id, 'F03' AS flag_code, ks_run_id AS run_id,
            'No record (created ' || CAST(ks_version_start_date AS VARCHAR) || ', after the last Keystone load)' AS keystone_shows,
            'Working since ' || CAST(bw_contract_start_date AS VARCHAR) AS bridgeway_has
     FROM ks_changed WHERE old_record_id IS NULL AND bw_working AND ks_exists
     UNION ALL
     SELECT month_end_date, identity_id, bw_worker_id, person_id,
-           CASE WHEN bw_active THEN 'F11' ELSE 'F09' END, ks_run_id,
+           CASE WHEN bw_active THEN 'F08' ELSE 'F09' END, ks_run_id,
            CASE WHEN old_status = 'Active' THEN 'Active' ELSE 'Inactive' END || ', contract to ' || CAST(old_end AS VARCHAR)
                || ' (as of ' || CAST(ks_data_as_of AS VARCHAR) || ')',
            CASE WHEN bw_active THEN 'Working, contract to ' ELSE 'Ended ' END || CAST(bw_contract_end_date AS VARCHAR)
@@ -51,12 +50,10 @@ ks_gaps AS (
       AND bw_active <> (old_status = 'Active') AND bw_active = ks_active
     UNION ALL
     SELECT k.month_end_date, k.identity_id, k.bw_worker_id, k.person_id,
-           CASE WHEN oc.function_name IS DISTINCT FROM bc.function_name THEN 'F01' ELSE 'F02' END, k.ks_run_id,
+           'F05', k.ks_run_id,
            'Cost center ' || k.old_cost_center_id || ' (as of ' || CAST(k.ks_data_as_of AS VARCHAR) || ')',
            'Cost center ' || k.bw_cost_center_id
     FROM ks_changed AS k
-    LEFT JOIN cc AS oc ON oc.cost_center_id = k.old_cost_center_id
-    LEFT JOIN cc AS bc ON bc.cost_center_id = k.bw_cost_center_id
     WHERE k.old_record_id IS NOT NULL AND k.bw_service_order_id IS NOT NULL
       AND k.old_cost_center_id IS DISTINCT FROM k.bw_cost_center_id
       AND k.ks_cost_center_id IS NOT DISTINCT FROM k.bw_cost_center_id
@@ -85,7 +82,7 @@ bw_stale AS (
     FROM bw_touched AS t
 ),
 bw_gaps AS (
-    SELECT s.month_end_date, s.identity_id, s.bw_worker_id, s.person_id, 'F10' AS flag_code, b.bw_run_id AS run_id,
+    SELECT s.month_end_date, s.identity_id, s.bw_worker_id, s.person_id, 'F09' AS flag_code, b.bw_run_id AS run_id,
            'Active since ' || CAST(s.ks_contract_start_date AS VARCHAR) AS keystone_shows,
            'No worker (sent after the last Bridgeway load, ' || CAST(b.bw_data_as_of AS VARCHAR) || ')' AS bridgeway_has
     FROM bw_stale AS b
@@ -93,7 +90,7 @@ bw_gaps AS (
     WHERE b.stale_end IS NULL AND s.ks_working
     UNION ALL
     SELECT s.month_end_date, s.identity_id, s.bw_worker_id, s.person_id,
-           CASE WHEN b.stale_end >= s.month_end_date THEN 'F11' ELSE 'F09' END, b.bw_run_id,
+           CASE WHEN b.stale_end >= s.month_end_date THEN 'F08' ELSE 'F09' END, b.bw_run_id,
            CASE WHEN s.ks_active THEN 'Active' ELSE 'Inactive' END || ', contract to ' || CAST(s.ks_contract_end_date AS VARCHAR),
            CASE WHEN b.stale_end >= s.month_end_date THEN 'Working, contract to ' ELSE 'Ended ' END
                || CAST(b.stale_end AS VARCHAR) || ' (as sent by ' || CAST(b.bw_data_as_of AS VARCHAR) || ')'
@@ -103,13 +100,11 @@ bw_gaps AS (
       AND (b.stale_end >= s.month_end_date) <> s.ks_active AND s.bw_active = s.ks_active
     UNION ALL
     SELECT s.month_end_date, s.identity_id, s.bw_worker_id, s.person_id,
-           CASE WHEN oc.function_name IS DISTINCT FROM kc.function_name THEN 'F01' ELSE 'F02' END, b.bw_run_id,
+           'F05', b.bw_run_id,
            'Cost center ' || s.ks_cost_center_id,
            'Cost center ' || b.stale_cost_center_id || ' (as sent by ' || CAST(b.bw_data_as_of AS VARCHAR) || ')'
     FROM bw_stale AS b
     JOIN snap AS s ON s.month_end_date = b.month_end_date AND s.bw_worker_id = b.bw_worker_id
-    LEFT JOIN cc AS oc ON oc.cost_center_id = b.stale_cost_center_id
-    LEFT JOIN cc AS kc ON kc.cost_center_id = s.ks_cost_center_id
     WHERE b.stale_cost_center_id IS NOT NULL AND s.ks_record_id IS NOT NULL
       AND b.stale_cost_center_id IS DISTINCT FROM s.ks_cost_center_id
       AND s.bw_cost_center_id IS NOT DISTINCT FROM s.ks_cost_center_id

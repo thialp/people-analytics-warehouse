@@ -643,10 +643,10 @@ OPS_LOAD_ERRORS = {"BW": "Extract not delivered: SFTP transfer timed out after 3
 # Keystone job data: the PID each contingent worker's job record holds (EMPLID x record number).
 # Normally a job row starts on the assignment's first day and is terminated the day after its last
 # day. Two seeded imperfections, fixed by HR Ops on the day they notice (never backdated):
-CW_JOB_RETURN_KEEP_OLD = 0.55             # a return on another PID within 120 days leaves the old job active
-CW_JOB_RETURN_KEEP_DAYS = (10, 240)       # until HR Ops ends it this many days after the return
+CW_JOB_RETURN_KEEP_OLD = 0.60             # a return on another PID within 120 days leaves the old job active
+CW_JOB_RETURN_KEEP_DAYS = (15, 240)       # until HR Ops ends it this many days after the return
 CW_JOB_RETURN_NEVER = 0.08                # ... or never
-CW_JOB_SAME_PID_NEW_RECORD = 0.06         # a return to the same PID entered as a new record, the old one left active
+CW_JOB_SAME_PID_NEW_RECORD = 0.16         # a return to the same PID entered as a new record, the old one left active
 CW_JOB_LATE_END = 0.004                   # any other end: the job stays active after the last day
 CW_JOB_LATE_END_DAYS = (16, 180)
 CW_JOB_LATE_END_NEVER = 0.05
@@ -655,14 +655,15 @@ CW_JOB_LATE_END_NEVER = 0.05
 HLX_START = "2021-01-01"                  # Helix went live; gaps already open then get a ticket later, if at all
 HLX_LEGACY_MEAN_DAYS = 300                # ... after this many days on average
 HLX_FIRST_NUMBER = 100001
-# Per risk: share of gaps that get a ticket, and the delay in days from the gap's first day
+# Per behaviour: share of gaps that get a ticket, and the delay in days from the gap's first day.
+# The behaviour follows what the gap does to people, so it is set per category in helix_service_desk.
 HLX_TICKET_RULES = {
-    "Access lost":          (0.90, (1, 3)),
+    "Access lost":          (0.90, (1, 3)),        # the contractor cannot log in and says so
     "Access kept":          (0.60, (3, 20)),
-    "Wrong cost center":    (0.40, None),          # mostly 1 to 5 days after the next close (Finance notices)
-    "Paying after the end": (0.50, None),          # F03 at Vendor Management's review on the 10th; F04 when the invoice comes in
-    "Wrong headcount":      (0.30, (5, 45)),
-    "Wrong PID":            (0.30, (10, 60)),
+    "Cost center":          (0.40, None),          # mostly 1 to 5 days after the next close (Finance notices)
+    "Billing":              (0.50, None),          # an open order at Vendor Management's review on the 10th; a late invoice when it comes in
+    "Headcount":            (0.30, (5, 45)),
+    "PID":                  (0.30, (10, 60)),
     "Feed stuck":           (0.15, (1, 2)),        # data engineering's monitoring
 }
 HLX_COST_CENTER_AFTER_CLOSE = 0.75

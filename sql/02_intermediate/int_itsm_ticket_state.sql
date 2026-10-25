@@ -37,7 +37,7 @@ SELECT
     s.state IN ('New', 'In progress', 'Pending', 'Reopened')             AS is_open,
     s.current_group,
     CASE s.current_group WHEN 'Vendor Management' THEN 'Bridgeway' WHEN 'HR Operations' THEN 'Keystone'
-                         ELSE 'Integration' END                          AS place,
+                         ELSE 'System feed' END                          AS place,
     s.opened_at,
     s.last_resolved_at,
     s.closed_at,

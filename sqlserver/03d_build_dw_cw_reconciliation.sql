@@ -12,7 +12,7 @@
     Load log         EtlLoadRun
     Helix            ItsmTicket, ItsmTicketEvent, ItsmTicketLink, RefTicketCategory
     derived          CwCloseRun         one row per month-end close: the run, each source's freshness
-                     CwFlagType         the 12 flags, their risk and default place
+                     CwFlagType         the 9 flags, their risk and default place
                      CwLoadGap          gaps that exist only because a load failed
                      CwFlag             every gap at every close, with its cause and its place
                      ItsmTicketState    each ticket's state at each close's Helix read
@@ -147,7 +147,7 @@ SELECT
     CAST(subject_type   AS VARCHAR(20))                    AS SubjectType,
     CAST(default_group  AS VARCHAR(20))                    AS DefaultGroup,
     CAST(NULLIF(flag_code, '') AS VARCHAR(4))              AS FlagCode,
-    CAST(NULLIF(risk, '') AS VARCHAR(24))                  AS Risk,
+    CAST(NULLIF(risk, '') AS VARCHAR(32))                  AS Risk,
     CAST(priority       AS VARCHAR(2))                     AS Priority,
     CAST(title_template AS VARCHAR(60))                    AS TitleTemplate
 INTO dw.RefTicketCategory
@@ -204,37 +204,33 @@ OUTER APPLY (SELECT MAX(r.ScheduledAt) AS ReadAt FROM dw.EtlLoadRun AS r
                AND r.ScheduledAt >= DATEADD(DAY, -10, c.CloseRunAt)) AS gh;
 GO
 
-/* ------------------------------------------------------------------ the 12 flags */
+/* ------------------------------------------------------------------ the 9 flags
+   Numbered and named so the Sankey reads alphabetically in all three columns (int_cw_flag_type). */
 DROP TABLE IF EXISTS dw.CwFlagType;
 SELECT CAST(t.FlagCode AS VARCHAR(4)) AS FlagCode, CAST(t.FlagName AS VARCHAR(60)) AS FlagName,
-       CAST(t.Risk AS VARCHAR(24)) AS Risk, t.RiskOrder, CAST(t.DefaultPlace AS VARCHAR(12)) AS DefaultPlace,
+       CAST(CONCAT(RIGHT(CONCAT('0', SUBSTRING(t.FlagCode, 2, 2)), 2), ' ', t.FlagName) AS VARCHAR(64)) AS FlagLabel,
+       CAST(t.Risk AS VARCHAR(32)) AS Risk, t.RiskOrder, CAST(t.DefaultPlace AS VARCHAR(12)) AS DefaultPlace,
        CAST(t.NextStep AS VARCHAR(100)) AS NextStep
 INTO dw.CwFlagType
 FROM (VALUES
-    ('F01', 'Function different',                          'Wrong cost center',    1, 'Bridgeway',
-     'Confirm the cost center with the manager; correct the Bridgeway order or Keystone'),
-    ('F02', 'Department different, same function',         'Wrong cost center',    1, 'Bridgeway',
-     'Confirm the cost center with the manager; correct the Bridgeway order or Keystone'),
-    ('F03', 'Order open after the end date',               'Paying after the end', 2, 'Bridgeway',
-     'Close the order in Bridgeway'),
-    ('F04', 'Billed after the end date',                   'Paying after the end', 2, 'Bridgeway',
-     'Request a credit from the supplier'),
-    ('F05', 'One person, two IDs',                         'Wrong headcount',      3, 'Bridgeway',
+    ('F01', 'One person, two IDs',                          'Active headcount mismatch',  1, 'Bridgeway',
      'Merge the two Bridgeway IDs'),
-    ('F06', 'Bridgeway ID missing or wrong',               'Wrong headcount',      3, 'Keystone',
-     'Repair the Bridgeway ID stored in Keystone'),
-    ('F07', 'One person, two active PID records',          'Wrong PID',            4, 'Keystone',
-     'End the old job record in Keystone'),
-    ('F08', 'PID still filled after the contract ended',   'Wrong PID',            4, 'Keystone',
+    ('F02', 'Bridgeway ID missing or different',            'Active headcount mismatch',  1, 'Keystone',
+     'Align the Bridgeway ID stored in Keystone'),
+    ('F03', 'In Bridgeway, not in Keystone',                'Active headcount mismatch',  1, 'Keystone',
+     'Create the contractor in Keystone'),
+    ('F04', 'Order open or billed after the end date',      'Billing after the end date', 2, 'Bridgeway',
+     'Close the order in Bridgeway; request a credit for time billed after the end'),
+    ('F05', 'Cost center differs',                          'Cost center mismatch',       3, 'Bridgeway',
+     'Confirm the cost center with the manager; align the Bridgeway order or Keystone'),
+    ('F06', 'PID still filled after the end date',          'PID mismatch',               4, 'Keystone',
      'End the job record and release the PID in Keystone'),
-    ('F09', 'Ended in Bridgeway, still active in Keystone', 'Access kept',         5, 'Keystone',
-     'Inactivate the contractor in Keystone and remove access'),
-    ('F10', 'In Keystone only',                            'Access kept',          5, 'Keystone',
-     'Confirm with the manager; inactivate in Keystone or raise a Bridgeway order'),
-    ('F11', 'Working in Bridgeway, ended in Keystone',     'Access lost',          6, 'Keystone',
+    ('F07', 'Two active PID records',                       'PID mismatch',               4, 'Keystone',
+     'End the older job record in Keystone'),
+    ('F08', 'Working in Bridgeway, ended in Keystone',      'Status mismatch',            5, 'Keystone',
      'Reactivate the contractor in Keystone'),
-    ('F12', 'In Bridgeway, missing in Keystone',           'Access lost',          6, 'Keystone',
-     'Create the contractor in Keystone')
+    ('F09', 'Active in Keystone, not working in Bridgeway', 'Status mismatch',            5, 'Keystone',
+     'Confirm with the manager; inactivate in Keystone or raise a Bridgeway order')
 ) AS t(FlagCode, FlagName, Risk, RiskOrder, DefaultPlace, NextStep);
 GO
 
@@ -282,13 +278,13 @@ SELECT g.MonthEndDate, g.IdentityID, g.BwWorkerID, g.PersonID, CAST(g.FlagCode A
        g.KeystoneShows, g.BridgewayHas
 INTO dw.CwLoadGap
 FROM (
-    SELECT MonthEndDate, IdentityID, BwWorkerID, PersonID, 'F12' AS FlagCode, KsRunID AS RunID,
+    SELECT MonthEndDate, IdentityID, BwWorkerID, PersonID, 'F03' AS FlagCode, KsRunID AS RunID,
            CONCAT('No record (created ', CAST(KsVersionStartDate AS VARCHAR(10)), ', after the last Keystone load)') AS KeystoneShows,
            CONCAT('Working since ', CAST(BwContractStartDate AS VARCHAR(10))) AS BridgewayHas
     FROM #KsChanged WHERE OldRecordID IS NULL AND BwWorking = 1 AND KsExists = 1
     UNION ALL
     SELECT MonthEndDate, IdentityID, BwWorkerID, PersonID,
-           CASE WHEN BwActive = 1 THEN 'F11' ELSE 'F09' END, KsRunID,
+           CASE WHEN BwActive = 1 THEN 'F08' ELSE 'F09' END, KsRunID,
            CONCAT(CASE WHEN OldStatus = 'Active' THEN 'Active' ELSE 'Inactive' END, ', contract to ',
                   CAST(OldEnd AS VARCHAR(10)), ' (as of ', CAST(KsDataAsOf AS VARCHAR(10)), ')'),
            CONCAT(CASE WHEN BwActive = 1 THEN 'Working, contract to ' ELSE 'Ended ' END, CAST(BwContractEndDate AS VARCHAR(10)))
@@ -297,17 +293,15 @@ FROM (
       AND BwActive <> CASE WHEN OldStatus = 'Active' THEN 1 ELSE 0 END AND BwActive = KsActive
     UNION ALL
     SELECT k.MonthEndDate, k.IdentityID, k.BwWorkerID, k.PersonID,
-           CASE WHEN oc.FunctionName IS DISTINCT FROM bc.FunctionName THEN 'F01' ELSE 'F02' END, k.KsRunID,
+           'F05', k.KsRunID,
            CONCAT('Cost center ', k.OldCostCenterID, ' (as of ', CAST(k.KsDataAsOf AS VARCHAR(10)), ')'),
            CONCAT('Cost center ', k.BwCostCenterID)
     FROM #KsChanged AS k
-    LEFT JOIN dw.DimCostCenter AS oc ON oc.CostCenterID = k.OldCostCenterID
-    LEFT JOIN dw.DimCostCenter AS bc ON bc.CostCenterID = k.BwCostCenterID
     WHERE k.OldRecordID IS NOT NULL AND k.BwServiceOrderID IS NOT NULL
       AND k.OldCostCenterID IS DISTINCT FROM k.BwCostCenterID
       AND k.KsCostCenterID IS NOT DISTINCT FROM k.BwCostCenterID
     UNION ALL
-    SELECT s.MonthEndDate, s.IdentityID, s.BwWorkerID, s.PersonID, 'F10', b.BwRunID,
+    SELECT s.MonthEndDate, s.IdentityID, s.BwWorkerID, s.PersonID, 'F09', b.BwRunID,
            CONCAT('Active since ', CAST(s.KsContractStartDate AS VARCHAR(10))),
            CONCAT('No worker (sent after the last Bridgeway load, ', CAST(b.BwDataAsOf AS VARCHAR(10)), ')')
     FROM #BwStale AS b
@@ -315,7 +309,7 @@ FROM (
     WHERE b.StaleEnd IS NULL AND s.KsWorking = 1
     UNION ALL
     SELECT s.MonthEndDate, s.IdentityID, s.BwWorkerID, s.PersonID,
-           CASE WHEN b.StaleEnd >= s.MonthEndDate THEN 'F11' ELSE 'F09' END, b.BwRunID,
+           CASE WHEN b.StaleEnd >= s.MonthEndDate THEN 'F08' ELSE 'F09' END, b.BwRunID,
            CONCAT(CASE WHEN s.KsActive = 1 THEN 'Active' ELSE 'Inactive' END, ', contract to ', CAST(s.KsContractEndDate AS VARCHAR(10))),
            CONCAT(CASE WHEN b.StaleEnd >= s.MonthEndDate THEN 'Working, contract to ' ELSE 'Ended ' END,
                   CAST(b.StaleEnd AS VARCHAR(10)), ' (as sent by ', CAST(b.BwDataAsOf AS VARCHAR(10)), ')')
@@ -325,13 +319,11 @@ FROM (
       AND CASE WHEN b.StaleEnd >= s.MonthEndDate THEN 1 ELSE 0 END <> s.KsActive AND s.BwActive = s.KsActive
     UNION ALL
     SELECT s.MonthEndDate, s.IdentityID, s.BwWorkerID, s.PersonID,
-           CASE WHEN oc.FunctionName IS DISTINCT FROM kc.FunctionName THEN 'F01' ELSE 'F02' END, b.BwRunID,
+           'F05', b.BwRunID,
            CONCAT('Cost center ', s.KsCostCenterID),
            CONCAT('Cost center ', b.StaleCostCenterID, ' (as sent by ', CAST(b.BwDataAsOf AS VARCHAR(10)), ')')
     FROM #BwStale AS b
     JOIN dw.CwReconciliationSnapshot AS s ON s.MonthEndDate = b.MonthEndDate AND s.BwWorkerID = b.BwWorkerID
-    LEFT JOIN dw.DimCostCenter AS oc ON oc.CostCenterID = b.StaleCostCenterID
-    LEFT JOIN dw.DimCostCenter AS kc ON kc.CostCenterID = s.KsCostCenterID
     WHERE b.StaleCostCenterID IS NOT NULL AND s.KsRecordID IS NOT NULL
       AND b.StaleCostCenterID IS DISTINCT FROM s.KsCostCenterID
       AND s.BwCostCenterID IS NOT DISTINCT FROM s.KsCostCenterID
@@ -354,7 +346,7 @@ LEFT JOIN dw.CwReconciliationSnapshot AS s ON s.MonthEndDate = d.MonthEndDate AN
 
 DROP TABLE IF EXISTS #Contract;
 SELECT d.MonthEndDate, d.IdentityID, d.BwWorkerID, d.PersonID,
-       CASE WHEN d.BwActive = 1 THEN 'F11' ELSE 'F09' END AS FlagCode,
+       CASE WHEN d.BwActive = 1 THEN 'F08' ELSE 'F09' END AS FlagCode,
        d.DiscrepancyCode AS CauseCode, d.RootCauseCode,
        CASE WHEN d.BwActive = 1 THEN d.SinceDate ELSE LEAST(d.SinceDate, CONVERT(DATE, DATEADD(DAY, 1, d.BwContractEndDate))) END AS SinceDate,
        d.ServiceOrderID, d.FeedEventID, d.Evidence,
@@ -415,7 +407,7 @@ INTO #Gaps
 FROM (
     /* cost center */
     SELECT d.MonthEndDate, d.IdentityID, d.BwWorkerID, d.PersonID,
-           CASE WHEN bc.FunctionName IS DISTINCT FROM kc.FunctionName THEN 'F01' ELSE 'F02' END AS FlagCode,
+           'F05' AS FlagCode,
            d.DiscrepancyCode AS CauseCode, d.RootCauseCode, d.SinceDate, d.ServiceOrderID, d.FeedEventID,
            CAST(NULL AS VARCHAR(12)) AS PositionID, d.Evidence,
            CONCAT('Cost center ', d.KsCostCenterID, ' (', kd.DepartmentName, ', ', kc.FunctionName, ')') AS KeystoneShows,
@@ -429,7 +421,7 @@ FROM (
     UNION ALL
     /* contract status, a conversion relabelled */
     SELECT c.MonthEndDate, c.IdentityID, c.BwWorkerID, c.PersonID,
-           CASE WHEN v.IdentityID IS NOT NULL THEN 'F05' ELSE c.FlagCode END,
+           CASE WHEN v.IdentityID IS NOT NULL THEN 'F01' ELSE c.FlagCode END,
            CASE WHEN v.IdentityID IS NOT NULL THEN 'CONV' ELSE c.CauseCode END,
            c.RootCauseCode, c.SinceDate, c.ServiceOrderID, c.FeedEventID, NULL,
            CASE WHEN v.IdentityID IS NOT NULL
@@ -448,8 +440,8 @@ FROM (
     UNION ALL
     /* structural */
     SELECT d.MonthEndDate, d.IdentityID, d.BwWorkerID, d.PersonID,
-           CASE d.DiscrepancyCode WHEN 'CW04' THEN 'F03' WHEN 'CW11' THEN 'F04' WHEN 'CW07' THEN 'F05'
-                WHEN 'CW06' THEN 'F06' WHEN 'CW09' THEN 'F10' ELSE 'F12' END,
+           CASE d.DiscrepancyCode WHEN 'CW04' THEN 'F04' WHEN 'CW11' THEN 'F04' WHEN 'CW07' THEN 'F01'
+                WHEN 'CW06' THEN 'F02' WHEN 'CW09' THEN 'F09' ELSE 'F03' END,
            d.DiscrepancyCode, d.RootCauseCode, d.SinceDate, d.ServiceOrderID, d.FeedEventID, NULL, d.Evidence,
            CASE d.DiscrepancyCode
                 WHEN 'CW04' THEN 'Not held in Keystone'
@@ -472,7 +464,7 @@ FROM (
     UNION ALL
     /* Keystone job data against the PID ledger */
     SELECT p.MonthEndDate, i.IdentityID, i.BwWorkerID, p.PersonID,
-           CASE WHEN p.ActiveRecords >= 2 THEN 'F07' ELSE 'F08' END, 'JOB', 'JOB',
+           CASE WHEN p.ActiveRecords >= 2 THEN 'F07' ELSE 'F06' END, 'JOB', 'JOB',
            CASE WHEN p.ActiveRecords >= 2 THEN p.SecondSince ELSE COALESCE(l.LeftOn, p.SecondSince) END,
            NULL, NULL, p.PositionID,
            CASE WHEN p.ActiveRecords >= 2
@@ -511,6 +503,7 @@ SELECT
     COALESCE(g.PersonID, i.PersonID)                                                   AS PersonID,
     CAST(g.FlagCode AS VARCHAR(4))                                                     AS FlagCode,
     t.FlagName,
+    t.FlagLabel,
     t.Risk,
     t.RiskOrder,
     CAST(g.CauseCode AS VARCHAR(12))                                                   AS CauseCode,
@@ -522,12 +515,14 @@ SELECT
     g.FeedEventID,
     fd.SentAt                                                                          AS FeedSentAt,
     g.PositionID,
-    CAST(CASE WHEN g.CauseCode IN ('CW00', 'CW01') THEN 'Integration'
-              WHEN g.CauseCode = 'LOAD' THEN 'Integration'
-              WHEN g.FlagCode = 'F05' AND g.CauseCode = 'CONV' THEN 'Keystone'
+    CAST(CASE WHEN g.CauseCode IN ('CW00', 'CW01', 'LOAD') THEN 'System feed'
+              WHEN g.CauseCode IN ('CW02', 'CW08', 'CW12') AND g.RootCauseCode IS DISTINCT FROM 'CW06' THEN 'System feed'
+              WHEN g.CauseCode IN ('CW02', 'CW08', 'CW12') THEN 'Keystone'
+              WHEN g.FlagCode = 'F01' AND g.CauseCode = 'CONV' THEN 'Keystone'
               ELSE t.DefaultPlace END AS VARCHAR(12))                                  AS Place,
     CAST(CASE WHEN g.CauseCode IN ('CW00', 'CW01') AND fd.SentAt > DATEADD(HOUR, -24, r.CloseRunAt) THEN 'Clears on its own'
               WHEN g.CauseCode IN ('CW00', 'CW01') THEN 'Feed stuck'
+              WHEN g.CauseCode IN ('CW02', 'CW08', 'CW12') AND g.RootCauseCode IS DISTINCT FROM 'CW06' THEN 'Feed event failed'
               WHEN g.CauseCode = 'LOAD' THEN 'Load failed' END AS VARCHAR(20))         AS TimingClass,
     g.KeystoneShows,
     g.BridgewayHas,
@@ -536,9 +531,12 @@ SELECT
                 THEN CONCAT('. Sent ', FORMAT(fd.SentAt, 'yyyy-MM-dd HH:mm'), ' GMT, ',
                             DATEDIFF(HOUR, fd.SentAt, r.CloseRunAt), ' hours before the close run')
                 ELSE '' END)                                                           AS Evidence,
-    CASE WHEN g.FlagCode = 'F05' AND g.CauseCode = 'CONV' THEN 'End the contractor record in Keystone; the person is now an employee'
+    CASE WHEN g.FlagCode = 'F01' AND g.CauseCode = 'CONV' THEN 'End the contractor record in Keystone; the person is now an employee'
          WHEN g.CauseCode IN ('CW00', 'CW01') AND fd.SentAt > DATEADD(HOUR, -24, r.CloseRunAt) THEN 'None: the change lands with the next feed batch'
          WHEN g.CauseCode IN ('CW00', 'CW01') THEN 'Data engineering: release the stuck feed change'
+         WHEN g.CauseCode IN ('CW02', 'CW08', 'CW12') AND g.RootCauseCode IS DISTINCT FROM 'CW06'
+              THEN 'Data engineering: replay the failed feed event, then check Keystone'
+         WHEN g.CauseCode IN ('CW02', 'CW08', 'CW12') THEN 'Align the Bridgeway ID stored in Keystone, then replay the feed event'
          WHEN g.CauseCode = 'LOAD' THEN 'Data engineering: the next run reloads the source; check it cleared'
          ELSE t.NextStep END                                                           AS NextStep
 INTO dw.CwFlag
@@ -573,7 +571,7 @@ SELECT
     CAST(CASE WHEN s.State IN ('New', 'In progress', 'Pending', 'Reopened') THEN 1 ELSE 0 END AS BIT) AS IsOpen,
     s.CurrentGroup,
     CAST(CASE s.CurrentGroup WHEN 'Vendor Management' THEN 'Bridgeway' WHEN 'HR Operations' THEN 'Keystone'
-              ELSE 'Integration' END AS VARCHAR(12))                         AS Place,
+              ELSE 'System feed' END AS VARCHAR(12))                         AS Place,
     s.OpenedAt,
     s.LastResolvedAt,
     s.ClosedAt,
@@ -719,7 +717,7 @@ SELECT
     sup.SupplierName,
     s.FlagCode,
     s.FlagName,
-    CONCAT(RIGHT(CONCAT('0', c.FlagRank), 2), ' ', s.FlagName)                       AS FlagRankLabel,
+    s.FlagLabel,
     c.FlagCount,
     c.FlagRank,
     cp.FlagCount                                                                       AS FlagCountPriorClose,
@@ -730,9 +728,9 @@ SELECT
     s.RiskOrder,
     s.Place,
     CASE s.Place WHEN 'Bridgeway' THEN 1 WHEN 'Keystone' THEN 2 ELSE 3 END            AS PlaceOrder,
-    CASE WHEN s.Place <> 'Integration' THEN s.Place
-         WHEN s.TimingClass = 'Clears on its own' THEN 'Integration: clears on its own'
-         ELSE 'Integration: alert data engineering' END                               AS PlaceKey,
+    CAST(CASE s.Place WHEN 'Bridgeway' THEN 'Bridgeway (vendor system)'
+                      WHEN 'Keystone' THEN 'Keystone (HR system)'
+                      ELSE 'System feed (integration)' END AS VARCHAR(28))           AS PlaceLabel,
     s.CauseCode,
     cz.CauseName,
     s.RootCauseCode,
@@ -743,7 +741,7 @@ SELECT
     CASE WHEN s.DaysOpen <= 30 THEN '0 to 30 days' WHEN s.DaysOpen <= 90 THEN '31 to 90 days'
          ELSE 'Over 90 days' END                                                       AS OpenBand,
     CAST(CASE WHEN s.DaysOpen > 90 THEN 1 ELSE 0 END AS BIT)                           AS IsOver90Days,
-    CASE WHEN s.FlagCode IN ('F08', 'F09') THEN DATEDIFF(DAY, s.SinceDate, s.MonthEndDate) END AS DaysSinceEnd,
+    CASE WHEN s.FlagCode IN ('F06', 'F09') THEN DATEDIFF(DAY, s.SinceDate, s.MonthEndDate) END AS DaysSinceEnd,
     CAST(CASE WHEN EXISTS (SELECT 1 FROM #Scoped AS p WHERE p.MonthEndDate = r.PriorMonthEndDate AND p.GapID = s.GapID)
                    AND s.SinceDate <= r.PriorMonthEndDate
               THEN 1 ELSE 0 END AS BIT)                                                AS WasOpenPriorClose,
@@ -878,6 +876,9 @@ SELECT
     sb.Priority,
     t.Place,
     CASE t.Place WHEN 'Bridgeway' THEN 1 WHEN 'Keystone' THEN 2 ELSE 3 END           AS PlaceOrder,
+    CAST(CASE t.Place WHEN 'Bridgeway' THEN 'Bridgeway (vendor system)'
+                      WHEN 'Keystone' THEN 'Keystone (HR system)'
+                      ELSE 'System feed (integration)' END AS VARCHAR(28))           AS PlaceLabel,
     t.CurrentGroup,
     t.OpenedAt,
     t.AgeDays,

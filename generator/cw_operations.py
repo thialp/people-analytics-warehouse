@@ -204,7 +204,7 @@ def job_data(stream: np.random.Generator, assign_rows: list[dict]) -> tuple[pd.D
 
 def _defect_truth(job: pd.DataFrame, by_person: dict[str, list[dict]], seeded_people: set[str]) -> pd.DataFrame:
     """Every period in which a person holds two active jobs (F07), or one active job on a PID the
-    ledger shows they are not in (F08), evaluated from the rows themselves, day by day between
+    ledger shows they are not in (F06), evaluated from the rows themselves, day by day between
     change points. Independent of the SQL that finds them."""
     active = job[job["job_status"] == "Active"]
     out = []
@@ -226,7 +226,7 @@ def _defect_truth(job: pd.DataFrame, by_person: dict[str, list[dict]], seeded_pe
             if len(on) >= 2:
                 flag, pid = "F07", min(p for p, _, _ in on)        # two active records (the same PID twice, or two PIDs)
             elif len(on) == 1 and not any(lp == on[0][0] and ls <= day <= le for lp, ls, le in ledger):
-                flag, pid = "F08", on[0][0]
+                flag, pid = "F06", on[0][0]
             else:
                 flag, pid = None, None
             if cur and (cur["flag_code"], cur["position_id"]) != (flag, pid):
