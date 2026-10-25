@@ -31,7 +31,7 @@ This page tracks the release from top to bottom, from the data the generator wri
 |---:|---|---|---|---|
 | 1 | Data creation: times, Keystone job data, load log, Helix tickets | Claude | **Done** 2026-10-25 | Every pre-existing raw row identical (all 40 files checked by hash; only the three registry files gain rows); 9 new tables; generator deterministic (two runs, same hashes) |
 | 2 | Warehouse (DuckDB): staging, flags and routing, ticket replay, 4 marts, tests 82 to 88 | Claude | **Done** 2026-10-25 | 88 of 88 tests pass; every mart of Dashboards #1 to #3 unchanged (all 31 published CSVs checked by hash) |
-| 3 | SQL Server twin: `03d`, `04c`, `15_validate`, `build_all` | Claude, then Thiago on the Mac | Checker **done**; Mac run **to do** | `check_tsql_in_duckdb.py` matches every view and the Custom SQL row for row; on the Mac, `build_all.sql` runs and `15_validate` says PASS on every row |
+| 3 | SQL Server twin: `03d`, `04c`, `15_validate`, `build_all` | Claude, then Thiago on the Mac | **Done** (checker and Mac run, 2026-10-25) | `check_tsql_in_duckdb.py` matches every view and the Custom SQL row for row; on the Mac, `build_all.sql` runs and `15_validate` says PASS on every row |
 | 4 | The Custom SQL | Claude | **Done** | `tableau/custom_sql_cw_reconciliation_dashboard.sql` returns the 62,808 rows of `mart_cw_reconciliation_dashboard` |
 | 5 | Check tables (section 7) | Claude | **Done** | Numbers for Current (Jun 2026), May 2026, Jun 2025 and the Dec 2024 replay, from the marts |
 | 6 | Prototype with real numbers | Claude, reviewed by Thiago | **Approved** 2026-10-25 | Thiago approves the layout, the wording and the numbers on the canvas |
@@ -153,6 +153,8 @@ sqlcmd -S localhost -U sa -P "<password>" -C -i /repo/sqlserver/15_validate_cw_r
 ```
 
 Every row of 15 should say PASS. Record the run time of 03d and of the Custom SQL in a run note, as for release 3.
+
+**Mac run, 2026-10-25:** done. The first build stopped at 04c with `Msg 113 Missing end comment mark` (a header comment held `data/marts/*.csv`, and T-SQL nests block comments); fixed in the comment, and the checker now flags any `/*` inside a block comment. After the fix, every script passes: 05, 08, 12 and all 35 checks of 15 (KPI 3 315, KPI 4 176, KPI 5 247, places 196 / 181 / 2, 330 open tickets, Dec 2024 358 gaps with 6 sent to Integration). The Dashboard #4 Custom SQL returned 62,808 rows in 1 second (the workforce cost bridge takes 25). A full `build_all.sql` run takes about 40 to 45 minutes under emulation (the first, partly interrupted run; Thiago's estimate).
 
 ---
 
@@ -323,6 +325,8 @@ An outside review of the three published dashboards (Headcount & FTE Walk, Compe
 ## 10. Phases 7 to 12: spikes, design, build, publish
 
 ### Phase 7: spikes on Tableau Public
+
+Step-by-step: [spikes_guide.md](spikes_guide.md).
 
 Run on a small workbook against `mart_cw_reconciliation_dashboard.csv` before any page is built.
 
