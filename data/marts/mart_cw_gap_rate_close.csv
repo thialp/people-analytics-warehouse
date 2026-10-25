@@ -811,7 +811,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2021-07-31,Jul 2021,false,CC-8030-MX,D-803,Workplace & Procurement,Operations,MX,Mexico,19,19,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2021-07-31,Jul 2021,false,CC-8030-NL,D-803,Workplace & Procurement,Operations,NL,Netherlands,12,12,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-07-31,Jul 2021,false,CC-8030-PL,D-803,Workplace & Procurement,Operations,PL,Poland,30,29,1,0,3,3,3,3,0,2,1,2,0,0.03,Loaded on time
-2021-07-31,Jul 2021,false,CC-8030-SG,D-803,Workplace & Procurement,Operations,SG,Singapore,20,20,0,0,4,4,4,4,0,4,0,1,0,0.03,Loaded on time
+2021-07-31,Jul 2021,false,CC-8030-SG,D-803,Workplace & Procurement,Operations,SG,Singapore,20,20,0,0,4,4,4,4,0,4,0,0,0,0.03,Loaded on time
 2021-07-31,Jul 2021,false,CC-8030-US,D-803,Workplace & Procurement,Operations,US,United States,245,244,1,0,9,9,9,9,0,8,2,2,0,0.03,Loaded on time
 2021-07-31,Jul 2021,false,CC-8030-ZA,D-803,Workplace & Procurement,Operations,ZA,South Africa,17,16,1,0,4,4,5,5,0,5,1,2,0,0.03,Loaded on time
 2021-08-31,Aug 2021,false,CC-1010-AU,D-101,Core Platform Engineering,Technology,AU,Australia,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -858,7 +858,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2021-08-31,Aug 2021,false,CC-1030-ES,D-103,Mobile & Web Engineering,Technology,ES,Spain,11,11,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-08-31,Aug 2021,false,CC-1030-FR,D-103,Mobile & Web Engineering,Technology,FR,France,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-08-31,Aug 2021,false,CC-1030-GB,D-103,Mobile & Web Engineering,Technology,GB,United Kingdom,31,31,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2021-08-31,Aug 2021,false,CC-1030-IN,D-103,Mobile & Web Engineering,Technology,IN,India,422,421,1,0,14,14,15,15,0,8,7,11,0,0.03,Loaded on time
+2021-08-31,Aug 2021,false,CC-1030-IN,D-103,Mobile & Web Engineering,Technology,IN,India,422,421,1,0,14,14,15,15,0,8,7,10,0,0.03,Loaded on time
 2021-08-31,Aug 2021,false,CC-1030-MX,D-103,Mobile & Web Engineering,Technology,MX,Mexico,66,65,1,0,2,2,2,2,0,1,2,2,0,0.03,Loaded on time
 2021-08-31,Aug 2021,false,CC-1030-NL,D-103,Mobile & Web Engineering,Technology,NL,Netherlands,2,2,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2021-08-31,Aug 2021,false,CC-1030-PL,D-103,Mobile & Web Engineering,Technology,PL,Poland,100,100,0,0,2,2,2,2,0,2,1,2,0,0.03,Loaded on time
@@ -1254,7 +1254,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2021-09-30,Sep 2021,false,CC-1020-JP,D-102,Product Engineering,Technology,JP,Japan,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1020-MX,D-102,Product Engineering,Technology,MX,Mexico,126,124,2,0,5,5,5,5,0,3,4,5,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2021-09-30,Sep 2021,false,CC-1020-PL,D-102,Product Engineering,Technology,PL,Poland,132,130,2,0,7,7,8,8,0,4,4,6,0,0.03,Loaded on time
+2021-09-30,Sep 2021,false,CC-1020-PL,D-102,Product Engineering,Technology,PL,Poland,132,130,2,0,7,7,8,8,0,4,4,5,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1020-SE,D-102,Product Engineering,Technology,SE,Sweden,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1020-SG,D-102,Product Engineering,Technology,SG,Singapore,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1020-US,D-102,Product Engineering,Technology,US,United States,75,75,0,0,2,2,2,2,0,1,1,2,0,0.03,Loaded on time
@@ -1312,7 +1312,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2021-09-30,Sep 2021,false,CC-1050-ZA,D-105,Site Reliability,Technology,ZA,South Africa,15,15,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1060-AE,D-106,Information Security,Technology,AE,United Arab Emirates,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1060-AU,D-106,Information Security,Technology,AU,Australia,4,4,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
-2021-09-30,Sep 2021,false,CC-1060-BR,D-106,Information Security,Technology,BR,Brazil,21,21,0,0,1,1,1,1,0,1,0,1,0,0.03,Loaded on time
+2021-09-30,Sep 2021,false,CC-1060-BR,D-106,Information Security,Technology,BR,Brazil,21,21,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1060-CA,D-106,Information Security,Technology,CA,Canada,14,14,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1060-DE,D-106,Information Security,Technology,DE,Germany,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-09-30,Sep 2021,false,CC-1060-ES,D-106,Information Security,Technology,ES,Spain,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -2149,7 +2149,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2021-11-30,Nov 2021,false,CC-1060-ES,D-106,Information Security,Technology,ES,Spain,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-11-30,Nov 2021,false,CC-1060-GB,D-106,Information Security,Technology,GB,United Kingdom,12,12,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2021-11-30,Nov 2021,false,CC-1060-IE,D-106,Information Security,Technology,IE,Ireland,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2021-11-30,Nov 2021,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,258,257,1,0,7,7,8,8,0,3,4,8,0,0.03,Loaded on time
+2021-11-30,Nov 2021,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,258,257,1,0,7,7,8,8,0,3,4,7,0,0.03,Loaded on time
 2021-11-30,Nov 2021,false,CC-1060-JP,D-106,Information Security,Technology,JP,Japan,0,0,0,0,1,1,1,1,0,1,0,1,0,0.03,Loaded on time
 2021-11-30,Nov 2021,false,CC-1060-MX,D-106,Information Security,Technology,MX,Mexico,44,43,1,0,3,3,4,4,0,3,4,4,0,0.03,Loaded on time
 2021-11-30,Nov 2021,false,CC-1060-NL,D-106,Information Security,Technology,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -3267,7 +3267,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-01-31,Jan 2022,false,CC-8010-CA,D-801,Customer Operations,Operations,CA,Canada,17,17,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-01-31,Jan 2022,false,CC-8010-FR,D-801,Customer Operations,Operations,FR,France,12,12,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-01-31,Jan 2022,false,CC-8010-IE,D-801,Customer Operations,Operations,IE,Ireland,7,7,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
-2022-01-31,Jan 2022,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,213,211,4,2,11,11,13,13,0,7,10,13,0,0.03,Loaded on time
+2022-01-31,Jan 2022,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,213,211,4,2,11,11,13,13,0,7,10,12,0,0.03,Loaded on time
 2022-01-31,Jan 2022,false,CC-8010-MX,D-801,Customer Operations,Operations,MX,Mexico,34,33,1,0,1,2,2,1,1,1,0,1,2,0.03,Loaded on time
 2022-01-31,Jan 2022,false,CC-8010-NL,D-801,Customer Operations,Operations,NL,Netherlands,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-01-31,Jan 2022,false,CC-8010-PL,D-801,Customer Operations,Operations,PL,Poland,59,59,0,0,2,2,2,2,0,1,1,1,0,0.03,Loaded on time
@@ -3739,7 +3739,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-03-31,Mar 2022,false,CC-1020-ES,D-102,Product Engineering,Technology,ES,Spain,14,14,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-03-31,Mar 2022,false,CC-1020-GB,D-102,Product Engineering,Technology,GB,United Kingdom,38,38,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2022-03-31,Mar 2022,false,CC-1020-IE,D-102,Product Engineering,Technology,IE,Ireland,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2022-03-31,Mar 2022,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,589,585,4,0,13,13,15,15,0,9,10,14,0,0.03,Loaded on time
+2022-03-31,Mar 2022,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,589,585,4,0,13,13,15,15,0,9,10,13,0,0.03,Loaded on time
 2022-03-31,Mar 2022,false,CC-1020-JP,D-102,Product Engineering,Technology,JP,Japan,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-03-31,Mar 2022,false,CC-1020-MX,D-102,Product Engineering,Technology,MX,Mexico,127,126,1,0,3,3,3,3,0,2,2,3,0,0.03,Loaded on time
 2022-03-31,Mar 2022,false,CC-1020-PL,D-102,Product Engineering,Technology,PL,Poland,136,135,1,0,6,6,7,7,0,2,6,7,0,0.03,Loaded on time
@@ -4223,7 +4223,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-04-30,Apr 2022,false,CC-1060-GB,D-106,Information Security,Technology,GB,United Kingdom,13,13,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-04-30,Apr 2022,false,CC-1060-IE,D-106,Information Security,Technology,IE,Ireland,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-04-30,Apr 2022,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,262,260,2,0,6,6,8,8,0,4,6,7,0,0.03,Loaded on time
-2022-04-30,Apr 2022,false,CC-1060-MX,D-106,Information Security,Technology,MX,Mexico,56,55,1,0,3,3,4,4,0,1,3,4,0,0.03,Loaded on time
+2022-04-30,Apr 2022,false,CC-1060-MX,D-106,Information Security,Technology,MX,Mexico,56,55,1,0,3,3,4,4,0,1,3,3,0,0.03,Loaded on time
 2022-04-30,Apr 2022,false,CC-1060-NL,D-106,Information Security,Technology,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-04-30,Apr 2022,false,CC-1060-PL,D-106,Information Security,Technology,PL,Poland,73,73,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-04-30,Apr 2022,false,CC-1060-SE,D-106,Information Security,Technology,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -4637,7 +4637,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-05-31,May 2022,false,CC-1060-US,D-106,Information Security,Technology,US,United States,44,44,0,0,3,3,3,3,0,1,3,3,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1060-ZA,D-106,Information Security,Technology,ZA,South Africa,14,14,0,0,1,1,1,1,0,1,0,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-AE,D-107,Enterprise IT,Technology,AE,United Arab Emirates,9,9,0,0,1,1,1,1,0,0,1,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
-2022-05-31,May 2022,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,32,31,1,0,1,1,2,2,0,1,1,2,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
+2022-05-31,May 2022,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,32,31,1,0,1,1,2,2,0,1,1,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-BR,D-107,Enterprise IT,Technology,BR,Brazil,36,36,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-CA,D-107,Enterprise IT,Technology,CA,Canada,29,29,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-CH,D-107,Enterprise IT,Technology,CH,Switzerland,12,12,0,0,1,1,1,1,0,1,1,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
@@ -4646,7 +4646,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-05-31,May 2022,false,CC-1070-FR,D-107,Enterprise IT,Technology,FR,France,17,17,0,0,1,1,1,1,0,0,1,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-GB,D-107,Enterprise IT,Technology,GB,United Kingdom,51,51,0,0,1,1,1,1,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-IE,D-107,Enterprise IT,Technology,IE,Ireland,12,12,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
-2022-05-31,May 2022,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,334,332,2,0,15,15,16,16,0,11,10,15,1,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
+2022-05-31,May 2022,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,334,332,2,0,15,15,16,16,0,11,10,14,1,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-JP,D-107,Enterprise IT,Technology,JP,Japan,13,13,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,70,70,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-1070-NL,D-107,Enterprise IT,Technology,NL,Netherlands,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
@@ -4913,7 +4913,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-05-31,May 2022,false,CC-8010-CA,D-801,Customer Operations,Operations,CA,Canada,19,19,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8010-FR,D-801,Customer Operations,Operations,FR,France,15,15,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8010-IE,D-801,Customer Operations,Operations,IE,Ireland,8,8,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
-2022-05-31,May 2022,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,211,209,2,0,7,7,9,9,0,4,7,9,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
+2022-05-31,May 2022,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,211,209,2,0,7,7,9,9,0,4,7,8,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8010-MX,D-801,Customer Operations,Operations,MX,Mexico,36,36,0,0,1,1,1,1,0,1,0,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8010-NL,D-801,Customer Operations,Operations,NL,Netherlands,8,8,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8010-PL,D-801,Customer Operations,Operations,PL,Poland,61,60,1,0,2,2,3,3,0,1,2,3,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
@@ -4929,7 +4929,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-05-31,May 2022,false,CC-8020-US,D-802,Trust & Safety Operations,Operations,US,United States,6,6,0,0,1,1,1,1,0,1,0,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8020-ZA,D-802,Trust & Safety Operations,Operations,ZA,South Africa,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8030-AE,D-803,Workplace & Procurement,Operations,AE,United Arab Emirates,13,13,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
-2022-05-31,May 2022,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,33,32,1,0,2,2,3,3,0,0,2,3,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
+2022-05-31,May 2022,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,33,32,1,0,2,2,3,3,0,0,2,2,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8030-CA,D-803,Workplace & Procurement,Operations,CA,Canada,36,36,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8030-GB,D-803,Workplace & Procurement,Operations,GB,United Kingdom,70,69,1,0,1,1,1,1,0,0,1,1,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
 2022-05-31,May 2022,false,CC-8030-IE,D-803,Workplace & Procurement,Operations,IE,Ireland,23,23,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 04:53 GMT; the data is complete"
@@ -5358,7 +5358,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-06-30,Jun 2022,false,CC-8030-PL,D-803,Workplace & Procurement,Operations,PL,Poland,44,43,1,0,2,2,2,2,0,1,2,2,0,0.03,Loaded on time
 2022-06-30,Jun 2022,false,CC-8030-SG,D-803,Workplace & Procurement,Operations,SG,Singapore,26,26,0,0,2,2,2,2,0,1,2,2,1,0.03,Loaded on time
 2022-06-30,Jun 2022,false,CC-8030-US,D-803,Workplace & Procurement,Operations,US,United States,307,306,1,0,4,4,4,4,0,2,3,4,2,0.03,Loaded on time
-2022-06-30,Jun 2022,false,CC-8030-ZA,D-803,Workplace & Procurement,Operations,ZA,South Africa,19,18,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2022-06-30,Jun 2022,false,CC-8030-ZA,D-803,Workplace & Procurement,Operations,ZA,South Africa,19,18,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1010-AU,D-101,Core Platform Engineering,Technology,AU,Australia,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1010-BR,D-101,Core Platform Engineering,Technology,BR,Brazil,46,46,0,0,3,3,3,3,0,2,2,2,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1010-CA,D-101,Core Platform Engineering,Technology,CA,Canada,29,27,2,0,2,2,2,2,0,1,1,2,0,0.03,Loaded on time
@@ -5452,7 +5452,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-07-31,Jul 2022,false,CC-1060-GB,D-106,Information Security,Technology,GB,United Kingdom,18,18,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1060-IE,D-106,Information Security,Technology,IE,Ireland,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,282,280,2,0,5,5,7,7,0,4,6,6,0,0.03,Loaded on time
-2022-07-31,Jul 2022,false,CC-1060-MX,D-106,Information Security,Technology,MX,Mexico,67,65,2,0,6,6,7,7,0,4,2,6,0,0.03,Loaded on time
+2022-07-31,Jul 2022,false,CC-1060-MX,D-106,Information Security,Technology,MX,Mexico,67,65,2,0,6,6,7,7,0,4,2,5,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1060-NL,D-106,Information Security,Technology,NL,Netherlands,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1060-PL,D-106,Information Security,Technology,PL,Poland,74,74,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2022-07-31,Jul 2022,false,CC-1060-SE,D-106,Information Security,Technology,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -5796,7 +5796,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-08-31,Aug 2022,false,CC-1020-FR,D-102,Product Engineering,Technology,FR,France,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1020-GB,D-102,Product Engineering,Technology,GB,United Kingdom,38,38,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1020-IE,D-102,Product Engineering,Technology,IE,Ireland,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2022-08-31,Aug 2022,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,620,617,3,0,9,9,10,10,0,4,7,9,0,0.03,Loaded on time
+2022-08-31,Aug 2022,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,620,617,3,0,9,9,10,10,0,4,7,8,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1020-MX,D-102,Product Engineering,Technology,MX,Mexico,116,116,0,0,3,3,3,3,0,2,2,2,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1020-PL,D-102,Product Engineering,Technology,PL,Poland,143,142,1,0,2,2,3,3,0,1,3,3,0,0.03,Loaded on time
@@ -5861,7 +5861,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-08-31,Aug 2022,false,CC-1060-FR,D-106,Information Security,Technology,FR,France,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1060-GB,D-106,Information Security,Technology,GB,United Kingdom,17,17,0,0,1,1,1,1,0,1,0,1,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1060-IE,D-106,Information Security,Technology,IE,Ireland,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2022-08-31,Aug 2022,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,275,273,2,0,5,5,7,7,0,3,5,6,0,0.03,Loaded on time
+2022-08-31,Aug 2022,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,275,273,2,0,5,5,7,7,0,3,5,5,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1060-MX,D-106,Information Security,Technology,MX,Mexico,66,64,2,0,6,6,7,7,0,4,2,6,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1060-NL,D-106,Information Security,Technology,NL,Netherlands,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-08-31,Aug 2022,false,CC-1060-PL,D-106,Information Security,Technology,PL,Poland,71,71,0,0,1,1,1,1,0,1,0,1,0,0.03,Loaded on time
@@ -7451,7 +7451,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2022-12-31,Dec 2022,false,CC-1010-FR,D-101,Core Platform Engineering,Technology,FR,France,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-12-31,Dec 2022,false,CC-1010-GB,D-101,Core Platform Engineering,Technology,GB,United Kingdom,36,35,1,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2022-12-31,Dec 2022,false,CC-1010-IE,D-101,Core Platform Engineering,Technology,IE,Ireland,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2022-12-31,Dec 2022,false,CC-1010-IN,D-101,Core Platform Engineering,Technology,IN,India,734,730,4,0,21,21,22,22,0,13,13,19,1,0.03,Loaded on time
+2022-12-31,Dec 2022,false,CC-1010-IN,D-101,Core Platform Engineering,Technology,IN,India,734,730,4,0,21,21,22,22,0,13,13,18,1,0.03,Loaded on time
 2022-12-31,Dec 2022,false,CC-1010-JP,D-101,Core Platform Engineering,Technology,JP,Japan,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2022-12-31,Dec 2022,false,CC-1010-MX,D-101,Core Platform Engineering,Technology,MX,Mexico,130,129,1,0,5,5,5,5,0,3,4,5,0,0.03,Loaded on time
 2022-12-31,Dec 2022,false,CC-1010-NL,D-101,Core Platform Engineering,Technology,NL,Netherlands,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -7952,7 +7952,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-01-31,Jan 2023,false,CC-1040-MX,D-104,Analytics Engineering,Technology,MX,Mexico,67,66,1,0,2,2,2,2,0,1,2,2,0,0.03,Loaded on time
 2023-01-31,Jan 2023,false,CC-1040-NL,D-104,Analytics Engineering,Technology,NL,Netherlands,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-01-31,Jan 2023,false,CC-1040-PH,D-104,Analytics Engineering,Technology,PH,Philippines,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-01-31,Jan 2023,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,60,58,2,0,2,2,5,5,0,1,4,5,0,0.03,Loaded on time
+2023-01-31,Jan 2023,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,60,58,2,0,2,2,5,5,0,1,4,4,0,0.03,Loaded on time
 2023-01-31,Jan 2023,false,CC-1040-SG,D-104,Analytics Engineering,Technology,SG,Singapore,1,2,0,1,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2023-01-31,Jan 2023,false,CC-1040-US,D-104,Analytics Engineering,Technology,US,United States,44,44,0,0,3,3,3,3,0,3,2,3,0,0.03,Loaded on time
 2023-01-31,Jan 2023,false,CC-1040-ZA,D-104,Analytics Engineering,Technology,ZA,South Africa,10,10,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -8832,7 +8832,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-03-31,Mar 2023,false,CC-1040-MX,D-104,Analytics Engineering,Technology,MX,Mexico,63,62,1,0,2,2,2,2,0,1,2,2,0,0.03,Loaded on time
 2023-03-31,Mar 2023,false,CC-1040-NL,D-104,Analytics Engineering,Technology,NL,Netherlands,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-03-31,Mar 2023,false,CC-1040-PH,D-104,Analytics Engineering,Technology,PH,Philippines,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-03-31,Mar 2023,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,56,54,2,0,3,3,6,6,0,2,3,6,0,0.03,Loaded on time
+2023-03-31,Mar 2023,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,56,54,2,0,3,3,6,6,0,2,3,5,0,0.03,Loaded on time
 2023-03-31,Mar 2023,false,CC-1040-SG,D-104,Analytics Engineering,Technology,SG,Singapore,1,2,0,1,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2023-03-31,Mar 2023,false,CC-1040-US,D-104,Analytics Engineering,Technology,US,United States,47,47,0,0,2,2,2,2,0,2,2,2,0,0.03,Loaded on time
 2023-03-31,Mar 2023,false,CC-1040-ZA,D-104,Analytics Engineering,Technology,ZA,South Africa,9,9,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -9746,7 +9746,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-05-31,May 2023,false,CC-1060-US,D-106,Information Security,Technology,US,United States,40,40,0,0,1,1,1,1,0,1,0,1,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-1060-ZA,D-106,Information Security,Technology,ZA,South Africa,14,14,0,0,1,1,1,1,0,0,1,1,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-1070-AE,D-107,Enterprise IT,Technology,AE,United Arab Emirates,11,11,0,0,1,1,1,1,0,0,1,1,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
-2023-05-31,May 2023,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,36,35,1,0,2,2,3,3,0,0,2,3,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
+2023-05-31,May 2023,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,36,35,1,0,2,2,3,3,0,0,2,2,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-1070-BR,D-107,Enterprise IT,Technology,BR,Brazil,36,36,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-1070-CA,D-107,Enterprise IT,Technology,CA,Canada,35,35,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-1070-CH,D-107,Enterprise IT,Technology,CH,Switzerland,14,15,0,1,1,1,1,1,0,0,0,0,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
@@ -10061,7 +10061,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-05-31,May 2023,false,CC-8020-US,D-802,Trust & Safety Operations,Operations,US,United States,9,9,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-8020-ZA,D-802,Trust & Safety Operations,Operations,ZA,South Africa,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-8030-AE,D-803,Workplace & Procurement,Operations,AE,United Arab Emirates,17,17,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
-2023-05-31,May 2023,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,37,36,1,0,2,2,3,3,0,0,2,3,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
+2023-05-31,May 2023,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,37,36,1,0,2,2,3,3,0,0,2,2,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-8030-CA,D-803,Workplace & Procurement,Operations,CA,Canada,36,36,0,0,3,3,3,3,0,2,2,3,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-8030-GB,D-803,Workplace & Procurement,Operations,GB,United Kingdom,75,74,1,0,1,1,1,1,0,0,1,1,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
 2023-05-31,May 2023,false,CC-8030-IE,D-803,Workplace & Procurement,Operations,IE,Ireland,27,27,0,0,0,0,0,0,0,0,0,0,0,0.03,"Loaded late, finished 05:39 GMT; the data is complete"
@@ -10192,7 +10192,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-06-30,Jun 2023,false,CC-1070-FR,D-107,Enterprise IT,Technology,FR,France,21,21,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-1070-GB,D-107,Enterprise IT,Technology,GB,United Kingdom,53,52,1,0,3,3,3,3,0,0,3,3,1,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-1070-IE,D-107,Enterprise IT,Technology,IE,Ireland,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-06-30,Jun 2023,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,380,376,4,0,7,7,8,8,0,3,6,7,0,0.03,Loaded on time
+2023-06-30,Jun 2023,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,380,376,4,0,7,7,8,8,0,3,6,6,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-1070-JP,D-107,Enterprise IT,Technology,JP,Japan,12,12,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,73,73,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-1070-NL,D-107,Enterprise IT,Technology,NL,Netherlands,11,11,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -10481,7 +10481,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-06-30,Jun 2023,false,CC-7020-SG,D-702,Compliance & Risk,Legal & Compliance,SG,Singapore,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-7020-US,D-702,Compliance & Risk,Legal & Compliance,US,United States,22,22,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-8010-AE,D-801,Customer Operations,Operations,AE,United Arab Emirates,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-06-30,Jun 2023,false,CC-8010-BR,D-801,Customer Operations,Operations,BR,Brazil,25,25,0,0,2,2,2,2,0,0,1,2,0,0.03,Loaded on time
+2023-06-30,Jun 2023,false,CC-8010-BR,D-801,Customer Operations,Operations,BR,Brazil,25,25,0,0,2,2,2,2,0,0,1,1,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-8010-CA,D-801,Customer Operations,Operations,CA,Canada,23,23,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-8010-FR,D-801,Customer Operations,Operations,FR,France,21,21,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-8010-IE,D-801,Customer Operations,Operations,IE,Ireland,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -10515,7 +10515,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-06-30,Jun 2023,false,CC-8030-PL,D-803,Workplace & Procurement,Operations,PL,Poland,52,51,1,0,3,3,3,3,0,2,3,3,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-8030-SG,D-803,Workplace & Procurement,Operations,SG,Singapore,28,28,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2023-06-30,Jun 2023,false,CC-8030-US,D-803,Workplace & Procurement,Operations,US,United States,322,321,1,0,4,4,4,4,0,0,3,4,0,0.03,Loaded on time
-2023-06-30,Jun 2023,false,CC-8030-ZA,D-803,Workplace & Procurement,Operations,ZA,South Africa,32,31,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2023-06-30,Jun 2023,false,CC-8030-ZA,D-803,Workplace & Procurement,Operations,ZA,South Africa,32,31,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-1010-AE,D-101,Core Platform Engineering,Technology,AE,United Arab Emirates,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-1010-AU,D-101,Core Platform Engineering,Technology,AU,Australia,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-1010-BR,D-101,Core Platform Engineering,Technology,BR,Brazil,54,54,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -10912,7 +10912,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-07-31,Jul 2023,false,CC-7020-FR,D-702,Compliance & Risk,Legal & Compliance,FR,France,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-7020-GB,D-702,Compliance & Risk,Legal & Compliance,GB,United Kingdom,6,6,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-7020-IE,D-702,Compliance & Risk,Legal & Compliance,IE,Ireland,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-07-31,Jul 2023,false,CC-7020-IN,D-702,Compliance & Risk,Legal & Compliance,IN,India,40,39,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2023-07-31,Jul 2023,false,CC-7020-IN,D-702,Compliance & Risk,Legal & Compliance,IN,India,40,39,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-7020-JP,D-702,Compliance & Risk,Legal & Compliance,JP,Japan,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-7020-MX,D-702,Compliance & Risk,Legal & Compliance,MX,Mexico,9,9,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-07-31,Jul 2023,false,CC-7020-NL,D-702,Compliance & Risk,Legal & Compliance,NL,Netherlands,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -10985,7 +10985,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-08-31,Aug 2023,false,CC-1020-FR,D-102,Product Engineering,Technology,FR,France,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-08-31,Aug 2023,false,CC-1020-GB,D-102,Product Engineering,Technology,GB,United Kingdom,40,40,0,0,2,2,2,2,0,2,2,2,0,0.03,Loaded on time
 2023-08-31,Aug 2023,false,CC-1020-IE,D-102,Product Engineering,Technology,IE,Ireland,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-08-31,Aug 2023,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,660,656,4,0,16,16,17,17,0,9,9,14,0,0.03,Loaded on time
+2023-08-31,Aug 2023,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,660,656,4,0,16,16,17,17,0,9,9,12,0,0.03,Loaded on time
 2023-08-31,Aug 2023,false,CC-1020-MX,D-102,Product Engineering,Technology,MX,Mexico,104,104,0,0,3,3,3,3,0,1,2,3,0,0.03,Loaded on time
 2023-08-31,Aug 2023,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,4,4,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2023-08-31,Aug 2023,false,CC-1020-PH,D-102,Product Engineering,Technology,PH,Philippines,38,38,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
@@ -11938,7 +11938,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-10-31,Oct 2023,false,CC-1060-FR,D-106,Information Security,Technology,FR,France,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-10-31,Oct 2023,false,CC-1060-GB,D-106,Information Security,Technology,GB,United Kingdom,19,19,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-10-31,Oct 2023,false,CC-1060-IE,D-106,Information Security,Technology,IE,Ireland,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-10-31,Oct 2023,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,271,269,2,0,9,9,12,12,0,6,9,11,0,0.03,Loaded on time
+2023-10-31,Oct 2023,false,CC-1060-IN,D-106,Information Security,Technology,IN,India,271,269,2,0,9,9,12,12,0,6,9,10,0,0.03,Loaded on time
 2023-10-31,Oct 2023,false,CC-1060-JP,D-106,Information Security,Technology,JP,Japan,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-10-31,Oct 2023,false,CC-1060-MX,D-106,Information Security,Technology,MX,Mexico,54,54,0,0,3,3,3,3,0,2,2,3,0,0.03,Loaded on time
 2023-10-31,Oct 2023,false,CC-1060-NL,D-106,Information Security,Technology,NL,Netherlands,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -12299,7 +12299,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2023-11-30,Nov 2023,false,CC-1010-MX,D-101,Core Platform Engineering,Technology,MX,Mexico,136,135,1,0,4,4,4,4,0,0,3,4,0,0.03,Loaded on time
 2023-11-30,Nov 2023,false,CC-1010-NL,D-101,Core Platform Engineering,Technology,NL,Netherlands,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-11-30,Nov 2023,false,CC-1010-PH,D-101,Core Platform Engineering,Technology,PH,Philippines,54,54,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2023-11-30,Nov 2023,false,CC-1010-PL,D-101,Core Platform Engineering,Technology,PL,Poland,164,162,2,0,6,6,8,8,0,2,6,7,0,0.03,Loaded on time
+2023-11-30,Nov 2023,false,CC-1010-PL,D-101,Core Platform Engineering,Technology,PL,Poland,164,162,2,0,6,6,8,8,0,2,6,6,0,0.03,Loaded on time
 2023-11-30,Nov 2023,false,CC-1010-PT,D-101,Core Platform Engineering,Technology,PT,Portugal,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-11-30,Nov 2023,false,CC-1010-SE,D-101,Core Platform Engineering,Technology,SE,Sweden,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2023-11-30,Nov 2023,false,CC-1010-SG,D-101,Core Platform Engineering,Technology,SG,Singapore,6,6,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
@@ -13268,7 +13268,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-01-31,Jan 2024,false,CC-1040-MX,D-104,Analytics Engineering,Technology,MX,Mexico,49,48,1,0,5,5,5,5,0,3,4,4,0,0.03,Loaded on time
 2024-01-31,Jan 2024,false,CC-1040-NL,D-104,Analytics Engineering,Technology,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-01-31,Jan 2024,false,CC-1040-PH,D-104,Analytics Engineering,Technology,PH,Philippines,21,21,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-01-31,Jan 2024,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,53,52,1,0,3,3,4,4,0,3,3,4,0,0.03,Loaded on time
+2024-01-31,Jan 2024,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,53,52,1,0,3,3,4,4,0,3,3,3,0,0.03,Loaded on time
 2024-01-31,Jan 2024,false,CC-1040-PT,D-104,Analytics Engineering,Technology,PT,Portugal,5,5,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2024-01-31,Jan 2024,false,CC-1040-SG,D-104,Analytics Engineering,Technology,SG,Singapore,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-01-31,Jan 2024,false,CC-1040-US,D-104,Analytics Engineering,Technology,US,United States,43,43,0,0,1,1,1,1,0,1,0,1,0,0.03,Loaded on time
@@ -14109,7 +14109,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-03-31,Mar 2024,false,CC-1010-MX,D-101,Core Platform Engineering,Technology,MX,Mexico,149,147,2,0,5,5,5,5,0,2,4,5,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1010-NL,D-101,Core Platform Engineering,Technology,NL,Netherlands,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1010-PH,D-101,Core Platform Engineering,Technology,PH,Philippines,60,60,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-03-31,Mar 2024,false,CC-1010-PL,D-101,Core Platform Engineering,Technology,PL,Poland,163,161,2,0,5,5,7,7,0,3,5,6,0,0.03,Loaded on time
+2024-03-31,Mar 2024,false,CC-1010-PL,D-101,Core Platform Engineering,Technology,PL,Poland,163,161,2,0,5,5,7,7,0,3,5,5,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1010-PT,D-101,Core Platform Engineering,Technology,PT,Portugal,19,19,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1010-SE,D-101,Core Platform Engineering,Technology,SE,Sweden,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1010-SG,D-101,Core Platform Engineering,Technology,SG,Singapore,9,9,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
@@ -14194,7 +14194,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-03-31,Mar 2024,false,CC-1060-AE,D-106,Information Security,Technology,AE,United Arab Emirates,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1060-AU,D-106,Information Security,Technology,AU,Australia,1,1,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1060-BR,D-106,Information Security,Technology,BR,Brazil,22,22,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
-2024-03-31,Mar 2024,false,CC-1060-CA,D-106,Information Security,Technology,CA,Canada,9,8,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2024-03-31,Mar 2024,false,CC-1060-CA,D-106,Information Security,Technology,CA,Canada,9,8,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1060-DE,D-106,Information Security,Technology,DE,Germany,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1060-ES,D-106,Information Security,Technology,ES,Spain,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-03-31,Mar 2024,false,CC-1060-GB,D-106,Information Security,Technology,GB,United Kingdom,19,19,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -14570,7 +14570,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-04-30,Apr 2024,false,CC-1020-FR,D-102,Product Engineering,Technology,FR,France,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-1020-GB,D-102,Product Engineering,Technology,GB,United Kingdom,42,42,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-1020-IE,D-102,Product Engineering,Technology,IE,Ireland,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-04-30,Apr 2024,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,647,644,4,1,18,19,21,20,1,8,14,17,1,0.03,Loaded on time
+2024-04-30,Apr 2024,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,647,644,4,1,18,19,21,20,1,8,14,16,1,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-1020-JP,D-102,Product Engineering,Technology,JP,Japan,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-1020-MX,D-102,Product Engineering,Technology,MX,Mexico,86,86,0,0,1,1,1,1,0,1,0,1,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,2,1,1,0,2,2,3,3,0,0,3,3,0,0.03,Loaded on time
@@ -14684,7 +14684,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-04-30,Apr 2024,false,CC-2010-FR,D-201,Product Management,Product,FR,France,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-2010-GB,D-201,Product Management,Product,GB,United Kingdom,14,14,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-2010-IE,D-201,Product Management,Product,IE,Ireland,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-04-30,Apr 2024,false,CC-2010-IN,D-201,Product Management,Product,IN,India,153,150,3,0,5,5,5,5,0,1,2,3,0,0.03,Loaded on time
+2024-04-30,Apr 2024,false,CC-2010-IN,D-201,Product Management,Product,IN,India,153,150,3,0,5,5,5,5,0,1,2,2,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-2010-JP,D-201,Product Management,Product,JP,Japan,1,2,0,1,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-2010-MX,D-201,Product Management,Product,MX,Mexico,24,24,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-04-30,Apr 2024,false,CC-2010-PH,D-201,Product Management,Product,PH,Philippines,11,11,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -15556,7 +15556,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-06-30,Jun 2024,false,CC-1060-US,D-106,Information Security,Technology,US,United States,44,44,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1060-ZA,D-106,Information Security,Technology,ZA,South Africa,8,8,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-AE,D-107,Enterprise IT,Technology,AE,United Arab Emirates,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-06-30,Jun 2024,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,45,44,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2024-06-30,Jun 2024,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,45,44,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-BR,D-107,Enterprise IT,Technology,BR,Brazil,29,29,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-CA,D-107,Enterprise IT,Technology,CA,Canada,27,27,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-CH,D-107,Enterprise IT,Technology,CH,Switzerland,16,16,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -15565,7 +15565,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-06-30,Jun 2024,false,CC-1070-FR,D-107,Enterprise IT,Technology,FR,France,21,21,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-GB,D-107,Enterprise IT,Technology,GB,United Kingdom,55,55,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-IE,D-107,Enterprise IT,Technology,IE,Ireland,11,11,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-06-30,Jun 2024,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,350,346,4,0,15,15,17,17,0,8,12,15,0,0.03,Loaded on time
+2024-06-30,Jun 2024,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,350,346,4,0,15,15,17,17,0,8,12,14,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-JP,D-107,Enterprise IT,Technology,JP,Japan,10,10,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-KR,D-107,Enterprise IT,Technology,KR,South Korea,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,71,71,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
@@ -15876,7 +15876,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-06-30,Jun 2024,false,CC-8020-US,D-802,Trust & Safety Operations,Operations,US,United States,8,8,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-8020-ZA,D-802,Trust & Safety Operations,Operations,ZA,South Africa,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-8030-AE,D-803,Workplace & Procurement,Operations,AE,United Arab Emirates,16,16,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-06-30,Jun 2024,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,40,39,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2024-06-30,Jun 2024,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,40,39,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-8030-CA,D-803,Workplace & Procurement,Operations,CA,Canada,43,43,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-8030-GB,D-803,Workplace & Procurement,Operations,GB,United Kingdom,75,74,1,0,2,2,2,2,0,0,2,2,0,0.03,Loaded on time
 2024-06-30,Jun 2024,false,CC-8030-IE,D-803,Workplace & Procurement,Operations,IE,Ireland,31,31,0,0,1,1,1,1,0,0,1,1,1,0.03,Loaded on time
@@ -15899,7 +15899,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-07-31,Jul 2024,false,CC-1010-FR,D-101,Core Platform Engineering,Technology,FR,France,3,3,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1010-GB,D-101,Core Platform Engineering,Technology,GB,United Kingdom,33,33,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1010-IE,D-101,Core Platform Engineering,Technology,IE,Ireland,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-07-31,Jul 2024,false,CC-1010-IN,D-101,Core Platform Engineering,Technology,IN,India,747,744,3,0,15,15,16,16,0,6,10,13,0,0.03,Loaded on time
+2024-07-31,Jul 2024,false,CC-1010-IN,D-101,Core Platform Engineering,Technology,IN,India,747,744,3,0,15,15,16,16,0,6,10,12,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1010-MX,D-101,Core Platform Engineering,Technology,MX,Mexico,137,136,1,0,3,3,3,3,0,2,3,3,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1010-NL,D-101,Core Platform Engineering,Technology,NL,Netherlands,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1010-PH,D-101,Core Platform Engineering,Technology,PH,Philippines,71,71,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -15963,7 +15963,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-07-31,Jul 2024,false,CC-1040-MX,D-104,Analytics Engineering,Technology,MX,Mexico,45,45,0,0,2,2,2,2,0,0,2,2,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1040-NL,D-104,Analytics Engineering,Technology,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1040-PH,D-104,Analytics Engineering,Technology,PH,Philippines,31,31,0,0,2,2,2,2,0,2,0,0,0,0.03,Loaded on time
-2024-07-31,Jul 2024,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,53,52,1,0,2,2,3,3,0,2,2,3,0,0.03,Loaded on time
+2024-07-31,Jul 2024,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,53,52,1,0,2,2,3,3,0,2,2,2,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1040-PT,D-104,Analytics Engineering,Technology,PT,Portugal,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1040-SG,D-104,Analytics Engineering,Technology,SG,Singapore,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1040-US,D-104,Analytics Engineering,Technology,US,United States,31,31,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -16024,7 +16024,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-07-31,Jul 2024,false,CC-1070-PT,D-107,Enterprise IT,Technology,PT,Portugal,15,15,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1070-SE,D-107,Enterprise IT,Technology,SE,Sweden,6,5,1,0,1,1,1,1,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1070-SG,D-107,Enterprise IT,Technology,SG,Singapore,13,13,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
-2024-07-31,Jul 2024,false,CC-1070-US,D-107,Enterprise IT,Technology,US,United States,174,173,1,0,12,12,12,12,0,8,3,6,0,0.03,Loaded on time
+2024-07-31,Jul 2024,false,CC-1070-US,D-107,Enterprise IT,Technology,US,United States,174,173,1,0,12,12,12,12,0,8,3,5,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-1070-ZA,D-107,Enterprise IT,Technology,ZA,South Africa,20,20,0,0,1,1,1,1,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-2010-AE,D-201,Product Management,Product,AE,United Arab Emirates,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-07-31,Jul 2024,false,CC-2010-AU,D-201,Product Management,Product,AU,Australia,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -16354,7 +16354,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-08-31,Aug 2024,false,CC-1010-MX,D-101,Core Platform Engineering,Technology,MX,Mexico,137,136,1,0,5,5,5,5,0,4,3,3,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1010-NL,D-101,Core Platform Engineering,Technology,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1010-PH,D-101,Core Platform Engineering,Technology,PH,Philippines,73,73,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2024-08-31,Aug 2024,false,CC-1010-PL,D-101,Core Platform Engineering,Technology,PL,Poland,159,157,2,0,5,5,7,7,0,2,5,6,0,0.03,Loaded on time
+2024-08-31,Aug 2024,false,CC-1010-PL,D-101,Core Platform Engineering,Technology,PL,Poland,159,157,2,0,5,5,7,7,0,2,5,5,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1010-PT,D-101,Core Platform Engineering,Technology,PT,Portugal,25,25,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1010-SE,D-101,Core Platform Engineering,Technology,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1010-SG,D-101,Core Platform Engineering,Technology,SG,Singapore,8,8,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -16373,7 +16373,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-08-31,Aug 2024,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,645,642,3,0,19,19,20,20,0,6,17,18,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1020-JP,D-102,Product Engineering,Technology,JP,Japan,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1020-MX,D-102,Product Engineering,Technology,MX,Mexico,97,97,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
-2024-08-31,Aug 2024,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,3,2,1,0,2,2,3,3,0,1,2,3,0,0.03,Loaded on time
+2024-08-31,Aug 2024,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,3,2,1,0,2,2,3,3,0,1,2,2,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1020-PH,D-102,Product Engineering,Technology,PH,Philippines,69,68,1,0,1,1,2,2,0,1,2,2,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1020-PL,D-102,Product Engineering,Technology,PL,Poland,133,134,0,1,9,9,9,9,0,5,5,8,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1020-PT,D-102,Product Engineering,Technology,PT,Portugal,34,34,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -16401,7 +16401,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-08-31,Aug 2024,false,CC-1030-SE,D-103,Mobile & Web Engineering,Technology,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1030-SG,D-103,Mobile & Web Engineering,Technology,SG,Singapore,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1030-US,D-103,Mobile & Web Engineering,Technology,US,United States,78,78,0,0,2,2,2,2,0,1,2,2,0,0.03,Loaded on time
-2024-08-31,Aug 2024,false,CC-1030-ZA,D-103,Mobile & Web Engineering,Technology,ZA,South Africa,18,17,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2024-08-31,Aug 2024,false,CC-1030-ZA,D-103,Mobile & Web Engineering,Technology,ZA,South Africa,18,17,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1040-BR,D-104,Analytics Engineering,Technology,BR,Brazil,10,10,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1040-CA,D-104,Analytics Engineering,Technology,CA,Canada,17,17,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2024-08-31,Aug 2024,false,CC-1040-CH,D-104,Analytics Engineering,Technology,CH,Switzerland,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -18244,7 +18244,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2024-12-31,Dec 2024,false,CC-1050-ZA,D-105,Site Reliability,Technology,ZA,South Africa,16,16,0,0,0,0,0,0,0,0,0,0,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
 2024-12-31,Dec 2024,false,CC-1060-AU,D-106,Information Security,Technology,AU,Australia,2,2,0,0,1,1,1,1,0,0,1,1,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
 2024-12-31,Dec 2024,false,CC-1060-BR,D-106,Information Security,Technology,BR,Brazil,21,21,0,0,3,3,3,3,0,2,2,3,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
-2024-12-31,Dec 2024,false,CC-1060-CA,D-106,Information Security,Technology,CA,Canada,9,8,1,0,2,2,3,3,0,0,2,3,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
+2024-12-31,Dec 2024,false,CC-1060-CA,D-106,Information Security,Technology,CA,Canada,9,8,1,0,2,2,3,3,0,0,2,2,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
 2024-12-31,Dec 2024,false,CC-1060-CH,D-106,Information Security,Technology,CH,Switzerland,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
 2024-12-31,Dec 2024,false,CC-1060-DE,D-106,Information Security,Technology,DE,Germany,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
 2024-12-31,Dec 2024,false,CC-1060-ES,D-106,Information Security,Technology,ES,Spain,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Keystone load failed: the close used Keystone as of Dec 28
@@ -18621,7 +18621,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-01-31,Jan 2025,false,CC-1010-FR,D-101,Core Platform Engineering,Technology,FR,France,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1010-GB,D-101,Core Platform Engineering,Technology,GB,United Kingdom,39,39,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1010-IE,D-101,Core Platform Engineering,Technology,IE,Ireland,8,8,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-01-31,Jan 2025,false,CC-1010-IN,D-101,Core Platform Engineering,Technology,IN,India,714,709,5,0,20,21,23,22,1,10,13,20,3,0.03,Loaded on time
+2025-01-31,Jan 2025,false,CC-1010-IN,D-101,Core Platform Engineering,Technology,IN,India,714,709,5,0,20,21,23,22,1,10,13,19,3,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1010-JP,D-101,Core Platform Engineering,Technology,JP,Japan,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1010-MX,D-101,Core Platform Engineering,Technology,MX,Mexico,151,151,0,0,1,2,2,1,1,0,1,1,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1010-NL,D-101,Core Platform Engineering,Technology,NL,Netherlands,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -18741,7 +18741,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-01-31,Jan 2025,false,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,63,62,1,0,1,1,2,2,0,0,2,2,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1070-NL,D-107,Enterprise IT,Technology,NL,Netherlands,9,9,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1070-PH,D-107,Enterprise IT,Technology,PH,Philippines,34,34,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-01-31,Jan 2025,false,CC-1070-PL,D-107,Enterprise IT,Technology,PL,Poland,90,89,1,0,5,5,6,6,0,3,3,5,0,0.03,Loaded on time
+2025-01-31,Jan 2025,false,CC-1070-PL,D-107,Enterprise IT,Technology,PL,Poland,90,89,1,0,5,5,6,6,0,3,3,4,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1070-PT,D-107,Enterprise IT,Technology,PT,Portugal,22,22,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1070-SE,D-107,Enterprise IT,Technology,SE,Sweden,6,5,1,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2025-01-31,Jan 2025,false,CC-1070-SG,D-107,Enterprise IT,Technology,SG,Singapore,14,14,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
@@ -19582,7 +19582,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-03-31,Mar 2025,false,CC-1020-IE,D-102,Product Engineering,Technology,IE,Ireland,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,604,604,0,0,17,17,17,17,0,12,10,13,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1020-MX,D-102,Product Engineering,Technology,MX,Mexico,96,96,0,0,3,3,3,3,0,3,1,1,0,0.03,Loaded on time
-2025-03-31,Mar 2025,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,6,5,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2025-03-31,Mar 2025,false,CC-1020-NL,D-102,Product Engineering,Technology,NL,Netherlands,6,5,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1020-PH,D-102,Product Engineering,Technology,PH,Philippines,74,74,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1020-PL,D-102,Product Engineering,Technology,PL,Poland,132,133,0,1,2,2,2,2,0,2,1,2,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1020-PT,D-102,Product Engineering,Technology,PT,Portugal,41,41,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -19609,7 +19609,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-03-31,Mar 2025,false,CC-1030-SE,D-103,Mobile & Web Engineering,Technology,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1030-SG,D-103,Mobile & Web Engineering,Technology,SG,Singapore,1,1,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1030-US,D-103,Mobile & Web Engineering,Technology,US,United States,73,73,0,0,4,4,4,4,0,1,2,3,0,0.03,Loaded on time
-2025-03-31,Mar 2025,false,CC-1030-ZA,D-103,Mobile & Web Engineering,Technology,ZA,South Africa,14,13,1,0,2,2,3,3,0,1,1,2,0,0.03,Loaded on time
+2025-03-31,Mar 2025,false,CC-1030-ZA,D-103,Mobile & Web Engineering,Technology,ZA,South Africa,14,13,1,0,2,2,3,3,0,1,1,1,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1040-AE,D-104,Analytics Engineering,Technology,AE,United Arab Emirates,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1040-BR,D-104,Analytics Engineering,Technology,BR,Brazil,9,9,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-03-31,Mar 2025,false,CC-1040-CA,D-104,Analytics Engineering,Technology,CA,Canada,16,16,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -20624,7 +20624,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-05-31,May 2025,false,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,65,63,2,0,2,2,2,2,0,0,1,2,0,0.03,Loaded on time
 2025-05-31,May 2025,false,CC-1070-NL,D-107,Enterprise IT,Technology,NL,Netherlands,8,8,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-05-31,May 2025,false,CC-1070-PH,D-107,Enterprise IT,Technology,PH,Philippines,44,43,1,0,1,1,1,1,0,0,0,0,0,0.03,Loaded on time
-2025-05-31,May 2025,false,CC-1070-PL,D-107,Enterprise IT,Technology,PL,Poland,86,84,2,0,4,4,5,5,0,2,4,5,0,0.03,Loaded on time
+2025-05-31,May 2025,false,CC-1070-PL,D-107,Enterprise IT,Technology,PL,Poland,86,84,2,0,4,4,5,5,0,2,4,4,0,0.03,Loaded on time
 2025-05-31,May 2025,false,CC-1070-PT,D-107,Enterprise IT,Technology,PT,Portugal,29,29,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-05-31,May 2025,false,CC-1070-SE,D-107,Enterprise IT,Technology,SE,Sweden,6,5,1,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2025-05-31,May 2025,false,CC-1070-SG,D-107,Enterprise IT,Technology,SG,Singapore,16,16,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
@@ -21081,7 +21081,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-06-30,Jun 2025,false,CC-1060-US,D-106,Information Security,Technology,US,United States,47,47,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-1060-ZA,D-106,Information Security,Technology,ZA,South Africa,10,10,0,0,2,2,2,2,0,1,1,2,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-1070-AE,D-107,Enterprise IT,Technology,AE,United Arab Emirates,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-06-30,Jun 2025,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,51,50,1,0,3,3,5,5,0,0,4,5,1,0.03,Loaded on time
+2025-06-30,Jun 2025,false,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,51,50,1,0,3,3,5,5,0,0,4,4,1,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-1070-BR,D-107,Enterprise IT,Technology,BR,Brazil,26,26,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-1070-CA,D-107,Enterprise IT,Technology,CA,Canada,32,32,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-1070-CH,D-107,Enterprise IT,Technology,CH,Switzerland,19,19,0,0,3,3,3,3,0,3,3,3,2,0.03,Loaded on time
@@ -21158,7 +21158,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-06-30,Jun 2025,false,CC-3010-BR,D-301,Enterprise Sales - Americas,Commercial,BR,Brazil,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-3010-DE,D-301,Enterprise Sales - Americas,Commercial,DE,Germany,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-3010-GB,D-301,Enterprise Sales - Americas,Commercial,GB,United Kingdom,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-06-30,Jun 2025,false,CC-3010-IN,D-301,Enterprise Sales - Americas,Commercial,IN,India,45,45,0,0,3,3,3,3,0,3,1,3,0,0.03,Loaded on time
+2025-06-30,Jun 2025,false,CC-3010-IN,D-301,Enterprise Sales - Americas,Commercial,IN,India,45,45,0,0,3,3,3,3,0,3,1,2,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-3010-MX,D-301,Enterprise Sales - Americas,Commercial,MX,Mexico,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-3010-PL,D-301,Enterprise Sales - Americas,Commercial,PL,Poland,17,17,0,0,2,2,2,2,0,1,1,1,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-3010-SG,D-301,Enterprise Sales - Americas,Commercial,SG,Singapore,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -21430,11 +21430,11 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-06-30,Jun 2025,false,CC-8020-US,D-802,Trust & Safety Operations,Operations,US,United States,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8020-ZA,D-802,Trust & Safety Operations,Operations,ZA,South Africa,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8030-AE,D-803,Workplace & Procurement,Operations,AE,United Arab Emirates,14,13,1,0,1,1,1,1,0,0,1,1,1,0.03,Loaded on time
-2025-06-30,Jun 2025,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,41,40,1,0,3,3,4,4,0,0,3,4,1,0.03,Loaded on time
+2025-06-30,Jun 2025,false,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,41,40,1,0,3,3,4,4,0,0,3,3,1,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8030-CA,D-803,Workplace & Procurement,Operations,CA,Canada,51,51,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8030-GB,D-803,Workplace & Procurement,Operations,GB,United Kingdom,66,65,1,0,2,2,2,2,0,0,2,2,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8030-IE,D-803,Workplace & Procurement,Operations,IE,Ireland,34,34,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
-2025-06-30,Jun 2025,false,CC-8030-IN,D-803,Workplace & Procurement,Operations,IN,India,221,219,2,0,6,6,7,7,0,3,6,7,1,0.03,Loaded on time
+2025-06-30,Jun 2025,false,CC-8030-IN,D-803,Workplace & Procurement,Operations,IN,India,221,219,2,0,6,6,7,7,0,3,6,6,1,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8030-JP,D-803,Workplace & Procurement,Operations,JP,Japan,28,28,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8030-MX,D-803,Workplace & Procurement,Operations,MX,Mexico,41,41,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-06-30,Jun 2025,false,CC-8030-NL,D-803,Workplace & Procurement,Operations,NL,Netherlands,22,22,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -21515,7 +21515,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-07-31,Jul 2025,false,CC-1040-MX,D-104,Analytics Engineering,Technology,MX,Mexico,46,46,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1040-NL,D-104,Analytics Engineering,Technology,NL,Netherlands,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1040-PH,D-104,Analytics Engineering,Technology,PH,Philippines,35,34,1,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
-2025-07-31,Jul 2025,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,59,57,2,0,3,3,4,4,0,4,2,4,0,0.03,Loaded on time
+2025-07-31,Jul 2025,false,CC-1040-PL,D-104,Analytics Engineering,Technology,PL,Poland,59,57,2,0,3,3,4,4,0,4,2,3,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1040-PT,D-104,Analytics Engineering,Technology,PT,Portugal,16,16,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1040-SE,D-104,Analytics Engineering,Technology,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1040-SG,D-104,Analytics Engineering,Technology,SG,Singapore,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -21569,7 +21569,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-07-31,Jul 2025,false,CC-1070-FR,D-107,Enterprise IT,Technology,FR,France,17,17,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1070-GB,D-107,Enterprise IT,Technology,GB,United Kingdom,49,48,1,0,3,3,3,3,0,2,0,1,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1070-IE,D-107,Enterprise IT,Technology,IE,Ireland,15,15,0,0,1,1,1,1,0,1,0,0,1,0.03,Loaded on time
-2025-07-31,Jul 2025,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,323,321,2,0,10,10,11,11,0,8,4,6,0,0.03,Loaded on time
+2025-07-31,Jul 2025,false,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,323,321,2,0,10,10,11,11,0,8,4,5,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1070-JP,D-107,Enterprise IT,Technology,JP,Japan,7,7,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1070-KR,D-107,Enterprise IT,Technology,KR,South Korea,9,9,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,63,62,1,0,3,3,3,3,0,2,1,1,0,0.03,Loaded on time
@@ -21893,7 +21893,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-07-31,Jul 2025,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,222,221,1,0,8,8,9,9,0,4,5,7,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8010-MX,D-801,Customer Operations,Operations,MX,Mexico,39,39,0,0,3,3,3,3,0,1,2,2,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8010-NL,D-801,Customer Operations,Operations,NL,Netherlands,5,5,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
-2025-07-31,Jul 2025,false,CC-8010-PH,D-801,Customer Operations,Operations,PH,Philippines,35,34,1,0,2,2,3,3,0,1,1,2,0,0.03,Loaded on time
+2025-07-31,Jul 2025,false,CC-8010-PH,D-801,Customer Operations,Operations,PH,Philippines,35,34,1,0,2,2,3,3,0,1,1,1,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8010-PL,D-801,Customer Operations,Operations,PL,Poland,52,52,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8010-PT,D-801,Customer Operations,Operations,PT,Portugal,20,20,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8010-SE,D-801,Customer Operations,Operations,SE,Sweden,4,4,0,0,2,2,2,2,0,2,0,0,0,0.03,Loaded on time
@@ -21914,7 +21914,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-07-31,Jul 2025,false,CC-8030-CA,D-803,Workplace & Procurement,Operations,CA,Canada,39,38,1,0,2,2,2,2,0,1,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-GB,D-803,Workplace & Procurement,Operations,GB,United Kingdom,60,58,2,0,5,5,5,5,0,2,2,2,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-IE,D-803,Workplace & Procurement,Operations,IE,Ireland,25,25,0,0,2,2,2,2,0,2,0,1,0,0.03,Loaded on time
-2025-07-31,Jul 2025,false,CC-8030-IN,D-803,Workplace & Procurement,Operations,IN,India,201,199,2,0,11,11,12,12,0,10,3,6,0,0.03,Loaded on time
+2025-07-31,Jul 2025,false,CC-8030-IN,D-803,Workplace & Procurement,Operations,IN,India,201,199,2,0,11,11,12,12,0,10,3,4,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-JP,D-803,Workplace & Procurement,Operations,JP,Japan,24,24,0,0,2,2,2,2,0,2,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-MX,D-803,Workplace & Procurement,Operations,MX,Mexico,34,34,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-NL,D-803,Workplace & Procurement,Operations,NL,Netherlands,20,19,1,0,3,3,3,3,0,2,0,0,0,0.03,Loaded on time
@@ -21922,7 +21922,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-07-31,Jul 2025,false,CC-8030-PL,D-803,Workplace & Procurement,Operations,PL,Poland,54,54,0,0,3,3,3,3,0,2,2,2,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-PT,D-803,Workplace & Procurement,Operations,PT,Portugal,11,11,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-SG,D-803,Workplace & Procurement,Operations,SG,Singapore,32,32,0,0,4,4,4,4,0,2,1,1,0,0.03,Loaded on time
-2025-07-31,Jul 2025,false,CC-8030-US,D-803,Workplace & Procurement,Operations,US,United States,288,286,2,0,18,18,19,19,0,16,4,5,0,0.03,Loaded on time
+2025-07-31,Jul 2025,false,CC-8030-US,D-803,Workplace & Procurement,Operations,US,United States,288,286,2,0,18,18,19,19,0,16,4,4,0,0.03,Loaded on time
 2025-07-31,Jul 2025,false,CC-8030-ZA,D-803,Workplace & Procurement,Operations,ZA,South Africa,18,18,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-1010-AE,D-101,Core Platform Engineering,Technology,AE,United Arab Emirates,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-1010-AU,D-101,Core Platform Engineering,Technology,AU,Australia,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -22011,7 +22011,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-08-31,Aug 2025,false,CC-1050-FR,D-105,Site Reliability,Technology,FR,France,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-1050-GB,D-105,Site Reliability,Technology,GB,United Kingdom,14,14,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-1050-IE,D-105,Site Reliability,Technology,IE,Ireland,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-08-31,Aug 2025,false,CC-1050-IN,D-105,Site Reliability,Technology,IN,India,303,300,3,0,5,6,7,6,1,3,5,6,1,0.03,Loaded on time
+2025-08-31,Aug 2025,false,CC-1050-IN,D-105,Site Reliability,Technology,IN,India,303,300,3,0,5,6,7,6,1,3,5,5,1,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-1050-JP,D-105,Site Reliability,Technology,JP,Japan,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-1050-MX,D-105,Site Reliability,Technology,MX,Mexico,57,57,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-1050-PH,D-105,Site Reliability,Technology,PH,Philippines,37,35,2,0,2,2,2,2,0,2,2,2,0,0.03,Loaded on time
@@ -22376,7 +22376,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-08-31,Aug 2025,false,CC-8010-CA,D-801,Customer Operations,Operations,CA,Canada,14,14,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-8010-FR,D-801,Customer Operations,Operations,FR,France,11,11,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-8010-IE,D-801,Customer Operations,Operations,IE,Ireland,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-08-31,Aug 2025,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,227,226,1,0,6,6,7,7,0,5,3,6,1,0.03,Loaded on time
+2025-08-31,Aug 2025,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,227,226,1,0,6,6,7,7,0,5,3,5,1,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-8010-MX,D-801,Customer Operations,Operations,MX,Mexico,39,39,0,0,4,4,4,4,0,2,1,2,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-8010-NL,D-801,Customer Operations,Operations,NL,Netherlands,5,5,0,0,1,1,1,1,0,0,0,1,0,0.03,Loaded on time
 2025-08-31,Aug 2025,false,CC-8010-PH,D-801,Customer Operations,Operations,PH,Philippines,37,36,1,0,2,2,3,3,0,1,1,3,0,0.03,Loaded on time
@@ -22543,7 +22543,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-09-30,Sep 2025,false,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,64,64,0,0,3,3,3,3,0,2,1,2,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1070-NL,D-107,Enterprise IT,Technology,NL,Netherlands,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1070-PH,D-107,Enterprise IT,Technology,PH,Philippines,43,42,1,0,2,2,2,2,0,1,1,1,1,0.03,Loaded on time
-2025-09-30,Sep 2025,false,CC-1070-PL,D-107,Enterprise IT,Technology,PL,Poland,88,84,4,0,6,6,7,7,0,4,4,6,0,0.03,Loaded on time
+2025-09-30,Sep 2025,false,CC-1070-PL,D-107,Enterprise IT,Technology,PL,Poland,88,84,4,0,6,6,7,7,0,4,4,5,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1070-PT,D-107,Enterprise IT,Technology,PT,Portugal,28,28,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1070-SE,D-107,Enterprise IT,Technology,SE,Sweden,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1070-SG,D-107,Enterprise IT,Technology,SG,Singapore,14,14,0,0,2,2,2,2,0,2,1,2,0,0.03,Loaded on time
@@ -22558,7 +22558,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-09-30,Sep 2025,false,CC-1080-GB,D-108,Data & AI Platform,Technology,GB,United Kingdom,15,15,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1080-IE,D-108,Data & AI Platform,Technology,IE,Ireland,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1080-IN,D-108,Data & AI Platform,Technology,IN,India,213,214,0,1,3,3,3,3,0,2,1,2,0,0.03,Loaded on time
-2025-09-30,Sep 2025,false,CC-1080-MX,D-108,Data & AI Platform,Technology,MX,Mexico,53,53,0,0,2,2,2,2,0,1,1,2,1,0.03,Loaded on time
+2025-09-30,Sep 2025,false,CC-1080-MX,D-108,Data & AI Platform,Technology,MX,Mexico,53,53,0,0,2,2,2,2,0,1,1,1,1,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1080-NL,D-108,Data & AI Platform,Technology,NL,Netherlands,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1080-PH,D-108,Data & AI Platform,Technology,PH,Philippines,21,21,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-1080-PL,D-108,Data & AI Platform,Technology,PL,Poland,56,56,0,0,2,2,2,2,0,0,2,2,0,0.03,Loaded on time
@@ -22777,7 +22777,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-09-30,Sep 2025,false,CC-6010-NL,D-601,HR Business Partners,People,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-6010-PH,D-601,HR Business Partners,People,PH,Philippines,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-6010-PL,D-601,HR Business Partners,People,PL,Poland,6,6,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
-2025-09-30,Sep 2025,false,CC-6010-PT,D-601,HR Business Partners,People,PT,Portugal,3,2,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2025-09-30,Sep 2025,false,CC-6010-PT,D-601,HR Business Partners,People,PT,Portugal,3,2,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-6010-SE,D-601,HR Business Partners,People,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-6010-SG,D-601,HR Business Partners,People,SG,Singapore,6,6,0,0,1,1,1,1,0,0,0,0,0,0.03,Loaded on time
 2025-09-30,Sep 2025,false,CC-6010-US,D-601,HR Business Partners,People,US,United States,15,14,1,0,2,2,3,3,0,1,2,2,0,0.03,Loaded on time
@@ -23721,7 +23721,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-11-30,Nov 2025,false,CC-5020-FR,D-502,Accounting & Controllership,Finance,FR,France,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-11-30,Nov 2025,false,CC-5020-GB,D-502,Accounting & Controllership,Finance,GB,United Kingdom,6,6,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2025-11-30,Nov 2025,false,CC-5020-IE,D-502,Accounting & Controllership,Finance,IE,Ireland,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-11-30,Nov 2025,false,CC-5020-IN,D-502,Accounting & Controllership,Finance,IN,India,55,54,1,0,3,3,3,3,0,1,2,3,0,0.03,Loaded on time
+2025-11-30,Nov 2025,false,CC-5020-IN,D-502,Accounting & Controllership,Finance,IN,India,55,54,1,0,3,3,3,3,0,1,2,2,0,0.03,Loaded on time
 2025-11-30,Nov 2025,false,CC-5020-JP,D-502,Accounting & Controllership,Finance,JP,Japan,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-11-30,Nov 2025,false,CC-5020-MX,D-502,Accounting & Controllership,Finance,MX,Mexico,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-11-30,Nov 2025,false,CC-5020-NL,D-502,Accounting & Controllership,Finance,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -23898,7 +23898,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2025-12-31,Dec 2025,false,CC-1010-JP,D-101,Core Platform Engineering,Technology,JP,Japan,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2025-12-31,Dec 2025,false,CC-1010-MX,D-101,Core Platform Engineering,Technology,MX,Mexico,138,136,2,0,4,4,5,4,1,1,2,4,2,0.03,Loaded on time
 2025-12-31,Dec 2025,false,CC-1010-NL,D-101,Core Platform Engineering,Technology,NL,Netherlands,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2025-12-31,Dec 2025,false,CC-1010-PH,D-101,Core Platform Engineering,Technology,PH,Philippines,79,78,1,0,3,3,4,4,0,3,2,3,0,0.03,Loaded on time
+2025-12-31,Dec 2025,false,CC-1010-PH,D-101,Core Platform Engineering,Technology,PH,Philippines,79,78,1,0,3,3,4,4,0,3,2,2,0,0.03,Loaded on time
 2025-12-31,Dec 2025,false,CC-1010-PL,D-101,Core Platform Engineering,Technology,PL,Poland,166,164,2,0,4,4,4,4,0,2,3,3,0,0.03,Loaded on time
 2025-12-31,Dec 2025,false,CC-1010-PT,D-101,Core Platform Engineering,Technology,PT,Portugal,60,60,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2025-12-31,Dec 2025,false,CC-1010-SG,D-101,Core Platform Engineering,Technology,SG,Singapore,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -24963,7 +24963,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-02-28,Feb 2026,false,CC-1050-ES,D-105,Site Reliability,Technology,ES,Spain,7,7,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-02-28,Feb 2026,false,CC-1050-GB,D-105,Site Reliability,Technology,GB,United Kingdom,11,11,0,0,1,1,1,1,0,1,0,0,0,0.03,Loaded on time
 2026-02-28,Feb 2026,false,CC-1050-IE,D-105,Site Reliability,Technology,IE,Ireland,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2026-02-28,Feb 2026,false,CC-1050-IN,D-105,Site Reliability,Technology,IN,India,285,282,3,0,9,9,10,10,0,4,5,10,0,0.03,Loaded on time
+2026-02-28,Feb 2026,false,CC-1050-IN,D-105,Site Reliability,Technology,IN,India,285,282,3,0,9,9,10,10,0,4,5,9,0,0.03,Loaded on time
 2026-02-28,Feb 2026,false,CC-1050-JP,D-105,Site Reliability,Technology,JP,Japan,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-02-28,Feb 2026,false,CC-1050-MX,D-105,Site Reliability,Technology,MX,Mexico,54,53,1,0,2,2,2,2,0,0,1,2,0,0.03,Loaded on time
 2026-02-28,Feb 2026,false,CC-1050-NL,D-105,Site Reliability,Technology,NL,Netherlands,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -25741,7 +25741,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-03-31,Mar 2026,false,CC-6010-NL,D-601,HR Business Partners,People,NL,Netherlands,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
 2026-03-31,Mar 2026,false,CC-6010-PH,D-601,HR Business Partners,People,PH,Philippines,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
 2026-03-31,Mar 2026,false,CC-6010-PL,D-601,HR Business Partners,People,PL,Poland,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
-2026-03-31,Mar 2026,false,CC-6010-PT,D-601,HR Business Partners,People,PT,Portugal,3,2,1,0,1,1,2,2,0,1,1,2,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
+2026-03-31,Mar 2026,false,CC-6010-PT,D-601,HR Business Partners,People,PT,Portugal,3,2,1,0,1,1,2,2,0,1,1,1,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
 2026-03-31,Mar 2026,false,CC-6010-SE,D-601,HR Business Partners,People,SE,Sweden,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
 2026-03-31,Mar 2026,false,CC-6010-SG,D-601,HR Business Partners,People,SG,Singapore,5,5,0,0,0,0,0,0,0,0,0,0,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
 2026-03-31,Mar 2026,false,CC-6010-US,D-601,HR Business Partners,People,US,United States,14,14,0,0,1,1,1,1,0,0,1,1,0,0.03,Helix read failed: tickets are as of Mar 31 12:00 GMT
@@ -26259,7 +26259,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-04-30,Apr 2026,false,CC-6030-CA,D-603,Total Rewards,People,CA,Canada,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-04-30,Apr 2026,false,CC-6030-DE,D-603,Total Rewards,People,DE,Germany,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-04-30,Apr 2026,false,CC-6030-GB,D-603,Total Rewards,People,GB,United Kingdom,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2026-04-30,Apr 2026,false,CC-6030-IN,D-603,Total Rewards,People,IN,India,13,12,1,0,1,1,2,2,0,1,1,2,0,0.03,Loaded on time
+2026-04-30,Apr 2026,false,CC-6030-IN,D-603,Total Rewards,People,IN,India,13,12,1,0,1,1,2,2,0,1,1,1,0,0.03,Loaded on time
 2026-04-30,Apr 2026,false,CC-6030-JP,D-603,Total Rewards,People,JP,Japan,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-04-30,Apr 2026,false,CC-6030-MX,D-603,Total Rewards,People,MX,Mexico,2,2,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-04-30,Apr 2026,false,CC-6030-NL,D-603,Total Rewards,People,NL,Netherlands,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -26819,7 +26819,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-05-31,May 2026,false,CC-8010-IN,D-801,Customer Operations,Operations,IN,India,245,244,2,1,13,13,13,13,0,8,7,10,0,0.03,Loaded on time
 2026-05-31,May 2026,false,CC-8010-MX,D-801,Customer Operations,Operations,MX,Mexico,40,40,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
 2026-05-31,May 2026,false,CC-8010-NL,D-801,Customer Operations,Operations,NL,Netherlands,7,7,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
-2026-05-31,May 2026,false,CC-8010-PH,D-801,Customer Operations,Operations,PH,Philippines,44,43,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2026-05-31,May 2026,false,CC-8010-PH,D-801,Customer Operations,Operations,PH,Philippines,44,43,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2026-05-31,May 2026,false,CC-8010-PL,D-801,Customer Operations,Operations,PL,Poland,68,68,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2026-05-31,May 2026,false,CC-8010-PT,D-801,Customer Operations,Operations,PT,Portugal,20,20,0,0,1,1,1,1,0,1,0,1,0,0.03,Loaded on time
 2026-05-31,May 2026,false,CC-8010-SE,D-801,Customer Operations,Operations,SE,Sweden,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -26878,7 +26878,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-06-30,Jun 2026,true,CC-1020-CH,D-102,Product Engineering,Technology,CH,Switzerland,1,1,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1020-DE,D-102,Product Engineering,Technology,DE,Germany,6,6,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1020-ES,D-102,Product Engineering,Technology,ES,Spain,18,18,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
-2026-06-30,Jun 2026,true,CC-1020-FR,D-102,Product Engineering,Technology,FR,France,3,2,1,0,1,1,2,2,0,0,1,2,0,0.03,Loaded on time
+2026-06-30,Jun 2026,true,CC-1020-FR,D-102,Product Engineering,Technology,FR,France,3,2,1,0,1,1,2,2,0,0,1,1,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1020-GB,D-102,Product Engineering,Technology,GB,United Kingdom,38,38,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1020-IE,D-102,Product Engineering,Technology,IE,Ireland,4,4,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1020-IN,D-102,Product Engineering,Technology,IN,India,616,616,0,0,18,18,18,18,0,10,12,17,0,0.03,Loaded on time
@@ -26971,7 +26971,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-06-30,Jun 2026,true,CC-1060-US,D-106,Information Security,Technology,US,United States,52,52,0,0,2,2,2,2,0,1,1,1,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1060-ZA,D-106,Information Security,Technology,ZA,South Africa,11,11,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-AE,D-107,Enterprise IT,Technology,AE,United Arab Emirates,10,10,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2026-06-30,Jun 2026,true,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,56,54,2,0,2,2,5,5,0,0,4,5,0,0.03,Loaded on time
+2026-06-30,Jun 2026,true,CC-1070-AU,D-107,Enterprise IT,Technology,AU,Australia,56,54,2,0,2,2,5,5,0,0,4,4,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-BR,D-107,Enterprise IT,Technology,BR,Brazil,30,29,1,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-CA,D-107,Enterprise IT,Technology,CA,Canada,31,31,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-CH,D-107,Enterprise IT,Technology,CH,Switzerland,21,21,0,0,1,1,1,1,0,1,1,1,0,0.03,Loaded on time
@@ -26980,7 +26980,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-06-30,Jun 2026,true,CC-1070-FR,D-107,Enterprise IT,Technology,FR,France,19,19,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-GB,D-107,Enterprise IT,Technology,GB,United Kingdom,52,52,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-IE,D-107,Enterprise IT,Technology,IE,Ireland,14,14,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2026-06-30,Jun 2026,true,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,348,346,2,0,9,9,10,10,0,5,4,6,0,0.03,Loaded on time
+2026-06-30,Jun 2026,true,CC-1070-IN,D-107,Enterprise IT,Technology,IN,India,348,346,2,0,9,9,10,10,0,5,4,5,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-JP,D-107,Enterprise IT,Technology,JP,Japan,9,9,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-KR,D-107,Enterprise IT,Technology,KR,South Korea,13,13,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-1070-MX,D-107,Enterprise IT,Technology,MX,Mexico,66,66,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
@@ -27333,7 +27333,7 @@ month_end_date,close_label,is_latest_close,cost_center_id,department_id,departme
 2026-06-30,Jun 2026,true,CC-8020-US,D-802,Trust & Safety Operations,Operations,US,United States,9,9,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-8020-ZA,D-802,Trust & Safety Operations,Operations,ZA,South Africa,3,3,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-8030-AE,D-803,Workplace & Procurement,Operations,AE,United Arab Emirates,14,14,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
-2026-06-30,Jun 2026,true,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,47,45,2,0,3,3,4,4,0,0,3,4,0,0.03,Loaded on time
+2026-06-30,Jun 2026,true,CC-8030-BR,D-803,Workplace & Procurement,Operations,BR,Brazil,47,45,2,0,3,3,4,4,0,0,3,3,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-8030-CA,D-803,Workplace & Procurement,Operations,CA,Canada,48,48,0,0,0,0,0,0,0,0,0,0,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-8030-GB,D-803,Workplace & Procurement,Operations,GB,United Kingdom,84,83,1,0,2,2,2,2,0,0,2,2,0,0.03,Loaded on time
 2026-06-30,Jun 2026,true,CC-8030-IE,D-803,Workplace & Procurement,Operations,IE,Ireland,35,35,0,0,1,1,1,1,0,0,1,1,0,0.03,Loaded on time

@@ -301,7 +301,7 @@ def main() -> None:
     print("\n## Total workforce cost growth mix (Company, year over year to June 30, $M nominal)\n")
     print(table(con.sql(GROWTH_MIX).fetchall(), ["FY", "Factor", "Shapley", "Sequential", "Order bias"]))
 
-    print("\n## Case study 6: discrepancies found by the warehouse\n")
+    print("\n## Case study 4: discrepancies found by the warehouse\n")
     print("Open on the extract date (the work list), and the rules scored against the answer key over every "
           "month-end (detected = flagged on the same worker and month-end; false flag = nothing seeded behind it).\n")
     print(table(con.sql(OPEN_NOW).fetchall(), ["Code", "Discrepancy", "Severity", "Open", "Median age (days)"]))

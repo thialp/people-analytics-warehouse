@@ -17,7 +17,7 @@ It writes four tables:
 | `gen_cw_discrepancy_truth` | **The answer key:** every discrepancy seeded, with its cause and the days it was true |
 | `ref_cw_discrepancy_type` | The catalogue of 13 discrepancy types |
 
-It also seeds three hygiene problems inside Bridgeway itself. Numbers below are as regenerated in phase 5, which added [conversions to employee](conversions_and_plan.md): a converted worker's Keystone record closes as *Converted to employee*, and a late feed change for that worker is rejected. Every parameter is in [`generator/reference_data.py`](../../../generator/reference_data.py) under *Keystone HR and the Bridgeway -> Keystone feed*. The module draws from its own random stream, so no employee number moves and every mart from case studies 1–5 is unchanged.
+It also seeds three hygiene problems inside Bridgeway itself. Numbers below are as regenerated in phase 5, which added [conversions to employee](conversions_and_plan.md): a converted worker's Keystone record closes as *Converted to employee*, and a late feed change for that worker is rejected. Every parameter is in [`generator/reference_data.py`](../../../generator/reference_data.py) under *Keystone HR and the Bridgeway -> Keystone feed*. The module draws from its own random stream, so no employee number moves and every mart from case studies 1–3, 5 and 6 is unchanged.
 
 ## How a change travels
 
@@ -93,7 +93,7 @@ Each type is named after what happened in the systems, not after any internal la
 Three changes from the plan's draft list:
 
 - **Two codes split out.** *Change in transit* (CW00) is separated from *late*, so normal one-day lag is never mistaken for a problem. Attribute changes that fail get their own code (CW12).
-- **Bill rates outside the card band are not seeded.** The ±7% scatter already puts some orders outside their band. That is a finding for the case study 6 analysis, not an injected defect.
+- **Bill rates outside the card band are not seeded.** The ±7% scatter already puts some orders outside their band. That is a finding for the case study 4 analysis, not an injected defect.
 - **Root causes.** When a broken link (CW06) or a missing record (CW08) makes a later extension fail, the row says *Extension never arrived* with root cause CW06 or CW08. Whoever fixes the link fixes both.
 
 ## The answer key
@@ -156,4 +156,4 @@ Two problems were caught by these checks while building this phase:
 
 ## What it sets up
 
-Case study 6 (phase 7) builds the warehouse side: identity resolution, a month-end snapshot with both systems side by side, and rules that classify each discrepancy from the two systems alone. The answer key then scores those rules: what share of seeded discrepancies they find, and what they flag that was never seeded.
+Case study 4 (phase 7) builds the warehouse side: identity resolution, a month-end snapshot with both systems side by side, and rules that classify each discrepancy from the two systems alone. The answer key then scores those rules: what share of seeded discrepancies they find, and what they flag that was never seeded.

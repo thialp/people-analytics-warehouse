@@ -3,7 +3,7 @@
 > **Warehouse release 3:** part-time was removed (every employee is 1.0 FTE), so part-time counts and the FTE Changes step described here no longer exist in the data. This guide describes the dashboard as built on release 2; what changes is listed in [release 3 migration notes](../contingent-workforce/release_3_migration_notes.md).
 
 
-Dashboard for case study 3. You copy the Compensation Walk workbook, point it at one new Custom SQL, keep the rail and the KPI cards, delete the pay pieces, and build three new cards: a larger, more efficient map, Top drivers of headcount change, and Growth by region / country / office. Arcadia Systems is fictional and all data is synthetic.
+Dashboard for case study 5. You copy the Compensation Walk workbook, point it at one new Custom SQL, keep the rail and the KPI cards, delete the pay pieces, and build three new cards: a larger, more efficient map, Top drivers of headcount change, and Growth by region / country / office. Arcadia Systems is fictional and all data is synthetic.
 
 Everything below was checked against the warehouse: the new query was run in the DuckDB copy of the SQL Server build (`sqlserver/check_tsql_in_duckdb.py` translation) and ties out, and every expected value in this guide comes from that run. The SQL Server run on your Mac (Part 1) is still the final check.
 
@@ -1116,7 +1116,7 @@ Action 13: only the office layer is selectable (8.3 step 4 to 6), so a click alw
 1. Reset the dashboard (test 9), Summary dashboard active.
 2. **File > Save to Tableau Public As...** → **Arcadia Global Workforce Footprint**.
 3. Description (under 230 characters): "Where Arcadia's people are, where headcount grew and how people move between offices. One Custom SQL feeds offices, routes and radius as map layers. Fictional company, synthetic data. github.com/thialp/people-analytics-warehouse".
-4. Add the URL to the README's case study 3 section and to `portfolio_handoff.md`.
+4. Add the URL to the README's case study 5 section and to `portfolio_handoff.md`.
 
 ### 13.4 Methodology line (Methodology page or info panel)
 

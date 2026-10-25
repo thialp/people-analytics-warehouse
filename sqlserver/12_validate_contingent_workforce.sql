@@ -7,7 +7,7 @@
     sqlcmd -S localhost -U sa -P "<password>" -C -i /repo/sqlserver/12_validate_contingent_workforce.sql
 
   Every "expected" value comes from the DuckDB marts (data/marts/) and
-  docs/projects/contingent-workforce/case_study_6.md. Every row should say PASS.
+  docs/projects/contingent-workforce/case_study_4.md. Every row should say PASS.
   Arcadia Systems, Keystone HR and Bridgeway VMS are fictional; all data is synthetic.
 */
 SET NOCOUNT ON;

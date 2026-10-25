@@ -1,4 +1,4 @@
-"""Reconciliation operations (release 4, case study 6): when things happened, Keystone's job data,
+"""Reconciliation operations (release 4, case study 4): when things happened, Keystone's job data,
 and the warehouse's own load log.
 
 Release 3 records the contingent workforce in days: the day Bridgeway sent a change, the day

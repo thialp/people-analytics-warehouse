@@ -1,6 +1,6 @@
-# Control totals: release 3 after phase 7 (case study 6, 2026-10-14)
+# Control totals: release 3 after phase 7 (case study 4, 2026-10-14)
 
-Employee and contingent totals are unchanged from [phase 6](release_3_totals_phase_6.md); the answer key changed slightly (a second ID counts from its first working day; a change that alters nothing marks nothing). New here: the discrepancies the warehouse finds on its own and their detection score. How: [case study 6](case_study_6.md). Rerun with `python pipeline/control_totals.py`.
+Employee and contingent totals are unchanged from [phase 6](release_3_totals_phase_6.md); the answer key changed slightly (a second ID counts from its first working day; a change that alters nothing marks nothing). New here: the discrepancies the warehouse finds on its own and their detection score. How: [case study 4](case_study_4.md). Rerun with `python pipeline/control_totals.py`.
 
 
 ## Fiscal years
@@ -138,7 +138,7 @@ Closing headcount on June 30, contingent starts and ends in the year, and conver
 | FY26 | Currency | -52.2 | -55.2 | -2.9 |
 | FY26 | Closing cost | 4,648.1 | 4,648.1 | 0.0 |
 
-## Case study 6: discrepancies found by the warehouse
+## Case study 4: discrepancies found by the warehouse
 
 Open on the extract date (the work list), and the rules scored against the answer key over every month-end (detected = flagged on the same worker and month-end; false flag = nothing seeded behind it).
 

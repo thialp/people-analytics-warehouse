@@ -7,10 +7,10 @@
   rpt.vw_cw_spend                     month x cost center x supplier x type x role family x currency:
                                       billed in the month beside the run-rate at the month-end
   rpt.vw_workforce_cost_growth_mix    year-over-year cost change in six factors, Shapley and sequential
-  rpt.vw_cw_discrepancy_detail        case study 6: the work list (latest 13 month-ends)
-  rpt.vw_cw_reconciliation            case study 6: the trend, beside the population each system shows
-  rpt.vw_cw_engagement_cap            case study 6: engagements against the 48-month cap
-  rpt.vw_cw_detection_score           case study 6: the rules scored against the answer key
+  rpt.vw_cw_discrepancy_detail        case study 4: the work list (latest 13 month-ends)
+  rpt.vw_cw_reconciliation            case study 4: the trend, beside the population each system shows
+  rpt.vw_cw_engagement_cap            case study 4: engagements against the 48-month cap
+  rpt.vw_cw_detection_score           case study 4: the rules scored against the answer key
 
   Checked row for row against the DuckDB marts by sqlserver/check_tsql_in_duckdb.py.
   Arcadia Systems, Keystone HR and Bridgeway VMS are fictional; all data is synthetic.
@@ -128,7 +128,7 @@ SELECT
 FROM dw.WorkforceCostGrowthMix AS g;
 GO
 
-/* ------------------------------------------------------------------ case study 6: the work list */
+/* ------------------------------------------------------------------ case study 4: the work list */
 CREATE OR ALTER VIEW rpt.vw_cw_discrepancy_detail AS
 SELECT
     d.MonthEndDate                                                       AS month_end_date,
@@ -180,7 +180,7 @@ LEFT JOIN dw.DimCostCenter AS cc ON cc.CostCenterID = COALESCE(p.CostCenterID, o
 LEFT JOIN dw.DimDepartment AS dep ON dep.DepartmentID = cc.DepartmentID;
 GO
 
-/* ------------------------------------------------------------------ case study 6: the trend
+/* ------------------------------------------------------------------ case study 4: the trend
    Two row types, never summed together: 'Population' (month-end x function x supplier) and
    'Discrepancy' (month-end x function x supplier x type). */
 CREATE OR ALTER VIEW rpt.vw_cw_reconciliation AS
@@ -241,7 +241,7 @@ GROUP BY x.MonthEndDate, cal.FiscalYear, cal.FiscalQuarterLabel, x.FunctionName,
          x.DiscrepancyCode, t.DiscrepancyName, t.Severity, t.WhoCanFixIt;
 GO
 
-/* ------------------------------------------------------------------ case study 6: the 48-month cap
+/* ------------------------------------------------------------------ case study 4: the 48-month cap
    One row per Bridgeway worker who started, as Bridgeway holds it on the extract date. */
 CREATE OR ALTER VIEW rpt.vw_cw_engagement_cap AS
 WITH ext AS (SELECT MAX(MonthEndDate) AS ExtractDate FROM dw.MonthEndCalendar),
@@ -306,7 +306,7 @@ LEFT JOIN dw.CwIdentityResolution AS i ON i.BwWorkerID = b.BwWorkerID
 LEFT JOIN dw.CwConversion AS c ON c.BwWorkerID = b.BwWorkerID;
 GO
 
-/* ------------------------------------------------------------------ case study 6: the score
+/* ------------------------------------------------------------------ case study 4: the score
    On each month-end a seeded discrepancy open that day is injected; detected when the rules flag
    the same type on the same worker that month-end; a flag with nothing seeded is a false flag.
    The only place the answer key is read. */

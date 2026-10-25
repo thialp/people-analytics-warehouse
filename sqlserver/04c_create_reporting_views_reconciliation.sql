@@ -1,6 +1,6 @@
 /*
   04c_create_reporting_views_reconciliation.sql
-  Release 4: the reporting views of Dashboard #6, Contingent Workforce Reconciliation. Runs after 03d.
+  Release 4: the reporting views of Dashboard #4, Contingent Workforce Reconciliation. Runs after 03d.
 
     rpt.vw_cw_gap_close        every gap at every month-end close, with its flag, risk, place,
                                cause, group (Bridgeway's billed cost center) and Helix ticket
@@ -16,7 +16,7 @@ SET NOCOUNT ON;
 USE ArcadiaHR;
 GO
 
-/* Dashboard #6: every gap at every month-end close (Jun 2021 to Jun 2026), with its flag, risk, place, cause, group and ticket */
+/* Dashboard #4: every gap at every month-end close (Jun 2021 to Jun 2026), with its flag, risk, place, cause, group and ticket */
 CREATE OR ALTER VIEW rpt.vw_cw_gap_close AS
 SELECT
     MonthEndDate                 AS month_end_date,
@@ -77,7 +77,7 @@ SELECT
 FROM dw.CwGapClose;
 GO
 
-/* Dashboard #6: the gap rate per close x cost center, against the 3% target */
+/* Dashboard #4: the gap rate per close x cost center, against the 3% target */
 CREATE OR ALTER VIEW rpt.vw_cw_gap_rate_close AS
 SELECT
     MonthEndDate                 AS month_end_date,
@@ -107,7 +107,7 @@ SELECT
 FROM dw.CwGapRateClose;
 GO
 
-/* Dashboard #6: Helix tickets open at each close, with their dot on the ticket card */
+/* Dashboard #4: Helix tickets open at each close, with their dot on the ticket card */
 CREATE OR ALTER VIEW rpt.vw_itsm_ticket_close AS
 SELECT
     MonthEndDate                 AS month_end_date,

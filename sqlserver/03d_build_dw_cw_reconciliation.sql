@@ -1,6 +1,6 @@
 /*
   03d_build_dw_cw_reconciliation.sql
-  Release 4: case study 6's reconciliation as Finance's month-end report meets it (Dashboard #6,
+  Release 4: case study 4's reconciliation as Finance's month-end report meets it (Dashboard #4,
   Contingent Workforce Reconciliation). Runs after 03, 03b and 03c. The T-SQL twin of the DuckDB
   models added in release 4 (sql/01_staging stg_feed_event_delivery ... stg_ticket_category,
   sql/02_intermediate int_cw_close_run ... int_itsm_ticket_gap_link, sql/03_marts mart_cw_gap_close,
@@ -745,6 +745,7 @@ SELECT
     CAST(CASE WHEN s.DaysOpen > 90 THEN 1 ELSE 0 END AS BIT)                           AS IsOver90Days,
     CASE WHEN s.FlagCode IN ('F08', 'F09') THEN DATEDIFF(DAY, s.SinceDate, s.MonthEndDate) END AS DaysSinceEnd,
     CAST(CASE WHEN EXISTS (SELECT 1 FROM #Scoped AS p WHERE p.MonthEndDate = r.PriorMonthEndDate AND p.GapID = s.GapID)
+                   AND s.SinceDate <= r.PriorMonthEndDate
               THEN 1 ELSE 0 END AS BIT)                                                AS WasOpenPriorClose,
     CAST(CASE WHEN (EXISTS (SELECT 1 FROM dw.KsContingentWorker AS k
                             WHERE k.PersonID = s.PersonID AND k.EffectiveStartDate = DATEADD(DAY, 1, s.MonthEndDate))

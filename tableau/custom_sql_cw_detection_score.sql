@@ -1,6 +1,6 @@
 /*
   custom_sql_cw_detection_score.sql
-  Tableau Custom SQL for Dashboard #6, Contingent Workforce: methodology page (detection score) (SQL Server, database ArcadiaHR).
+  Tableau Custom SQL for Dashboard #4, Contingent Workforce: methodology page (detection score) (SQL Server, database ArcadiaHR).
   761 rows, the same columns and rows as data/marts/mart_cw_detection_score.csv, so a workbook built on
   either can switch with Data > Replace Data Source.
 

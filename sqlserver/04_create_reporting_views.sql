@@ -130,7 +130,7 @@ FROM dw.RefFringeRate AS f
 JOIN dw.DimCountry AS c ON c.CountryCode = f.CountryCode;
 GO
 
-/* ------------------------------------------------- Workforce Planning (case study 1)
+/* ------------------------------------------------- Workforce Planning (case study 3)
    Built on the seat tables from 03b_build_dw_workforce_planning.sql. Same columns as
    data/marts/mart_position_fill, mart_vacancy_pool, mart_plan_vs_actual and
    mart_seat_corridors. */

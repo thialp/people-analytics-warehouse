@@ -1,4 +1,4 @@
-"""Helix Service Desk (release 4, case study 6): the tickets people raise to fix the gaps.
+"""Helix Service Desk (release 4, case study 4): the tickets people raise to fix the gaps.
 
 Helix is a fictional IT service management system. Its tables are generic (a ticket, its state
 changes, what it is about, a category list), seeded here with contingent worker tickets only, so

@@ -36,12 +36,12 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 
 | | Question a leader asks | What the warehouse shows | Dashboard |
 |---|---|---|---|
-| 🪑 **1. [Workforce Planning](#case-study-1-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)** |
-| 📈 **2. [Headcount & FTE Walk](#case-study-2-headcount--fte-walk)** | *How did the workforce change, and why?* | Start + hires − leavers ± moves = end, for employees, contractors and both, for any team | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard)** |
-| 🗺️ **3. [Global Workforce Footprint](#case-study-3-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
-| 💵 **4. [Compensation Walk](#case-study-4-compensation-walk)** | *Why did pay in this group change?* | Each dollar of change traced to hires, exits, promotions, raises, employer costs or currency | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)** |
-| 🧮 **5. [Workforce Cost Bridge](#case-study-5-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | *coming soon* |
-| 🔍 **6. [Contingent Workforce](#case-study-6-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | *coming soon* |
+| 📈 **1. [Headcount & FTE Walk](#case-study-1-headcount--fte-walk)** | *How did the workforce change, and why?* | Start + hires − leavers ± moves = end, for employees, contractors and both, for any team | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard)** |
+| 💵 **2. [Compensation Walk](#case-study-2-compensation-walk)** | *Why did pay in this group change?* | Each dollar of change traced to hires, exits, promotions, raises, employer costs or currency | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)** |
+| 🪑 **3. [Workforce Planning](#case-study-3-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)** |
+| 🔍 **4. [Contingent Workforce](#case-study-4-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | *in build: [prototype and plan](docs/projects/contingent-workforce/release_4_plan.md)* |
+| 🗺️ **5. [Global Workforce Footprint](#case-study-5-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
+| 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | *coming soon* |
 | 🔮 **7. [PID Fill Forecast](#case-study-7-pid-fill-forecast-planned)** | *How many PIDs will we need to fill, and how fast can we fill them?* | Fill history of every vacant PID, then a forecast of the PIDs growth and attrition will open | *planned* |
 
 ### How it works, in one picture
@@ -55,6 +55,7 @@ flowchart LR
         DASH["🔷 <b>Dashboards</b><br/>Tableau"]
     end
     PUB["🟢 <b>Public data</b><br/>exchange rates, employer costs,<br/>postal codes"]
+    HLX["🟤 <b>Helix Service Desk</b><br/>tickets raised to fix records"]
     DEC["⭐ <b>Decisions</b><br/>hiring, budget, risk"]
 
     BW -. "one-way feed<br/>(late or failed)" .-> KS
@@ -62,6 +63,7 @@ flowchart LR
     PUB --> WH
     WH --> DASH --> DEC
     BW -. "extract, to check the feed" .-> WH
+    HLX -. "tickets, read twice a day" .-> WH
 
     classDef hr fill:#dbeafe,stroke:#1d4ed8,color:#0f172a,stroke-width:3px
     classDef vms fill:#ffedd5,stroke:#c2410c,color:#0f172a,stroke-width:1px
@@ -69,12 +71,14 @@ flowchart LR
     classDef wh fill:#ede9fe,stroke:#6d28d9,color:#0f172a,stroke-width:2px
     classDef dash fill:#cffafe,stroke:#0e7490,color:#0f172a,stroke-width:2px
     classDef dec fill:#fef9c3,stroke:#a16207,color:#0f172a,stroke-width:2px
+    classDef hlx fill:#f5f5f4,stroke:#78716c,color:#0f172a,stroke-width:1px
     class KS hr
     class BW vms
     class PUB pub
     class WH wh
     class DASH dash
     class DEC dec
+    class HLX hlx
     linkStyle 0 stroke:#dc2626,stroke-width:2px
     linkStyle 5 stroke:#94a3b8,stroke-width:1px
 ```
@@ -83,7 +87,8 @@ Like most large companies, Arcadia keeps **everyone in its own HR system** and b
 
 - 🔵 **Keystone HR** is Arcadia's system of record. Employees are hired into it directly. Every contractor is converted to an Arcadia ID and assigned a **PID** (position) there, just like an employee, so the workforce plan sees every seat, filled or vacant.
 - 🟠 **Bridgeway VMS** is where suppliers manage contractor orders, dates and rates. It **feeds Keystone**; nothing flows back.
-- 🔴 The **one-way feed** is sometimes late, sometimes fails, and sometimes someone edits Keystone by hand. Then the two systems disagree, which is why the warehouse also reads a Bridgeway extract: only to check the feed (case study 6).
+- 🔴 The **one-way feed** is sometimes late, sometimes fails, and sometimes someone edits Keystone by hand. Then the two systems disagree, which is why the warehouse also reads a Bridgeway extract: only to check the feed (case study 4).
+- 🟤 **Helix Service Desk** holds the tickets people raise to fix a record. The warehouse replays each ticket's state at every month-end close and ties it to the gap it is working on, and keeps its own **load log**, so a late or failed read is visible instead of looking like a data problem (case study 4).
 
 The warehouse reads Keystone and the public data, checks the feed against the Bridgeway extract, and feeds the dashboards. It never changes either system: when they disagree, it says **what** differs, **why**, **since when**, and **who can fix it**.
 
@@ -116,7 +121,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 - **The workforce grew 7.2%**, from 39,154 to 41,955 people: employees +5.5%, contractors +11.5%.
 - **Total cost grew $403M (+9.5%).** A fair split ([Shapley values](#growth-mix-why-did-total-workforce-cost-change)) shows **$307M came from having more people** and **$140M from paying people more**, while currency moves *saved* $52M.
 - **270 contractors became employees.** Each conversion lowered run-rate cost: on average $121k a year of supplier billing was replaced by $73k of employee pay and employer costs.
-- **416 contractors (3.5%) have a record that disagrees between the two systems.** The largest group: 219 whose details were changed by hand in the HR system only (mostly a manager moving them to another team), so the supplier still bills the cost center on the order.
+- **At the June close, 357 contractors (2.99%) have a gap that puts Finance's month-end report at risk**, just under a 3% target: 379 gaps, 196 to fix in the supplier system, 181 in the HR system, 2 in the integration. Counting every disagreement, including manager and office, 416 contractors (3.5%) differ; the largest group is 219 changed by hand in the HR system only.
 - **Arcadia holds 51,163 PIDs**: 30,005 filled by employees, 11,941 by contractors, and 9,217 vacant (8,689 that someone left, 528 new ones waiting for a first hire). Hiring followed the plan at 79% for new PIDs and 93% for backfills.
 
 ### Why it is built this way
@@ -132,14 +137,14 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 |---|---|
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 46,980 employees and 43,484 contractors over five years · 61 month-ends · 64,914 PIDs (33,650 employee, 31,264 contractor) · 31,614 requisitions · 189,964 applicants · 58,276 supplier orders · 632,504 timesheets |
-| **Output** | 21 Tableau-ready marts and 7 dimension files in [`data/marts/`](data/marts/); 17 Tableau Custom SQL queries and 13 reporting views on SQL Server |
+| **Output** | 28 Tableau-ready marts and 7 dimension files in [`data/marts/`](data/marts/); 19 Tableau Custom SQL queries and 18 reporting views on SQL Server |
 | **Controls** | 88 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
 
 ---
 
 # Technical deep dive
 
-**Contents:** [The platform](#the-platform) · [Case study 1](#case-study-1-workforce-planning) · [2](#case-study-2-headcount--fte-walk) · [3](#case-study-3-global-workforce-footprint) · [4](#case-study-4-compensation-walk) · [5](#case-study-5-workforce-cost-bridge) · [6](#case-study-6-contingent-workforce-reconciliation) · [Run it yourself](#run-it-yourself) · [SQL Server](#run-it-on-sql-server-with-tableau) · [Repository layout](#repository-layout)
+**Contents:** [The platform](#the-platform) · [Case study 1](#case-study-1-headcount--fte-walk) · [2](#case-study-2-compensation-walk) · [3](#case-study-3-workforce-planning) · [4](#case-study-4-contingent-workforce-reconciliation) · [5](#case-study-5-global-workforce-footprint) · [6](#case-study-6-workforce-cost-bridge) · [7](#case-study-7-pid-fill-forecast-planned) · [Run it yourself](#run-it-yourself) · [SQL Server](#run-it-on-sql-server-with-tableau) · [Repository layout](#repository-layout)
 
 ## The platform
 
@@ -154,7 +159,8 @@ flowchart LR
     subgraph Sources["Source systems (simulated, fictional)"]
         HR["Keystone HR<br/>employees · jobs · pay · PIDs · requisitions · applicants · plan<br/>contingent workers: Arcadia ID and PID"]
         VMS["Bridgeway VMS<br/>suppliers · contingent workers · service orders · rates · timesheets"]
-        FEED["Integration log<br/>Bridgeway → Keystone, one way"]
+        FEED["Integration log<br/>Bridgeway → Keystone, one way<br/>sent and applied, by the hour"]
+        HLX["Helix Service Desk<br/>tickets · state changes · links"]
     end
     subgraph Public["Public reference data"]
         ECB["ECB daily FX rates"]
@@ -164,7 +170,8 @@ flowchart LR
     subgraph WH["DuckDB warehouse"]
         RAW["raw<br/>files land as text"]
         STG["staging<br/>types · dedup · corrections"]
-        INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain<br/>identity resolution · discrepancy rules"]
+        INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain<br/>identity resolution · discrepancy rules<br/>close runs · flags and routing · ticket replay"]
+        LOG["load log<br/>every scheduled read"]
         MART["marts<br/>walks · fills · plan vs actual · cost · reconciliation"]
         TEST{{"88 data tests"}}
     end
@@ -173,6 +180,8 @@ flowchart LR
     HR --> RAW
     VMS --> RAW
     FEED --> RAW
+    HLX --> RAW
+    LOG -.-> INT
     ECB --> RAW
     FRG --> RAW
     GEO --> RAW
@@ -184,15 +193,17 @@ flowchart LR
     classDef pub fill:#dcfce7,stroke:#15803d,color:#0f172a
     classDef wh fill:#ede9fe,stroke:#6d28d9,color:#0f172a
     classDef dash fill:#cffafe,stroke:#0e7490,color:#0f172a
+    classDef hlx fill:#f5f5f4,stroke:#78716c,color:#0f172a
     class HR hr
     class VMS vms
     class FEED feed
+    class HLX hlx
     class ECB,FRG,GEO pub
-    class RAW,STG,INT,MART,TEST wh
+    class RAW,STG,INT,MART,TEST,LOG wh
     class TAB dash
 ```
 
-Colors as in the [executive summary](#how-it-works-in-one-picture): 🔵 Keystone HR, 🟠 Bridgeway VMS, 🔴 the feed between them, 🟢 public reference data, 🟣 the warehouse, 🔷 Tableau.
+Colors as in the [executive summary](#how-it-works-in-one-picture): 🔵 Keystone HR, 🟠 Bridgeway VMS, 🔴 the feed between them, 🟤 Helix Service Desk, 🟢 public reference data, 🟣 the warehouse and its load log, 🔷 Tableau.
 
 | Layer | What happens there | Files |
 |---|---|---|
@@ -215,8 +226,8 @@ The same model is built in T-SQL on **SQL Server** for a live Tableau connection
 | **Reporting hierarchy** | "Everyone in Maria's organization" is a recursive question, and it changes every time a manager leaves or a team is split. | Manager on every effective-dated job record; a recursive CTE builds a closure table (worker × every manager above) per month-end, so an org roll-up is one equality join ([`int_worker_reporting_chain`](sql/02_intermediate/int_worker_reporting_chain.sql)) |
 | **Fringe that changes by law** | Employer charges differ by country and change on January 1 (the UK raised employer NIC in 2025; Australia's super guarantee rises every July). | A researched rate per country and calendar year with its components and sources, joined on the year of each month-end |
 | **Transfers between groups** | If movers are valued at new pay on the way in and old pay on the way out, transfers stop netting to zero for the company. | Transfers move at **prior** pay; any raise shows up as its own driver in the new group |
-| **Order of attribution** | A worker can get promoted *and* see FX move in the same month; a re-levelled seat can also move office. The split must not double-count. | Decompositions whose terms always sum exactly to the change, with the rounding absorbed by one named term ([case study 5](#case-study-5-workforce-cost-bridge), [case study 1](#case-study-1-workforce-planning)) |
-| **Two systems of record** | Contractors live in the vendor system (Bridgeway); managers see them in the HR system (Keystone), filled by a one-way feed that can be late, fail or be overridden by hand. Their IDs, supplier names and dates disagree. | Identity resolution in three confidence tiers; a side-by-side snapshot of what Keystone *should* hold (everything Bridgeway sent) against what it holds; rules that name the cause of each difference ([case study 6](#case-study-6-contingent-workforce-reconciliation)) |
+| **Order of attribution** | A worker can get promoted *and* see FX move in the same month; a re-levelled seat can also move office. The split must not double-count. | Decompositions whose terms always sum exactly to the change, with the rounding absorbed by one named term ([case study 6](#case-study-6-workforce-cost-bridge), [case study 3](#case-study-3-workforce-planning)) |
+| **Two systems of record** | Contractors live in the vendor system (Bridgeway); managers see them in the HR system (Keystone), filled by a one-way feed that can be late, fail or be overridden by hand. Their IDs, supplier names and dates disagree. | Identity resolution in three confidence tiers; a side-by-side snapshot of what Keystone *should* hold (everything Bridgeway sent) against what it holds; rules that name the cause of each difference ([case study 4](#case-study-4-contingent-workforce-reconciliation)) |
 | **Attribution bias** | Splitting a cost change into volume, mix, rate and currency gives a different answer depending on which factor is moved first. | Shapley values: each factor's average contribution over every order of the six factors, beside the sequential split and its bias ([growth mix](#growth-mix-why-did-total-workforce-cost-change)) |
 | **Privacy** | Pay for groups under 5 people can identify individuals, and what counts as a group depends on how a dashboard slices the data. | Suppression applied in Tableau at the level of the view; executive officers excluded from pay in SQL |
 
@@ -444,94 +455,7 @@ Tests were checked against deliberately broken builds, to make sure they fail. E
 
 ---
 
-## Case study 1: Workforce Planning
-
-### Business problem
-
-A hiring plan is approved as numbers per cost center and quarter: net-new seats, backfills, an ending headcount and a cost. A year later, "we hired 5,235 people" doesn't say whether hiring followed the plan. Leaders need to know what each hire filled:
-
-- a **net-new** seat (growth the plan paid for) or a **backfill**;
-- for a backfill, **who sat there before**: their grade, office and pay, and whether they left by choice, involuntarily or by moving to another seat;
-- whether the seat **changed on refill**: re-levelled, or moved to a cheaper office in the same country;
-- whether a net-new seat was **needed**, or a matching seat stood empty while it was approved;
-- whether hiring **matched the plan**, by quarter and year, against the budget or any reforecast;
-- how many **PIDs** the company holds, employee and contractor, and how many are **vacant**: someone left them, or they are new and waiting for a first hire.
-
-### Approach
-
-| Piece | What it does |
-|---|---|
-| PID layer (raw) | `dim_position` (PID history, employee and contractor), `fact_position_assignment` (who held each PID), `fact_requisition`, the applicant pipeline, `dim_cost_center` (department × country) and `fact_workforce_plan` (a budget and three reforecasts per year, never overwritten) |
-| [`int_position_snapshot`](sql/02_intermediate/int_position_snapshot.sql) | Every seat at every month-end: status, incumbent, open requisition. Filled seats equal the people headcount (test 45) |
-| [`int_seat_fill`](sql/02_intermediate/int_seat_fill.sql) | One row per fill (external hire or internal move): net-new or backfill, the prior incumbent, what happened to the seat, level and location change, pay walk, reuse check |
-| [`int_seat_vacancy_chain`](sql/02_intermediate/int_seat_vacancy_chain.sql) | An internal fill empties another seat: each fill is linked to the move that emptied its seat, so one resignation's whole chain carries one `chain_id` |
-| [`int_cw_position_snapshot`](sql/02_intermediate/int_cw_position_snapshot.sql), [`mart_pid_month_end`](sql/03_marts/mart_pid_month_end.sql) | Contractor PIDs (release 3.1): created or reused when a request is approved, filled for the days the supplier holds the assignment, vacant until reused or closed by the twice-yearly position audit. Filled contractor PIDs equal the contractor headcount (test 81); the PID ledger counts every PID filled, vacant previously held or vacant new |
-| [`mart_position_fill`](sql/03_marts/mart_position_fill.sql), [`mart_vacancy_pool`](sql/03_marts/mart_vacancy_pool.sql), [`mart_plan_vs_actual`](sql/03_marts/mart_plan_vs_actual.sql), [`mart_seat_corridors`](sql/03_marts/mart_seat_corridors.sql) | Fills, empty seats by age, plan beside actual per version, cost center and quarter (since release 3 with the contingent line: headcount and run-rate), and where backfilled seats moved |
-
-**Key calculations.**
-
-- **Reuse candidate.** A net-new seat is flagged when, on its approval date, a seat in the same department and job family, a grade within one, in the same country, had stood Open or Frozen for 90 days or more.
-- **Seat pay walk.** For every backfill, the change from the prior incumbent's pay to the new one splits into four steps that add up to the cent (test 53). With `mid` = salary range midpoint × office pay zone:
-
-```
-level       = mid(new grade, old office, exit FY) − mid(old grade, old office, exit FY)
-location    = mid(new grade, new office, exit FY) − mid(new grade, old office, exit FY)
-market      = mid(new grade, new office, hire FY) − mid(new grade, new office, exit FY)
-positioning = (new pay − prior pay) − level − location − market
-```
-
-Full method, a worked vacancy chain and every rule: [`docs/projects/workforce-planning/workforce_planning.md`](docs/projects/workforce-planning/workforce_planning.md).
-
-### Results (FY26)
-
-| Measure | Value |
-|---|---:|
-| Seat fills: backfills / net-new | 6,849: 4,668 / 2,181 |
-| Filled by internal moves | 24% (42% for manager seats) |
-| Backfills by why the seat emptied: voluntary / internal move / involuntary | 2,612 / 1,397 / 659 |
-| Backfills re-levelled down / up | 567 / 185 |
-| Net-new seats approved while a matching seat stood vacant 90+ days | 631 (29%), $55.7M of starting base pay |
-| Median days from approval to fill (backfills) | 42 |
-| PIDs at 30 Jun 2026: filled by employees / by contractors | 30,005 / 11,941 |
-| Vacant PIDs at 30 Jun 2026: previously held / new | 8,689 / 528 (employee 1,268, contractor 7,949) |
-
-| FY | Net-new filled (budget) | Attainment | Backfills (budget) | Attainment |
-|---|---:|---:|---:|---:|
-| FY22 | 2,637 (3,531) | 75% | 3,297 (3,691) | 89% |
-| FY23 | 2,484 (3,201) | 78% | 4,441 (4,753) | 93% |
-| FY24 | 910 (2,834) | **32%** | 4,105 (4,503) | 91% |
-| FY25 | 1,628 (2,236) | 73% | 4,224 (4,737) | 89% |
-| FY26 | 2,181 (2,762) | 79% | 4,668 (5,031) | 93% |
-
-- **Backfills save money, mostly by re-levelling.** New incumbents earn $7.0M a year less than the people they replaced: level −$6.8M, location −$0.7M, market +$2.2M, positioning −$1.8M.
-- **FY24's budget predates the restructuring.** Net-new hiring stopped at 32% of plan while backfills stayed near it; each reforecast closes the gap (FY26: 79% against the budget, 93% against RF3).
-- **Reuse candidates concentrate in Operations**: 44% of its net-new seats, against 11% in People and Legal & Compliance.
-- One honest caveat: the generator writes each plan version around what happened, with an error that shrinks per reforecast. Variance and attainment are real calculations; the plan does not drive hiring.
-
-Eighteen tests (41 to 56, 80 and 81) guard the PID layer, and [`08_validate_workforce_planning.sql`](sqlserver/08_validate_workforce_planning.sql) checks the SQL Server build against the same values.
-
-### Tableau
-
-**Published:** [Workforce Planning on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard) (release 3.1 data, four Custom SQL extracts: the per-period PID summary 2,520 rows, plan vs actual 11,740, position fills 30,575 and the vacancy pool at quarter-ends 149,615).
-
-[![Workforce Planning on Tableau Public](docs/images/workforce_planning_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)
-
-*FY26, all of Arcadia. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)**: pick a fiscal year, half or quarter, and a company, function, sub-function, department or country; hover any KPI card for its breakdown, and hover the map title for the busiest routes.*
-
-| Part | What it does |
-|---|---|
-| Top bar and popovers | Period (fiscal year, half, quarter) and View (company down to country) as browse-then-apply popovers: pick a tab to see its choices, then pick the choice. A period or group with no plan is dimmed and does nothing, so no click leads to an empty page |
-| KPI band | PIDs, vacant previously held, vacant new, PIDs filled and backfills with a level change; each card is a map layer drawn behind transparent hover sheets, and each hover is a small chart (Viz in Tooltip) |
-| PID Moves | The map: one line per backfilled PID that came back in another office than the person who left it, a dot per receiving office; the five busiest routes are in the title's tooltip |
-| Backfill Changes | Of the backfills, how many changed level or office, and what that did to pay (a pay walk that adds up to the cent) |
-| Net-new by Group | Net-new PIDs filled against the plan, bar inside a bar, with the share approved while a matching PID stood vacant |
-| Vacant PIDs | How long vacant PIDs have waited, previously held against new, on the period's closing date |
-
-Every control is a parameter action (34 of them, plus 19 deselect actions), so one click drives all four data sources. Every card ties to the others by construction (backfills with a level change = one level down + one level up + changed level and office). Build plan with every calculation, size and expected value: [`release_3_rebuild_dashboard_3.md`](docs/projects/workforce-planning/release_3_rebuild_dashboard_3.md); method and the PID ledger: [`workforce_planning.md`](docs/projects/workforce-planning/workforce_planning.md#0-which-dashboard-this-is-and-the-pid-principle); [headline values](docs/projects/workforce-planning/headline_values.md).
-
----
-
-## Case study 2: Headcount & FTE Walk
+## Case study 1: Headcount & FTE Walk
 
 [![Headcount & FTE Walk on Tableau Public](docs/images/headcount_fte_walk_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard)
 
@@ -630,45 +554,7 @@ The numbers tie out: the waterfall, the cards, the trend and the Compensation Wa
 
 ---
 
-## Case study 3: Global Workforce Footprint
-
-![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
-
-*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard).*
-
-### Business problem
-
-Location strategy questions (where to hire next, which hubs are growing, whether people are moving toward engineering centers or away from headquarters) are usually answered from a country column. A country hides the difference between two offices in the same country, and it can't show movement. This case study answers them at the office level, with every number tied back to the headcount walk.
-
-### Approach
-
-| Model | What it does |
-|---|---|
-| [`int_worker_movement`](sql/02_intermediate/int_worker_movement.sql) | Carries each worker's office at both month-ends |
-| [`mart_location_headcount`](sql/03_marts/mart_location_headcount.sql) | One row per office per month and worker type (Employee, Contingent since release 3): opening, hires or contingent starts, leavers by type or contingent ends, conversions, relocations in and out, closing (headcount and FTE) |
-| [`mart_mobility_flows`](sql/03_marts/mart_mobility_flows.sql) | Origin and destination office for every relocation, with both ends' coordinates, so Tableau can draw `MAKELINE` without relating the location table twice |
-| [`mart_dim_location`](sql/03_marts/mart_dim_location.sql) | 35 offices with real postal codes and their GeoNames coordinates (street addresses are fictional), the pay zone and the date each office opened |
-
-A relocation is any change of office between two month-ends, including between two offices in the same country, which the slice-level walk in case study 2 can't see (Bengaluru to Hyderabad is the busiest corridor, and both are in India). Four tests (19 to 22) tie the office walk to the company walk and the flows to the office walk.
-
-### Results (FY26)
-
-| Finding | Number |
-|---|---|
-| Fastest-growing region | Latin America, +5.9% (2,225 → 2,356), against +5.5% company-wide; Europe next at +5.7% |
-| Share in the three India engineering centers | 23% of the company (6,967 people in Bengaluru, Hyderabad and Pune), more than twice headquarters in Austin (3,224) |
-| New offices | Six opened since 2022; Manila, Guadalajara and Pune passed 200 people each |
-| Relocations | 857 office moves month by month (146 between countries); 725 people were in a different office at the end of the year than at the start |
-| Busiest corridor | Bengaluru ↔ Hyderabad, 122 moves |
-| Within 1,000 km of London | Paris, Amsterdam, Dublin, Zurich, Munich and Berlin: 4,240 people across seven offices, London included |
-
-### Tableau
-
-Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_guide.md`](docs/projects/workforce-footprint/tableau_workforce_map_guide.md). One map with four layers (countries, relocation paths with `MAKELINE`, a `BUFFER` radius around the selected office, offices with `MAKEPOINT`), a parameter action that moves the radius when an office is clicked, `DISTANCE` to count the people inside it, and the 2025 viewport parameter and dynamic color range where Tableau Public supports them.
-
----
-
-## Case study 4: Compensation Walk
+## Case study 2: Compensation Walk
 
 **Published:** [Compensation Walk on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard) (interactive; every control drives every card).
 
@@ -706,7 +592,7 @@ Three rules make the walk close in every group, under any filter: each line is p
 
 Hiring is the cost story (+$143M), while tenure raises are the average-pay story. New hires join below the average, so hires and exits together pull the average down by $997 per FTE, a little over a quarter of what anniversary raises add.
 
-Ten tests (34 to 40 and 57 to 59) prove the ledger explains every worker's change, that every one of the 9,126 group walks closes, ties to the snapshot, nets its transfers to zero and agrees across views, and that office moves, the region walk and career moves tie to the walk. Month-over-month department walks match the cost bridge of case study 5 to the cent on opening, closing, hires (the bridge's hires plus conversions) and exits (the two split a promotion month's pay change differently by design).
+Ten tests (34 to 40 and 57 to 59) prove the ledger explains every worker's change, that every one of the 9,126 group walks closes, ties to the snapshot, nets its transfers to zero and agrees across views, and that office moves, the region walk and career moves tie to the walk. Month-over-month department walks match the cost bridge of case study 6 to the cent on opening, closing, hires (the bridge's hires plus conversions) and exits (the two split a promotion month's pay change differently by design).
 
 ### Tableau
 
@@ -724,7 +610,211 @@ Build guides: [`docs/projects/compensation-walk/`](docs/projects/compensation-wa
 
 ---
 
-## Case study 5: Workforce Cost Bridge
+## Case study 3: Workforce Planning
+
+### Business problem
+
+A hiring plan is approved as numbers per cost center and quarter: net-new seats, backfills, an ending headcount and a cost. A year later, "we hired 5,235 people" doesn't say whether hiring followed the plan. Leaders need to know what each hire filled:
+
+- a **net-new** seat (growth the plan paid for) or a **backfill**;
+- for a backfill, **who sat there before**: their grade, office and pay, and whether they left by choice, involuntarily or by moving to another seat;
+- whether the seat **changed on refill**: re-levelled, or moved to a cheaper office in the same country;
+- whether a net-new seat was **needed**, or a matching seat stood empty while it was approved;
+- whether hiring **matched the plan**, by quarter and year, against the budget or any reforecast;
+- how many **PIDs** the company holds, employee and contractor, and how many are **vacant**: someone left them, or they are new and waiting for a first hire.
+
+### Approach
+
+| Piece | What it does |
+|---|---|
+| PID layer (raw) | `dim_position` (PID history, employee and contractor), `fact_position_assignment` (who held each PID), `fact_requisition`, the applicant pipeline, `dim_cost_center` (department × country) and `fact_workforce_plan` (a budget and three reforecasts per year, never overwritten) |
+| [`int_position_snapshot`](sql/02_intermediate/int_position_snapshot.sql) | Every seat at every month-end: status, incumbent, open requisition. Filled seats equal the people headcount (test 45) |
+| [`int_seat_fill`](sql/02_intermediate/int_seat_fill.sql) | One row per fill (external hire or internal move): net-new or backfill, the prior incumbent, what happened to the seat, level and location change, pay walk, reuse check |
+| [`int_seat_vacancy_chain`](sql/02_intermediate/int_seat_vacancy_chain.sql) | An internal fill empties another seat: each fill is linked to the move that emptied its seat, so one resignation's whole chain carries one `chain_id` |
+| [`int_cw_position_snapshot`](sql/02_intermediate/int_cw_position_snapshot.sql), [`mart_pid_month_end`](sql/03_marts/mart_pid_month_end.sql) | Contractor PIDs (release 3.1): created or reused when a request is approved, filled for the days the supplier holds the assignment, vacant until reused or closed by the twice-yearly position audit. Filled contractor PIDs equal the contractor headcount (test 81); the PID ledger counts every PID filled, vacant previously held or vacant new |
+| [`mart_position_fill`](sql/03_marts/mart_position_fill.sql), [`mart_vacancy_pool`](sql/03_marts/mart_vacancy_pool.sql), [`mart_plan_vs_actual`](sql/03_marts/mart_plan_vs_actual.sql), [`mart_seat_corridors`](sql/03_marts/mart_seat_corridors.sql) | Fills, empty seats by age, plan beside actual per version, cost center and quarter (since release 3 with the contingent line: headcount and run-rate), and where backfilled seats moved |
+
+**Key calculations.**
+
+- **Reuse candidate.** A net-new seat is flagged when, on its approval date, a seat in the same department and job family, a grade within one, in the same country, had stood Open or Frozen for 90 days or more.
+- **Seat pay walk.** For every backfill, the change from the prior incumbent's pay to the new one splits into four steps that add up to the cent (test 53). With `mid` = salary range midpoint × office pay zone:
+
+```
+level       = mid(new grade, old office, exit FY) − mid(old grade, old office, exit FY)
+location    = mid(new grade, new office, exit FY) − mid(new grade, old office, exit FY)
+market      = mid(new grade, new office, hire FY) − mid(new grade, new office, exit FY)
+positioning = (new pay − prior pay) − level − location − market
+```
+
+Full method, a worked vacancy chain and every rule: [`docs/projects/workforce-planning/workforce_planning.md`](docs/projects/workforce-planning/workforce_planning.md).
+
+### Results (FY26)
+
+| Measure | Value |
+|---|---:|
+| Seat fills: backfills / net-new | 6,849: 4,668 / 2,181 |
+| Filled by internal moves | 24% (42% for manager seats) |
+| Backfills by why the seat emptied: voluntary / internal move / involuntary | 2,612 / 1,397 / 659 |
+| Backfills re-levelled down / up | 567 / 185 |
+| Net-new seats approved while a matching seat stood vacant 90+ days | 631 (29%), $55.7M of starting base pay |
+| Median days from approval to fill (backfills) | 42 |
+| PIDs at 30 Jun 2026: filled by employees / by contractors | 30,005 / 11,941 |
+| Vacant PIDs at 30 Jun 2026: previously held / new | 8,689 / 528 (employee 1,268, contractor 7,949) |
+
+| FY | Net-new filled (budget) | Attainment | Backfills (budget) | Attainment |
+|---|---:|---:|---:|---:|
+| FY22 | 2,637 (3,531) | 75% | 3,297 (3,691) | 89% |
+| FY23 | 2,484 (3,201) | 78% | 4,441 (4,753) | 93% |
+| FY24 | 910 (2,834) | **32%** | 4,105 (4,503) | 91% |
+| FY25 | 1,628 (2,236) | 73% | 4,224 (4,737) | 89% |
+| FY26 | 2,181 (2,762) | 79% | 4,668 (5,031) | 93% |
+
+- **Backfills save money, mostly by re-levelling.** New incumbents earn $7.0M a year less than the people they replaced: level −$6.8M, location −$0.7M, market +$2.2M, positioning −$1.8M.
+- **FY24's budget predates the restructuring.** Net-new hiring stopped at 32% of plan while backfills stayed near it; each reforecast closes the gap (FY26: 79% against the budget, 93% against RF3).
+- **Reuse candidates concentrate in Operations**: 44% of its net-new seats, against 11% in People and Legal & Compliance.
+- One honest caveat: the generator writes each plan version around what happened, with an error that shrinks per reforecast. Variance and attainment are real calculations; the plan does not drive hiring.
+
+Eighteen tests (41 to 56, 80 and 81) guard the PID layer, and [`08_validate_workforce_planning.sql`](sqlserver/08_validate_workforce_planning.sql) checks the SQL Server build against the same values.
+
+### Tableau
+
+**Published:** [Workforce Planning on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard) (release 3.1 data, four Custom SQL extracts: the per-period PID summary 2,520 rows, plan vs actual 11,740, position fills 30,575 and the vacancy pool at quarter-ends 149,615).
+
+[![Workforce Planning on Tableau Public](docs/images/workforce_planning_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)
+
+*FY26, all of Arcadia. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)**: pick a fiscal year, half or quarter, and a company, function, sub-function, department or country; hover any KPI card for its breakdown, and hover the map title for the busiest routes.*
+
+| Part | What it does |
+|---|---|
+| Top bar and popovers | Period (fiscal year, half, quarter) and View (company down to country) as browse-then-apply popovers: pick a tab to see its choices, then pick the choice. A period or group with no plan is dimmed and does nothing, so no click leads to an empty page |
+| KPI band | PIDs, vacant previously held, vacant new, PIDs filled and backfills with a level change; each card is a map layer drawn behind transparent hover sheets, and each hover is a small chart (Viz in Tooltip) |
+| PID Moves | The map: one line per backfilled PID that came back in another office than the person who left it, a dot per receiving office; the five busiest routes are in the title's tooltip |
+| Backfill Changes | Of the backfills, how many changed level or office, and what that did to pay (a pay walk that adds up to the cent) |
+| Net-new by Group | Net-new PIDs filled against the plan, bar inside a bar, with the share approved while a matching PID stood vacant |
+| Vacant PIDs | How long vacant PIDs have waited, previously held against new, on the period's closing date |
+
+Every control is a parameter action (34 of them, plus 19 deselect actions), so one click drives all four data sources. Every card ties to the others by construction (backfills with a level change = one level down + one level up + changed level and office). Build plan with every calculation, size and expected value: [`release_3_rebuild_dashboard_3.md`](docs/projects/workforce-planning/release_3_rebuild_dashboard_3.md); method and the PID ledger: [`workforce_planning.md`](docs/projects/workforce-planning/workforce_planning.md#0-which-dashboard-this-is-and-the-pid-principle); [headline values](docs/projects/workforce-planning/headline_values.md).
+
+---
+
+## Case study 4: Contingent Workforce reconciliation
+
+### Business problem
+
+*Who is actually working for Arcadia through a supplier today, and where does the system managers use disagree with the system suppliers use?*
+
+Bridgeway VMS is the source of truth for contractors; managers only ever see Keystone HR, which a one-way feed fills from Bridgeway. When the feed is late or fails, or someone edits Keystone by hand, a manager may think a contractor has left who is still working (and still billing), or keep access open for someone who left weeks ago. The warehouse cannot fix either system. It **finds every disagreement, says why it happened and who can fix it**, from the two systems and the feed log alone.
+
+### Approach
+
+```mermaid
+flowchart LR
+    BW["🟠 Bridgeway<br/>workers · orders · revisions"] --> IR
+    KS["🔵 Keystone<br/>contingent person records"] --> IR
+    IR["Identity resolution<br/>who is who"] --> SS
+    FEED["🔴 Feed log<br/>sent · applied · failed"] --> SS
+    SS["Side by side, every month-end<br/>what Keystone should hold vs what it holds"] --> RULES["Discrepancy rules<br/>what differs, and why"]
+    RULES --> WL["Work list<br/>evidence · age · severity · owner"]
+    KEY["Answer key<br/>(test fixture only)"] -.-> SC["Detection score"]
+    RULES --> SC
+
+    classDef hr fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+    classDef vms fill:#ffedd5,stroke:#c2410c,color:#0f172a
+    classDef feed fill:#fee2e2,stroke:#b91c1c,color:#0f172a
+    classDef wh fill:#ede9fe,stroke:#6d28d9,color:#0f172a
+    classDef out fill:#dcfce7,stroke:#15803d,color:#0f172a
+    classDef key fill:#f1f5f9,stroke:#64748b,color:#0f172a,stroke-dasharray: 4 3
+    class BW vms
+    class KS hr
+    class FEED feed
+    class IR,SS,RULES wh
+    class WL,SC out
+    class KEY key
+```
+
+| Step | Model | What it does |
+|---|---|---|
+| Who is who | [`int_cw_supplier_alias`](sql/02_intermediate/int_cw_supplier_alias.sql), [`int_cw_identity_resolution`](sql/02_intermediate/int_cw_identity_resolution.sql) | Keystone's 59 spellings of 23 suppliers mapped to Bridgeway's; people matched in three tiers: **High** (the stored Bridgeway ID, last names agree) 41,900, **Medium** (same name and supplier, starts within 7 days) 130, **Low** (same name, within 30 days) 0. Every record kept, matched or not |
+| Side by side | [`int_cw_reconciliation_snapshot`](sql/02_intermediate/int_cw_reconciliation_snapshot.sql) | For every person and month-end either system shows them working: what Keystone *should* hold (everything Bridgeway had sent by then, via an `ASOF` join on the feed) beside what it holds, on four field groups |
+| Why they differ | [`int_cw_discrepancy`](sql/02_intermediate/int_cw_discrepancy.sql) | For each difference, the most recent recorded cause names it: a change in transit or late (CW00, CW01), a failed extension, early end or attribute change (CW02, CW03, CW12), a hand edit (CW05). Structural rules find broken links (CW06), one person with two IDs (CW07), records that never reached Keystone (CW08) or exist only there (CW09), the 48-month cap (CW10), orders not closed (CW04) and billing after the end (CW11) |
+| Marts | [`mart_cw_discrepancy_detail`](sql/03_marts/mart_cw_discrepancy_detail.sql), [`mart_cw_reconciliation`](sql/03_marts/mart_cw_reconciliation.sql), [`mart_cw_engagement_cap`](sql/03_marts/mart_cw_engagement_cap.sql), [`mart_cw_detection_score`](sql/03_marts/mart_cw_detection_score.sql) | The work list (evidence sentence, age, severity, owner), the monthly trend beside each system's population, engagements against the cap, and the score |
+
+### Results (30 June 2026)
+
+**416 of 11,941 contingent workers (3.5%)** carry a discrepancy beyond a change in transit; the share has run 3.1% to 3.5% every June since 2021.
+
+| Discrepancy | Severity | Open | Median age |
+|---|---|---:|---:|
+| Changed in Keystone only | Cost risk | 219 | 107 days |
+| Ended but not closed in Bridgeway | Cost risk | 99 | 111 days |
+| Extension never arrived | Access risk | 65 | 85 days |
+| Link ID missing or mistyped | Data hygiene | 49 | 309 days |
+| One person, two IDs | Data hygiene | 27 | 729 days |
+| Change arrived late | Data hygiene | 26 | 4 days |
+| Never reached Keystone | Access risk | 25 | 462 days |
+| Attribute change never arrived | Data hygiene | 16 | 110 days |
+| Early end never arrived · Keystone-only · Over the cap · Billed after the end | Access, compliance, cost | 6 · 6 · 1 · 1 | |
+
+**Detection score.** On every month-end from June 2021 to June 2026, each planted discrepancy open that day is *injected*; it is *detected* if the rules flag the same type on the same worker. **28,530 injected, 28,530 detected (100%), 42 false flags**, all two different people with the same name at the same supplier and cost center, one starting the day after the other ended: nothing in either system tells them apart, so the work list asks HR Ops to look. Tests 73 and 75 hold this. Full write-up, including what scoring the rules uncovered while building them: [`case_study_4.md`](docs/projects/contingent-workforce/case_study_4.md).
+
+### The month-end close view (release 4)
+
+Finance runs its month-end report from Keystone, so the question that matters at a close is narrower than "where do the systems differ": **which differences put this report at risk, and where does each one get fixed?** Release 4 recasts the reconciliation as Finance meets it.
+
+| Piece | What it adds |
+|---|---|
+| 12 flags, 6 risks, 3 places | Each gap is a **comparison** Finance can check (cost center in another function or department, order open or billed after the end, two IDs, a wrong stored ID, two active PID records, a PID still filled, ended or missing on one side). It creates one of six **risks** and is fixed in one **place**: Bridgeway, Keystone, or Integration ([`int_cw_flag`](sql/02_intermediate/int_cw_flag.sql)) |
+| Times and the close run | The hour every feed change was sent and applied, when every Keystone version was written, and the warehouse's own **load log**. A close is the 00:00 GMT run on the 1st; a change sent in the last 24 hours "clears on its own", one waiting longer is a stuck feed, and a failed load makes gaps that exist only in the stale copy ([`int_cw_close_run`](sql/02_intermediate/int_cw_close_run.sql), [`int_cw_load_gap`](sql/02_intermediate/int_cw_load_gap.sql)) |
+| Keystone job data | The PID each contingent job record holds, against the PID ledger: two active records for one person, or a record left in a PID after the contract ended. Seeded, with its own answer key; Dashboard #3's PID ledger is untouched |
+| Helix Service Desk | A fictional ticket system: 2,967 tickets and 12,895 state changes since January 2021, replayed at each close, linked to gaps in tiers (ID, name in the text, none) |
+| One data source | [`custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql): gaps, populations and open tickets for all 61 closes in one union, so multi-select sets work across the page |
+
+**At the June 2026 close:** 379 gaps on 357 contractors, a **2.99% gap rate against a 3% target** (below it at every June close; above it at 41 of the 61 closes). Bridgeway holds 196 of the gaps, Keystone 181, Integration 2; 176 have no ticket and 247 are over 90 days old. At the December 2024 close the Keystone load failed for three nights, and 6 of that close's gaps existed only in the stale copy.
+
+Dashboard #4 is in build: [release plan](docs/projects/contingent-workforce/release_4_plan.md). On SQL Server the marts are views (`rpt.vw_cw_*`, [`04b`](sqlserver/04b_create_reporting_views_contingent.sql), [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql)).
+
+---
+
+
+## Case study 5: Global Workforce Footprint
+
+![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
+
+*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard).*
+
+### Business problem
+
+Location strategy questions (where to hire next, which hubs are growing, whether people are moving toward engineering centers or away from headquarters) are usually answered from a country column. A country hides the difference between two offices in the same country, and it can't show movement. This case study answers them at the office level, with every number tied back to the headcount walk.
+
+### Approach
+
+| Model | What it does |
+|---|---|
+| [`int_worker_movement`](sql/02_intermediate/int_worker_movement.sql) | Carries each worker's office at both month-ends |
+| [`mart_location_headcount`](sql/03_marts/mart_location_headcount.sql) | One row per office per month and worker type (Employee, Contingent since release 3): opening, hires or contingent starts, leavers by type or contingent ends, conversions, relocations in and out, closing (headcount and FTE) |
+| [`mart_mobility_flows`](sql/03_marts/mart_mobility_flows.sql) | Origin and destination office for every relocation, with both ends' coordinates, so Tableau can draw `MAKELINE` without relating the location table twice |
+| [`mart_dim_location`](sql/03_marts/mart_dim_location.sql) | 35 offices with real postal codes and their GeoNames coordinates (street addresses are fictional), the pay zone and the date each office opened |
+
+A relocation is any change of office between two month-ends, including between two offices in the same country, which the slice-level walk in case study 1 can't see (Bengaluru to Hyderabad is the busiest corridor, and both are in India). Four tests (19 to 22) tie the office walk to the company walk and the flows to the office walk.
+
+### Results (FY26)
+
+| Finding | Number |
+|---|---|
+| Fastest-growing region | Latin America, +5.9% (2,225 → 2,356), against +5.5% company-wide; Europe next at +5.7% |
+| Share in the three India engineering centers | 23% of the company (6,967 people in Bengaluru, Hyderabad and Pune), more than twice headquarters in Austin (3,224) |
+| New offices | Six opened since 2022; Manila, Guadalajara and Pune passed 200 people each |
+| Relocations | 857 office moves month by month (146 between countries); 725 people were in a different office at the end of the year than at the start |
+| Busiest corridor | Bengaluru ↔ Hyderabad, 122 moves |
+| Within 1,000 km of London | Paris, Amsterdam, Dublin, Zurich, Munich and Berlin: 4,240 people across seven offices, London included |
+
+### Tableau
+
+Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_guide.md`](docs/projects/workforce-footprint/tableau_workforce_map_guide.md). One map with four layers (countries, relocation paths with `MAKELINE`, a `BUFFER` radius around the selected office, offices with `MAKEPOINT`), a parameter action that moves the radius when an office is clicked, `DISTANCE` to count the people inside it, and the 2025 viewport parameter and dynamic color range where Tableau Public supports them.
+
+---
+
+## Case study 6: Workforce Cost Bridge
 
 ### Business problem
 
@@ -857,90 +947,11 @@ Step-by-step connection guide: [`docs/setup/tableau_public_guide.md`](docs/setup
 
 ---
 
-## Case study 6: Contingent Workforce reconciliation
-
-### Business problem
-
-*Who is actually working for Arcadia through a supplier today, and where does the system managers use disagree with the system suppliers use?*
-
-Bridgeway VMS is the source of truth for contractors; managers only ever see Keystone HR, which a one-way feed fills from Bridgeway. When the feed is late or fails, or someone edits Keystone by hand, a manager may think a contractor has left who is still working (and still billing), or keep access open for someone who left weeks ago. The warehouse cannot fix either system. It **finds every disagreement, says why it happened and who can fix it**, from the two systems and the feed log alone.
-
-### Approach
-
-```mermaid
-flowchart LR
-    BW["🟠 Bridgeway<br/>workers · orders · revisions"] --> IR
-    KS["🔵 Keystone<br/>contingent person records"] --> IR
-    IR["Identity resolution<br/>who is who"] --> SS
-    FEED["🔴 Feed log<br/>sent · applied · failed"] --> SS
-    SS["Side by side, every month-end<br/>what Keystone should hold vs what it holds"] --> RULES["Discrepancy rules<br/>what differs, and why"]
-    RULES --> WL["Work list<br/>evidence · age · severity · owner"]
-    KEY["Answer key<br/>(test fixture only)"] -.-> SC["Detection score"]
-    RULES --> SC
-
-    classDef hr fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
-    classDef vms fill:#ffedd5,stroke:#c2410c,color:#0f172a
-    classDef feed fill:#fee2e2,stroke:#b91c1c,color:#0f172a
-    classDef wh fill:#ede9fe,stroke:#6d28d9,color:#0f172a
-    classDef out fill:#dcfce7,stroke:#15803d,color:#0f172a
-    classDef key fill:#f1f5f9,stroke:#64748b,color:#0f172a,stroke-dasharray: 4 3
-    class BW vms
-    class KS hr
-    class FEED feed
-    class IR,SS,RULES wh
-    class WL,SC out
-    class KEY key
-```
-
-| Step | Model | What it does |
-|---|---|---|
-| Who is who | [`int_cw_supplier_alias`](sql/02_intermediate/int_cw_supplier_alias.sql), [`int_cw_identity_resolution`](sql/02_intermediate/int_cw_identity_resolution.sql) | Keystone's 59 spellings of 23 suppliers mapped to Bridgeway's; people matched in three tiers: **High** (the stored Bridgeway ID, last names agree) 41,900, **Medium** (same name and supplier, starts within 7 days) 130, **Low** (same name, within 30 days) 0. Every record kept, matched or not |
-| Side by side | [`int_cw_reconciliation_snapshot`](sql/02_intermediate/int_cw_reconciliation_snapshot.sql) | For every person and month-end either system shows them working: what Keystone *should* hold (everything Bridgeway had sent by then, via an `ASOF` join on the feed) beside what it holds, on four field groups |
-| Why they differ | [`int_cw_discrepancy`](sql/02_intermediate/int_cw_discrepancy.sql) | For each difference, the most recent recorded cause names it: a change in transit or late (CW00, CW01), a failed extension, early end or attribute change (CW02, CW03, CW12), a hand edit (CW05). Structural rules find broken links (CW06), one person with two IDs (CW07), records that never reached Keystone (CW08) or exist only there (CW09), the 48-month cap (CW10), orders not closed (CW04) and billing after the end (CW11) |
-| Marts | [`mart_cw_discrepancy_detail`](sql/03_marts/mart_cw_discrepancy_detail.sql), [`mart_cw_reconciliation`](sql/03_marts/mart_cw_reconciliation.sql), [`mart_cw_engagement_cap`](sql/03_marts/mart_cw_engagement_cap.sql), [`mart_cw_detection_score`](sql/03_marts/mart_cw_detection_score.sql) | The work list (evidence sentence, age, severity, owner), the monthly trend beside each system's population, engagements against the cap, and the score |
-
-### Results (30 June 2026)
-
-**416 of 11,941 contingent workers (3.5%)** carry a discrepancy beyond a change in transit; the share has run 3.1% to 3.5% every June since 2021.
-
-| Discrepancy | Severity | Open | Median age |
-|---|---|---:|---:|
-| Changed in Keystone only | Cost risk | 219 | 107 days |
-| Ended but not closed in Bridgeway | Cost risk | 99 | 111 days |
-| Extension never arrived | Access risk | 65 | 85 days |
-| Link ID missing or mistyped | Data hygiene | 49 | 309 days |
-| One person, two IDs | Data hygiene | 27 | 729 days |
-| Change arrived late | Data hygiene | 26 | 4 days |
-| Never reached Keystone | Access risk | 25 | 462 days |
-| Attribute change never arrived | Data hygiene | 16 | 110 days |
-| Early end never arrived · Keystone-only · Over the cap · Billed after the end | Access, compliance, cost | 6 · 6 · 1 · 1 | |
-
-**Detection score.** On every month-end from June 2021 to June 2026, each planted discrepancy open that day is *injected*; it is *detected* if the rules flag the same type on the same worker. **28,530 injected, 28,530 detected (100%), 42 false flags**, all two different people with the same name at the same supplier and cost center, one starting the day after the other ended: nothing in either system tells them apart, so the work list asks HR Ops to look. Tests 73 and 75 hold this. Full write-up, including what scoring the rules uncovered while building them: [`case_study_6.md`](docs/projects/contingent-workforce/case_study_6.md).
-
-### The month-end close view (release 4)
-
-Finance runs its month-end report from Keystone, so the question that matters at a close is narrower than "where do the systems differ": **which differences put this report at risk, and where does each one get fixed?** Release 4 recasts the reconciliation as Finance meets it.
-
-| Piece | What it adds |
-|---|---|
-| 12 flags, 6 risks, 3 places | Each gap is a **comparison** Finance can check (cost center in another function or department, order open or billed after the end, two IDs, a wrong stored ID, two active PID records, a PID still filled, ended or missing on one side). It creates one of six **risks** and is fixed in one **place**: Bridgeway, Keystone, or Integration ([`int_cw_flag`](sql/02_intermediate/int_cw_flag.sql)) |
-| Times and the close run | The hour every feed change was sent and applied, when every Keystone version was written, and the warehouse's own **load log**. A close is the 00:00 GMT run on the 1st; a change sent in the last 24 hours "clears on its own", one waiting longer is a stuck feed, and a failed load makes gaps that exist only in the stale copy ([`int_cw_close_run`](sql/02_intermediate/int_cw_close_run.sql), [`int_cw_load_gap`](sql/02_intermediate/int_cw_load_gap.sql)) |
-| Keystone job data | The PID each contingent job record holds, against the PID ledger: two active records for one person, or a record left in a PID after the contract ended. Seeded, with its own answer key; Dashboard #3's PID ledger is untouched |
-| Helix Service Desk | A fictional ticket system: 2,967 tickets and 12,895 state changes since January 2021, replayed at each close, linked to gaps in tiers (ID, name in the text, none) |
-| One data source | [`custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql): gaps, populations and open tickets for all 61 closes in one union, so multi-select sets work across the page |
-
-**At the June 2026 close:** 379 gaps on 357 contractors, a **2.99% gap rate against a 3% target** (below it at every June close; above it at 41 of the 61 closes). Bridgeway holds 196 of the gaps, Keystone 181, Integration 2; 176 have no ticket and 247 are over 90 days old. At the December 2024 close the Keystone load failed for three nights, and 6 of that close's gaps existed only in the stale copy.
-
-Dashboard #6 is in build: [release plan](docs/projects/contingent-workforce/release_4_plan.md). On SQL Server the marts are views (`rpt.vw_cw_*`, [`04b`](sqlserver/04b_create_reporting_views_contingent.sql), [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql)).
-
----
-
-
 ## Case study 7: PID Fill Forecast (planned)
 
 ### Business problem
 
-Workforce planning is decided in PIDs: how many positions the plan opens, how many fall vacant when people leave, and how many Recruiting can fill each quarter. Case study 1 shows where Arcadia stands today. The next question is forward-looking: **given planned growth and expected attrition, how many PIDs will need filling each quarter, and how many will still be vacant at quarter-end?**
+Workforce planning is decided in PIDs: how many positions the plan opens, how many fall vacant when people leave, and how many Recruiting can fill each quarter. Case study 3 shows where Arcadia stands today. The next question is forward-looking: **given planned growth and expected attrition, how many PIDs will need filling each quarter, and how many will still be vacant at quarter-end?**
 
 ### Approach (planned)
 
@@ -964,7 +975,7 @@ python generator/generate_data.py      # optional: rebuild the raw data (same se
 python pipeline/run_pipeline.py        # build the warehouse, run the 88 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
-python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)
+python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 1)
 bash docs/brand/build/build.sh                  # optional: rebuild the logo and both dashboard previews (needs Node)
 ```
 
@@ -978,8 +989,8 @@ The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau 
 
 - [`sqlserver/`](sqlserver/) holds T-SQL scripts that load the CSVs with `BULK INSERT` and build typed `dw` tables, the pay history in USD at its posting-date rate (`OUTER APPLY TOP 1` as the as-of join), an indexed worker month-end snapshot, a running pay ledger, a recursive reporting-chain table and the reporting views. The load script is generated from the CSV headers ([`make_load_raw.py`](sqlserver/make_load_raw.py)).
 - [`03b_build_dw_workforce_planning.sql`](sqlserver/03b_build_dw_workforce_planning.sql) builds the seat layer (positions, seat assignments, requisitions, the workforce plan, candidates, a seat month-end snapshot, seat fills with the pay walk, vacancy chains with a recursive CTE, plan vs actual) and four reporting views; [`08_validate_workforce_planning.sql`](sqlserver/08_validate_workforce_planning.sql) checks it.
-- [`03c_build_dw_contingent.sql`](sqlserver/03c_build_dw_contingent.sql) (release 3) brings in the contingent workforce: Bridgeway VMS and Keystone HR's contingent records, the contingent month-end snapshot, conversions and movement, and case study 6's identity resolution and discrepancy rules, where DuckDB's `ASOF JOIN` becomes a range join on each feed change and the date of the next one. [`04b`](sqlserver/04b_create_reporting_views_contingent.sql) adds six views (contingent spend, the Shapley growth mix in T-SQL, precomputed in `dw.WorkforceCostGrowthMix`, and the case study 6 marts), each with a matching Tableau Custom SQL file (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`); [`12_validate_contingent_workforce.sql`](sqlserver/12_validate_contingent_workforce.sql) checks them.
-- [`03d_build_dw_cw_reconciliation.sql`](sqlserver/03d_build_dw_cw_reconciliation.sql) (release 4) adds case study 6's month-end close view: the load log and the close runs, the 12 flags with their routing, Keystone job data, the Helix ticket replay and the three Dashboard #6 marts; [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql) exposes them as views, [`tableau/custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql) unions them into the page's one data source, and [`15_validate_cw_reconciliation.sql`](sqlserver/15_validate_cw_reconciliation.sql) checks them.
+- [`03c_build_dw_contingent.sql`](sqlserver/03c_build_dw_contingent.sql) (release 3) brings in the contingent workforce: Bridgeway VMS and Keystone HR's contingent records, the contingent month-end snapshot, conversions and movement, and case study 4's identity resolution and discrepancy rules, where DuckDB's `ASOF JOIN` becomes a range join on each feed change and the date of the next one. [`04b`](sqlserver/04b_create_reporting_views_contingent.sql) adds six views (contingent spend, the Shapley growth mix in T-SQL, precomputed in `dw.WorkforceCostGrowthMix`, and the case study 4 marts), each with a matching Tableau Custom SQL file (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`); [`12_validate_contingent_workforce.sql`](sqlserver/12_validate_contingent_workforce.sql) checks them.
+- [`03d_build_dw_cw_reconciliation.sql`](sqlserver/03d_build_dw_cw_reconciliation.sql) (release 4) adds case study 4's month-end close view: the load log and the close runs, the 12 flags with their routing, Keystone job data, the Helix ticket replay and the three Dashboard #4 marts; [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql) exposes them as views, [`tableau/custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql) unions them into the page's one data source, and [`15_validate_cw_reconciliation.sql`](sqlserver/15_validate_cw_reconciliation.sql) checks them.
 - [`tableau/custom_sql_workforce_cost_bridge.sql`](tableau/custom_sql_workforce_cost_bridge.sql) is the cost bridge as **Tableau Custom SQL**: one `SELECT` with no CTEs, using derived tables and `CROSS APPLY (VALUES …)` to unpivot each employee and contingent worker into walk lines.
 - [`tableau/custom_sql_headcount_fte_walk.sql`](tableau/custom_sql_headcount_fte_walk.sql) is the headcount & FTE walk for Dashboard #1: the walk rebuilt from the SQL Server snapshot with the five dimensions joined in, keeping every CSV column name so the workbook moves over with *Replace Data Source* ([field mapping](docs/projects/workforce-planning/release_2_replace_references.md)); [`10_validate_headcount_fte_walk.sql`](sqlserver/10_validate_headcount_fte_walk.sql) runs it and checks it.
 - [`tableau/custom_sql_compensation_walk.sql`](tableau/custom_sql_compensation_walk.sql) is the compensation walk, built on `dw.WorkerPayLedger`; [`06_validate_compensation_walk.sql`](sqlserver/06_validate_compensation_walk.sql) runs that exact file inside SQL Server (about 45 seconds), times it and checks it.

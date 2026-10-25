@@ -1,12 +1,13 @@
 # Contingent Workforce Reconciliation: release plan
 
-Case study 6 · Dashboard #6 · warehouse release 4. Arcadia Systems, Keystone HR, Bridgeway VMS, Helix Service Desk and every person and supplier here are fictional; all data is synthetic.
+Case study 4 · Dashboard #4 · warehouse release 4. Arcadia Systems, Keystone HR, Bridgeway VMS, Helix Service Desk and every person and supplier here are fictional; all data is synthetic.
 
-This page tracks the release from top to bottom, from the data the generator writes to the Custom SQL to the published dashboard. Each phase has an owner, a status and a "done when". The design behind it is the concept plan (project doc `dashboard_6_concept_plan.md`, agreed 2026-10-25). The release 3 reconciliation it builds on is described in [case study 6](case_study_6.md) and [Keystone and the feed](keystone_feed.md).
+This page tracks the release from top to bottom, from the data the generator writes to the Custom SQL to the published dashboard. Each phase has an owner, a status and a "done when". The design behind it is the concept plan (project doc `dashboard_6_concept_plan.md`, agreed 2026-10-25). The release 3 reconciliation it builds on is described in [case study 4](case_study_4.md) and [Keystone and the feed](keystone_feed.md).
 
 | Revision | Date | What changed |
 |---|---|---|
 | 1 | 2026-10-25 | Phases 1 to 6 done: generator, warehouse, SQL Server twin, Custom SQL, check tables, prototype. Phases 7 to 12 planned |
+| 2 | 2026-10-25 | Prototype approved. Section 9 added: lessons from the three published dashboards (an outside review), what this build adopts and what it does not, the action contract and acceptance checks. Carryover is now one continuous gap episode (KPI 3: 315, was 319). KPI 4 reads "No linked ticket". The dashboard is **#4** and the case study **4**: the README now orders case studies by dashboard |
 
 ## Contents
 
@@ -18,8 +19,9 @@ This page tracks the release from top to bottom, from the data the generator wri
 6. Phase 4: the Custom SQL
 7. Phase 5: check tables
 8. Phase 6: prototype
-9. Phases 7 to 12: spikes, design, build, publish
-10. Risks and open items
+9. Lessons from the published dashboards
+10. Phases 7 to 12: spikes, design, build, publish
+11. Risks and open items
 
 ---
 
@@ -32,13 +34,13 @@ This page tracks the release from top to bottom, from the data the generator wri
 | 3 | SQL Server twin: `03d`, `04c`, `15_validate`, `build_all` | Claude, then Thiago on the Mac | Checker **done**; Mac run **to do** | `check_tsql_in_duckdb.py` matches every view and the Custom SQL row for row; on the Mac, `build_all.sql` runs and `15_validate` says PASS on every row |
 | 4 | The Custom SQL | Claude | **Done** | `tableau/custom_sql_cw_reconciliation_dashboard.sql` returns the 62,808 rows of `mart_cw_reconciliation_dashboard` |
 | 5 | Check tables (section 7) | Claude | **Done** | Numbers for Current (Jun 2026), May 2026, Jun 2025 and the Dec 2024 replay, from the marts |
-| 6 | Prototype with real numbers | Claude, reviewed by Thiago | Built; **review to do** | Thiago approves the layout, the wording and the numbers on the canvas |
+| 6 | Prototype with real numbers | Claude, reviewed by Thiago | **Approved** 2026-10-25 | Thiago approves the layout, the wording and the numbers on the canvas |
 | 7 | Spikes S1 to S6 on Tableau Public | Both | To do | Each passes or has its fallback chosen (section 9) |
 | 8 | Multi-select design session (function, department, country) | Both | To do | Mechanics agreed: set actions, the empty-set rule, the dim rule |
 | 9 | Figma: palette page and the mock | Thiago, with Claude | To do | Palette checked for colour blindness; the mock matches the prototype |
 | 10 | Build plan, step by step (like `release_3_rebuild_dashboard_3.md`) | Claude | To do, after 7 and 8 | Every sheet, calculation, action and zone written down, with screenshots to compare |
 | 11 | Build in Tableau | Thiago (Mac) | To do | Check tables and click tests pass; the saved .twb reviewed before publishing |
-| 12 | Publish: Tableau Public, README, screenshot, profile row, project docs | Both | To do | Live link in the README; the case study 6 section shows the page |
+| 12 | Publish: Tableau Public, README, screenshot, profile row, project docs | Both | To do | Live link in the README; the case study 4 section shows the page |
 
 ---
 
@@ -196,8 +198,8 @@ Every number below comes from the marts (`data/marts/mart_cw_*.csv`). The build 
 | KPI 2 status | Report with low risk | Report with known risk | Report with low risk | Report with known risk |
 | Gaps (Sankey total) | 379 | 381 | 313 | 358 |
 | Of which clear on their own | 0 | 1 | 3 | 0 |
-| KPI 3 open at the prior close | 319 | 322 | 268 | 299 |
-| KPI 4 no ticket | 176 | 174 | 143 | 185 |
+| KPI 3 open since the prior close (same episode) | 315 | 321 | 264 | 298 |
+| KPI 4 no linked ticket | 176 | 174 | 143 | 185 |
 | KPI 5 open over 90 days | 247 | 255 | 208 | 231 |
 | Oldest gap, days | 3,235 | 3,205 | 2,870 | 2,689 |
 | Load note | Loaded on time | Loaded on time | Loaded on time | Keystone load failed: the close used Keystone as of Dec 28 |
@@ -254,7 +256,71 @@ What it settles for review: the funnel order (flags ranked, risks and places fix
 
 ---
 
-## 9. Phases 7 to 12: spikes, design, build, publish
+## 9. Lessons from the published dashboards
+
+An outside review of the three published dashboards (Headcount & FTE Walk, Compensation Walk, Workforce Planning) turned their strengths and weak spots into requirements for this one. It also proposed its own prototype. This section records what the build adopts, what it does not and why. The published dashboards are not being reworked.
+
+### Adopted
+
+| # | Lesson (from) | What this build does | Status |
+|---:|---|---|---|
+| L1 | Keep the unit visible without hover (Workforce Planning) | Every KPI and card names its unit on its face: contractors (KPIs 1, 2), gaps (Sankey, KPIs 3 to 5), tickets (ticket card). Hover adds evidence, never the meaning | In the prototype; build rule |
+| L2 | Make the arithmetic visible (Headcount Walk) | Gap conservation at every close and every filter: 12 flag totals = 6 risk totals = 3 place totals = gap list rows = Sankey total. Contractors and gaps are never mixed (357 contractors, 379 gaps) | Test 83 and the check tables; acceptance check A2 |
+| L3 | Generate text from the same measures (Headcount Walk) | Headline, movement line, KPI sub-lines and tooltips are calculations on the data source, never typed sentences; rechecked after every filter and close change | Build rule (phase 10) |
+| L4 | Composition is not improvement (Compensation Walk) | A falling rate can come from a larger population: the June dip is mostly the population peaking at the close. The movement line names the numerator and the denominator and never says "fixed" unless the gap count fell | Build rule |
+| L5 | Keep gap age and ticket age apart (Headcount Walk) | KPI 5 and the gap list use gap age (days since the gap began, strictly over 90); the ticket card uses ticket age. A gap can be older than its ticket; the gap list shows both | Built (`days_open`, `age_days`) |
+| L6 | Don't overclaim from a missing link | KPI 4 is "No linked ticket", not "nobody is working on these": a ticket may exist without an ID the warehouse can link | Prototype updated |
+| L7 | Carryover means one continuous episode | KPI 3 counts a gap open at the prior close **and** begun on or before it. A flag that cleared and came back between closes is a new episode | Built: Jun 2026 315 (was 319) |
+| L8 | Correction place and assigned team are different facts | The Sankey routes a gap to where it should be fixed; the ticket card places a ticket by the group working it now (a misrouted ticket sits in the wrong row until reassigned). The gap list shows both | Built (`place` vs `current_group`) |
+| L9 | Replay must not leak current values | A past close shows ticket states, groups and links as they were at that close's Helix read, rebuilt from events | Built (`int_itsm_ticket_state`); acceptance check A9 |
+| L10 | A target is not a certificate | KPI 2 keeps "Report with low risk / known risk", and its hover states the distance in percentage points from a provisional 3% target ("0.01 pts below") and that it does not certify the report | Build rule |
+| L11 | Say what a flag does and does not prove | "Access kept" means Keystone shows the contractor active after Bridgeway ended them, not that they used any access. The detection score is synthetic recall (every planted case found), with false flags reported beside it | Info popover text |
+| L12 | Empty and missing states | "No gaps in this selection" for zero gaps; N/A, not 0%, for a zero denominator; a failed load is a freshness note, never a zero | Build rule |
+| L13 | Prove the extension before the build plan | The Sankey spike passes only on Tableau Public: proportional widths, place colours, small paths, order by rank, click to the gap list. A failure is recorded with its fallback, never by quietly changing the story | Phase 7 |
+
+### Not adopted, and why
+
+| Proposal | Decision |
+|---|---|
+| One dot per open **gap**, aged by gap age, with a "no ticket" row | Kept the agreed design: one dot per open **ticket**, by the group working it and its age. Gap age is already KPI 5 and the gap list; the card answers who is working and for how long, which nothing else on the page does |
+| Six risk colours on the left ribbons, place colours on the right | Kept one colour story: colour means where to fix, everywhere on the page. Risks are labelled in the middle column, and a second nine-colour palette would compete with the places |
+| KPI 3 as the total number of gaps | The total is the Sankey's headline; KPI 3 stays "open since the prior close" because Finance asks whether the same problems keep coming back |
+| Drop the go / no-go wording | Kept for Finance (agreed), with the hover in L10 |
+
+### Action contract
+
+| Interaction | Effect |
+|---|---|
+| Point in time, Function, Department, Country | Every card: KPIs, Sankey, timeline (history kept, the selected close highlighted), ticket card, gap list |
+| Click a flag, risk or place in the Sankey | Filters the gap list to those gaps; the KPIs keep the overview |
+| Hover a ribbon or node | Count, rank at this close, the prior close and a year ago |
+| Hover a ticket dot | Ticket number and title |
+| Overview · Gap list | Swaps the main card (dynamic zone visibility) |
+| Reset | Current, all groups, Overview, popovers closed, selections cleared |
+
+### Acceptance checks for the build
+
+| # | Check | Expected (Current) | Where it is proven now |
+|---|---|---|---|
+| A1 | Gap rate = contractors with a counted gap / working in Bridgeway | 357 / 11,941 = 2.99% | Test 84 |
+| A2 | Gap conservation across flags, risks, places and the gap list | 379 everywhere | Test 83 |
+| A3 | Linked plus not linked = all counted gaps | 203 + 176 = 379 | Mart |
+| A4 | Over 90 days is strictly more than 90 | 247 | `is_over_90_days` |
+| A5 | Open tickets by group add up | 147 + 168 + 15 = 330 | Mart |
+| A6 | Carryover is one continuous episode | 315 | Mart |
+| A7 | No typed sentence survives a change of close or group | Headline and movement line change with Dec 2024 | Build |
+| A8 | One function, several departments, a country intersection tie to SQL totals | Additive cells in `mart_cw_gap_rate_close` | Build |
+| A9 | Replay: June 2026, May 2026, Dec 2024 | Section 7 | Tests 85, 15_validate |
+| A10 | A misrouted ticket sits under the group working it | Ticket card rows by `current_group` | Mart |
+| A11 | Every open ticket renders once; no clipping | 330 dots, at most 144 in a cell | Packed `dot_seq` |
+| A12 | Sankey widths proportional; small paths visible | F04 with 1 gap still drawn | Spike S1 to S3 |
+| A13 | Selected timeline point equals KPI 2 | 2.99% | Build |
+| A14 | Published interactions on Tableau Public at 1400 × 850 | All of the action contract | Phase 11 |
+| A15 | Failed loads, stale sources, ambiguous links have documented outputs | Dec 2024 outage note; 449 ambiguous name-only tickets unlinked | Tests 86, 87 |
+
+---
+
+## 10. Phases 7 to 12: spikes, design, build, publish
 
 ### Phase 7: spikes on Tableau Public
 
@@ -297,11 +363,11 @@ Written after phases 7 and 8, in the format of `release_3_rebuild_dashboard_3.md
 
 ### Phase 12: publish
 
-Tableau Public, a README update (case study 6's Tableau section and a screenshot), the Figma file, the profile row, the project docs, and a session handoff.
+Tableau Public, a README update (case study 4's Tableau section and a screenshot), the Figma file, the profile row, the project docs, and a session handoff.
 
 ---
 
-## 10. Risks and open items
+## 11. Risks and open items
 
 | # | Item | Plan |
 |---:|---|---|

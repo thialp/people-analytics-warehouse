@@ -1,5 +1,5 @@
 -- mart_cw_reconciliation_dashboard
--- Grain: one row per row_type x its own grain. Dashboard #6 in one data source (multi-select sets
+-- Grain: one row per row_type x its own grain. Dashboard #4 in one data source (multi-select sets
 -- work only inside one), the union of three marts, never summed across row types:
 --
 --   Gap         one per close x contractor x flag (mart_cw_gap_close): the Sankey, the gap list,

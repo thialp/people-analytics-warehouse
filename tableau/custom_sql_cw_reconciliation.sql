@@ -1,6 +1,6 @@
 /*
   custom_sql_cw_reconciliation.sql
-  Tableau Custom SQL for Dashboard #6, Contingent Workforce: the trend (SQL Server, database ArcadiaHR).
+  Tableau Custom SQL for Dashboard #4, Contingent Workforce: the trend (SQL Server, database ArcadiaHR).
   18,072 rows, the same columns and rows as data/marts/mart_cw_reconciliation.csv, so a workbook built on
   either can switch with Data > Replace Data Source.
 

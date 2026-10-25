@@ -8,8 +8,8 @@ Rebuild the `ArcadiaHR` database on your Mac from `main` (release 3) and confirm
 
 | File | What it adds |
 |---|---|
-| `sqlserver/03c_build_dw_contingent.sql` | Bridgeway VMS and Keystone HR's contingent records typed into `dw`; the contingent month-end snapshot, conversions, movement and the plan's contingent actuals; case study 6's identity resolution, side-by-side snapshot and discrepancy rules |
-| `sqlserver/04b_create_reporting_views_contingent.sql` | `rpt.vw_cw_spend`, `rpt.vw_workforce_cost_growth_mix` (Shapley), and case study 6's `rpt.vw_cw_discrepancy_detail`, `rpt.vw_cw_reconciliation`, `rpt.vw_cw_engagement_cap`, `rpt.vw_cw_detection_score` |
+| `sqlserver/03c_build_dw_contingent.sql` | Bridgeway VMS and Keystone HR's contingent records typed into `dw`; the contingent month-end snapshot, conversions, movement and the plan's contingent actuals; case study 4's identity resolution, side-by-side snapshot and discrepancy rules |
+| `sqlserver/04b_create_reporting_views_contingent.sql` | `rpt.vw_cw_spend`, `rpt.vw_workforce_cost_growth_mix` (Shapley), and case study 4's `rpt.vw_cw_discrepancy_detail`, `rpt.vw_cw_reconciliation`, `rpt.vw_cw_engagement_cap`, `rpt.vw_cw_detection_score` |
 | `sqlserver/12_validate_contingent_workforce.sql` | 51 PASS/FAIL checks on all of the above, and on the cost bridge Custom SQL |
 | `sqlserver/03_build_dw.sql`, `03b_…` | `dw.DimWorker.WorkEmail` (how Bridgeway names a contractor's manager); the plan's `PlannedCwHeadcount` and `PlannedCwSpendUsd` |
 | `rpt.vw_plan_vs_actual` | five contingent columns: `planned_cw_headcount`, `actual_cw_headcount`, `planned_cw_spend_usd`, `actual_cw_spend_usd_plan_fx`, `actual_cw_spend_usd_constant` |

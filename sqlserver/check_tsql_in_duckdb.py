@@ -18,7 +18,7 @@ What it runs
      compensation walk for the pairs that end in FY26 (the full walk needs more memory
      than a laptop-sized DuckDB run allows)
   4. the PASS/FAIL tables of 05, 08, 10, 12 (the contingent workforce), 14 (Dashboard #3) and
-     15 (Dashboard #6, the reconciliation)
+     15 (Dashboard #4, the reconciliation)
   and, before all that, SQL Server rules DuckDB does not enforce: primary-key columns must be
   made NOT NULL first, text must fit its declared VARCHAR length, PRINT takes no subquery, and
   ordered STRING_AGGs in one SELECT must share one ordering (Msg 8711).
@@ -321,7 +321,7 @@ def main() -> int:
                      "cw_reconciliation", "cw_engagement_cap", "cw_detection_score"):
             custom_sql(con, f"custom_sql_{name}.sql", name)
             ok &= compare(con, f"mart_{name}", f"cs.{name}")
-        custom_sql(con, "custom_sql_cw_reconciliation_dashboard.sql", "cw_reconciliation_dashboard")   # Dashboard #6
+        custom_sql(con, "custom_sql_cw_reconciliation_dashboard.sql", "cw_reconciliation_dashboard")   # Dashboard #4
         ok &= compare(con, "mart_cw_reconciliation_dashboard", "cs.cw_reconciliation_dashboard")
         con.execute("CREATE OR REPLACE TABLE tmp_d6 AS SELECT * FROM cs.cw_reconciliation_dashboard")   # #d6 in 15_validate
         con.execute("CREATE OR REPLACE VIEW d6 AS SELECT * FROM tmp_d6")

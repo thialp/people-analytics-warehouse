@@ -1901,7 +1901,7 @@ write(pd.DataFrame(assign_rows + cw_assign_rows)[[
     "vacate_reason", "worker_type", "bw_worker_id"]].sort_values("assignment_id"), "fact_position_assignment")
 
 # ======================================================================================
-# 9. Reconciliation operations (release 4, case study 6): times, job data, load log, tickets
+# 9. Reconciliation operations (release 4, case study 4): times, job data, load log, tickets
 # ======================================================================================
 # New tables only, each from its own stream: the hour every feed change was sent and applied,
 # when every Keystone contingent version was written, Keystone's job data (the PID each

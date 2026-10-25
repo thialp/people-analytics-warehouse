@@ -1,6 +1,6 @@
 -- mart_itsm_ticket_close
 -- Grain: one row per month-end close x Helix ticket open at the close's read (New, In progress,
--- Pending, Reopened). Dashboard #6's ticket card: one dot per ticket by where it is fixed and how
+-- Pending, Reopened). Dashboard #4's ticket card: one dot per ticket by where it is fixed and how
 -- long it has waited.
 --
 --   place        from the group working it at the read (a misrouted ticket sits in the wrong row

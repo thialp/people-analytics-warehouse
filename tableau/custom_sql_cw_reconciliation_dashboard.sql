@@ -1,6 +1,6 @@
 /*
   custom_sql_cw_reconciliation_dashboard.sql
-  Tableau Custom SQL for Dashboard #6, Contingent Workforce Reconciliation (SQL Server, database ArcadiaHR).
+  Tableau Custom SQL for Dashboard #4, Contingent Workforce Reconciliation (SQL Server, database ArcadiaHR).
   ONE data source for the whole page, because multi-select sets (function, department, country)
   work only inside one: the same columns and rows as data/marts/mart_cw_reconciliation_dashboard.csv
   (about 63,000 rows), so a workbook built on either can switch with Data > Replace Data Source.

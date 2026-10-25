@@ -1,6 +1,6 @@
 /*
   15_validate_cw_reconciliation.sql
-  Release 4: checks Dashboard #6's build (03d, 04c) and its Custom SQL
+  Release 4: checks Dashboard #4's build (03d, 04c) and its Custom SQL
   (tableau/custom_sql_cw_reconciliation_dashboard.sql, included unchanged with sqlcmd's :r, exactly
   as Tableau runs it) against the DuckDB pipeline's values. Run it after build_all.sql:
 
@@ -23,7 +23,7 @@ FROM (
 :r /repo/tableau/custom_sql_cw_reconciliation_dashboard.sql
 ) AS d;
 DECLARE @n INT = (SELECT COUNT(*) FROM #d6);
-PRINT CONCAT('Dashboard #6 Custom SQL returned ', @n, ' rows in ',
+PRINT CONCAT('Dashboard #4 Custom SQL returned ', @n, ' rows in ',
              DATEDIFF(SECOND, @started, SYSDATETIME()), ' seconds');
 GO
 
@@ -63,7 +63,7 @@ FROM (
     UNION ALL SELECT 'Gaps (Sankey total)',
                      (SELECT SUM(gaps) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30'), 379
     UNION ALL SELECT 'KPI 3 open at the prior close',
-                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND was_open_prior_close = 1 AND is_counted = 1), 319
+                     (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND was_open_prior_close = 1 AND is_counted = 1), 315
     UNION ALL SELECT 'KPI 4 no ticket',
                      (SELECT COUNT(*) FROM #d6 WHERE row_type = 'Gap' AND month_end_date = '2026-06-30' AND has_ticket = 0 AND is_counted = 1), 176
     UNION ALL SELECT 'KPI 5 open over 90 days',

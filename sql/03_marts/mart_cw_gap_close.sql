@@ -1,6 +1,6 @@
 -- mart_cw_gap_close
 -- Grain: one row per month-end close x contractor x flag: every gap Finance's report would carry
--- at that close (Jun 2021 to Jun 2026; the latest close is also Current). Dashboard #6's Sankey,
+-- at that close (Jun 2021 to Jun 2026; the latest close is also Current). Dashboard #4's Sankey,
 -- gap list and KPIs read it through tableau/custom_sql_cw_reconciliation_dashboard.sql.
 --
 --   flag, risk, place     the comparison (F01 to F12), the risk it creates (fixed order 1 to 6) and
@@ -9,7 +9,9 @@
 --   flag_rank             rank of the flag by gaps at this close (1 = most), and at the prior close
 --                         and 12 closes earlier, so the page can say what moved
 --   is_counted            counts against the 3% target (everything but "Clears on its own")
---   was_open_prior_close  the same contractor had the same flag at the prior close
+--   was_open_prior_close  the same gap episode was open at the prior close: the same contractor had
+--                         the same flag then, and this episode began on or before it (a flag that
+--                         cleared and came back between closes is a new episode, not carryover)
 --   fixed_day_after_close a change landed on the 1st and the gap is gone at the next close: it
 --                         missed the close by a day
 --   groups                function, department and country of the cost center Bridgeway bills
@@ -123,8 +125,8 @@ SELECT
          ELSE 'Over 90 days' END                                                      AS open_band,
     s.days_open > 90                                                                  AS is_over_90_days,
     CASE WHEN s.flag_code IN ('F08', 'F09') THEN s.month_end_date - s.since_date END AS days_since_end,
-    EXISTS (SELECT 1 FROM scoped AS p WHERE p.month_end_date = cl.prior_month_end_date AND p.gap_id = s.gap_id)
-                                                                                      AS was_open_prior_close,
+    (EXISTS (SELECT 1 FROM scoped AS p WHERE p.month_end_date = cl.prior_month_end_date AND p.gap_id = s.gap_id)
+     AND s.since_date <= cl.prior_month_end_date)                                     AS was_open_prior_close,
     (nd.gap_id IS NOT NULL
      AND NOT EXISTS (SELECT 1 FROM scoped AS n
                      WHERE n.month_end_date = LAST_DAY(s.month_end_date + 1) AND n.gap_id = s.gap_id))

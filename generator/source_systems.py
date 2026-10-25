@@ -118,7 +118,7 @@ RAW_TABLE_LINEAGE = [
     ("ref_cw_discrepancy_type", _WH, "Warehouse metadata", "discrepancy type", "Type 1", 3),
     # The answer key (release 3): a test fixture, never a business source
     ("gen_cw_discrepancy_truth", _GEN, "Answer key", "seeded discrepancy x continuous period", "Effective-dated", 3),
-    # Reconciliation operations (release 4, case study 6)
+    # Reconciliation operations (release 4, case study 4)
     ("feed_event_delivery", _INT, "Integration log", "change sent from Bridgeway", "Transaction", 4),
     ("ks_contingent_worker_audit", _KS, "Contingent worker profile", "contingent version", "Transaction", 4),
     ("ks_cw_job", _KS, "Contingent worker job data", "person x job record x effective-dated version", "SCD Type 2", 4),
@@ -245,7 +245,7 @@ RAW_COLUMNS: dict[str, list[tuple[str, str, str]]] = {
     ],
 }
 
-# Release 4 (case study 6): reconciliation operations
+# Release 4 (case study 4): reconciliation operations
 RAW_COLUMNS.update({
     "feed_event_delivery": [
         ("feed_event_id", "VARCHAR", "-> feed_bridgeway_keystone_event"),

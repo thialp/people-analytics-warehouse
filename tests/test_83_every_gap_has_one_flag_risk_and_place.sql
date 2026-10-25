@@ -1,4 +1,4 @@
--- Dashboard #6's Sankey: every gap has exactly one flag, one risk and one place, the risk is the
+-- Dashboard #4's Sankey: every gap has exactly one flag, one risk and one place, the risk is the
 -- flag's own, the place is one of the three, Integration gaps carry their shade and nothing else
 -- does, and a contractor has a flag at most once per close.
 SELECT 'more than one row for a gap' AS problem, month_end_date, gap_id, COUNT(*) AS n

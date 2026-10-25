@@ -1,6 +1,6 @@
 /*
   custom_sql_cw_discrepancy_detail.sql
-  Tableau Custom SQL for Dashboard #6, Contingent Workforce: the work list (SQL Server, database ArcadiaHR).
+  Tableau Custom SQL for Dashboard #4, Contingent Workforce: the work list (SQL Server, database ArcadiaHR).
   6,908 rows, the same columns and rows as data/marts/mart_cw_discrepancy_detail.csv, so a workbook built on
   either can switch with Data > Replace Data Source.
 

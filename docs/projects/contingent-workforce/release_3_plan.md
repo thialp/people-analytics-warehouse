@@ -2,7 +2,7 @@
 
 **Arcadia Systems · people-analytics-warehouse** · drafted 2026-10-14. Arcadia Systems is fictional and all data is synthetic.
 
-Release 3 adds Arcadia's **contingent workforce** and the **two source systems** behind it, removes **part-time**, and carries the change through every case study. It ends with a new **case study 6, Contingent Workforce**, about reconciling the two systems.
+Release 3 adds Arcadia's **contingent workforce** and the **two source systems** behind it, removes **part-time**, and carries the change through every case study. It ends with a new **case study 4, Contingent Workforce**, about reconciling the two systems.
 
 Like release 2, it is one generator release and one rebuild. Every number on Dashboards #1 and #2 changes again, so the check tables are rebuilt at the end, and Dashboard #3 is built on release 3 data rather than release 2.
 
@@ -17,9 +17,9 @@ Like release 2, it is one generator release and one rebuild. Every number on Das
 | 4. Feed and discrepancy injection | Done 2026-10-14 | `generator/keystone_feed.py` (own random stream: employee data and every mart unchanged). 106,357 feed events (1,410 failed, 6,345 late, 252 partly applied); 42,073 Keystone records, 140,681 versions (feed, Keystone inactivations, HR Ops, managers); Bridgeway hygiene seeded (late or missing closures, 139 timesheets after the last day, 62 renewals submitted as new workers). Answer key `gen_cw_discrepancy_truth`: 28,869 periods across 13 types (CW00 to CW12, catalogue `ref_cw_discrepancy_type`), built by replaying each Keystone record ideal vs real; zero unexplained days; about 3% of active CW carry an open discrepancy on any June 30; every worker active in one system but not the other on three test dates is explained by the key. Tests 67–69 (and 66 amended) pass and catch deliberate breaks. [Keystone and the feed](keystone_feed.md), [totals](release_3_totals_phase_4.md) |
 | 5. Plan, conversions, spend | Done 2026-10-14 | **Conversions:** 1,182 contingent workers hired as employees into existing external hires (4.0–5.1% of contingent exits a year), same country and department, hire in the same month as the first day after the engagement and within 21 days, so a conversion never changes the total; Bridgeway's worker takes the employee's name, the applicant source is *Contingent conversion*, Keystone closes the record as *Converted to employee* with `converted_to_worker_id`, and a late feed change to a converted record is rejected. Employee data unchanged except 1,182 applicant sources. **Plan:** `planned_cw_headcount` and `planned_cw_spend_usd` (annualized run-rate at the version's FX) on every plan row, plus 615 contingent-only rows (zero employee measures; every employee total unchanged), own random stream. Phase 4 numbers shifted slightly with the new draws (docs refreshed). Tests 76–77 (and 68 extended) pass and catch deliberate breaks. [Conversions and the plan](conversions_and_plan.md), [totals](release_3_totals_phase_5.md) |
 | 6. Marts: existing case studies | Done 2026-10-14 | Foundations: `int_cw_month_end_snapshot` (Bridgeway as held each month-end, never restated, run-rates at month-end and constant FX), `int_cw_movement`, `int_cw_conversion` (1,174 linked conversions, all in the same month on both sides). **Walk** (#1): `worker_type` and `walk_step`; contingent Starts, Ends (completed, early, *lapsed while an approval was late*: 85–116 a year), moves and Conversions (order 7), so employee Hires exclude conversions; Employees, Contingent and Total close every month. **Footprint**: office walk and flows by worker type, Bridgeway office. **Plan vs actual**: contingent headcount and run-rate at plan FX. **`mart_cw_spend`** (new): billed spend beside the month-end run-rate, tied to the timesheets to the cent. **Cost bridge**: worker type, contingent drivers, Conversions (driver 10). **`mart_workforce_cost_growth_mix`** (new): year-over-year total workforce cost split into volume, workforce mix, location mix, level mix, rate and currency by Shapley values, beside the sequential split and its order bias. The pipeline now orders models by what they read. Tests 70, 71, 72, 74, 78 (and 07–22 by worker type) pass and catch deliberate breaks. [Migration notes](release_3_migration_notes.md#phase-6-contingent-workers-in-the-marts-of-case-studies-15-2026-10-14), [growth mix](../workforce-cost-bridge/methodology.md#release-3-total-workforce-cost-and-the-growth-mix), [totals](release_3_totals_phase_6.md) |
-| 7. Marts: case study 6 | Done 2026-10-14 | `dim_worker.work_email` (managers comparable across systems). Identity resolution in three tiers with confidence and evidence, a supplier alias map (59 spellings, 23 suppliers): every broken-link record matched to the right worker, every Keystone-only worker left unmatched. Side-by-side snapshot (what Keystone should hold = everything Bridgeway sent, applied the day it was sent) and rules for CW00–CW12 from the two systems and the feed log alone, with root cause, evidence, age, severity and owner. **Detection score: 28,530 seeded discrepancy-months, 100% found; 42 false flags, all explained name coincidences.** 416 of 11,941 contingent workers (3.5%) carry an open discrepancy on 30 June 2026. Marts `mart_cw_discrepancy_detail`, `mart_cw_reconciliation`, `mart_cw_engagement_cap`, `mart_cw_detection_score`. Tests 73, 75. [Case study 6](case_study_6.md), [totals](release_3_totals_phase_7.md) |
+| 7. Marts: case study 4 | Done 2026-10-14 | `dim_worker.work_email` (managers comparable across systems). Identity resolution in three tiers with confidence and evidence, a supplier alias map (59 spellings, 23 suppliers): every broken-link record matched to the right worker, every Keystone-only worker left unmatched. Side-by-side snapshot (what Keystone should hold = everything Bridgeway sent, applied the day it was sent) and rules for CW00–CW12 from the two systems and the feed log alone, with root cause, evidence, age, severity and owner. **Detection score: 28,530 seeded discrepancy-months, 100% found; 42 false flags, all explained name coincidences.** 416 of 11,941 contingent workers (3.5%) carry an open discrepancy on 30 June 2026. Marts `mart_cw_discrepancy_detail`, `mart_cw_reconciliation`, `mart_cw_engagement_cap`, `mart_cw_detection_score`. Tests 73, 75. [Case study 4](case_study_4.md), [totals](release_3_totals_phase_7.md) |
 | 8. SQL Server twin and Custom SQL | Done 2026-10-14 (SQL Server on the Mac: all PASS) | `sqlserver/03c_build_dw_contingent.sql` (Bridgeway, Keystone and the feed typed into `dw`; contingent snapshot, conversions, movement, plan actuals; supplier alias, identity resolution, side-by-side snapshot, discrepancy rules), `04b_create_reporting_views_contingent.sql` (six views), `12_validate_contingent_workforce.sql` (51 checks); `DimWorker.WorkEmail`, the plan's contingent columns; Custom SQL for the walk (#1), the cost bridge and plan vs actual brought to worker types. `check_tsql_in_duckdb.py`: all 13 views and 10 Custom SQL results MATCH their marts row for row; the contingent intermediates match exactly, evidence text included; 05, 08, 10, 12 all PASS. [Run guide for the Mac](sql_server_release_3_run.md), [migration notes](release_3_migration_notes.md#phase-8-sql-server-twin-and-custom-sql-2026-10-14). **SQL Server run (Mac, 2026-10-14): 10 all 25 PASS (walk Custom SQL 597,097 rows in 14 s); 12 all 51 PASS (cost bridge Custom SQL 29,123 rows in 22 s).** Two SQL Server–only issues found and fixed on the way: Msg 8711 (two ordered `STRING_AGG`s in one SELECT; the checker now flags it) and a growth-mix view that ran 18+ minutes (now precomputed in `dw.WorkforceCostGrowthMix`) |
-| 9. Expected values, docs | Done 2026-10-14 | Dashboard check tables (`expected_values.md`) regenerated by the pipeline since phase 6. README rewritten: a plain-language **executive summary** first (fictional company on real public data, Arcadia in numbers, the six questions, color-coded diagrams of the two systems and of a disagreement, FY26 findings), then the **technical deep dive** with release 3 throughout (contingent walk and bridge tables, the growth mix with Shapley vs sequential, case study 6, 40 raw tables, 78 tests, lessons). Six thin Custom SQL files for the new views (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`), all MATCH their marts |
+| 9. Expected values, docs | Done 2026-10-14 | Dashboard check tables (`expected_values.md`) regenerated by the pipeline since phase 6. README rewritten: a plain-language **executive summary** first (fictional company on real public data, Arcadia in numbers, the six questions, color-coded diagrams of the two systems and of a disagreement, FY26 findings), then the **technical deep dive** with release 3 throughout (contingent walk and bridge tables, the growth mix with Shapley vs sequential, case study 4, 40 raw tables, 78 tests, lessons). Six thin Custom SQL files for the new views (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`), all MATCH their marts |
 | 10. Tableau: Dashboards #1 and #2, then #3, then #6 | Not started | Includes the **Growth by Region fix** on Dashboard #2: the card ignores View and Group, so it shows the company while the KPI cards show the selected group; rebuild it on the region walk query ([migration notes](release_3_migration_notes.md#fix-carried-in-release-3-growth-by-region-follows-the-group-logged-2026-10-14)) |
 
 ---
@@ -37,13 +37,13 @@ Like release 2, it is one generator release and one rebuild. Every number on Das
 | D7 | **Bill rates change only at an extension or renewal** (a new service order revision). Some revisions renegotiate the rate up or down; nothing is automatic. |
 | D8 | **Duration cap.** Contractor and Consultant: initial term up to 24 months, extensions up to 24 more, **48 months in total**. BPO: no cap, renewed yearly. A small number of breaches are seeded so the cap can be flagged. |
 | D9 | **CW do not hold employee seats.** Positions, requisitions, applicants and the seat tests stay employee-only. CW arrive through service orders. |
-| D10 | **Dashboards #1 and #2: worker-type split.** #1 walks Employees, CW and Total workforce. #2 stays employee pay per FTE; CW spend gets its own panel and feeds case study 5. |
+| D10 | **Dashboards #1 and #2: worker-type split.** #1 walks Employees, CW and Total workforce. #2 stays employee pay per FTE; CW spend gets its own panel and feeds case study 6. |
 | D11 | **The workforce plan carries a CW line** per cost center: planned CW headcount and CW spend, in every plan version. |
-| D12 | **Case study 6 flags, it never fixes.** The warehouse cannot change either system; it classifies each discrepancy, explains it, and names who can fix it. |
+| D12 | **Case study 4 flags, it never fixes.** The warehouse cannot change either system; it classifies each discrepancy, explains it, and names who can fix it. |
 
 ## 2. Guardrails
 
-1. **Employer anonymity.** CW reconciliation is a textbook enterprise problem, and case study 6 is designed from first principles with generic language (vendor system, service order, revision, feed, lag). It does not reproduce any real query's rule order, status codes, recon labels, flag names, toggles or validation layout. Discrepancy categories are named after **what happened in the systems**, not after anyone's internal vocabulary.
+1. **Employer anonymity.** CW reconciliation is a textbook enterprise problem, and case study 4 is designed from first principles with generic language (vendor system, service order, revision, feed, lag). It does not reproduce any real query's rule order, status codes, recon labels, flag names, toggles or validation layout. Discrepancy categories are named after **what happened in the systems**, not after anyone's internal vocabulary.
 2. **Real data is used only for aggregate realism.** The hourly bill-rate benchmarks in section 6 are medians by country and worker type. No name, ID, supplier, cost center, code, title or row from any real file enters the generator, the repo or the docs.
 3. **Same layering and conventions as release 2.** Raw CSV → `sql/01_staging` → `02_intermediate` → `03_marts`, T-SQL twin in `sqlserver/`, Custom SQL in `tableau/` (one SELECT, no CTEs, block comments only), per-domain random streams, every new table has a control that fails the build when it does not reconcile.
 4. **Existing marts keep their column names** where they survive, so *Replace Data Source* still works. Dropped columns are listed in the migration notes.
@@ -71,7 +71,7 @@ Like release 2, it is one generator release and one rebuild. Every number on Das
  └──────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Managers only see Keystone. When an extension is approved in Bridgeway but never reaches Keystone, the manager sees a worker "ending"; when a worker leaves early in Bridgeway but Keystone is never told, the manager still sees them active (and they may keep system access). Those are the stories case study 6 tells.
+Managers only see Keystone. When an extension is approved in Bridgeway but never reaches Keystone, the manager sees a worker "ending"; when a worker leaves early in Bridgeway but Keystone is never told, the manager still sees them active (and they may keep system access). Those are the stories case study 4 tells.
 
 ### Naming in the raw layer
 
@@ -189,7 +189,7 @@ Rates and hours never go to Keystone: managers in Keystone cannot see what a wor
 
 Starting rates are tuned so that, on a typical month-end, about **3–5% of active CW** carry at least one open discrepancy: noticeable, not alarming, as in a healthy real program.
 
-> **Phase 4:** built as **13 types, CW00 to CW12**: *Change in transit* (CW00) is split from *Change arrived late* so normal lag is never a problem; failed attribute changes are CW12; *rate outside the card band* is not seeded (the order scatter already produces it: a case study 6 finding, not an injected defect). Each type carries a severity and an owner in `ref_cw_discrepancy_type`; failures caused by a broken link or a missing record keep that **root cause**. The result lands at about 3%. Final catalogue, rates and volumes: [Keystone and the feed](keystone_feed.md#the-discrepancy-catalogue). The table below is the original draft.
+> **Phase 4:** built as **13 types, CW00 to CW12**: *Change in transit* (CW00) is split from *Change arrived late* so normal lag is never a problem; failed attribute changes are CW12; *rate outside the card band* is not seeded (the order scatter already produces it: a case study 4 finding, not an injected defect). Each type carries a severity and an owner in `ref_cw_discrepancy_type`; failures caused by a broken link or a missing record keep that **root cause**. The result lands at about 3%. Final catalogue, rates and volumes: [Keystone and the feed](keystone_feed.md#the-discrepancy-catalogue). The table below is the original draft.
 
 | # | Discrepancy (named after what happened) | How it is seeded | What a Keystone-only manager sees | Who can fix it |
 |---|---|---|---|---|
@@ -207,20 +207,20 @@ Starting rates are tuned so that, on a typical month-end, about **3–5% of acti
 
 ---
 
-## 9. How release 3 ripples through case studies 1–5
+## 9. How release 3 ripples through case studies 1–3, 5 and 6
 
 | Case study | Change |
 |---|---|
 | **1 Workforce Planning** (Dashboard #3) | `fact_workforce_plan` gains `planned_cw_headcount` and `planned_cw_spend_usd` per cost center × quarter × version. `mart_plan_vs_actual` gains the CW actuals. Seats, requisitions and applicants stay employee-only (D9), except **CW conversions**: ~4% of CW exits are a conversion that fills an employee requisition (`candidate_source` = `Contingent conversion`), so a backfill or net-new seat can be filled by someone who was already working at Arcadia. Dashboard #3 adds the employee / CW mix and plan vs actual for both. |
 | **2 Headcount & FTE** (Dashboard #1) | `mart_headcount_fte_walk` gains `worker_type` (`Employee`, `Contingent`) in its grain. **FTE Changes** and `part_time_headcount` are removed. CW movements: **Starts**, **Ends** (completed, early), **Conversions** (out of Contingent, into Employee in the same month, so Total is unchanged by a conversion). Opening + movements = Closing for Employees, CW and Total (tests). The `fte` column stays for compatibility and equals headcount. |
-| **3 Workforce Footprint** | CW appear on the office maps (Keystone office), split by worker type. *Built in phase 6 on the **Bridgeway** office instead, so every case study counts contingent workers from one source (D4); where Keystone's office differs it is discrepancy CW05, case study 6.* |
+| **3 Workforce Footprint** | CW appear on the office maps (Keystone office), split by worker type. *Built in phase 6 on the **Bridgeway** office instead, so every case study counts contingent workers from one source (D4); where Keystone's office differs it is discrepancy CW05, case study 4.* |
 | **4 Compensation Walk** (Dashboard #2) | Stays employee-only. The **FTE Changes** step is removed. A separate **CW spend** panel: run-rate per CW and total CW spend, with its own walk (volume, rate, mix, FX). |
 | **5 Workforce Cost Bridge / Finance Growth Mix** | Total workforce cost = employee loaded cost + CW spend. New drivers: **CW volume**, **CW rate**, **CW mix**, **employee / CW substitution** (conversions and CW replacing vacant seats). This is where the Shapley decomposition is built. |
 | **6 Contingent Workforce** (new) | Section 10. |
 
 ---
 
-## 10. Case study 6: Contingent Workforce
+## 10. Case study 4: Contingent Workforce
 
 **Business question.** *Who is actually working for Arcadia through a supplier today, what does it cost, and where does the system managers use disagree with the system suppliers use?*
 
@@ -259,7 +259,7 @@ Starting rates are tuned so that, on a typical month-end, about **3–5% of acti
 - Generator: `fte` always 1.0; no `FTE Change` action; the hire mix draws no 0.8 or 0.5.
 - Marts: the FTE Changes movement and driver lines are removed from the headcount walk, compensation walk and cost bridge; `part_time_headcount` is dropped; `fte` columns remain and equal headcount for employees.
 - Tests: test 23 (part-time levels) is retired; walks still reconcile.
-- Docs: data dictionary, README, case studies 2 and 4.
+- Docs: data dictionary, README, case studies 1 and 2.
 - Migration note for Dashboards #1 and #2: fields that disappear (`Part Time Headcount`, FTE Changes step) and calcs that reference them.
 
 ---
@@ -298,10 +298,10 @@ Built in phase 2: **60** every raw table names exactly one source system, **61**
 | 3 | CW simulation: suppliers, workers, orders, revisions, rate card, timesheets (own random stream) | Tests 62–66; population and spend targets |
 | 4 | Feed log and Keystone CW history; discrepancy injection; truth table | Tests 67–69 (identity resolution test moves to 75, phase 7) |
 | 5 | CW plan line; conversions into employee requisitions | Tests 76–77 (test 74 needs the phase 6 marts); employee hires unchanged except conversions |
-| 6 | Marts for case studies 1–5 (worker type in the walk, CW spend panel, cost bridge drivers, footprint) | Tests 70–72, 74; existing tests pass |
-| 7 | Marts for case study 6 | Tests 71, 73, 75 |
+| 6 | Marts for case studies 1–3, 5 and 6 (worker type in the walk, CW spend panel, cost bridge drivers, footprint) | Tests 70–72, 74; existing tests pass |
+| 7 | Marts for case study 4 | Tests 71, 73, 75 |
 | 8 | SQL Server twin, Custom SQL files, DuckDB checker; Mac run | All PASS |
-| 9 | Expected values for every dashboard; docs: data dictionary, case study 6, README, control totals | Check tables generated |
+| 9 | Expected values for every dashboard; docs: data dictionary, case study 4, README, control totals | Check tables generated |
 | 10 | Tableau: republish #1 and #2 on release 3, build #3, then design and build #6 | Check tables match |
 
 ## 14. Still open (none blocks phase 0)
@@ -309,5 +309,5 @@ Built in phase 2: **60** every raw table names exactly one source system, **61**
 - **Supplier count and names:** about 25 fictional names, generated to sound plausible and match no real firm.
 - **Local-currency billing share:** 15% to start.
 - **Holiday calendar for billed hours:** a flat country-level allowance first; a public holiday calendar later if useful.
-- **Weekly snapshots:** case study 6 starts at month-end grain. A weekly view of the latest quarter can be added if the dashboard needs it, with an eye on Tableau Public extract size.
+- **Weekly snapshots:** case study 4 starts at month-end grain. A weekly view of the latest quarter can be added if the dashboard needs it, with an eye on Tableau Public extract size.
 - **Size:** about 90,000 revisions and about 650,000 timesheet rows, measured in phase 3 against the GitHub 100 MB file limit (timesheets may ship compressed or as a mart-only export).

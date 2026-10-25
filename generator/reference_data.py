@@ -611,7 +611,7 @@ PLAN_CW_FY_BUDGET_SHIFT = {2024: 0.050}  # the FY24 budget did not foresee the F
 
 
 # ======================================================================================
-# Reconciliation operations (release 4, case study 6): times, Keystone job data, the
+# Reconciliation operations (release 4, case study 4): times, Keystone job data, the
 # warehouse load log and the Helix Service Desk
 # ======================================================================================
 # Each piece draws from its own random stream after everything above, so no earlier table moves.
