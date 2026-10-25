@@ -9,14 +9,16 @@ Custom SQL with the DuckDB pipeline's marts, row for row.
 
 What it runs
   1. 03_build_dw.sql, 03b_build_dw_workforce_planning.sql, 03c_build_dw_contingent.sql,
-     04_create_reporting_views.sql, 04b_create_reporting_views_contingent.sql
+     03d_build_dw_cw_reconciliation.sql, 04_create_reporting_views.sql,
+     04b_create_reporting_views_contingent.sql, 04c_create_reporting_views_reconciliation.sql
      (index, constraint and ALTER COLUMN statements are skipped: DuckDB does not need them)
   2. every rpt view against its mart (numbers to the cent, flags as 0/1, the rest as text)
   3. the Tableau Custom SQL: the headcount & FTE walk (against its six CSVs), office moves,
      region walk, career moves, workforce planning (with its summary) and the workforce cost bridge in full, the
      compensation walk for the pairs that end in FY26 (the full walk needs more memory
      than a laptop-sized DuckDB run allows)
-  4. the PASS/FAIL tables of 05, 08, 10, 12 (the contingent workforce) and 14 (Dashboard #3)
+  4. the PASS/FAIL tables of 05, 08, 10, 12 (the contingent workforce), 14 (Dashboard #3) and
+     15 (Dashboard #6, the reconciliation)
   and, before all that, SQL Server rules DuckDB does not enforce: primary-key columns must be
   made NOT NULL first, text must fit its declared VARCHAR length, PRINT takes no subquery, and
   ordered STRING_AGGs in one SELECT must share one ordering (Msg 8711).
@@ -43,7 +45,9 @@ from sqlglot import exp
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DB = ROOT / "warehouse" / "arcadia.duckdb"
 BUILD = ["03_build_dw.sql", "03b_build_dw_workforce_planning.sql", "03c_build_dw_contingent.sql",
-         "04_create_reporting_views.sql", "04b_create_reporting_views_contingent.sql"]
+         "03d_build_dw_cw_reconciliation.sql",
+         "04_create_reporting_views.sql", "04b_create_reporting_views_contingent.sql",
+         "04c_create_reporting_views_reconciliation.sql"]
 VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_org_leader_summary", "rpt.vw_org_leader_summary"),
          ("mart_fringe_rate", "rpt.vw_fringe_rate"),
@@ -58,7 +62,10 @@ VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_cw_engagement_cap", "rpt.vw_cw_engagement_cap"),
          ("mart_cw_detection_score", "rpt.vw_cw_detection_score"),
          ("mart_pid_month_end", "rpt.vw_pid_month_end"),
-         ("mart_cw_pid_fill", "rpt.vw_cw_pid_fill")]
+         ("mart_cw_pid_fill", "rpt.vw_cw_pid_fill"),
+         ("mart_cw_gap_close", "rpt.vw_cw_gap_close"),
+         ("mart_cw_gap_rate_close", "rpt.vw_cw_gap_rate_close"),
+         ("mart_itsm_ticket_close", "rpt.vw_itsm_ticket_close")]
 SKIP = re.compile(r"^\s*(CREATE\s+(CLUSTERED\s+|UNIQUE\s+)?INDEX|ALTER\s+TABLE|SET\s+NOCOUNT|USE\s|PRINT\s|DECLARE\s"
                   r"|IF\s+DB_ID|IF\s+SCHEMA_ID)", re.I)
 
@@ -165,6 +172,10 @@ def compare(con: duckdb.DuckDBPyConnection, mart: str, other: str, where: str = 
     ok = n_a == n_b and only_a == only_b == 0
     print(f"   {'MATCH' if ok else 'DIFF '}  {other:<34} {n_b:>9,} rows   vs {mart:<30} {n_a:>9,} rows"
           + ("" if ok else f"   ({only_a:,} only in the mart, {only_b:,} only in SQL Server's)"))
+    if not ok:                                         # which columns disagree, on a few rows
+        diff = [c for c, _ in cols if con.execute(
+            f'SELECT COUNT(*) FROM (SELECT "{c}" FROM ({a}) EXCEPT ALL SELECT "{c}" FROM ({b}))').fetchone()[0]]
+        print(f"          columns that differ: {', '.join(diff) or 'none on their own (row pairing)'}")
     return ok
 
 
@@ -310,6 +321,10 @@ def main() -> int:
                      "cw_reconciliation", "cw_engagement_cap", "cw_detection_score"):
             custom_sql(con, f"custom_sql_{name}.sql", name)
             ok &= compare(con, f"mart_{name}", f"cs.{name}")
+        custom_sql(con, "custom_sql_cw_reconciliation_dashboard.sql", "cw_reconciliation_dashboard")   # Dashboard #6
+        ok &= compare(con, "mart_cw_reconciliation_dashboard", "cs.cw_reconciliation_dashboard")
+        con.execute("CREATE OR REPLACE TABLE tmp_d6 AS SELECT * FROM cs.cw_reconciliation_dashboard")   # #d6 in 15_validate
+        con.execute("CREATE OR REPLACE VIEW d6 AS SELECT * FROM tmp_d6")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
@@ -318,6 +333,7 @@ def main() -> int:
         ok &= validation(con, "10_validate_headcount_fte_walk.sql")
         ok &= validation(con, "12_validate_contingent_workforce.sql")
         ok &= validation(con, "14_validate_workforce_planning_dashboard.sql")
+        ok &= validation(con, "15_validate_cw_reconciliation.sql")
         con.close()
     ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")

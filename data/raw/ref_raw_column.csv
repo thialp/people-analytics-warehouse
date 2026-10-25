@@ -91,6 +91,68 @@ feed_bridgeway_keystone_event,5,sent_date,DATE,Day Bridgeway sent the change: th
 feed_bridgeway_keystone_event,6,applied_date,DATE,Day Keystone applied it; empty if it failed or is still queued
 feed_bridgeway_keystone_event,7,outcome,VARCHAR,"Applied (within 2 days), Applied Late (3 days or more), Partly Applied (created without the Bridgeway ID), Failed, or Queued on the extract date"
 feed_bridgeway_keystone_event,8,error_text,VARCHAR,Integration message for failures and partial loads
+feed_event_delivery,1,feed_event_id,VARCHAR,-> feed_bridgeway_keystone_event
+feed_event_delivery,2,sent_at,TIMESTAMP,GMT hour of the hourly batch that sent the change; on sent_date
+feed_event_delivery,3,applied_at,TIMESTAMP,"GMT hour Keystone applied it, on applied_date; empty if it failed or is still queued"
+ks_contingent_worker_audit,1,ks_record_id,VARCHAR,-> ks_contingent_worker
+ks_contingent_worker_audit,2,changed_at,TIMESTAMP,"GMT time the version was written, on its effective start date"
+ks_contingent_worker_audit,3,changed_by,VARCHAR,"Integration, Keystone nightly job, Manager or HR Operations"
+ks_cw_job,1,job_record_id,VARCHAR,Row key
+ks_cw_job,2,person_id,VARCHAR,EMPLID: the Keystone person (-> ks_contingent_worker)
+ks_cw_job,3,empl_rcd,INTEGER,"Job record number of the person: 0 for the first PID, 1 for the next, ..."
+ks_cw_job,4,position_id,VARCHAR,PID the job holds (-> dim_position)
+ks_cw_job,5,effective_start_date,DATE,First day the row applies
+ks_cw_job,6,effective_end_date,DATE,Last day (inclusive); empty for the current row
+ks_cw_job,7,job_status,VARCHAR,Active or Terminated
+ks_cw_job,8,action,VARCHAR,"Assignment start, Return or Assignment end"
+ks_cw_job,9,change_source,VARCHAR,"Feed, or HR Ops for an end entered by hand late"
+ks_cw_job,10,assignment_id,VARCHAR,-> fact_position_assignment: the assignment the row was written for
+gen_cw_job_defect,1,defect_id,VARCHAR,Answer key row
+gen_cw_job_defect,2,flag_code,VARCHAR,"F07 one person, two active PIDs; F08 PID still filled after the contract ended"
+gen_cw_job_defect,3,person_id,VARCHAR,EMPLID
+gen_cw_job_defect,4,position_id,VARCHAR,The PID involved (the lower one for F07)
+gen_cw_job_defect,5,start_date,DATE,First day it is true
+gen_cw_job_defect,6,end_date,DATE,Last day it is true; empty if still open on the extract date
+gen_cw_job_defect,7,origin,VARCHAR,Seeded (a job end entered late or never) or PID ledger (the ledger itself overlaps)
+gen_cw_job_defect,8,resolution,VARCHAR,"Ended, or Open at extract"
+gen_cw_job_defect,9,detail,VARCHAR,"The facts behind it, in a sentence"
+etl_load_run,1,run_id,VARCHAR,Run key
+etl_load_run,2,source_system,VARCHAR,"BW, KS or HLX (-> ref_source_system)"
+etl_load_run,3,scheduled_at,TIMESTAMP,"GMT: Bridgeway 00:00, Keystone 00:20 (after Bridgeway), Helix 00:00 and 12:00"
+etl_load_run,4,started_at,TIMESTAMP,GMT
+etl_load_run,5,finished_at,TIMESTAMP,GMT
+etl_load_run,6,status,VARCHAR,"Succeeded, Late (started more than an hour after schedule) or Failed (read nothing)"
+etl_load_run,7,rows_read,INTEGER,Rows in the extract; empty when the run failed
+etl_load_run,8,error_text,VARCHAR,Why a run failed
+itsm_ticket,1,ticket_number,VARCHAR,"HLX-100001 upward, in the order tickets were opened"
+itsm_ticket,2,title,VARCHAR,"Category title and the subject (ID, or name, or nothing)"
+itsm_ticket,3,short_description,VARCHAR,What the person who raised it wrote
+itsm_ticket,4,category_code,VARCHAR,-> ref_ticket_category
+itsm_ticket,5,priority,VARCHAR,P1 to P4
+itsm_ticket,6,assignment_group,VARCHAR,"Group working it now: Vendor Management, HR Operations or Data Engineering"
+itsm_ticket,7,opened_at,TIMESTAMP,GMT
+itsm_ticket,8,resolved_at,TIMESTAMP,GMT of the current resolution; empty while open or after a reopen
+itsm_ticket,9,closed_at,TIMESTAMP,GMT; Helix closes a resolved ticket after 3 days
+itsm_ticket,10,close_code,VARCHAR,"Fixed in source, No longer reproducible, Credit requested from supplier, Source fixed; next run reloads"
+itsm_ticket_event,1,ticket_number,VARCHAR,-> itsm_ticket
+itsm_ticket_event,2,event_at,TIMESTAMP,GMT
+itsm_ticket_event,3,from_state,VARCHAR,Empty for the opening event
+itsm_ticket_event,4,to_state,VARCHAR,"New, In progress, Pending, Resolved, Reopened or Closed (a reassignment keeps the state)"
+itsm_ticket_event,5,actor_group,VARCHAR,Group that made the change; Helix for automatic closes
+itsm_ticket_event,6,note,VARCHAR,What happened
+itsm_ticket_link,1,ticket_number,VARCHAR,-> itsm_ticket
+itsm_ticket_link,2,subject_type,VARCHAR,"Contingent worker or Data load (later: Employee, Position)"
+itsm_ticket_link,3,subject_id,VARCHAR,"Bridgeway worker ID, or the load run ID; empty when not entered"
+itsm_ticket_link,4,secondary_id,VARCHAR,"Keystone EMPLID, when entered"
+itsm_ticket_link,5,link_quality,VARCHAR,"ID field, Name in text (the name is in the description) or None"
+ref_ticket_category,1,category_code,VARCHAR,Category key
+ref_ticket_category,2,category_name,VARCHAR,Name
+ref_ticket_category,3,subject_type,VARCHAR,What a ticket of this category is about
+ref_ticket_category,4,default_group,VARCHAR,Group it is assigned to
+ref_ticket_category,5,flag_code,VARCHAR,"The reconciliation flag it fixes, F01 to F12; empty for Integration categories"
+ref_ticket_category,6,risk,VARCHAR,The risk the flag creates
+ref_ticket_category,7,priority,VARCHAR,Default priority
+ref_ticket_category,8,title_template,VARCHAR,Ticket title before the subject
 ref_cw_discrepancy_type,1,discrepancy_code,VARCHAR,CW00 to CW12
 ref_cw_discrepancy_type,2,discrepancy_name,VARCHAR,Named after what happened in the systems
 ref_cw_discrepancy_type,3,what_happened,VARCHAR,The event behind it
@@ -110,7 +172,7 @@ gen_cw_discrepancy_truth,10,start_date,DATE,First day it is true
 gen_cw_discrepancy_truth,11,end_date,DATE,Last day it is true; empty if still open on the extract date
 gen_cw_discrepancy_truth,12,resolution,VARCHAR,"How it ended, or Open at extract"
 gen_cw_discrepancy_truth,13,detail,VARCHAR,"The facts behind it, in a sentence"
-ref_source_system,1,system_code,VARCHAR,"KS, BW, INT, PUB, WH or GEN"
+ref_source_system,1,system_code,VARCHAR,"KS, BW, INT, PUB, WH, GEN, HLX or ETL"
 ref_source_system,2,system_name,VARCHAR,System name
 ref_source_system,3,system_type,VARCHAR,What kind of system it is
 ref_source_system,4,record_of,VARCHAR,What it is the system of record for

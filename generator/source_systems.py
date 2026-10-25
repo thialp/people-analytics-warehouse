@@ -54,12 +54,20 @@ SOURCE_SYSTEMS = [
      "record_of": "The answer key: every discrepancy the generator seeded between Bridgeway and Keystone, with its cause and dates",
      "used_by": "The tests and the detection score: how much of what was seeded the warehouse finds. Never a business source",
      "extract": "Written with the data by generator/keystone_feed.py"},
+    {"system_code": "HLX", "system_name": "Helix Service Desk", "system_type": "IT service management",
+     "record_of": "Tickets raised to fix records, their state changes, what each one is about; seeded with contingent worker tickets",
+     "used_by": "Vendor Management, HR Operations, Data Engineering, anyone who reports a problem",
+     "extract": "Read twice a day, at 00:00 and 12:00 GMT"},
+    {"system_code": "ETL", "system_name": "Arcadia warehouse load log", "system_type": "Warehouse operations",
+     "record_of": "Every scheduled read of a source: when it ran, whether it was late or failed, how many rows it read",
+     "used_by": "Data Engineering; the dashboards, to say how fresh each source is",
+     "extract": "Written by the warehouse as it runs"},
 ]
 
 # --------------------------------------------------------------------------------------
 # Every raw table: source system, module, grain and history type
 # --------------------------------------------------------------------------------------
-_KS, _BW, _INT, _PUB, _WH, _GEN = "KS", "BW", "INT", "PUB", "WH", "GEN"
+_KS, _BW, _INT, _PUB, _WH, _GEN, _HLX, _ETL = "KS", "BW", "INT", "PUB", "WH", "GEN", "HLX", "ETL"
 RAW_TABLE_LINEAGE = [
     # Keystone HR: people
     ("dim_worker", _KS, "Core HR", "worker", "Type 1", 2),
@@ -110,6 +118,16 @@ RAW_TABLE_LINEAGE = [
     ("ref_cw_discrepancy_type", _WH, "Warehouse metadata", "discrepancy type", "Type 1", 3),
     # The answer key (release 3): a test fixture, never a business source
     ("gen_cw_discrepancy_truth", _GEN, "Answer key", "seeded discrepancy x continuous period", "Effective-dated", 3),
+    # Reconciliation operations (release 4, case study 6)
+    ("feed_event_delivery", _INT, "Integration log", "change sent from Bridgeway", "Transaction", 4),
+    ("ks_contingent_worker_audit", _KS, "Contingent worker profile", "contingent version", "Transaction", 4),
+    ("ks_cw_job", _KS, "Contingent worker job data", "person x job record x effective-dated version", "SCD Type 2", 4),
+    ("gen_cw_job_defect", _GEN, "Answer key", "job data defect x continuous period", "Effective-dated", 4),
+    ("etl_load_run", _ETL, "Load log", "source x scheduled run", "Transaction", 4),
+    ("itsm_ticket", _HLX, "Tickets", "ticket", "Accumulating snapshot", 4),
+    ("itsm_ticket_event", _HLX, "Tickets", "ticket x state change", "Transaction", 4),
+    ("itsm_ticket_link", _HLX, "Tickets", "ticket x subject", "Type 1", 4),
+    ("ref_ticket_category", _HLX, "Tickets", "ticket category", "Type 1", 4),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -227,6 +245,90 @@ RAW_COLUMNS: dict[str, list[tuple[str, str, str]]] = {
     ],
 }
 
+# Release 4 (case study 6): reconciliation operations
+RAW_COLUMNS.update({
+    "feed_event_delivery": [
+        ("feed_event_id", "VARCHAR", "-> feed_bridgeway_keystone_event"),
+        ("sent_at", "TIMESTAMP", "GMT hour of the hourly batch that sent the change; on sent_date"),
+        ("applied_at", "TIMESTAMP", "GMT hour Keystone applied it, on applied_date; empty if it failed or is still queued"),
+    ],
+    "ks_contingent_worker_audit": [
+        ("ks_record_id", "VARCHAR", "-> ks_contingent_worker"),
+        ("changed_at", "TIMESTAMP", "GMT time the version was written, on its effective start date"),
+        ("changed_by", "VARCHAR", "Integration, Keystone nightly job, Manager or HR Operations"),
+    ],
+    "ks_cw_job": [
+        ("job_record_id", "VARCHAR", "Row key"),
+        ("person_id", "VARCHAR", "EMPLID: the Keystone person (-> ks_contingent_worker)"),
+        ("empl_rcd", "INTEGER", "Job record number of the person: 0 for the first PID, 1 for the next, ..."),
+        ("position_id", "VARCHAR", "PID the job holds (-> dim_position)"),
+        ("effective_start_date", "DATE", "First day the row applies"),
+        ("effective_end_date", "DATE", "Last day (inclusive); empty for the current row"),
+        ("job_status", "VARCHAR", "Active or Terminated"),
+        ("action", "VARCHAR", "Assignment start, Return or Assignment end"),
+        ("change_source", "VARCHAR", "Feed, or HR Ops for an end entered by hand late"),
+        ("assignment_id", "VARCHAR", "-> fact_position_assignment: the assignment the row was written for"),
+    ],
+    "gen_cw_job_defect": [
+        ("defect_id", "VARCHAR", "Answer key row"),
+        ("flag_code", "VARCHAR", "F07 one person, two active PIDs; F08 PID still filled after the contract ended"),
+        ("person_id", "VARCHAR", "EMPLID"),
+        ("position_id", "VARCHAR", "The PID involved (the lower one for F07)"),
+        ("start_date", "DATE", "First day it is true"),
+        ("end_date", "DATE", "Last day it is true; empty if still open on the extract date"),
+        ("origin", "VARCHAR", "Seeded (a job end entered late or never) or PID ledger (the ledger itself overlaps)"),
+        ("resolution", "VARCHAR", "Ended, or Open at extract"),
+        ("detail", "VARCHAR", "The facts behind it, in a sentence"),
+    ],
+    "etl_load_run": [
+        ("run_id", "VARCHAR", "Run key"),
+        ("source_system", "VARCHAR", "BW, KS or HLX (-> ref_source_system)"),
+        ("scheduled_at", "TIMESTAMP", "GMT: Bridgeway 00:00, Keystone 00:20 (after Bridgeway), Helix 00:00 and 12:00"),
+        ("started_at", "TIMESTAMP", "GMT"),
+        ("finished_at", "TIMESTAMP", "GMT"),
+        ("status", "VARCHAR", "Succeeded, Late (started more than an hour after schedule) or Failed (read nothing)"),
+        ("rows_read", "INTEGER", "Rows in the extract; empty when the run failed"),
+        ("error_text", "VARCHAR", "Why a run failed"),
+    ],
+    "itsm_ticket": [
+        ("ticket_number", "VARCHAR", "HLX-100001 upward, in the order tickets were opened"),
+        ("title", "VARCHAR", "Category title and the subject (ID, or name, or nothing)"),
+        ("short_description", "VARCHAR", "What the person who raised it wrote"),
+        ("category_code", "VARCHAR", "-> ref_ticket_category"),
+        ("priority", "VARCHAR", "P1 to P4"),
+        ("assignment_group", "VARCHAR", "Group working it now: Vendor Management, HR Operations or Data Engineering"),
+        ("opened_at", "TIMESTAMP", "GMT"),
+        ("resolved_at", "TIMESTAMP", "GMT of the current resolution; empty while open or after a reopen"),
+        ("closed_at", "TIMESTAMP", "GMT; Helix closes a resolved ticket after 3 days"),
+        ("close_code", "VARCHAR", "Fixed in source, No longer reproducible, Credit requested from supplier, Source fixed; next run reloads"),
+    ],
+    "itsm_ticket_event": [
+        ("ticket_number", "VARCHAR", "-> itsm_ticket"),
+        ("event_at", "TIMESTAMP", "GMT"),
+        ("from_state", "VARCHAR", "Empty for the opening event"),
+        ("to_state", "VARCHAR", "New, In progress, Pending, Resolved, Reopened or Closed (a reassignment keeps the state)"),
+        ("actor_group", "VARCHAR", "Group that made the change; Helix for automatic closes"),
+        ("note", "VARCHAR", "What happened"),
+    ],
+    "itsm_ticket_link": [
+        ("ticket_number", "VARCHAR", "-> itsm_ticket"),
+        ("subject_type", "VARCHAR", "Contingent worker or Data load (later: Employee, Position)"),
+        ("subject_id", "VARCHAR", "Bridgeway worker ID, or the load run ID; empty when not entered"),
+        ("secondary_id", "VARCHAR", "Keystone EMPLID, when entered"),
+        ("link_quality", "VARCHAR", "ID field, Name in text (the name is in the description) or None"),
+    ],
+    "ref_ticket_category": [
+        ("category_code", "VARCHAR", "Category key"),
+        ("category_name", "VARCHAR", "Name"),
+        ("subject_type", "VARCHAR", "What a ticket of this category is about"),
+        ("default_group", "VARCHAR", "Group it is assigned to"),
+        ("flag_code", "VARCHAR", "The reconciliation flag it fixes, F01 to F12; empty for Integration categories"),
+        ("risk", "VARCHAR", "The risk the flag creates"),
+        ("priority", "VARCHAR", "Default priority"),
+        ("title_template", "VARCHAR", "Ticket title before the subject"),
+    ],
+})
+
 # The registry tables themselves, so test 61 covers them too
 RAW_COLUMNS["ref_cw_discrepancy_type"] = [
     ("discrepancy_code", "VARCHAR", "CW00 to CW12"),
@@ -252,7 +354,7 @@ RAW_COLUMNS["gen_cw_discrepancy_truth"] = [
     ("detail", "VARCHAR", "The facts behind it, in a sentence"),
 ]
 RAW_COLUMNS["ref_source_system"] = [
-    ("system_code", "VARCHAR", "KS, BW, INT, PUB, WH or GEN"),
+    ("system_code", "VARCHAR", "KS, BW, INT, PUB, WH, GEN, HLX or ETL"),
     ("system_name", "VARCHAR", "System name"),
     ("system_type", "VARCHAR", "What kind of system it is"),
     ("record_of", "VARCHAR", "What it is the system of record for"),
@@ -290,6 +392,8 @@ def columns(table: str) -> list[str]:
     """Column names of a release 3 raw table, in extract order."""
     return [c for c, _, _ in RAW_COLUMNS[table]]
 
+
+RELEASE_4_TABLES = [t for t, _, _, _, _, r in RAW_TABLE_LINEAGE if r == 4]
 
 # Release 3 operational tables and the answer key (not the registry): written from the
 # Bridgeway and Keystone simulations.

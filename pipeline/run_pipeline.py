@@ -69,6 +69,10 @@ EXPORTS = [
     "mart_wfp_summary",
     "mart_pid_month_end",
     "mart_cw_pid_fill",
+    "mart_cw_gap_close",
+    "mart_cw_gap_rate_close",
+    "mart_itsm_ticket_close",
+    "mart_cw_reconciliation_dashboard",
 ]
 
 

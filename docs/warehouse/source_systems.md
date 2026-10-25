@@ -1,6 +1,6 @@
 # Source systems and lineage
 
-Arcadia Systems, Keystone HR and Bridgeway VMS are fictional; all data is synthetic.
+Arcadia Systems, Keystone HR, Bridgeway VMS and Helix Service Desk are fictional; all data is synthetic.
 
 Arcadia's workforce lives in two operational systems that were never designed to agree. Since release 3 the warehouse loads both, says on every raw table which one it came from, and joins them into one picture of the workforce: **employees** from Keystone HR and **contingent workers** from Bridgeway VMS, with Keystone's view of those contingent workers kept beside Bridgeway's so the differences can be seen.
 
@@ -26,7 +26,9 @@ flowchart LR
 | `INT` | **Bridgeway to Keystone integration** | Every change Bridgeway sent to Keystone, when it was applied, whether it failed | Integration support |
 | `PUB` | **Public reference data** | ECB euro reference rates; employer fringe rates from OECD, BLS and national sources | Finance, the warehouse |
 | `WH` | **Arcadia warehouse metadata** | Which system every raw table comes from; the column contract of every release 3 extract; the catalogue of contingent workforce discrepancies | The build and its tests |
-| `GEN` | **Synthetic data generator** | The answer key: every discrepancy seeded between the systems, with its cause and dates. A test fixture, never a business source | The tests and the detection score |
+| `GEN` | **Synthetic data generator** | The answer keys: every discrepancy seeded between the systems, with its cause and dates, and (release 4) every Keystone job data defect. Test fixtures, never a business source | The tests and the detection score |
+| `HLX` | **Helix Service Desk** (release 4) | Tickets raised to fix records, their state changes, what each is about; seeded with contingent worker tickets | Vendor Management, HR Operations, Data Engineering, anyone who reports a problem |
+| `ETL` | **Arcadia warehouse load log** (release 4) | Every scheduled read of a source: when it ran, whether it was late or failed, how many rows it read | Data Engineering; the dashboards, to say how fresh each source is |
 
 The same list is a raw table, `ref_source_system`, written from [`generator/source_systems.py`](../../generator/source_systems.py).
 
@@ -57,12 +59,14 @@ Two consequences shape the warehouse design:
 
 | System | Raw tables |
 |---|---|
-| Keystone HR | `dim_worker`, `fact_job_history`, `fact_compensation_history`, `fact_performance_review`, `fact_bonus_payout`, `dim_org_unit`, `dim_department`, `dim_cost_center`, `dim_location`, `dim_country`, `dim_job_level`, `dim_job_profile`, `ref_job_level_base_salary`, `ref_salary_range`, `ref_tenure_increase`, `ref_performance_bonus`, `dim_position`, `fact_position_assignment`, `fact_requisition`, `dim_candidate`, `fact_candidate_stage_event`, `fact_workforce_plan`, **`ks_contingent_worker`** |
+| Keystone HR | `ks_contingent_worker_audit`, `ks_cw_job` (release 4), `dim_worker`, `fact_job_history`, `fact_compensation_history`, `fact_performance_review`, `fact_bonus_payout`, `dim_org_unit`, `dim_department`, `dim_cost_center`, `dim_location`, `dim_country`, `dim_job_level`, `dim_job_profile`, `ref_job_level_base_salary`, `ref_salary_range`, `ref_tenure_increase`, `ref_performance_bonus`, `dim_position`, `fact_position_assignment`, `fact_requisition`, `dim_candidate`, `fact_candidate_stage_event`, `fact_workforce_plan`, **`ks_contingent_worker`** |
 | Bridgeway VMS | **`bw_supplier`**, **`bw_rate_card`**, **`bw_contingent_worker`**, **`bw_service_order`**, **`bw_service_order_revision`**, **`bw_timesheet_month`** |
-| Integration log | **`feed_bridgeway_keystone_event`** |
+| Integration log | **`feed_bridgeway_keystone_event`**, `feed_event_delivery` (release 4) |
 | Public reference data | `ref_fx_rate_daily`, `ref_fx_rate_monthly`, `ref_fx_rate_constant`, `ref_fringe_rate`, `ref_fringe_source` |
 | Warehouse metadata | `ref_source_system`, `ref_raw_table_lineage`, `ref_raw_column`, **`ref_cw_discrepancy_type`** |
-| Synthetic data generator | **`gen_cw_discrepancy_truth`** (the answer key; a test fixture) |
+| Synthetic data generator | **`gen_cw_discrepancy_truth`** (the answer key; a test fixture), `gen_cw_job_defect` (release 4) |
+| Helix Service Desk | `itsm_ticket`, `itsm_ticket_event`, `itsm_ticket_link`, `ref_ticket_category` (release 4) |
+| Warehouse load log | `etl_load_run` (release 4) |
 
 In **bold**, the tables release 3 adds. Each new table carries a **system prefix** (`bw_`, `ks_`, `feed_`) so a reviewer sees at a glance which system a fact came from; the release 1 and 2 tables keep their names so nothing built on them breaks. Their columns are in the [data dictionary](data_dictionary.md#contingent-workforce-release-3).
 
@@ -73,6 +77,19 @@ The registry is data, so the build can test it:
 | Test | Rule | Catches |
 |---|---|---|
 | 60 | Every raw table has exactly one lineage row with a known system, and every lineage row names a table that is loaded | A new extract nobody documented; lineage left behind for a dropped table |
-| 61 | Every release 3 table carries exactly the documented columns, in order | An extract that gained, lost, renamed or reordered a column, before any model reads it |
+| 61 | Every release 3 and 4 table carries exactly the documented columns, in order | An extract that gained, lost, renamed or reordered a column, before any model reads it |
 
 How the feed and Keystone are simulated, what goes wrong between them and how the answer key is built: [Keystone and the feed](../projects/contingent-workforce/keystone_feed.md).
+
+## Release 4: times, the load log and tickets
+
+Finance's month-end report is built by a warehouse run at a clock time, so release 4 adds the times the release 3 dates leave out, and the two systems around the reconciliation, all as new tables (nothing earlier changed):
+
+| What | When (GMT) | Bangalore | Austin (CDT) |
+|---|---|---|---|
+| Bridgeway to Keystone feed | every hour, on the hour | | |
+| Warehouse reads Bridgeway, then Keystone | 00:00, then about 00:20 | 05:30 | 19:00 the day before |
+| Warehouse reads Helix | 00:00 and 12:00 | 05:30 and 17:30 | 19:00 and 07:00 |
+| Month-end close | the 00:00 run on the 1st | 05:30 on the 1st | 19:00 on the last day |
+
+The warehouse runs on GMT from Bangalore. A failed read leaves the source as of its last good load, which is what `etl_load_run` records and `int_cw_close_run` uses. How the close view routes each gap to Bridgeway, Keystone or Integration: [release 4 plan](../projects/contingent-workforce/release_4_plan.md).

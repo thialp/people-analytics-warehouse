@@ -51,7 +51,7 @@ flowchart LR
     BW["🟠 <b>Bridgeway VMS</b><br/>the supplier system<br/>contract orders, rates, timesheets"]
     subgraph ARC["Arcadia's own systems"]
         KS["🔵 <b>Keystone HR</b><br/>Arcadia's system of record<br/>every employee and contractor,<br/>an Arcadia ID and a PID each<br/>pay, jobs, hiring, the plan"]
-        WH["🟣 <b>The warehouse</b><br/>cleans, connects, checks<br/>81 automated tests"]
+        WH["🟣 <b>The warehouse</b><br/>cleans, connects, checks<br/>88 automated tests"]
         DASH["🔷 <b>Dashboards</b><br/>Tableau"]
     end
     PUB["🟢 <b>Public data</b><br/>exchange rates, employer costs,<br/>postal codes"]
@@ -123,7 +123,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 
 | Principle | What it means here |
 |---|---|
-| ✅ **Every number reconciles** | Start + changes = end, for every team, month and currency, checked by 81 automated tests on every change |
+| ✅ **Every number reconciles** | Start + changes = end, for every team, month and currency, checked by 88 automated tests on every change |
 | 🔁 **One company, many questions** | All the case studies read the same people, the same history and the same month-end snapshots, so two dashboards never tell different stories |
 | 🏢 **Built like an enterprise stack** | The same model runs on DuckDB (for Tableau Public) and SQL Server (for a live Tableau connection), and is proven identical row for row |
 | 🧭 **Explain, don't just report** | Every case study answers *why*, not only *how much* |
@@ -133,7 +133,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
 | **Scale** | 46,980 employees and 43,484 contractors over five years · 61 month-ends · 64,914 PIDs (33,650 employee, 31,264 contractor) · 31,614 requisitions · 189,964 applicants · 58,276 supplier orders · 632,504 timesheets |
 | **Output** | 21 Tableau-ready marts and 7 dimension files in [`data/marts/`](data/marts/); 17 Tableau Custom SQL queries and 13 reporting views on SQL Server |
-| **Controls** | 81 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
+| **Controls** | 88 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
 
 ---
 
@@ -166,7 +166,7 @@ flowchart LR
         STG["staging<br/>types · dedup · corrections"]
         INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain<br/>identity resolution · discrepancy rules"]
         MART["marts<br/>walks · fills · plan vs actual · cost · reconciliation"]
-        TEST{{"81 data tests"}}
+        TEST{{"88 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -323,7 +323,7 @@ Full column definitions: [`docs/warehouse/data_dictionary.md`](docs/warehouse/da
 
 ### Validation strategy
 
-Every test is a SQL query that returns the rows breaking a rule. The pipeline runs all 81 after every build and refuses to export if any returns rows.
+Every test is a SQL query that returns the rows breaking a rule. The pipeline runs all 88 after every build and refuses to export if any returns rows.
 
 | # | Test | Guards against |
 |---|---|---|
@@ -408,6 +408,13 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 79 | Hires that joined a group and are still in it never exceed the people who joined that group; the walk and the region walk agree on who joined elsewhere and moved in | A tie-out note reading "73 of the 72 who joined" |
 | 80 | The Workforce Planning summary: every period and view has a row; filled employee PIDs equal the ending headcount, filled contractor PIDs the contractor headcount; filled + vacant = total PIDs; groups add up to the company | A PID count that disagrees with the headcount next to it |
 | 81 | Every contractor holds a PID: filled contractor PIDs equal the contractor headcount by month, department and country; one holder at a time; no gaps in a PID's history; a PID exists before its first day | A contractor working without a position, or two people in one seat |
+| 82 | Keystone job data: on every close the warehouse finds exactly the people the answer key says hold two active job records or sit in a PID they left, and no one else | PID flags that miss what was planted, or invent what was not |
+| 83 | Every gap has one flag, one risk (the flag's own) and one of the three places; Integration gaps carry their shade; flag ranks run 1 to n | A Sankey ribbon that splits, double counts or lands nowhere |
+| 84 | The gap rate's denominator is the Bridgeway working count on every close (11,941 on 30 June 2026); numerators and gap counts tie to the gap mart | A rate whose parts come from different populations |
+| 85 | Every Helix ticket's history is one chain (opens as New, each change starts where the last ended, nothing after Closed) and agrees with the ticket row | A replayed close showing a ticket in a state it never had |
+| 86 | Every ID a ticket carries points at a real Bridgeway worker, Keystone person or failed load run | Tickets linked to nobody, counted as work on a gap |
+| 87 | Failed-load gaps exist only at closes whose load failed and route to Integration as alerts; feed gaps are "clears on its own" only when sent in the 24 hours before the close run | A data engineering alert for a gap that was a real record problem, or the reverse |
+| 88 | Feed and Keystone times fall on the release 3 dates; one load run per source per schedule; Keystone reads after Bridgeway; a failed run reads nothing | Times that contradict the dates the reconciliation was built on |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -910,9 +917,21 @@ flowchart LR
 
 **Detection score.** On every month-end from June 2021 to June 2026, each planted discrepancy open that day is *injected*; it is *detected* if the rules flag the same type on the same worker. **28,530 injected, 28,530 detected (100%), 42 false flags**, all two different people with the same name at the same supplier and cost center, one starting the day after the other ended: nothing in either system tells them apart, so the work list asks HR Ops to look. Tests 73 and 75 hold this. Full write-up, including what scoring the rules uncovered while building them: [`case_study_6.md`](docs/projects/contingent-workforce/case_study_6.md).
 
-### Tableau
+### The month-end close view (release 4)
 
-Dashboard #6 (work list, trend, cap and score) is next. On SQL Server the four marts are views (`rpt.vw_cw_*`, [`04b`](sqlserver/04b_create_reporting_views_contingent.sql)).
+Finance runs its month-end report from Keystone, so the question that matters at a close is narrower than "where do the systems differ": **which differences put this report at risk, and where does each one get fixed?** Release 4 recasts the reconciliation as Finance meets it.
+
+| Piece | What it adds |
+|---|---|
+| 12 flags, 6 risks, 3 places | Each gap is a **comparison** Finance can check (cost center in another function or department, order open or billed after the end, two IDs, a wrong stored ID, two active PID records, a PID still filled, ended or missing on one side). It creates one of six **risks** and is fixed in one **place**: Bridgeway, Keystone, or Integration ([`int_cw_flag`](sql/02_intermediate/int_cw_flag.sql)) |
+| Times and the close run | The hour every feed change was sent and applied, when every Keystone version was written, and the warehouse's own **load log**. A close is the 00:00 GMT run on the 1st; a change sent in the last 24 hours "clears on its own", one waiting longer is a stuck feed, and a failed load makes gaps that exist only in the stale copy ([`int_cw_close_run`](sql/02_intermediate/int_cw_close_run.sql), [`int_cw_load_gap`](sql/02_intermediate/int_cw_load_gap.sql)) |
+| Keystone job data | The PID each contingent job record holds, against the PID ledger: two active records for one person, or a record left in a PID after the contract ended. Seeded, with its own answer key; Dashboard #3's PID ledger is untouched |
+| Helix Service Desk | A fictional ticket system: 2,967 tickets and 12,895 state changes since January 2021, replayed at each close, linked to gaps in tiers (ID, name in the text, none) |
+| One data source | [`custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql): gaps, populations and open tickets for all 61 closes in one union, so multi-select sets work across the page |
+
+**At the June 2026 close:** 379 gaps on 357 contractors, a **2.99% gap rate against a 3% target** (below it at every June close; above it at 41 of the 61 closes). Bridgeway holds 196 of the gaps, Keystone 181, Integration 2; 176 have no ticket and 247 are over 90 days old. At the December 2024 close the Keystone load failed for three nights, and 6 of that close's gaps existed only in the stale copy.
+
+Dashboard #6 is in build: [release plan](docs/projects/contingent-workforce/release_4_plan.md). On SQL Server the marts are views (`rpt.vw_cw_*`, [`04b`](sqlserver/04b_create_reporting_views_contingent.sql), [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql)).
 
 ---
 
@@ -942,7 +961,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
-python pipeline/run_pipeline.py        # build the warehouse, run the 81 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 88 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 2)
@@ -960,6 +979,7 @@ The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau 
 - [`sqlserver/`](sqlserver/) holds T-SQL scripts that load the CSVs with `BULK INSERT` and build typed `dw` tables, the pay history in USD at its posting-date rate (`OUTER APPLY TOP 1` as the as-of join), an indexed worker month-end snapshot, a running pay ledger, a recursive reporting-chain table and the reporting views. The load script is generated from the CSV headers ([`make_load_raw.py`](sqlserver/make_load_raw.py)).
 - [`03b_build_dw_workforce_planning.sql`](sqlserver/03b_build_dw_workforce_planning.sql) builds the seat layer (positions, seat assignments, requisitions, the workforce plan, candidates, a seat month-end snapshot, seat fills with the pay walk, vacancy chains with a recursive CTE, plan vs actual) and four reporting views; [`08_validate_workforce_planning.sql`](sqlserver/08_validate_workforce_planning.sql) checks it.
 - [`03c_build_dw_contingent.sql`](sqlserver/03c_build_dw_contingent.sql) (release 3) brings in the contingent workforce: Bridgeway VMS and Keystone HR's contingent records, the contingent month-end snapshot, conversions and movement, and case study 6's identity resolution and discrepancy rules, where DuckDB's `ASOF JOIN` becomes a range join on each feed change and the date of the next one. [`04b`](sqlserver/04b_create_reporting_views_contingent.sql) adds six views (contingent spend, the Shapley growth mix in T-SQL, precomputed in `dw.WorkforceCostGrowthMix`, and the case study 6 marts), each with a matching Tableau Custom SQL file (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`); [`12_validate_contingent_workforce.sql`](sqlserver/12_validate_contingent_workforce.sql) checks them.
+- [`03d_build_dw_cw_reconciliation.sql`](sqlserver/03d_build_dw_cw_reconciliation.sql) (release 4) adds case study 6's month-end close view: the load log and the close runs, the 12 flags with their routing, Keystone job data, the Helix ticket replay and the three Dashboard #6 marts; [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql) exposes them as views, [`tableau/custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql) unions them into the page's one data source, and [`15_validate_cw_reconciliation.sql`](sqlserver/15_validate_cw_reconciliation.sql) checks them.
 - [`tableau/custom_sql_workforce_cost_bridge.sql`](tableau/custom_sql_workforce_cost_bridge.sql) is the cost bridge as **Tableau Custom SQL**: one `SELECT` with no CTEs, using derived tables and `CROSS APPLY (VALUES …)` to unpivot each employee and contingent worker into walk lines.
 - [`tableau/custom_sql_headcount_fte_walk.sql`](tableau/custom_sql_headcount_fte_walk.sql) is the headcount & FTE walk for Dashboard #1: the walk rebuilt from the SQL Server snapshot with the five dimensions joined in, keeping every CSV column name so the workbook moves over with *Replace Data Source* ([field mapping](docs/projects/workforce-planning/release_2_replace_references.md)); [`10_validate_headcount_fte_walk.sql`](sqlserver/10_validate_headcount_fte_walk.sql) runs it and checks it.
 - [`tableau/custom_sql_compensation_walk.sql`](tableau/custom_sql_compensation_walk.sql) is the compensation walk, built on `dw.WorkerPayLedger`; [`06_validate_compensation_walk.sql`](sqlserver/06_validate_compensation_walk.sql) runs that exact file inside SQL Server (about 45 seconds), times it and checks it.
@@ -982,7 +1002,8 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 
 ```
 ├── generator/            synthetic company simulation (people, seats, recruiting, plan, contingent workers,
-│                         the Bridgeway → Keystone feed), fringe research, FX loader (Python)
+│                         the Bridgeway → Keystone feed, its times, Keystone job data, the load log,
+│                         Helix tickets), fringe research, FX loader (Python)
 ├── reference/            public reference data: ECB daily FX extract and the script that builds it
 ├── data/
 │   ├── raw/              raw warehouse tables (CSV)
@@ -991,12 +1012,14 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 │   ├── 01_staging/       typing, corrections
 │   ├── 02_intermediate/  calendar, pay in USD, worker, seat and contingent month-end snapshots, pay ledger,
 │   │                     movement, conversions, seat fills, vacancy chains, reporting chain and line,
-│   │                     supplier alias, identity resolution, reconciliation snapshot, discrepancy rules
+│   │                     supplier alias, identity resolution, reconciliation snapshot, discrepancy rules,
+│   │                     close runs, flags and routing, load gaps, ticket state and links
 │   └── 03_marts/         fills, vacancy pool, plan vs actual, seat corridors, headcount & FTE walk, office walk,
 │                         mobility flows, compensation walk, region walk, career moves, cost bridge,
 │                         growth mix, contingent spend, discrepancy work list, reconciliation trend,
-│                         engagement cap, detection score, cost snapshot, org chart, fringe, dimensions
-├── tests/                81 data-quality and reconciliation tests (SQL)
+│                         engagement cap, detection score, gaps and gap rate at each close, open tickets,
+│                         cost snapshot, org chart, fringe, dimensions
+├── tests/                88 data-quality and reconciliation tests (SQL)
 ├── pipeline/             build runner, control totals, org chart and dashboard check-table writers
 ├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, validation, and the DuckDB checker

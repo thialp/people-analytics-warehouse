@@ -322,6 +322,24 @@ DECLARE @n_dim_worker INT = (SELECT COUNT(*) FROM raw.dim_worker);
 PRINT CONCAT('raw.dim_worker', '                      ', @n_dim_worker, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.etl_load_run;
+CREATE TABLE raw.etl_load_run (
+    [run_id]        NVARCHAR(400) NULL,
+    [source_system] NVARCHAR(400) NULL,
+    [scheduled_at]  NVARCHAR(400) NULL,
+    [started_at]    NVARCHAR(400) NULL,
+    [finished_at]   NVARCHAR(400) NULL,
+    [status]        NVARCHAR(400) NULL,
+    [rows_read]     NVARCHAR(400) NULL,
+    [error_text]    NVARCHAR(400) NULL
+);
+BULK INSERT raw.etl_load_run
+FROM '/repo/data/raw/etl_load_run.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_etl_load_run INT = (SELECT COUNT(*) FROM raw.etl_load_run);
+PRINT CONCAT('raw.etl_load_run', '                    ', @n_etl_load_run, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.fact_bonus_payout;
 CREATE TABLE raw.fact_bonus_payout (
     [bonus_id]                 NVARCHAR(400) NULL,
@@ -506,6 +524,19 @@ DECLARE @n_feed_bridgeway_keystone_event INT = (SELECT COUNT(*) FROM raw.feed_br
 PRINT CONCAT('raw.feed_bridgeway_keystone_event', '   ', @n_feed_bridgeway_keystone_event, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.feed_event_delivery;
+CREATE TABLE raw.feed_event_delivery (
+    [feed_event_id] NVARCHAR(400) NULL,
+    [sent_at]       NVARCHAR(400) NULL,
+    [applied_at]    NVARCHAR(400) NULL
+);
+BULK INSERT raw.feed_event_delivery
+FROM '/repo/data/raw/feed_event_delivery.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_feed_event_delivery INT = (SELECT COUNT(*) FROM raw.feed_event_delivery);
+PRINT CONCAT('raw.feed_event_delivery', '             ', @n_feed_event_delivery, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.gen_cw_discrepancy_truth;
 CREATE TABLE raw.gen_cw_discrepancy_truth (
     [discrepancy_id]   NVARCHAR(400) NULL,
@@ -527,6 +558,76 @@ FROM '/repo/data/sqlserver/gen_cw_discrepancy_truth.psv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_gen_cw_discrepancy_truth INT = (SELECT COUNT(*) FROM raw.gen_cw_discrepancy_truth);
 PRINT CONCAT('raw.gen_cw_discrepancy_truth', '        ', @n_gen_cw_discrepancy_truth, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.gen_cw_job_defect;
+CREATE TABLE raw.gen_cw_job_defect (
+    [defect_id]   NVARCHAR(400) NULL,
+    [flag_code]   NVARCHAR(400) NULL,
+    [person_id]   NVARCHAR(400) NULL,
+    [position_id] NVARCHAR(400) NULL,
+    [start_date]  NVARCHAR(400) NULL,
+    [end_date]    NVARCHAR(400) NULL,
+    [origin]      NVARCHAR(400) NULL,
+    [resolution]  NVARCHAR(400) NULL,
+    [detail]      NVARCHAR(400) NULL
+);
+BULK INSERT raw.gen_cw_job_defect
+FROM '/repo/data/raw/gen_cw_job_defect.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_gen_cw_job_defect INT = (SELECT COUNT(*) FROM raw.gen_cw_job_defect);
+PRINT CONCAT('raw.gen_cw_job_defect', '               ', @n_gen_cw_job_defect, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.itsm_ticket;
+CREATE TABLE raw.itsm_ticket (
+    [ticket_number]     NVARCHAR(400) NULL,
+    [title]             NVARCHAR(400) NULL,
+    [short_description] NVARCHAR(400) NULL,
+    [category_code]     NVARCHAR(400) NULL,
+    [priority]          NVARCHAR(400) NULL,
+    [assignment_group]  NVARCHAR(400) NULL,
+    [opened_at]         NVARCHAR(400) NULL,
+    [resolved_at]       NVARCHAR(400) NULL,
+    [closed_at]         NVARCHAR(400) NULL,
+    [close_code]        NVARCHAR(400) NULL
+);
+BULK INSERT raw.itsm_ticket
+FROM '/repo/data/sqlserver/itsm_ticket.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_itsm_ticket INT = (SELECT COUNT(*) FROM raw.itsm_ticket);
+PRINT CONCAT('raw.itsm_ticket', '                     ', @n_itsm_ticket, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.itsm_ticket_event;
+CREATE TABLE raw.itsm_ticket_event (
+    [ticket_number] NVARCHAR(400) NULL,
+    [event_at]      NVARCHAR(400) NULL,
+    [from_state]    NVARCHAR(400) NULL,
+    [to_state]      NVARCHAR(400) NULL,
+    [actor_group]   NVARCHAR(400) NULL,
+    [note]          NVARCHAR(400) NULL
+);
+BULK INSERT raw.itsm_ticket_event
+FROM '/repo/data/raw/itsm_ticket_event.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_itsm_ticket_event INT = (SELECT COUNT(*) FROM raw.itsm_ticket_event);
+PRINT CONCAT('raw.itsm_ticket_event', '               ', @n_itsm_ticket_event, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.itsm_ticket_link;
+CREATE TABLE raw.itsm_ticket_link (
+    [ticket_number] NVARCHAR(400) NULL,
+    [subject_type]  NVARCHAR(400) NULL,
+    [subject_id]    NVARCHAR(400) NULL,
+    [secondary_id]  NVARCHAR(400) NULL,
+    [link_quality]  NVARCHAR(400) NULL
+);
+BULK INSERT raw.itsm_ticket_link
+FROM '/repo/data/raw/itsm_ticket_link.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_itsm_ticket_link INT = (SELECT COUNT(*) FROM raw.itsm_ticket_link);
+PRINT CONCAT('raw.itsm_ticket_link', '                ', @n_itsm_ticket_link, ' rows');
 GO
 
 DROP TABLE IF EXISTS raw.ks_contingent_worker;
@@ -557,6 +658,39 @@ FROM '/repo/data/raw/ks_contingent_worker.csv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ks_contingent_worker INT = (SELECT COUNT(*) FROM raw.ks_contingent_worker);
 PRINT CONCAT('raw.ks_contingent_worker', '            ', @n_ks_contingent_worker, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ks_contingent_worker_audit;
+CREATE TABLE raw.ks_contingent_worker_audit (
+    [ks_record_id] NVARCHAR(400) NULL,
+    [changed_at]   NVARCHAR(400) NULL,
+    [changed_by]   NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_contingent_worker_audit
+FROM '/repo/data/raw/ks_contingent_worker_audit.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_contingent_worker_audit INT = (SELECT COUNT(*) FROM raw.ks_contingent_worker_audit);
+PRINT CONCAT('raw.ks_contingent_worker_audit', '      ', @n_ks_contingent_worker_audit, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ks_cw_job;
+CREATE TABLE raw.ks_cw_job (
+    [job_record_id]        NVARCHAR(400) NULL,
+    [person_id]            NVARCHAR(400) NULL,
+    [empl_rcd]             NVARCHAR(400) NULL,
+    [position_id]          NVARCHAR(400) NULL,
+    [effective_start_date] NVARCHAR(400) NULL,
+    [effective_end_date]   NVARCHAR(400) NULL,
+    [job_status]           NVARCHAR(400) NULL,
+    [action]               NVARCHAR(400) NULL,
+    [change_source]        NVARCHAR(400) NULL,
+    [assignment_id]        NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_cw_job
+FROM '/repo/data/raw/ks_cw_job.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_cw_job INT = (SELECT COUNT(*) FROM raw.ks_cw_job);
+PRINT CONCAT('raw.ks_cw_job', '                       ', @n_ks_cw_job, ' rows');
 GO
 
 DROP TABLE IF EXISTS raw.ref_cw_discrepancy_type;
@@ -759,4 +893,22 @@ FROM '/repo/data/raw/ref_tenure_increase.csv'
 WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_tenure_increase INT = (SELECT COUNT(*) FROM raw.ref_tenure_increase);
 PRINT CONCAT('raw.ref_tenure_increase', '             ', @n_ref_tenure_increase, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ref_ticket_category;
+CREATE TABLE raw.ref_ticket_category (
+    [category_code]  NVARCHAR(400) NULL,
+    [category_name]  NVARCHAR(400) NULL,
+    [subject_type]   NVARCHAR(400) NULL,
+    [default_group]  NVARCHAR(400) NULL,
+    [flag_code]      NVARCHAR(400) NULL,
+    [risk]           NVARCHAR(400) NULL,
+    [priority]       NVARCHAR(400) NULL,
+    [title_template] NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_ticket_category
+FROM '/repo/data/sqlserver/ref_ticket_category.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_ticket_category INT = (SELECT COUNT(*) FROM raw.ref_ticket_category);
+PRINT CONCAT('raw.ref_ticket_category', '             ', @n_ref_ticket_category, ' rows');
 GO

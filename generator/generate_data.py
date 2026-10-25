@@ -26,6 +26,7 @@ overlap. The output is deterministic: the same seed always produces the same fil
 
 from __future__ import annotations
 
+import bisect
 import calendar
 import datetime as dt
 import math
@@ -36,9 +37,11 @@ import numpy as np
 import pandas as pd
 
 import contingent_workforce
+import cw_operations
 import cw_positions
 import fringe_research
 import fx_rates
+import helix_service_desk
 import keystone_feed
 import source_systems
 import reference_data as ref
@@ -1896,6 +1899,39 @@ write(pos[["position_record_id", "position_id", "effective_start_date", "effecti
 write(pd.DataFrame(assign_rows + cw_assign_rows)[[
     "assignment_id", "position_id", "worker_id", "start_date", "end_date", "fill_type", "requisition_id",
     "vacate_reason", "worker_type", "bw_worker_id"]].sort_values("assignment_id"), "fact_position_assignment")
+
+# ======================================================================================
+# 9. Reconciliation operations (release 4, case study 6): times, job data, load log, tickets
+# ======================================================================================
+# New tables only, each from its own stream: the hour every feed change was sent and applied,
+# when every Keystone contingent version was written, Keystone's job data (the PID each
+# contingent job record holds, with two seeded imperfections and their answer key), the
+# warehouse's load log, and the Helix Service Desk tickets raised to fix the gaps.
+_delivery = cw_operations.feed_delivery(domain_stream("feed_times"), cw_tables["feed_bridgeway_keystone_event"])
+_region = {o["id"]: COUNTRY[o["country"]]["region"] for o in OFFICE.values()}
+_audit = cw_operations.ks_audit(domain_stream("keystone_times"), cw_tables["ks_contingent_worker"], _delivery, _region)
+_job, _job_defect = cw_operations.job_data(domain_stream("ks_job"), cw_assign_rows)
+
+
+def _counter(dates):
+    """Rows dated on or before a day (or time): what a full extract taken then holds."""
+    _s = sorted(pd.to_datetime(pd.Series(dates).replace("", None), errors="coerce").dropna())
+    return lambda t: bisect.bisect_right(_s, pd.Timestamp(t))
+
+
+_rows_bw = _counter(cw_tables["bw_service_order_revision"]["effective_start_date"])
+_rows_ks = _counter(list(cw_tables["ks_contingent_worker"]["effective_start_date"]) + list(_job["effective_start_date"]))
+_runs = cw_operations.load_log(domain_stream("load_log"), {"BW": _rows_bw, "KS": _rows_ks, "HLX": lambda t: 0})
+_helix = helix_service_desk.simulate(
+    stream=domain_stream("helix"), tables=cw_tables, job_defects=_job_defect, load_runs=_runs,
+    conversions=cw_program.conversions, cc_function={c["cost_center_id"]: DEPT[c["department_id"]]["function"] for c in cost_center_rows})
+_ev = _counter(_helix["itsm_ticket_event"]["event_at"])
+_ok = _runs["source_system"].eq("HLX") & _runs["status"].ne("Failed")
+_runs.loc[_ok, "rows_read"] = [_ev(t) for t in _runs.loc[_ok, "started_at"]]
+_new = {"feed_event_delivery": _delivery, "ks_contingent_worker_audit": _audit, "ks_cw_job": _job,
+        "gen_cw_job_defect": _job_defect, "etl_load_run": _runs, **_helix}
+for _table in source_systems.RELEASE_4_TABLES:
+    write(_new[_table][source_systems.columns(_table)], _table)
 
 # The plan's contingent line, from its own stream so no employee plan number moves.
 _plan = pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"])
