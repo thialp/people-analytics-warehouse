@@ -1,7 +1,9 @@
 import re, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from spec import PARAMS, C, EXISTING
-params={p[0] for p in PARAMS}
+import spec_sankey
+params={p[0] for p in PARAMS}|{p[0] for p in spec_sankey.PARAMS}
+C=C+spec_sankey.C
 F={cap:(k,f) for cap,dt,k,f in C}
 for old,(new,f) in EXISTING.items():
     k='row' if new in ('What differs','What it puts at risk','Where it is aligned') else 'agg'

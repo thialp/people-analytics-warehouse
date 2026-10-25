@@ -3,15 +3,21 @@
   Tableau Custom SQL for Dashboard #4, Contingent Workforce Reconciliation (SQL Server, database ArcadiaHR).
   ONE data source for the whole page, because multi-select sets (function, department, country)
   work only inside one: the same columns and rows as data/marts/mart_cw_reconciliation_dashboard.csv
-  (about 65,000 rows), so a workbook built on either can switch with Data > Replace Data Source.
+  (about 67,600 rows), so a workbook built on either can switch with Data > Replace Data Source.
 
-  Three row types, never summed together: filter row_type in every calculation.
+  Four row types, never summed together: filter row_type in every calculation.
     Gap         one per close x contractor x flag (rpt.vw_cw_gap_close): the Sankey (flag, risk,
                 place), the gap list, KPIs 3 to 5. gaps = 1.
     Population  one per close x cost center (rpt.vw_cw_gap_rate_close): the gap rate and KPI 1.
                 Gap rate = SUM(contractors_with_gap) / SUM(contractors_working), target 3%.
     Ticket      one per close x open Helix ticket (rpt.vw_itsm_ticket_close): the ticket card,
                 one dot at (dot_x, dot_y). tickets = 1.
+    Sankey      2,188 scaffold rows for the native Sankey, from the flag, risk and place taxonomy
+                (no close, no group): sk_part Link (sk_level 1 flag to risk, 2 risk to place;
+                sk_point 0 to 49 along the ribbon's two edges), Node (sk_point 0 to 3, the corners),
+                Label (sk_point 0) and Header (sk_level 1 to 3). Tableau places every point with
+                FIXED LODs over the Gap rows, so the chart follows the close and the groups.
+  flag_short is the flag's short name, the one every viewer sees (Gap and Sankey rows).
   Every row carries month_end_date (is_latest_close marks Current, Jun 30, 2026) and the group
   (function_name, department_name, country_name), so one In Scope calculation filters every card.
 
@@ -93,7 +99,11 @@ SELECT
     CAST(NULL AS INT)                        AS gaps_open_prior_close,
     CAST(NULL AS INT)                        AS gaps_fixed_day_after,
     CAST(NULL AS FLOAT)                      AS gap_rate_target,
-    CAST(NULL AS VARCHAR(400))               AS load_note
+    CAST(NULL AS VARCHAR(400))               AS load_note,
+    CASE v.flag_code WHEN 'F01' THEN 'One person, two IDs' WHEN 'F02' THEN 'Bridgeway ID mismatch' WHEN 'F03' THEN 'Not in Keystone' WHEN 'F04' THEN 'Billed after end date' WHEN 'F05' THEN 'Cost center differs' WHEN 'F06' THEN 'PID filled after end' WHEN 'F07' THEN 'Two active PID records' WHEN 'F08' THEN 'Ended in Keystone only' WHEN 'F09' THEN 'Active in Keystone only' END AS flag_short,
+    CAST(NULL AS VARCHAR(400))               AS sk_part,
+    CAST(NULL AS INT)                        AS sk_level,
+    CAST(NULL AS INT)                        AS sk_point
 FROM rpt.vw_cw_gap_close AS v
 UNION ALL
 SELECT
@@ -170,7 +180,11 @@ SELECT
     v.gaps_open_prior_close,
     v.gaps_fixed_day_after,
     v.gap_rate_target,
-    v.load_note
+    v.load_note,
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT)
 FROM rpt.vw_cw_gap_rate_close AS v
 UNION ALL
 SELECT
@@ -247,5 +261,103 @@ SELECT
     CAST(NULL AS INT),
     CAST(NULL AS INT),
     CAST(NULL AS FLOAT),
-    CAST(NULL AS VARCHAR(400))
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT)
 FROM rpt.vw_itsm_ticket_close AS v
+UNION ALL
+SELECT
+    'Sankey',
+    CAST(NULL AS DATE),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS BIT),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    s.flag_code,
+    s.flag_name,
+    CAST(NULL AS INT),
+    s.flag_label,
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    s.risk,
+    s.risk_order,
+    s.place,
+    s.place_order,
+    s.place_label,
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS BIT),
+    CAST(NULL AS DATE),
+    CAST(NULL AS INT),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS INT),
+    CAST(NULL AS BIT),
+    CAST(NULL AS BIT),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS BIT),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS INT),
+    CAST(NULL AS VARCHAR(400)),
+    CAST(NULL AS INT),
+    CAST(NULL AS FLOAT),
+    CAST(NULL AS FLOAT),
+    0,
+    0,
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS INT),
+    CAST(NULL AS FLOAT),
+    CAST(NULL AS VARCHAR(400)),
+    CASE s.flag_code WHEN 'F01' THEN 'One person, two IDs' WHEN 'F02' THEN 'Bridgeway ID mismatch' WHEN 'F03' THEN 'Not in Keystone' WHEN 'F04' THEN 'Billed after end date' WHEN 'F05' THEN 'Cost center differs' WHEN 'F06' THEN 'PID filled after end' WHEN 'F07' THEN 'Two active PID records' WHEN 'F08' THEN 'Ended in Keystone only' WHEN 'F09' THEN 'Active in Keystone only' END,
+    s.sk_part,
+    s.sk_level,
+    s.sk_point
+FROM (SELECT 'Link' AS sk_part, l.*, n.sk_point FROM (SELECT CAST(1 AS INT) AS sk_level, f.flag_code, f.flag_label, f.flag_name, f.risk, f.risk_order, p.place, p.place_order, p.place_label
+           FROM (SELECT DISTINCT flag_code, flag_label, flag_name, risk, risk_order FROM rpt.vw_cw_gap_close) AS f CROSS JOIN (SELECT DISTINCT place, place_order, place_label FROM rpt.vw_cw_gap_close) AS p
+         UNION ALL
+         SELECT CAST(2 AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), r.risk, r.risk_order, p.place, p.place_order, p.place_label
+           FROM (SELECT DISTINCT risk, risk_order FROM rpt.vw_cw_gap_close) AS r CROSS JOIN (SELECT DISTINCT place, place_order, place_label FROM rpt.vw_cw_gap_close) AS p) AS l
+       CROSS JOIN (VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12), (13), (14), (15), (16), (17), (18), (19), (20), (21), (22), (23), (24), (25), (26), (27), (28), (29), (30), (31), (32), (33), (34), (35), (36), (37), (38), (39), (40), (41), (42), (43), (44), (45), (46), (47), (48), (49)) AS n(sk_point)
+     UNION ALL
+     SELECT k.sk_part, d.*, k.sk_point FROM (SELECT CAST(1 AS INT) AS sk_level, flag_code, flag_label, flag_name, risk, risk_order, CAST(NULL AS VARCHAR(400)) AS place, CAST(NULL AS INT) AS place_order, CAST(NULL AS VARCHAR(400)) AS place_label FROM (SELECT DISTINCT flag_code, flag_label, flag_name, risk, risk_order FROM rpt.vw_cw_gap_close) AS f
+         UNION ALL SELECT CAST(2 AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), risk, risk_order, CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), CAST(NULL AS VARCHAR(400)) FROM (SELECT DISTINCT risk, risk_order FROM rpt.vw_cw_gap_close) AS r
+         UNION ALL SELECT CAST(3 AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), place, place_order, place_label FROM (SELECT DISTINCT place, place_order, place_label FROM rpt.vw_cw_gap_close) AS p) AS d
+       CROSS JOIN (VALUES ('Node', 0), ('Node', 1), ('Node', 2), ('Node', 3), ('Label', 0)) AS k(sk_part, sk_point)
+     UNION ALL
+     SELECT 'Header', h.sk_level, CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), CAST(NULL AS VARCHAR(400)), CAST(0 AS INT)
+       FROM (VALUES (1), (2), (3)) AS h(sk_level)) AS s
