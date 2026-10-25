@@ -623,6 +623,8 @@ Dashboard #3 (Workforce Planning, published Oct 23) taught us two things about p
 
 **Status (Oct 24, 2026): built, reviewed against 14.11 and published** at the same URL. All click tests passed. Corrections found while building are folded in below: `Rail View` must keep `Close Panel` on Detail, `WF Caption` is an unused leftover (not an R1 item), and the navy that was published (see R3).
 
+**Next time you republish #2 (found while finishing #1, Oct 24):** (1) `d2_field_capsule` now has a drawn chevron (`make_d1_d2_chevrons.py`); apply it to `Period Field` and `Group Field`, delete the typed `▾` and keep one label run each, as in #1 section 14.14 item 1. (2) Open the Info popover on Tableau Public and check that the text is not cut off: #1's needed 29 px more height online than in Desktop. (3) `Info Button` and `Group Panel` have tooltip command buttons on, which shows a "Keep Only / Exclude" toolbar on hover online; untick **Include command buttons** on both.
+
 ### 14.1 What each picker does today, and what it will do
 
 | Picker | Today (checked in your saved .twb, Oct 24) | After this section |
