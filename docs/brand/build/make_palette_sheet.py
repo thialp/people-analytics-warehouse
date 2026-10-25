@@ -14,7 +14,7 @@ USE = {
     "Arcadia 1 Categorical": "Roles: growth, decline, movement, one highlight",
     "Arcadia 2 Categorical Extended": "Identity for up to nine groups",
     "Arcadia 3 Categorical Light": "Large labelled fills (Sankey flags); Tableau 10/20 colours only",
-    "Arcadia 4 Systems": "Bridgeway, Keystone, System feed; Tableau 10 colours",
+    "Arcadia 4 Systems": "Bridgeway, Keystone, System feed; Tableau Hue Circle colours",
     "Arcadia 5 Status": "On track, watch, at risk, no status",
     "Arcadia 6 Neutrals": "Navy to white: ink, rail, borders, text, totals, page, card",
     "Arcadia 7 Teal Sequential": "Magnitude",
@@ -23,10 +23,10 @@ USE = {
 }
 LABELS = {
     "Arcadia 3 Categorical Light": ["T20 #12", "T20 #5", "T20 #4", "T20 #11", "T20 #16", "T20 #6", "T20 #18", "T20 #8", "T20 #2"],
-    "Arcadia 4 Systems": ["Bridgeway · T10 #2", "Keystone · T10 #1", "Feed · T10 #4"],
+    "Arcadia 4 Systems": ["Bridgeway · HC 10th", "Keystone · HC 18th", "Feed · HC 4th"],
     "Arcadia 5 Status": ["On track", "Watch", "At risk", "No status"],
     "Arcadia 6 Neutrals": ["Navy", "Navy 2", "Slate", "Text gray", "Steel", "Silver", "Mist",
-                           "Warm gray", "Tableau gray", "Hairline", "Page", "Card", "White"],
+                           "Warm gray", "Miller slate", "Hairline", "Page", "Card", "White"],
 }
 
 

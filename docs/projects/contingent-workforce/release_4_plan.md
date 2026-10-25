@@ -372,7 +372,7 @@ Three sets on the one data source; an empty set means All; a click adds or remov
 
 ### Phase 9: Figma
 
-The mock, matching the prototype, in the Arcadia palettes (`docs/brand/Preferences.tps`, nine palettes, colour-blind checked): flags in *Arcadia 3 Categorical Light*, risks Tableau gray `#BAB0AC`, places and the ticket card in *Arcadia 4 Systems*, the rail and text in *Arcadia 6 Neutrals*. The prototype's own shades (`#EF9F27`, `#7F77DD`, `#1D9E75`, page `#F3F4F6`) move to the brand ones. The Sankey extension lists only Tableau's built-in palettes (spike S3), so palettes 3 and 4 are made of Tableau 10 and 20 colours: Bridgeway orange `#F28E2B`, Keystone blue `#4E79A7`, System feed teal `#76B7B2`.
+The mock, matching the prototype, in the Arcadia palettes (`docs/brand/Preferences.tps`, nine palettes, colour-blind checked): flags in *Arcadia 3 Categorical Light*, risks Miller slate `#4F6980`, places and the ticket card in *Arcadia 4 Systems*, the rail and text in *Arcadia 6 Neutrals*. The prototype's own shades (`#EF9F27`, `#7F77DD`, `#1D9E75`, page `#F3F4F6`) move to the brand ones. The Sankey extension lists only Tableau's built-in palettes (spike S3), so the Sankey's colours come from Tableau's own palettes: flags from Tableau 20, risks Miller slate `#4F6980`, places from Hue Circle (Bridgeway amber `#F89217`, Keystone violet `#7873C0`, System feed teal `#21B087`). Labels black (one font colour for every level). Tooltips: the canvas board *Sankey tooltips* and the spike guide (S3).
 
 ### Phase 10: build plan
 

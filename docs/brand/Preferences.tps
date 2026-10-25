@@ -54,13 +54,14 @@
       <color>#A0CBE8</color>
     </color-palette>
 
-    <!-- 4. The systems, wherever they appear: Bridgeway (vendor system) orange, Keystone
-            (HR system) blue, the system feed teal. Tableau 10 colours, so the Sankey extension
-            can use them; checked for color-blind separation as a set. White text on Keystone. -->
+    <!-- 4. The systems, wherever they appear: Bridgeway (vendor system) amber, Keystone
+            (HR system) violet, the system feed teal. All three from Tableau's Hue Circle
+            palette, so the Sankey extension can use them; checked for color-blind separation
+            as a set. Black text on all three. -->
     <color-palette name="Arcadia 4 Systems" type="regular">
-      <color>#F28E2B</color>
-      <color>#4E79A7</color>
-      <color>#76B7B2</color>
+      <color>#F89217</color>
+      <color>#7873C0</color>
+      <color>#21B087</color>
     </color-palette>
 
     <!-- 5. Status: on track, watch, at risk, no status. Always with a word ("Low risk"). -->
@@ -73,7 +74,7 @@
 
     <!-- 6. Neutrals, dark to light: navy (brand ink, rail), navy 2 (controls on the rail),
             slate (borders on navy, secondary bars), text gray, steel, silver (dividers on navy),
-            mist, warm gray (totals), Tableau gray (the Sankey's middle column; in Tableau 10 too),
+            mist, warm gray (totals), Miller slate (the Sankey's middle column; from Tableau's Miller Stone),
             hairline, page, card, white. -->
     <color-palette name="Arcadia 6 Neutrals" type="regular">
       <color>#13233A</color>
@@ -84,7 +85,7 @@
       <color>#B8C0CD</color>
       <color>#D5DBE4</color>
       <color>#8C8A84</color>
-      <color>#BAB0AC</color>
+      <color>#4F6980</color>
       <color>#E4E3DD</color>
       <color>#F3F3EF</color>
       <color>#FBFBF8</color>

@@ -51,15 +51,39 @@ If the S1 workbook already exists, refresh its extract (Data > CW Reconciliation
 
 The extension (version 2.0, December 2025) sets colours per node, per level, in **Format Extension > Edit Colors**. A ribbon takes the colour of the node it leaves.
 
-1. The extension lists only Tableau's own palettes (checked 2026-10-25: the Arcadia palettes show under Tableau's Edit Colors, not the extension's). So the Arcadia palettes the Sankey needs are built from Tableau 10 and Tableau 20 colours. In **Edit Colors**, pick the data item, the palette, then the swatch, as in the table in `docs/brand/README.md` (Dashboard #4):
-   - `flag_label`, from Tableau 20: 01 light red, 02 green, 03 light orange, 04 red, 05 light pink, 06 light green, 07 light purple, 08 yellow, 09 light blue
-   - `risk`, from Tableau 10: gray for every risk
-   - `place_label`, from Tableau 10: Bridgeway orange, Keystone blue, System feed teal
-2. Look for a setting that colours links by their **target** node. The ribbons from a risk to a place should take the place's colour; by default a ribbon takes the colour of the node it leaves (grey here). Record which it is.
-3. Level width about 150 so the labels sit inside the nodes; node labels show the value and the percentage of total (version 2.0 option).
-4. Tooltip: `flag_label`, `flag_rank`, `flag_rank_prior_close`, `flag_count_prior_close`, `SUM(gaps)`.
+1. The extension lists only Tableau's own palettes (checked 2026-10-25: the Arcadia palettes show under Tableau's Edit Colors, not the extension's). So every Sankey colour is a swatch in one of Tableau's palettes. In **Edit Colors**, pick the data item, the palette, then the swatch, as in the table in `docs/brand/README.md` (Dashboard #4):
+   - `flag_label`, from **Tableau 20**: 01 light red, 02 green, 03 light orange, 04 red, 05 light pink, 06 light green, 07 light purple, 08 yellow, 09 light blue
+   - `risk`, from **Miller Stone**: the 1st swatch, slate `#4F6980`, for every risk
+   - `place_label`, from **Hue Circle**: Bridgeway amber `#F89217` (10th), Keystone violet `#7873C0` (18th), System feed teal `#21B087` (4th)
+   Check each swatch's hex in the colour picker; if one differs, send a screenshot of the palette and I will match it.
+2. **Font:** one colour for every label in the extension, so keep it **black**. White would vanish on the light flags. Black on the slate middle is 3.7:1; if it reads weak on Tableau Public, switch the risks to Miller Stone's 2nd swatch, `#849DB1`.
+3. Look for a setting that colours links by their **target** node. The ribbons from a risk to a place should take the place's colour; by default a ribbon takes the colour of the node it leaves (slate here). Record which it is.
+4. Level width about 150 so the labels sit inside the nodes; node labels show the value and the percentage of total (version 2.0 option).
+5. **Tooltip.** The design is the board *Sankey tooltips* on the prototype canvas: three cards (a flag, a risk, a place). Each system's name is written in its own colour, so the tooltip ties back to the Sankey: Bridgeway `#B86400`, Keystone `#5650A0`, System feed `#0E7D5F` (darker shades of the place colours, readable on white). Worse or missing in coral `#B8401F`, unchanged in gray `#5A6170`, titles navy `#13233A`. All calculations work on the Gap rows; keep the dashboard filters **in context** (right-click > Add to Context) so the FIXED totals follow them.
 
-**Pass:** the colours hold after a filter change (version 2.0 fixed colour persistence), risk-to-place ribbons can take the place's colour, flag 09's label is readable, and the tooltip shows the rank and the prior close. Send a screenshot of the Edit Colors panel too.
+   | Calculation | Formula |
+   |---|---|
+   | `Tip Gaps` | `SUM([gaps])` |
+   | `Tip Share` | `SUM([gaps]) / MIN({FIXED : SUM([gaps])})` (format as percentage, 0 decimals) |
+   | `Tip Is Flag` | `COUNTD([flag_label]) = 1` (the mark is one flag) |
+   | `Tip Title` | `IF [Tip Is Flag] THEN MIN([flag_label]) ELSEIF COUNTD([risk]) = 1 AND COUNTD([place]) > 1 THEN MIN([risk]) ELSE MIN([place_label]) END` |
+   | `Tip Rank` | `IF [Tip Is Flag] THEN "Rank " + STR(MIN([flag_rank])) + " of 9" END` |
+   | `Tip Rank Worse` (coral) | `IF [Tip Is Flag] AND MIN([flag_rank]) < MIN([flag_rank_prior_close]) THEN "up from " + STR(MIN([flag_rank_prior_close])) + " at the prior close (" + STR(MIN([flag_count_prior_close])) + ")" END` |
+   | `Tip Rank Better` (teal `#0E7D5F`) | same, with `>` and "down from" |
+   | `Tip Rank Same` (gray) | same, with `=` and "same rank as the prior close (" ... ")" |
+   | `Tip Year Ago` | `IF [Tip Is Flag] THEN "A year ago: " + STR(MIN([flag_count_year_ago])) + " gaps, rank " + STR(MIN([flag_rank_year_ago])) END` |
+   | `Tip Puts At Risk` | `IF [Tip Is Flag] THEN "Puts at risk: " + MIN([risk]) END` |
+   | `Tip Bridgeway` (Bridgeway colour) | `IF SUM(IIF([place] = "Bridgeway", [gaps], 0)) > 0 THEN "Bridgeway (vendor system) " + STR(SUM(IIF([place] = "Bridgeway", [gaps], 0))) END` |
+   | `Tip Keystone`, `Tip System Feed` | same, for `Keystone` and `System feed` |
+   | `Tip From` | `IF NOT [Tip Is Flag] THEN "From " + STR(COUNTD([flag_label])) + " flags" END` |
+   | `Tip Feed Causes` | `IF MIN([place]) = "System feed" AND MAX([place]) = "System feed" THEN STR(SUM(IIF([timing_class] = "Feed event failed", [gaps], 0))) + " failed feed events, " + STR(SUM(IIF([timing_class] = "Load failed", [gaps], 0))) + " failed loads" END` |
+   | `Tip No Ticket` (coral) | `IF SUM(IIF([has_ticket], 0, 1)) > 0 THEN STR(SUM(IIF([has_ticket], 0, 1))) + " with no ticket" END` |
+   | `Tip Over 90` | `IF SUM(IIF([days_open] > 90, 1, 0)) > 0 THEN STR(SUM(IIF([days_open] > 90, 1, 0))) + " open more than 90 days" END` |
+   | `Tip Next Step` | `IF [Tip Is Flag] THEN "Next step: " + MIN([next_step]) ELSEIF MIN([place]) = "System feed" AND MAX([place]) = "System feed" THEN "Worked by Data Engineering" ELSE "Next steps differ by gap: see the gap list" END` |
+
+   Layout (Tooltip editor, one field per line; empty fields leave no line): **Tip Title** (navy, bold, 13) / **Tip Gaps** gaps, **Tip Share** of all gaps / Tip Rank + Tip Rank Worse + Tip Rank Better + Tip Rank Same on one line / Tip Year Ago / Tip Puts At Risk / "Aligned in:" + Tip Bridgeway + Tip Keystone + Tip System Feed, each in its colour / Tip From / Tip Feed Causes / Tip No Ticket, Tip Over 90 / Tip Next Step (gray, italic). Command buttons off. If the extension's tooltip takes only fields (no rich text), put the colours on the Gap list's tooltip instead and record it.
+
+**Pass:** the colours hold after a filter change (version 2.0 fixed colour persistence), risk-to-place ribbons can take the place's colour, flag 09's label is readable, and the tooltip shows the rank, the prior close and the colours per system. Send a screenshot of the Edit Colors panel too.
 
 **Fallback:** risk-to-place ribbons stay grey; the place colour is on the place nodes only.
 
