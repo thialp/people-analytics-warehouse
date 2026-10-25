@@ -41,7 +41,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | Step | What | Who | Size | State |
 |---:|---|---|---|---|
 | 0 | Data: generator, warehouse, SQL Server, Custom SQL, check tables, prototype (release plan phases 1 to 6) | Claude, Thiago on the Mac | | **Done** (88 of 88 tests, 35 of 35 SQL Server checks, prototype approved) |
-| 1 | Spikes S1 to S7 | Both | S | S1, S2, S3, S7 **passed**. S2b in 13.4; S4, S5, S6 in their sections |
+| 1 | Spikes S1 to S7 | Both | S | S1, S2, S3, S7 **passed** (S3 after the levels lost their counts, 9.3). S2b in 13.4; S4, S5, S6 in their sections |
 | 2 | Workbook and data source | Thiago | S | Done in the spike workbook; step 2 makes it the real one |
 | 3 | Parameters | Claude | S | **Written into the workbook** 2026-10-25 (10; `kpi_` in step 9) |
 | 4 | Calculations | Claude | M | **Written into the workbook** 2026-10-25 (211 new; the 21 spike label and tooltip calcs rewritten in place) |
@@ -616,7 +616,9 @@ Format Extension > Edit Colors, per level and node (pick the palette, then the s
 | What it puts at risk | all five | Miller Stone | 1st, slate `#4F6980` |
 | Where it is aligned | Bridgeway (vendor system) · Keystone (HR system) · System feed (integration) | Hue Circle | 10th amber `#F89217` · 18th violet `#7873C0` · 4th teal `#21B087` |
 
-**The persistence test failed on 2026-10-25, and the levels lost their counts.** The extension saves each colour under the node's full text, so with the count in the text ("One person, two IDs (28)") the same flag at Dec 2024 ("(22)") or under `|Marketing|` ("Order open or billed after the end date (2)") is a new node with a default colour. The three level fields are therefore plain names (7.6): `What differs` = `flag_name`, `What it puts at risk` = `risk`, `Where it is aligned` = `place_label`, each with its anchor version. A node keeps its colour at every close and under every filter. `tableau/build/d4_fields/patch_levels.py` made the change in the workbook and carried the nine flag, five risk and three place colours already chosen over to the new names.
+**Persistence test: failed, fixed and passed on 2026-10-25.** Re-run after the fix at Jun 2026 with `|Marketing|`, Dec 2024 with `|Marketing|` and Dec 2024 with every group: the same colours in all three, places in the order Bridgeway, Keystone, System feed (System feed absent for Marketing, no empty node).
+
+**What failed first, and why the levels lost their counts.** The extension saves each colour under the node's full text, so with the count in the text ("One person, two IDs (28)") the same flag at Dec 2024 ("(22)") or under `|Marketing|` ("Order open or billed after the end date (2)") is a new node with a default colour. The three level fields are therefore plain names (7.6): `What differs` = `flag_name`, `What it puts at risk` = `risk`, `Where it is aligned` = `place_label`, each with its anchor version. A node keeps its colour at every close and under every filter. `tableau/build/d4_fields/patch_levels.py` made the change in the workbook and carried the nine flag, five risk and three place colours already chosen over to the new names.
 
 The count now comes from the extension's own value label (Format Extension, the level label setting; it shows the node size from `Sankey Weight`, anchors weigh 0). `Flag Text`, `Risk Text`, `First Flag Text` and `First Risk Text` no longer feed the levels; leave them, they are harmless.
 
