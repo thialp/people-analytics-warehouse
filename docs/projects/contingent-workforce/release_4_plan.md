@@ -281,7 +281,7 @@ A Design canvas with three 1400 × 850 boards, built from the marts: **Current (
 
 What it settles for review: the funnel order, place colours on ribbons and dots, the five KPI cards with their sub-lines, the headline and the movement line, the timeline with the target and the selected close, and the gap list's columns.
 
-**Revision 3** (after spike S1): the title, controls and Reset move from the top banner to a **vertical rail on the left**, as on the Compensation Walk, so the Sankey gets the page's full height. The Sankey is drawn the way the extension draws it: flags 01 to 09, risks and places in alphabetical order, each node with its count and share, a ribbon in the colour of the node it leaves (flags in their place's colour, risks in navy, places in theirs).
+**Revision 3** (after spike S1): the title, controls and Reset move from the top banner to a **vertical rail on the left**, as on the Compensation Walk, so the Sankey gets the page's full height. The Sankey is drawn the way the extension draws it: flags 01 to 09, risks and places in alphabetical order, labels inside the nodes with the count and share. Colours: nine flag colours from one palette, risks grey, places in their own colours, and the ribbons from a risk to a place in the place's colour (spike S3 confirms the extension can colour those ribbons by where they end; if not, they stay grey and only the place nodes carry the colour).
 
 ---
 
@@ -312,7 +312,7 @@ An outside review of the three published dashboards (Headcount & FTE Walk, Compe
 | Proposal | Decision |
 |---|---|
 | One dot per open **gap**, aged by gap age, with a "no ticket" row | Kept the agreed design: one dot per open **ticket**, by the group working it and its age. Gap age is already KPI 5 and the gap list; the card answers who is working and for how long, which nothing else on the page does |
-| Six risk colours on the left ribbons, place colours on the right | Kept one colour story: colour means where to align, everywhere on the page. Risks are labelled in the middle column and drawn in navy, so they never compete with the places. (The extension colours a ribbon by the node it leaves, so flags carry their place's colour) |
+| Six risk colours on the left ribbons, place colours on the right | Adopted in part (revision 3, Thiago's call): nine flag colours on the left, risks grey, place colours on the right. Colour still means where to align on the right side, the ticket card and the gap list |
 | KPI 3 as the total number of gaps | The total is the Sankey's headline; KPI 3 stays "open since the prior close" because Finance asks whether the same problems keep coming back |
 | Drop the go / no-go wording | Kept for Finance (agreed), with the hover in L10 |
 
@@ -361,7 +361,7 @@ Run on a small workbook on the dashboard's Custom SQL (local SQL Server, extract
 |---|---|---|---|
 | S1 | Sankey extension: node order | **Done, 2026-10-25.** The first column follows its pill sort; columns 2 and 3 ignore theirs and follow first appearance in the first column's order (reproduced in code from four screenshots, percentages included). Without a measure each row counts 1, so `SUM(gaps)` is required | Led to revision 3: the data is built so all three columns read alphabetically |
 | S2 | Sankey extension: a click drives a filter or set action | Clicking a flag, risk or place filters the gap list | KPI cards and the ticket card's rows drive the gap list |
-| S3 | Sankey extension: colours (Edit Colors, version 2.0) and tooltip | Each flag in its place's colour, risks navy, places in theirs; tooltip shows count, share, rank and prior close | Default palette; place colour on the place nodes only |
+| S3 | Sankey extension: colours (Edit Colors, version 2.0) and tooltip | Nine flag colours, risks grey, places in theirs, risk-to-place ribbons in the place's colour; labels inside the nodes; tooltip shows count, share, rank and prior close | Risk-to-place ribbons grey, place colour on the place nodes only |
 | S4 | Set-action multi-select popover on the web | Adding and removing members is quick, the tick shows | Native multi-value filters styled close to the capsules |
 | S5 | Ticket dots at 141 per cell | Readable at 2.5 px dots on the packed grid; hover hits the right dot | Smaller cells, or a count per cell with dots on hover |
 | S6 | Extract size and speed | The 65,435-row extract publishes under Tableau Public's limits and the page loads in under 5 seconds | Drop the Gap rows of closes older than 25 months from the extract (the replay keeps two years) |

@@ -52,15 +52,16 @@ If the S1 workbook already exists, refresh its extract (Data > CW Reconciliation
 The extension (version 2.0, December 2025) sets colours per node, per level, in **Format Extension > Edit Colors**. A ribbon takes the colour of the node it leaves.
 
 1. **Edit Colors**, level by level:
-   - Flags in the colour of the place they mostly go to: 01, 04, 05 Bridgeway amber `#EF9F27`; 02, 06, 07, 09 Keystone violet `#7F77DD`; 03, 08 system feed teal `#1D9E75`
-   - Risks all navy `#4A5B73` (so they never compete with the places)
+   - Flags, nine colours: 01 `#6A8FD0`, 02 `#4FB3A9`, 03 `#8CC07A`, 04 `#B5C95A`, 05 `#E48B6E`, 06 `#D77AA8`, 07 `#8F98DA`, 08 `#7FB8E6`, 09 `#C2A27A`
+   - Risks all grey `#6B7280`
    - Places: Bridgeway `#EF9F27`, Keystone `#7F77DD`, System feed `#1D9E75`
-2. Node labels: show the value and the percentage of total (version 2.0 option), if the label fits.
-3. Tooltip: `flag_label`, `flag_rank`, `flag_rank_prior_close`, `flag_count_prior_close`, `SUM(gaps)`.
+2. Look for a setting that colours links by their **target** node. The ribbons from a risk to a place should take the place's colour; by default a ribbon takes the colour of the node it leaves (grey here). Record which it is.
+3. Level width about 150 so the labels sit inside the nodes; node labels show the value and the percentage of total (version 2.0 option).
+4. Tooltip: `flag_label`, `flag_rank`, `flag_rank_prior_close`, `flag_count_prior_close`, `SUM(gaps)`.
 
-**Pass:** the colours hold after a filter change (version 2.0 fixed colour persistence), flag 09's label is readable, and the tooltip shows the rank and the prior close. Send a screenshot of the Edit Colors panel too.
+**Pass:** the colours hold after a filter change (version 2.0 fixed colour persistence), risk-to-place ribbons can take the place's colour, flag 09's label is readable, and the tooltip shows the rank and the prior close. Send a screenshot of the Edit Colors panel too.
 
-**Fallback:** the default palette, with the place colour on the place nodes only.
+**Fallback:** risk-to-place ribbons stay grey; the place colour is on the place nodes only.
 
 ## S4. Set-action multi-select, on the web
 
@@ -100,7 +101,7 @@ The extension (version 2.0, December 2025) sets colours per node, per level, in 
 |---|---|---|
 | S1 | Done | re-check on revision 3: all three columns alphabetical, flag 09 visible? |
 | S2 | | one click carries which fields? |
-| S3 | | node colours set per level? hold after a filter? flag 09 label fits? tooltip? |
+| S3 | | node colours set per level? risk-to-place ribbons by target? hold after a filter? flag 09 label fits? tooltip? |
 | S4 | | add / remove speed, tick, empty set = All? |
 | S5 | | readable at what size? hover correct? |
 | S6 | | published? load seconds (cold, warm) |
