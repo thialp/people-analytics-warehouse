@@ -8,7 +8,7 @@
     rpt.vw_itsm_ticket_close   Helix tickets open at each close, placed for the ticket card
 
   Thin reads of the dw tables 03d builds, in the DuckDB marts' column names, so a workbook built on
-  data/marts/*.csv can switch to SQL Server with Data > Replace Data Source. Checked row for row
+  the data/marts CSV files can switch to SQL Server with Data > Replace Data Source. Checked row for row
   against the DuckDB marts by sqlserver/check_tsql_in_duckdb.py.
   Arcadia Systems, Keystone HR, Bridgeway VMS and Helix Service Desk are fictional; all data is synthetic.
 */
