@@ -18,7 +18,7 @@ Companion guide: [Dashboard #2 rebuild](../compensation-walk/release_3_rebuild_d
 
 **Dashboard #1 is rebuilt and published:** [https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard). Sections 1 to 8 and 10 are done: top bar and popovers, waterfall (Summary | By driver), five KPI cards with hover tooltips, Trend and Turnover, layout aligned to the KPI grid. The published page was checked against section 11 for Employees, Contingent and Total (FY26 and FY25 Q3), Commercial and Finance; every figure ties to the cards, waterfall, trend and Dashboard #2.
 
-**Next change (Oct 24, 2026):** the popovers get the two improvements proven on Dashboard #3: organised popovers (fixed row slots, one shared frame) and a Group popover that browses first and applies on a group click. Everything is in [section 14](#14-popover-carryback-from-dashboard-3-oct-24-2026); nothing else on the page changes.
+**Popover carryback (Oct 24, 2026): built, reviewed against 14.11 and published** at the same URL. The popovers now have the two improvements proven on Dashboard #3: organised popovers (fixed row slots, one shared frame) and a Group popover that browses first and applies on a group click. All click tests passed. What changed from the plan while building is in [14.14](#1414-as-built-and-what-to-carry-forward); nothing else on the page changed.
 
 **Open follow-ups (small):** (1) `Period Name` still prints "Jan 2025 – Mar 2025" for a quarter while the Period field says "FY25 Q3"; see 8.5 for the quarter branch. (2) Apply the same toggle, KPI hover tooltips and type rule to Dashboard #2. (3) Cleanup of leftover calcs, sheets and actions: see section 13.
 
@@ -1336,6 +1336,8 @@ Dashboard #3 (Workforce Planning, published Oct 23) taught us two things about p
 
 **Change B, browse first, apply on a group click.** Clicking a view only browses (a new parameter, `p_ViewTab`) and the page does not move. Clicking a group applies the view and the group together and closes the popover. "All organizations" has no groups, so it applies at once. Nothing defaults to the first country, function or office alphabetically any more.
 
+**Status (Oct 24, 2026): built, reviewed and published.** Changes from the plan below are in 14.14: drawn-chevron capsule (the typed `▾` is gone), the Info button stays an "i", the Info popover is taller on Tableau Public, and a note on the Info tooltip toolbar.
+
 ### 14.1 What each picker does today, and what it will do
 
 | Picker | Today (checked in your saved .twb, Oct 24) | After this section |
@@ -1357,7 +1359,7 @@ Why Group applied on the first click: `Set view` and `Set group from view` both 
 | R4 | **One navy, `#13233A`**: the file has `#13223A` (header band, Info body), `#13203B` (Period Panel and Group Panel sheets) and `#12213B` (toggle); popovers should match the band exactly or you see a seam | Popovers hang from the band, so a one-digit difference shows as a line | Format only |
 | R5 | `Group Heading 2` still holds a typed run `SELECT PERIOD`; make sure the label is only `<Panel Title>` | A typed run beats the field and would print the wrong heading | Check |
 
-Not changing (so you do not wonder): the typed `▾` in `Period Field` and `Group Field` (a drawn chevron like #3's capsule is possible later, `d1_field_capsule.png` already exists, but it is not part of this job); the calibrated `kpi_FitX` 1.082 and `kpi_ShiftX` -12 (those are #1's own); `Set collapse` (leave it alone).
+Not changing (so you do not wonder): the typed `▾` in `Period Field` and `Group Field` (this was done at the end of the job after all: see 14.14, item 1); the calibrated `kpi_FitX` 1.082 and `kpi_ShiftX` -12 (those are #1's own); `Set collapse` (leave it alone).
 
 **Known and left alone.** `Group Panel` lists every group that ever existed (Department 31, Country 22 across all periods), while a single period has 30 to 31 departments and 19 to 22 countries. A group that did not exist in the selected period is still clickable and gives an empty page. This predates the job and needs a period filter on the picker source; flagged for later.
 
@@ -1681,3 +1683,16 @@ Save the workbook, tell me, and I read the file. I check these and report pass o
 ### 14.13 What this section does not touch
 
 The data sources and Custom SQL; the waterfall, KPI cards, trend, turnover and tie-out; the header layout (6.8); the other `Reset` defaults (only `Default Group` changes, and `p_ViewTab` is added to the reset); Dashboard #2 (its rail is a different shape and gets its own pass, with one open decision on what a rail view click does); and any number on the page.
+
+### 14.14 As built, and what to carry forward
+
+Published Oct 24, 2026 at the same URL. These are the differences from the plan above, in the order they came up.
+
+1. **Drawn-chevron capsule.** `d1_field_capsule` now has the chevron drawn into the image (generator `docs/brand/build/make_d1_d2_chevrons.py`; `d2_field_capsule` got the same). #1's capsule is 180 px wide (#3's is 200), so the chevron sits **12 px** from the right edge instead of 18, which leaves the label about 11 px of clearance. The labels are one run each, `<Period Field Text>` or `<Group Field Text>`, Tableau Semibold, navy, Center and Middle, with no typed `▾`, no trailing spaces and no stray glyph. Two calc changes keep the text short: `Group Field Text` cuts at 17 letters plus "…" (`IF [p_View] = "Company" THEN "All organizations" ELSEIF LEN([p_Group]) > 18 THEN LEFT([p_Group], 17) + "…" ELSE [p_Group] END`), and `Period Field Text` is `REPLACE([Pair Name], " to ", " – ")`, which saves about 8 px (the grid and subtitles keep "to"). Shape: `Arcadia D1 > d1_field_capsule`, Size slider all the way right.
+2. **Info button is only an "i".** Taking the ✕ glyph off the button (it swapped on `Info Shape` while the popover was open) was a request after the first build: the popover's own ✕ (`Popover Close Info`, action 37) closes it. The `Info` sheet has no `Info Shape` on the Shape shelf and a single shape. Clicking the "i" while the popover is open still toggles it shut (`Toggle Info`), which is harmless.
+3. **Info popover is taller on Tableau Public.** The text was cut off at the bottom online although it fit in Desktop (the web renders the Book 10 body slightly wider and wraps more). It was published at **x 960, y 76, w 408, h 600** instead of 410 x 571 (body 547 instead of 518). Rule for #2 and #3: after publishing, open the Info popover on the web and leave at least 15% spare height. If you republish from your local file, apply the same size there first, or the next publish brings back 571.
+4. **Group footer.** A footer text object needs a **fixed height** to hold 28 px: left alone, Tableau sized it to 25 px with a 4 px outer margin. Set Outer padding 0, Inner padding left 16 and top 6, and the height 28 (the Period footer was already correct).
+5. **One navy, typed.** The Tableau colour picker rounds: typing `#13243A` into the Info popover background saved as `#132539`, one unit off and invisible, with no border. The Header Band and the Period and Group popovers are `#13243A`; the published navy is therefore not the `#13233A` in R4 above (same as #2).
+6. **`Info` tooltip toolbar (to fix on the next dashboard).** On Tableau Public, hovering the Info button shows the "Keep Only / Exclude" command toolbar. Cause, found in the saved .twb: the `Info` sheet's tooltip has command buttons on (`<customized-tooltip>`), while `Reset`, `Period Field`, `Group Field`, `Workforce Toggle` and `Detail Toggle` have them off (`show-buttons='false'`). Fix: `Info` sheet > Tooltip > untick **Include command buttons**. #2's `Info Button` and `Group Panel` have the same default. Not changed in this release.
+7. **`View List` Detail.** `Default Group` and `Close Panel` were left on its Detail; nothing reads them there, so it is harmless, and 14.6 says to remove them.
+8. **Counts as built.** 38 Change Parameter actions and 21 Deselect, 27 parameters; no arrows anywhere in calcs, labels or text.
