@@ -262,7 +262,19 @@ def static_checks() -> bool:
         for line in re.findall(r"^\s*PRINT\b[^;]*\(\s*SELECT\b", text, flags=re.I | re.M):
             ok = False
             print(f"   FAIL  {path.name}: PRINT holds a subquery: {line.strip()[:60]}")
-    print("   primary keys, text lengths, PRINT and STRING_AGG orderings: "
+    for path in sorted((ROOT / "sqlserver").glob("*.sql")):   # T-SQL nests /* */ (Msg 113); a path like marts/*.csv in a comment opens a second level
+        depth = 0
+        for tok in re.finditer(r"/\*|\*/", path.read_text()):
+            depth += 1 if tok.group() == "/*" else -1
+            if depth > 1:
+                ok = False
+                print(f"   FAIL  {path.name}: a '/*' inside a block comment (T-SQL nests them) near character {tok.start()}")
+                break
+        else:
+            if depth != 0:
+                ok = False
+                print(f"   FAIL  {path.name}: unbalanced block comment")
+    print("   primary keys, text lengths, PRINT, STRING_AGG orderings and comments: "
           + ("all fit SQL Server's rules" if ok else "see above"))
     return ok
 
