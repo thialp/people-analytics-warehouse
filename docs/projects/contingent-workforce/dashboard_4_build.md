@@ -54,7 +54,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | **5** | **Dashboard shell: rail, KPI band, three cards, footnote, with placeholders; the Sankey in its tile (section 8)** | Thiago | S | **Done 2026-10-26.** Rail items R1 to R27 written by `tableau/build/d4_fields/build_rail.py` (fixed heights sum to 850 with one flexible gap), card title placeholders for Timeline and Tickets, checked on screen. The three test parameter controls stay until step 7 |
 | 6 | The Sankey, **native v2** (section 9N.0): extension look, path highlight. Version A, the extension (section 9), stays in the workbook | Claude, Thiago | M | **Done** 2026-10-26: on the page, follows every filter, highlight and the four click actions are in. Open: ribbon and border colours (later), the select-and-fade click (step 14, `zz` deselect) |
 | 7 | Rail controls | Claude, Thiago | M | **Drawn 2026-10-26** (checked on screen): the eight sheets `Close Field`, `Function Field`, `Department Field`, `Country Field`, `Show Toggle`, `Reset`, `Info Button`, `Rail As Of` are on the rail, written by `tableau/build/d4_fields/build_rail_sheets.py` and `patch_rail_sheets.py`. They follow the page parameters (capsule words, replay note). **Clicks do nothing until the actions of step 14.** The three test parameter controls stay until then |
-| 8 | Popovers: Point in time, Function, Department, Country, Info | Thiago | L | Needs S4 |
+| 8 | Popovers: Point in time, Function, Department, Country, Info | Claude, Thiago | L | **Drawn 2026-10-26** (checked on screen with temporary open-flag controls): five floating popovers, their ✕ and Clear all sheets, year/month grid and the three tick lists, written by `build_popovers.py`, `build_popover_sheets.py`, `patch_popover_encodings.py`, `patch_popover_lists.py`. **Clicks do nothing until step 14; spike S4 (multi-select on Tableau Public) is still open and runs with the actions.** The five temporary controls (`p_*Open`) go with the three test controls |
 | 9 | KPI band and hovers | Thiago | M | |
 | 10 | Gap list and the toggle | Thiago | M | Needs S2b |
 | 11 | Timeline card | Thiago | S | |
@@ -1197,3 +1197,23 @@ What Tableau taught us when a script writes sheets (keep for the next dashboards
 7. Find a defect by making test copies, each with one part switched off (here, sheets in the workbook but not placed, then one sheet placed at a time).
 
 Next: step 8, the popovers, then the actions (step 14) that make the controls respond.
+
+---
+
+## Revision 12 (2026-10-26)
+
+Step 8: the five popovers are drawn. Dashboard #4 now shows and hides them from their `p_*Open` flags.
+
+What Tableau taught us (keep for the next dashboards):
+
+1. **Show/hide by value is a `<datagraph>`** after `</windows>`: per popover a `single-value-field-node` (the parameter) wired by an `edge` to a `dashboard-zone-visibility-node` (dashboard simple-id, zone id). It needs four flags in `document-format-change-manifest` (`DatagraphCoreV1`, `DatagraphNodeDashboardZoneVisibilityV1`, `DatagraphNodeSingleValueFieldV1`, `ZoneVisibilityControl`) or the file will not load (error D2E8DA72).
+2. **A colour field on a shape mark tints the custom shape.** State is carried by the shape alone (tick on / off / dim); names get one fixed colour.
+3. **Tableau drops a colour or shape assignment it has not seen made in the app.** After a hand assignment on one field in the sheet, rewriting the same entries in the saved file works. Hand-assign once, save, then patch.
+4. **Whitespace-only runs are stripped.** Put leading spaces in the same run as the field.
+5. **Table-calc lists** (Function Slot, Pick Col / Row) need every dimension in the view in the Compute Using order list, plus one entry per nested table calc, or each mark is its own partition.
+6. **A text zone's Æ marker** (D2's Info text) is Tableau's escape for runs that start or end with a space; copy it as written.
+7. A SQL column that exists only in the data source metadata (`cost_center_id`) still needs a `<column>` declaration in each sheet that uses it.
+
+Dim departments are shown by the dim tick only; the name is not dimmed (accepted).
+
+Next: step 9, the KPI band and hovers.
