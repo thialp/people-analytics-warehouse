@@ -7,6 +7,7 @@ Show Toggle (two marks), Reset, Info Button, Rail As Of (text). Each replaces th
 made by build_rail.py (same id, same geometry). Shapes come from the palette `Arcadia D4`. The three test parameter
 controls stay until the actions exist (step 14), because the sheets only draw the controls; clicks need the actions.
 """
+import os
 import re
 import sys
 import uuid
@@ -314,7 +315,7 @@ TOGGLE_STYLE = ("<zone-style>\n<format attr='border-color' value='#000000' />\n<
                 "<format attr='margin' value='0' />\n<format attr='background-color' value='#1b2d45' />\n</zone-style>")
 n_done = 0
 for ph, sh in PLACE.items():
-    if sh in SKIP:
+    if sh in SKIP or os.environ.get('NOSWAP'):
         continue
     m = re.search(r"<zone ([^>]*?)friendly-name='" + re.escape(ph) + r"'([^>]*)>", d)
     assert m, ph
