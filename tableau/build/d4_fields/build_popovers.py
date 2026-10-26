@@ -248,5 +248,13 @@ dg = (f"  <datagraph>\n    <graph>\n      <properties>\n        <default-executi
 assert '<datagraph>' not in s
 k = s.index('  </windows>\n') + len('  </windows>\n')
 s = s[:k] + dg + s[k:]
+# the visibility graph needs these feature flags in the document-format-change manifest (Tableau rejects <datagraph> without them)
+m0 = s.index('<document-format-change-manifest>')
+m1 = s.index('</document-format-change-manifest>')
+man = re.findall(r"    <[^>]+ />\n", s[m0:m1])
+for f in ('DatagraphCoreV1', 'DatagraphNodeDashboardZoneVisibilityV1', 'DatagraphNodeSingleValueFieldV1', 'ZoneVisibilityControl'):
+    if f"<{f} />" not in s[m0:m1]:
+        man.append(f"    <{f} />\n")
+s = s[:m0] + '<document-format-change-manifest>\n' + ''.join(sorted(man, key=lambda x: x.strip().replace("_.fcp.", "").lower())) + '  ' + s[m1:]
 open(out, 'w', encoding='utf-8').write(s)
 print('sheets', len(SHEETS), 'popovers', len(POP), 'last zone id', nid[0], 'dashboard id', dash_id)
