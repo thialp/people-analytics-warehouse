@@ -77,7 +77,7 @@ def inst(cap, kind='nk'):
 
 
 def sheet_xml(name, lods, text=(), shape=None, filters=(), cols=None, manual=None, hide_col=False,
-              shape_default=None, size='11.27', tooltip=None, label=None, label_align='center', mark='Shape',
+              shape_default=None, size='13.6', tooltip=None, label=None, label_align='center', mark='Shape',
               bg='#00000000', worksheet_font=None):
     """lods/text/filters: captions. shape: (caption, {bucket: file}) for a shape field. cols: caption."""
     used = list(dict.fromkeys(list(lods) + list(text) + [f[0] for f in filters] + ([cols] if cols else []) + ([shape[0]] if shape else [])))
@@ -117,7 +117,7 @@ def sheet_xml(name, lods, text=(), shape=None, filters=(), cols=None, manual=Non
         enc += f"              <text column='{ref[c][1]}' />\n"
     shape_enc = ''
     if shape:
-        shape_enc = f"          <encoding attr='shape' field='{ref[shape[0]][1]}' palette='Arcadia D4' type='shape'>\n"
+        shape_enc = f"          <encoding attr='shape' field='{ref[shape[0]][1]}' type='shape'>\n"
         for b, fnm in shape[1].items():
             shape_enc += f"            <map to='Arcadia D4/{fnm}.png'>\n              <bucket>&quot;{b}&quot;</bucket>\n            </map>\n"
         shape_enc += "          </encoding>\n"
