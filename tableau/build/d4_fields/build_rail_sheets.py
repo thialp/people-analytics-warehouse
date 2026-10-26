@@ -32,7 +32,7 @@ for m in re.finditer(r"      <column caption='([^']*)' datatype='(\w+)' name='(\
     CALC[m.group(1)] = (m.group(3), m.group(0), m.group(2))
 PARAM = {}
 for m in re.finditer(r"      <column caption='([^']*)'[^>]*name='(\[Parameter \d+\])'[^>]*>\n.*?\n      </column>\n", PARX, re.S):
-    PARAM[m.group(2)] = m.group(0)
+    PARAM[m.group(2)] = re.sub(r"\n\s*<members>.*?</members>", '', m.group(0), flags=re.S)   # a sheet's copy of a parameter has no member list
 CAP_OF = {v[0]: k for k, v in CALC.items()}
 
 
