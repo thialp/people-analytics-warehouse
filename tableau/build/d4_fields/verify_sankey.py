@@ -78,7 +78,7 @@ def to_sql(f, deps):
     return f
 
 
-NEED = ['Sk X', 'Sk Y', 'Sk Show', 'Sk Draw', 'Sk N']
+NEED = ['Sk X', 'Sk Y', 'Sk Show', 'Sk Draw', 'Sk N', 'Sk Node H']
 sql, order, seen = {}, [], set()
 def visit(n):
     if n in seen: return
@@ -93,25 +93,34 @@ con = duckdb.connect(os.path.join(ROOT, 'warehouse', 'arcadia.duckdb'), read_onl
 q = 'SELECT * FROM marts.mart_cw_reconciliation_dashboard'
 for i, n in enumerate(order):
     q = f'SELECT *, {sql[n]} AS "{n}" FROM ({q}) AS t{i}'
-rows = con.execute(f"""SELECT sk_part, sk_level, flag_code, risk, place, sk_point, "Sk X", "Sk Y", "Sk Draw", "Sk N"
+rows = con.execute(f"""SELECT sk_part, sk_level, flag_code, risk, place, sk_point, "Sk X", "Sk Y", "Sk Draw", "Sk N", "Sk Node H"
                        FROM ({q}) WHERE row_type = 'Sankey' AND "Sk Show" ORDER BY "Sk Draw", sk_part, sk_level, flag_code, risk, place, sk_point""").fetchall()
+FCOL = {'F01': '#FF9D9A', 'F02': '#59A14F', 'F03': '#FFBE7D', 'F04': '#E15759', 'F05': '#FABFD2', 'F06': '#8CD17D',
+        'F07': '#D4A6C8', 'F08': '#F1CE63', 'F09': '#A0CBE8'}
+PCOL = {'Bridgeway': '#F89217', 'Keystone': '#7873C0', 'System feed': '#21B087'}
+SHORT = dict(con.execute("SELECT DISTINCT flag_code, flag_short FROM marts.mart_cw_reconciliation_dashboard WHERE flag_short IS NOT NULL").fetchall())
+PL = {'Bridgeway': 'Bridgeway (vendor system)', 'Keystone': 'Keystone (HR system)', 'System feed': 'System feed (integration)'}
 polys, labels = {}, []
-for part, lvl, f, r, p, pt, x, y, draw, n in rows:
+for part, lvl, f, r, p, pt, x, y, draw, n, nh in rows:
     if part in ('Link', 'Node'):
         polys.setdefault((draw, part, lvl, f, r, p), []).append((pt, x, y))
     else:
-        labels.append((part, lvl, f, r, p, x, y, n))
-TINT = {'Bridgeway': '#FBC37F', 'Keystone': '#B5B2DC', 'System feed': '#85D4BD'}
-SOLID = {'Bridgeway': '#F89217', 'Keystone': '#7873C0', 'System feed': '#21B087'}
+        labels.append((part, lvl, f, r, p, pt, x, y, n))
 svg = []
 for key in sorted(polys, key=lambda k: (k[0], k[1])):
     draw, part, lvl, f, r, p = key
     pts = sorted(polys[key])
-    col = TINT[p] if part == 'Link' else (SOLID[p] if lvl == 3 else '#13233A')
-    svg.append(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for _, x, y in pts)}" fill="{col}"/>')
-for part, lvl, f, r, p, x, y, n in labels:
-    t = {1: 'What differs', 2: 'What it puts at risk', 3: 'Where it is aligned'}[lvl] if part == 'Header' else \
-        (f or '') + (r if lvl == 2 else '') + (p if lvl == 3 else '') + f' {n}'
-    svg.append(f'<text x="{x:.1f}" y="{y + 3:.1f}" font-size="9" fill="#13233A">{t}</text>')
+    if part == 'Link':
+        col, op = (FCOL[f], 0.45) if lvl == 1 else ('#4F6980', 0.45)
+    else:
+        col, op = ({1: FCOL.get(f), 2: '#4F6980', 3: PCOL.get(p)}[lvl], 1)
+    svg.append(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for _, x, y in pts)}" fill="{col}" fill-opacity="{op}"/>')
+for part, lvl, f, r, p, pt, x, y, n in labels:
+    if part == 'Header':
+        t, fill, size = {1: 'What differs', 2: 'What it puts at risk', 3: 'Where it is aligned'}[lvl], '#2B2F36', 9
+    else:
+        t = ({1: SHORT.get(f), 2: r, 3: PL.get(p)}[lvl]) if pt == 0 else f'({n})'
+        fill, size = ('#FFFFFF' if lvl == 2 else '#13233A'), 10.5
+    svg.append(f'<text x="{x:.1f}" y="{y + 3.5:.1f}" font-size="{size}" text-anchor="middle" fill="{fill}">{t}</text>')
 print(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 726 540" width="726" height="540" font-family="Helvetica"><rect width="726" height="540" fill="#fff"/>{"".join(svg)}</svg>')
 print(f'{len(order)} calcs computed; {len(polys)} polygons, {len(labels)} labels', file=sys.stderr)

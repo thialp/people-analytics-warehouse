@@ -3,7 +3,7 @@
   Tableau Custom SQL for Dashboard #4, Contingent Workforce Reconciliation (SQL Server, database ArcadiaHR).
   ONE data source for the whole page, because multi-select sets (function, department, country)
   work only inside one: the same columns and rows as data/marts/mart_cw_reconciliation_dashboard.csv
-  (about 67,600 rows), so a workbook built on either can switch with Data > Replace Data Source.
+  (about 68,200 rows), so a workbook built on either can switch with Data > Replace Data Source.
 
   Four row types, never summed together: filter row_type in every calculation.
     Gap         one per close x contractor x flag (rpt.vw_cw_gap_close): the Sankey (flag, risk,
@@ -12,10 +12,10 @@
                 Gap rate = SUM(contractors_with_gap) / SUM(contractors_working), target 3%.
     Ticket      one per close x open Helix ticket (rpt.vw_itsm_ticket_close): the ticket card,
                 one dot at (dot_x, dot_y). tickets = 1.
-    Sankey      2,188 scaffold rows for the native Sankey, from the flag, risk and place taxonomy
-                (no close, no group): sk_part Link (sk_level 1 flag to risk, 2 risk to place;
+    Sankey      2,805 scaffold rows for the native Sankey, from the flag, risk and place taxonomy
+                (no close, no group): sk_part Link (sk_level 1 flag to risk, 2 risk to place, both one ribbon per flag x place;
                 sk_point 0 to 49 along the ribbon's two edges), Node (sk_point 0 to 3, the corners),
-                Label (sk_point 0) and Header (sk_level 1 to 3). Tableau places every point with
+                Label (sk_point 0 the name, 1 the count) and Header (sk_level 1 to 3). Tableau places every point with
                 FIXED LODs over the Gap rows, so the chart follows the close and the groups.
   flag_short is the flag's short name, the one every viewer sees (Gap and Sankey rows).
   Every row carries month_end_date (is_latest_close marks Current, Jun 30, 2026) and the group
@@ -350,14 +350,14 @@ SELECT
 FROM (SELECT 'Link' AS sk_part, l.*, n.sk_point FROM (SELECT CAST(1 AS INT) AS sk_level, f.flag_code, f.flag_label, f.flag_name, f.risk, f.risk_order, p.place, p.place_order, p.place_label
            FROM (SELECT DISTINCT flag_code, flag_label, flag_name, risk, risk_order FROM rpt.vw_cw_gap_close) AS f CROSS JOIN (SELECT DISTINCT place, place_order, place_label FROM rpt.vw_cw_gap_close) AS p
          UNION ALL
-         SELECT CAST(2 AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), r.risk, r.risk_order, p.place, p.place_order, p.place_label
-           FROM (SELECT DISTINCT risk, risk_order FROM rpt.vw_cw_gap_close) AS r CROSS JOIN (SELECT DISTINCT place, place_order, place_label FROM rpt.vw_cw_gap_close) AS p) AS l
+         SELECT CAST(2 AS INT), f.flag_code, f.flag_label, f.flag_name, f.risk, f.risk_order, p.place, p.place_order, p.place_label
+           FROM (SELECT DISTINCT flag_code, flag_label, flag_name, risk, risk_order FROM rpt.vw_cw_gap_close) AS f CROSS JOIN (SELECT DISTINCT place, place_order, place_label FROM rpt.vw_cw_gap_close) AS p) AS l
        CROSS JOIN (VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12), (13), (14), (15), (16), (17), (18), (19), (20), (21), (22), (23), (24), (25), (26), (27), (28), (29), (30), (31), (32), (33), (34), (35), (36), (37), (38), (39), (40), (41), (42), (43), (44), (45), (46), (47), (48), (49)) AS n(sk_point)
      UNION ALL
      SELECT k.sk_part, d.*, k.sk_point FROM (SELECT CAST(1 AS INT) AS sk_level, flag_code, flag_label, flag_name, risk, risk_order, CAST(NULL AS VARCHAR(400)) AS place, CAST(NULL AS INT) AS place_order, CAST(NULL AS VARCHAR(400)) AS place_label FROM (SELECT DISTINCT flag_code, flag_label, flag_name, risk, risk_order FROM rpt.vw_cw_gap_close) AS f
          UNION ALL SELECT CAST(2 AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), risk, risk_order, CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), CAST(NULL AS VARCHAR(400)) FROM (SELECT DISTINCT risk, risk_order FROM rpt.vw_cw_gap_close) AS r
          UNION ALL SELECT CAST(3 AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), place, place_order, place_label FROM (SELECT DISTINCT place, place_order, place_label FROM rpt.vw_cw_gap_close) AS p) AS d
-       CROSS JOIN (VALUES ('Node', 0), ('Node', 1), ('Node', 2), ('Node', 3), ('Label', 0)) AS k(sk_part, sk_point)
+       CROSS JOIN (VALUES ('Node', 0), ('Node', 1), ('Node', 2), ('Node', 3), ('Label', 0), ('Label', 1)) AS k(sk_part, sk_point)
      UNION ALL
      SELECT 'Header', h.sk_level, CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), CAST(NULL AS VARCHAR(400)), CAST(NULL AS INT), CAST(NULL AS VARCHAR(400)), CAST(0 AS INT)
        FROM (VALUES (1), (2), (3)) AS h(sk_level)) AS s
