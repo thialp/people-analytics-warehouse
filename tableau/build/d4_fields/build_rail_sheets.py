@@ -272,6 +272,14 @@ s = s[:w_end] + ''.join(x[0] for x in SHEETS) + s[w_end:]
 win_end = s.rindex('  </windows>')
 s = s[:win_end] + ''.join(x[1] for x in SHEETS) + s[win_end:]
 
+# Tableau keeps <worksheets> in name order (byte order); new sheets must go in their place, not at the end
+w0 = s.index('<worksheets>') + len('<worksheets>\n')
+w1 = s.index('  </worksheets>')
+blocks = re.findall(r"    <worksheet name='([^']*)'>.*?\n    </worksheet>\n", s[w0:w1], re.S)
+parts = [(m.group(1), m.group(0)) for m in re.finditer(r"    <worksheet name='([^']*)'>.*?\n    </worksheet>\n", s[w0:w1], re.S)]
+assert ''.join(p[1] for p in parts) == s[w0:w1], 'unexpected worksheet layout'
+s = s[:w0] + ''.join(b for _, b in sorted(parts, key=lambda p: p[0])) + s[w1:]
+
 # shape maps live in the data source's own style rule
 enc_all = ''.join(x[2] for x in SHEETS)
 ds_s = s.index(f"<datasource caption='CW Reconciliation' inline='true' name='{DS}'")
