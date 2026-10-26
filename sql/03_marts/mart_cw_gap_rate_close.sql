@@ -64,7 +64,7 @@ SELECT
     COALESCE(g.gaps_over_90_days, 0)                                                 AS gaps_over_90_days,
     COALESCE(g.gaps_open_prior_close, 0)                                             AS gaps_open_prior_close,
     COALESCE(g.gaps_fixed_day_after, 0)                                              AS gaps_fixed_day_after,
-    0.03                                                                             AS gap_rate_target,
+    0.035                                                                            AS gap_rate_target,
     r.load_note
 FROM cells AS c
 JOIN intermediate.int_cw_close_run AS r USING (month_end_date)

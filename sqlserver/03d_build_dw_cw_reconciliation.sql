@@ -822,7 +822,7 @@ SELECT
     COALESCE(g.GapsOver90Days, 0)                                                   AS GapsOver90Days,
     COALESCE(g.GapsOpenPriorClose, 0)                                               AS GapsOpenPriorClose,
     COALESCE(g.GapsFixedDayAfter, 0)                                                AS GapsFixedDayAfter,
-    CAST(0.03 AS DECIMAL(5, 2))                                                     AS GapRateTarget,
+    CAST(0.035 AS DECIMAL(5, 3))                                                    AS GapRateTarget,
     r.LoadNote
 INTO dw.CwGapRateClose
 FROM (
