@@ -18,6 +18,10 @@ FUNCS = sys.argv[2] if len(sys.argv) > 2 else ''
 PARAM = {'p_Close': f"DATE '{CLOSE}'", 'p_Functions': f"'{FUNCS}'", 'p_Departments': "''", 'p_Countries': "''",
          'p_SkFlag': "''", 'p_SkRisk': "''", 'p_SkPlace': "''"}
 F = {c[0]: c[3] for c in spec.C + spec_sankey.C}
+# DuckDB evaluates COUNT(DISTINCT) as a window very slowly; these three count the non-empty nodes, so the
+# check uses the equivalent sum (every other formula runs as written)
+for col, n in (("F", 9), ("R", 5), ("P", 3)):
+    F[f"Sk N{col}"] = " + ".join(f"IIF([Sk {col}{k}] > 0, 1, 0)" for k in range(1, n + 1))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
 
 
@@ -67,6 +71,7 @@ def to_sql(f, deps):
         agg = agg.strip()
         f = f[:a] + f'({agg} OVER ({part.strip()}))' + f[b + 1:]
     f = fn(f, 'IIF', lambda a: f'(CASE WHEN {a[0]} THEN {a[1]} ELSE {a[2]} END)')
+    f = fn(f, 'COUNTD', lambda a: f'COUNT(DISTINCT {a[0]})')
     f = fn(f, 'ZN', lambda a: f'COALESCE({a[0]}, 0)')
     f = fn(f, 'IFNULL', lambda a: f'COALESCE({a[0]}, {a[1]})')
     f = fn(f, 'FLOAT', lambda a: f'CAST({a[0]} AS DOUBLE)')
@@ -89,16 +94,19 @@ def visit(n):
     order.append(n)
 for n in NEED: visit(n)
 
-con = duckdb.connect(os.path.join(ROOT, 'warehouse', 'arcadia.duckdb'), read_only=True)
-q = 'SELECT * FROM marts.mart_cw_reconciliation_dashboard'
-for i, n in enumerate(order):
-    q = f'SELECT *, {sql[n]} AS "{n}" FROM ({q}) AS t{i}'
+con = duckdb.connect()
+con.execute(f"ATTACH '{os.path.join(ROOT, 'warehouse', 'arcadia.duckdb')}' AS w (READ_ONLY)")
+con.execute("CREATE TABLE t0 AS SELECT * FROM w.marts.mart_cw_reconciliation_dashboard")
+for i, n in enumerate(order):                       # one table per step: a flat plan, however deep the chain
+    con.execute(f'CREATE TABLE t{i + 1} AS SELECT *, {sql[n]} AS "{n}" FROM t{i}')
+    con.execute(f'DROP TABLE t{i}')
+q = f'SELECT * FROM t{len(order)}'
 rows = con.execute(f"""SELECT sk_part, sk_level, flag_code, risk, place, sk_point, "Sk X", "Sk Y", "Sk Draw", "Sk N", "Sk Node H"
                        FROM ({q}) WHERE row_type = 'Sankey' AND "Sk Show" ORDER BY "Sk Draw", sk_part, sk_level, flag_code, risk, place, sk_point""").fetchall()
 FCOL = {'F01': '#FF9D9A', 'F02': '#59A14F', 'F03': '#FFBE7D', 'F04': '#E15759', 'F05': '#FABFD2', 'F06': '#8CD17D',
         'F07': '#D4A6C8', 'F08': '#F1CE63', 'F09': '#A0CBE8'}
 PCOL = {'Bridgeway': '#F89217', 'Keystone': '#7873C0', 'System feed': '#21B087'}
-SHORT = dict(con.execute("SELECT DISTINCT flag_code, flag_short FROM marts.mart_cw_reconciliation_dashboard WHERE flag_short IS NOT NULL").fetchall())
+SHORT = dict(con.execute("SELECT DISTINCT flag_code, flag_short FROM w.marts.mart_cw_reconciliation_dashboard WHERE flag_short IS NOT NULL").fetchall())
 PL = {'Bridgeway': 'Bridgeway (vendor system)', 'Keystone': 'Keystone (HR system)', 'System feed': 'System feed (integration)'}
 polys, labels = {}, []
 for part, lvl, f, r, p, pt, x, y, draw, n, nh in rows:

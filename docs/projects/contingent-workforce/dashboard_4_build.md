@@ -12,6 +12,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 4 | 2026-10-25 | **Native Sankey (D15, section 9N).** The Custom SQL gains the Sankey scaffold (2,188 rows) and `flag_short`; 3 parameters and 142 `Sk` calcs written into the workbook and checked against the data (`verify_sankey.py`). Version A, the extension, kept as section 9 |
 | 5 | 2026-10-25 | Flag labels left of the flag nodes, right-aligned, on their own 150 px sheet beside a 576 px Sankey (`Sk Flag Y`, `Sk Flag X`; `Sk Y Text`, `Sk W`, `Sk X3` changed). Written into the workbook by `patch_flag_labels.py`, which also builds the `Sankey Flag Labels` sheet and sets the `Sankey Native` X axis to 0 to 576; `spec_sankey.py` matches |
 | 6 | 2026-10-25 | **Sankey v2 (9N.0):** the extension's look built natively, approved from a design board: colour boxes with labels inside, ribbons by flag × place so a path highlights, minimum box height, a scale cap for small selections. `apply_sankey_v2.py` wrote it into the workbook; the revision 5 flag-label sheet is gone |
+| 7 | 2026-10-25 | Sankey v2 refresh hang fixed: every intermediate is a FIXED LOD (`Sk Y` 168 million terms to 270; same output). Flag palette A, muted families, replaces Tableau 20 (no red and green). `sync_sankey.py` brings a v2 workbook to the spec |
 
 ## Contents
 
@@ -680,7 +681,7 @@ Approved from [the design board](img/sankey_v2_design.png) on 2026-10-25, after 
 
 | | v2 |
 |---|---|
-| Boxes | 140 wide, the label inside: flags in their 9 colours, risks slate `#4F6980` (white text), places amber, violet, teal |
+| Boxes | 140 wide, the label inside: flags in **palette A, muted families** (revision 7, [board](img/sankey_palettes.png)): Active headcount blue-grey `#6F8FB0` `#97B0C9` `#BFCFDF`, Billing sand `#C9A27E`, Cost center warm grey `#ADA79C`, PID dusty plum `#A38AA6` `#C9B7CB`, Status ochre `#CDAE6E` `#E3D0A6`; risks slate `#4F6980` (white text); places amber, violet, teal |
 | Labels | Row 0 the name; row 1 the count, only when the box is at least 28 px tall (`Sk Count Min H`); short boxes show the name, the count is in the tooltip |
 | Ribbons | Both links are one band per flag × place (the scaffold has 1,350 rows for each), so a flag's whole path can light up. Flag to risk in the flag's colour, risk to place slate; colours are solid tints (45% on white) |
 | Small boxes | Never under 14 px (`Sk Min H`): the scale is fitted per column with two passes so every label fits |
@@ -693,6 +694,8 @@ Approved from [the design board](img/sankey_v2_design.png) on 2026-10-25, after 
 1. Extract > Refresh. `CHK Rows`: Gap 21,665 · Population 27,324 · Sankey 2,805 · Ticket 16,446.
 2. Dashboard > Actions > Add Action > Highlight: name `Sankey highlights a path`, source `Sankey Native`, Run on **Hover**, target `Sankey Native`, Selected Fields **`flag_code`**. Hovering a flag box or one of its ribbons lights its whole path; the other marks fade.
 3. Check: Jun 2026 as the design board; Dec 2024 the same colours; `|Marketing|` small at the top.
+
+**Performance (revision 7).** Tableau pastes each referenced formula in again where it is used, with no shared intermediate results. The v2 chain (scale fitted in two passes, every box position built on it) expanded `Sk Y` to about 168 million terms, and the refresh hung while Tableau built the query. Every intermediate is now its own FIXED LOD (`{ FIXED : MIN(…) }` for one value per selection, per `flag_code`, `risk_order` or `place_order` for one per node), so it is computed once and referenced as a column: `Sk Y` is 270 terms. Same numbers: `verify_sankey.py` draws byte-identical output at Jun 2026, Dec 2024 and Marketing. Rule for every later calc on this page: when a formula is referenced by many others, make it an LOD.
 
 The sections below (9N.1 to 9N.5) describe version 1; where they differ, 9N.0 wins.
 
