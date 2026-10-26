@@ -11,6 +11,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 3 | 2026-10-25 | Status marks: 🟢 in the workbook, 🔴 still to add by hand (only the `kpi_` set, step 9). Folder `4 Contingent Workforce Reconciliation` (no leading zero) |
 | 4 | 2026-10-25 | **Native Sankey (D15, section 9N).** The Custom SQL gains the Sankey scaffold (2,188 rows) and `flag_short`; 3 parameters and 142 `Sk` calcs written into the workbook and checked against the data (`verify_sankey.py`). Version A, the extension, kept as section 9 |
 | 5 | 2026-10-25 | Flag labels left of the flag nodes, right-aligned, on their own 150 px sheet beside a 576 px Sankey (`Sk Flag Y`, `Sk Flag X`; `Sk Y Text`, `Sk W`, `Sk X3` changed). Written into the workbook by `patch_flag_labels.py`, which also builds the `Sankey Flag Labels` sheet and sets the `Sankey Native` X axis to 0 to 576; `spec_sankey.py` matches |
+| 6 | 2026-10-25 | **Sankey v2 (9N.0):** the extension's look built natively, approved from a design board: colour boxes with labels inside, ribbons by flag × place so a path highlights, minimum box height, a scale cap for small selections. `apply_sankey_v2.py` wrote it into the workbook; the revision 5 flag-label sheet is gone |
 
 ## Contents
 
@@ -48,7 +49,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 3 | Parameters | Claude | S | **Written into the workbook** 2026-10-25 (10; `kpi_` in step 9) |
 | 4 | Calculations | Claude | M | **Written into the workbook** 2026-10-25 (211 new; the 21 spike label and tooltip calcs rewritten in place) |
 | **5** | **Dashboard shell: rail, KPI band, three cards, footnote, with placeholders; the Sankey in its tile (section 8)** | Thiago | S | **Next** |
-| 6 | The Sankey, **native** (section 9N): extract refresh, the `Sankey Native` sheet, on the dashboard, actions. Version A, the extension (section 9), stays in the workbook | Thiago | M | **Next**: data and 142 fields written; the sheet is to build |
+| 6 | The Sankey, **native v2** (section 9N.0): extension look, path highlight. Version A, the extension (section 9), stays in the workbook | Claude, Thiago | M | **Sheet built and on the dashboard**; Thiago: extract refresh, the highlight action, the check |
 | 7 | Rail controls | Thiago | M | |
 | 8 | Popovers: Point in time, Function, Department, Country, Info | Thiago | L | Needs S4 |
 | 9 | KPI band and hovers | Thiago | M | |
@@ -672,6 +673,28 @@ Text mark, `Main Title` and `Main Subtitle` on Label: line 1 Tableau Semibold 12
 | Ribbons | Flag to risk, one band per flag × place (`Sk FP`), so each band already has its place colour. Risk to place, one per risk × place (`Sk RP`). Offsets in each node: `Sk FP Before`, `Sk RP Before`, `Sk PR Before` |
 | Curve | `Sk T Along` runs 0 to 1 on the top edge and back on the bottom edge; `Sk Ease` = 3t² − 2t³ |
 | Coordinates | `Sk X`, `Sk Y` for every part. `Sk Y Shape` (links and nodes) and `Sk Y Text` (labels and headers) split them over the two axes |
+
+### 9N.0 Version 2 (revision 6): the extension's look, built natively (what is on the page)
+
+Approved from [the design board](img/sankey_v2_design.png) on 2026-10-25, after the first native version read as too plain and the extension could not be tuned. It keeps what made the extension feel modern and adds the control the extension lacked:
+
+| | v2 |
+|---|---|
+| Boxes | 140 wide, the label inside: flags in their 9 colours, risks slate `#4F6980` (white text), places amber, violet, teal |
+| Labels | Row 0 the name; row 1 the count, only when the box is at least 28 px tall (`Sk Count Min H`); short boxes show the name, the count is in the tooltip |
+| Ribbons | Both links are one band per flag × place (the scaffold has 1,350 rows for each), so a flag's whole path can light up. Flag to risk in the flag's colour, risk to place slate; colours are solid tints (45% on white) |
+| Small boxes | Never under 14 px (`Sk Min H`): the scale is fitted per column with two passes so every label fits |
+| Small selections | At most 12 px per gap (`Sk Max Scale`): Marketing (6 gaps) sits at the top at its own size instead of filling the tile |
+| Path highlight | `flag_code` on the polygons' Detail; a Highlight action on it (below) |
+
+**Written into the workbook (🟢, `apply_sankey_v2.py`):** the Custom SQL (2,805 scaffold rows, 68,240 in all; `check_tsql_in_duckdb.py` and `15_validate` pass), 134 `Sk` fields rewritten, 70 added and 9 that v2 no longer uses removed, the 23-colour `Sk Colour` palette, the `Sankey Native` sheet (X axis 0 to 726, centred box labels, `flag_code` on Detail), and the revision 5 flag-label sheet removed with its dashboard tiles (`Sankey Native` takes the full 726). `verify_sankey.py` runs the formulas on the mart and matches the design ([check](img/sankey_v2_check.png)).
+
+**Thiago, in Tableau:**
+1. Extract > Refresh. `CHK Rows`: Gap 21,665 · Population 27,324 · Sankey 2,805 · Ticket 16,446.
+2. Dashboard > Actions > Add Action > Highlight: name `Sankey highlights a path`, source `Sankey Native`, Run on **Hover**, target `Sankey Native`, Selected Fields **`flag_code`**. Hovering a flag box or one of its ribbons lights its whole path; the other marks fade.
+3. Check: Jun 2026 as the design board; Dec 2024 the same colours; `|Marketing|` small at the top.
+
+The sections below (9N.1 to 9N.5) describe version 1; where they differ, 9N.0 wins.
 
 ### 9N.1 Refresh the extract (SQL Server running in Docker)
 

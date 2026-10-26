@@ -1,4 +1,4 @@
-# Native Sankey (build doc section 9N): parameters and Sk calcs, by caption.
+# Native Sankey, v2 (build doc section 9N): the extension's look, built natively: parameters and Sk calcs, by caption.
 # Same format as spec.py: (caption, datatype, kind, formula); kind 'row' | 'agg'.
 # Reads existing fields (Total Gaps, Flag Gaps, Risk Gaps, Place Gaps, Sankey Gap Row, Sankey Gap,
 # Scope Is All, Place Sub, ...) but never changes them, so the extension Sankey (version A) stays as it is.
@@ -15,12 +15,13 @@ C = []
 def add(cap, dt, kind, f):
     C.append((cap, dt, kind, f))
 
-# ---------- constants (the Sankey sheet is 576 x 540, beside a 150 px flag-label sheet: 726 in all)
-for cap, v in (("Sk W", "576"), ("Sk H", "540"), ("Sk Top", "26"), ("Sk Bottom", "4"), ("Sk Node W", "10"),
-               ("Sk Pad", "8"), ("Sk X1", "0"), ("Sk X3", "436"), ("Sk Points", "25"), ("Sk Label DX", "5")):
+# ---------- constants (v2: the Sankey is one 726 x 540 sheet; tune here, everything follows)
+for cap, v in (("Sk W", "726"), ("Sk H", "540"), ("Sk Top", "22"), ("Sk Bottom", "2"), ("Sk Node W", "140"),
+               ("Sk Pad", "6"), ("Sk X1", "0"), ("Sk X3", "586"), ("Sk Points", "25"),
+               ("Sk Min H", "14"), ("Sk Max Scale", "12"), ("Sk Count Min H", "28")):
     add(cap, "integer", "row", v)
 add("Sk X2", "real", "row", "([Sk X1] + [Sk Node W] + [Sk X3]) / 2 - [Sk Node W] / 2")
-add("Sk Label DY", "real", "row", "0")   # nudge (px, + is down) if the one-line labels sit high
+add("Sk Label DY", "real", "row", "0")   # nudge (px, + is down) if the box labels sit high or low
 
 # ---------- the rows
 add("Sk Row", "boolean", "row", '[row_type] = "Sankey"')
@@ -33,111 +34,144 @@ for k in range(1, 6):
     add(f"Sk R{k}", "integer", "row", f"{{ FIXED : SUM(IF [Sankey Gap Row] AND [risk_order] = {k} THEN 1 ELSE 0 END) }}")
 for k in range(1, 4):
     add(f"Sk P{k}", "integer", "row", f"{{ FIXED : SUM(IF [Sankey Gap Row] AND [place_order] = {k} THEN 1 ELSE 0 END) }}")
+COLS = (("F", 9), ("R", 5), ("P", 3))
 ne = lambda p, n: " + ".join(f"IIF([Sk {p}{k}] > 0, 1, 0)" for k in range(1, n + 1))
 add("Sk NF", "integer", "row", ne("F", 9))
 add("Sk NR", "integer", "row", ne("R", 5))
 add("Sk NP", "integer", "row", ne("P", 3))
-add("Sk N Max", "integer", "row", "IF [Sk NF] >= [Sk NR] AND [Sk NF] >= [Sk NP] THEN [Sk NF] ELSEIF [Sk NR] >= [Sk NP] THEN [Sk NR] ELSE [Sk NP] END")
-
-# ---------- scale and the gap between nodes in each column
 add("Sk Avail", "real", "row", "[Sk H] - [Sk Top] - [Sk Bottom]")
-add("Sk Scale", "real", "row", "IF [Total Gaps] > 0 THEN ([Sk Avail] - [Sk Pad] * ([Sk N Max] - 1)) / [Total Gaps] END")
-for col, n in (("F", "NF"), ("R", "NR"), ("P", "NP")):
+
+# ---------- scale: the largest one where every column fits with boxes at least Sk Min H tall, at most Sk Max Scale
+# Per column: start from the plain fit, then twice take the boxes that fall under Sk Min H out of the share
+# (they get Sk Min H each) and refit the rest. Two passes settle the 9 / 5 / 3 columns.
+for col, n in COLS:
+    N = f"[Sk N{col}]"
+    add(f"Sk S0 {col}", "real", "row", f"IF [Total Gaps] > 0 THEN ([Sk Avail] - [Sk Pad] * ({N} - 1)) / [Total Gaps] END")
+    for i in (1, 2):
+        prev = f"[Sk S{i - 1} {col}]"
+        small = lambda k: f"([Sk {col}{k}] > 0 AND [Sk {col}{k}] * {prev} < [Sk Min H])"
+        add(f"Sk Small N{i} {col}", "integer", "row", " + ".join(f"IIF({small(k)}, 1, 0)" for k in range(1, n + 1)))
+        add(f"Sk Small Sum{i} {col}", "integer", "row", " + ".join(f"IIF({small(k)}, [Sk {col}{k}], 0)" for k in range(1, n + 1)))
+        add(f"Sk S{i} {col}", "real", "row",
+            f"IF [Total Gaps] - [Sk Small Sum{i} {col}] > 0\n"
+            f"THEN ([Sk Avail] - [Sk Pad] * ({N} - 1) - [Sk Min H] * [Sk Small N{i} {col}]) / ([Total Gaps] - [Sk Small Sum{i} {col}])\n"
+            f"ELSE {prev} END")
+add("Sk Fit Scale", "real", "row",
+    "IF [Sk S2 F] <= [Sk S2 R] AND [Sk S2 F] <= [Sk S2 P] THEN [Sk S2 F] ELSEIF [Sk S2 R] <= [Sk S2 P] THEN [Sk S2 R] ELSE [Sk S2 P] END")
+add("Sk Capped", "boolean", "row", "[Sk Fit Scale] > [Sk Max Scale]")
+add("Sk Scale", "real", "row", "IF [Sk Capped] THEN [Sk Max Scale] ELSE [Sk Fit Scale] END")
+
+# ---------- box heights (proportional, never under Sk Min H), and each column's gap between boxes
+for col, n in COLS:
+    for k in range(1, n + 1):
+        v = f"[Sk {col}{k}]"
+        add(f"Sk {col}H{k}", "real", "row",
+            f"IF {v} > 0 THEN (IF {v} * [Sk Scale] > [Sk Min H] THEN {v} * [Sk Scale] ELSE [Sk Min H] END) ELSE 0 END")
+    add(f"Sk {col} Used", "real", "row", " + ".join(f"[Sk {col}H{k}]" for k in range(1, n + 1)))
     add(f"Sk Gap {col}", "real", "row",
-        f"IF [Sk {n}] > 1 THEN ([Sk Avail] - [Total Gaps] * [Sk Scale]) / ([Sk {n}] - 1) ELSE 0 END")
+        f"IF [Sk Capped] THEN [Sk Pad] ELSEIF [Sk N{col}] > 1 THEN ([Sk Avail] - [Sk {col} Used]) / ([Sk N{col}] - 1) ELSE 0 END")
 
 
-def before(p, n, idx, ne_only=False):
-    """CASE idx WHEN 1 THEN 0 WHEN 2 THEN F1 WHEN 3 THEN F1 + F2 ... (or the count of non-empty nodes)."""
-    term = (lambda k: f"IIF([Sk {p}{k}] > 0, 1, 0)") if ne_only else (lambda k: f"[Sk {p}{k}]")
-    parts = [f"WHEN 1 THEN 0"] + [f"WHEN {k} THEN " + " + ".join(term(j) for j in range(1, k)) for k in range(2, n + 1)]
+def before(term, n, idx):
+    parts = ["WHEN 1 THEN 0"] + [f"WHEN {k} THEN " + " + ".join(term(j) for j in range(1, k)) for k in range(2, n + 1)]
     return f"CASE {idx}\n  " + "\n  ".join(parts) + "\nEND"
 
 
-add("Sk F Before", "integer", "row", before("F", 9, "[Sk Fi]"))
-add("Sk F NE Before", "integer", "row", before("F", 9, "[Sk Fi]", True))
-add("Sk R Before", "integer", "row", before("R", 5, "[risk_order]"))
-add("Sk R NE Before", "integer", "row", before("R", 5, "[risk_order]", True))
-add("Sk P Before", "integer", "row", before("P", 3, "[place_order]"))
-add("Sk P NE Before", "integer", "row", before("P", 3, "[place_order]", True))
-add("Sk Y Flag", "real", "row", "[Sk Top] + [Sk F Before] * [Sk Scale] + [Sk F NE Before] * [Sk Gap F]")
-add("Sk Y Risk", "real", "row", "[Sk Top] + [Sk R Before] * [Sk Scale] + [Sk R NE Before] * [Sk Gap R]")
-add("Sk Y Place", "real", "row", "[Sk Top] + [Sk P Before] * [Sk Scale] + [Sk P NE Before] * [Sk Gap P]")
+IDX = {"F": "[Sk Fi]", "R": "[risk_order]", "P": "[place_order]"}
+for col, n in COLS:
+    add(f"Sk {col} Before", "integer", "row", before(lambda j, c=col: f"[Sk {c}{j}]", n, IDX[col]))          # gaps before
+    add(f"Sk {col} H Before", "real", "row", before(lambda j, c=col: f"[Sk {c}H{j}]", n, IDX[col]))       # box heights before
+    add(f"Sk {col} NE Before", "integer", "row", before(lambda j, c=col: f"IIF([Sk {c}{j}] > 0, 1, 0)", n, IDX[col]))
+    add(f"Sk {col}H This", "real", "row", f"CASE {IDX[col]} " + " ".join(f"WHEN {k} THEN [Sk {col}H{k}]" for k in range(1, n + 1)) + " END")
+add("Sk Y Flag", "real", "row", "[Sk Top] + [Sk F H Before] + [Sk F NE Before] * [Sk Gap F]")
+add("Sk Y Risk", "real", "row", "[Sk Top] + [Sk R H Before] + [Sk R NE Before] * [Sk Gap R]")
+add("Sk Y Place", "real", "row", "[Sk Top] + [Sk P H Before] + [Sk P NE Before] * [Sk Gap P]")
+# one gap's height inside each box (boxes held at Sk Min H are taller than their share)
+add("Sk F Unit", "real", "row", "IF [Flag Gaps] > 0 THEN [Sk FH This] / [Flag Gaps] END")
+add("Sk R Unit", "real", "row", "IF [Risk Gaps] > 0 THEN [Sk RH This] / [Risk Gaps] END")
+add("Sk P Unit", "real", "row", "IF [Place Gaps] > 0 THEN [Sk PH This] / [Place Gaps] END")
 
-# ---------- ribbon sizes and offsets inside the nodes
+# ---------- ribbons: both links are one band per flag x place, so a flag's whole path can light up
 add("Sk FP", "integer", "row", "{ FIXED [flag_label], [place] : SUM([Sankey Gap]) }")
-add("Sk RP", "integer", "row", "{ FIXED [risk], [place] : SUM([Sankey Gap]) }")
 for k in (1, 2):
     add(f"Sk F PB{k}", "integer", "row", f"{{ FIXED [flag_label] : SUM(IF [Sankey Gap Row] AND [place_order] <= {k} THEN 1 ELSE 0 END) }}")
     add(f"Sk R PB{k}", "integer", "row", f"{{ FIXED [risk] : SUM(IF [Sankey Gap Row] AND [place_order] <= {k} THEN 1 ELSE 0 END) }}")
 for k in (1, 2, 3, 4):
     add(f"Sk P RB{k}", "integer", "row", f"{{ FIXED [place] : SUM(IF [Sankey Gap Row] AND [risk_order] <= {k} THEN 1 ELSE 0 END) }}")
+for k in range(1, 9):
+    add(f"Sk P FB{k}", "integer", "row", f"{{ FIXED [place] : SUM(IF [Sankey Gap Row] AND [flag_code] <= \"F0{k}\" THEN 1 ELSE 0 END) }}")
 add("Sk FP Before", "integer", "row", "CASE [place_order] WHEN 1 THEN 0 WHEN 2 THEN [Sk F PB1] ELSE [Sk F PB2] END")
 add("Sk RP Before", "integer", "row", "CASE [place_order] WHEN 1 THEN 0 WHEN 2 THEN [Sk R PB1] ELSE [Sk R PB2] END")
 add("Sk PR Before", "integer", "row",
     "CASE [risk_order] WHEN 1 THEN 0 WHEN 2 THEN [Sk P RB1] WHEN 3 THEN [Sk P RB2] WHEN 4 THEN [Sk P RB3] ELSE [Sk P RB4] END")
-
-# ---------- ribbons (sk_part Link: level 1 flag to risk, level 2 risk to place)
+add("Sk PF Before", "integer", "row",
+    "CASE [Sk Fi] WHEN 1 THEN 0 " + " ".join(f"WHEN {k} THEN [Sk P FB{k - 1}]" for k in range(2, 10)) + " END")
+add("Sk Link N", "integer", "row", "[Sk FP]")
+# level 1, flag to risk: leaves the flag box by place; enters the risk box by flag, then place
+# level 2, risk to place: leaves the risk box by place, then flag; enters the place box by risk, then flag
+add("Sk Link Y0", "real", "row", """IF [sk_level] = 1 THEN [Sk Y Flag] + [Sk FP Before] * [Sk F Unit]
+ELSE [Sk Y Risk] + ([Sk RP Before] + [Sk PF Before] - [Sk PR Before]) * [Sk R Unit] END""")
+add("Sk Link H0", "real", "row", "[Sk FP] * IIF([sk_level] = 1, [Sk F Unit], [Sk R Unit])")
+add("Sk Link Y1", "real", "row", """IF [sk_level] = 1 THEN [Sk Y Risk] + ([Sk F Before] - [Sk R Before] + [Sk FP Before]) * [Sk R Unit]
+ELSE [Sk Y Place] + [Sk PF Before] * [Sk P Unit] END""")
+add("Sk Link H1", "real", "row", "[Sk FP] * IIF([sk_level] = 1, [Sk R Unit], [Sk P Unit])")
+add("Sk Link X0", "real", "row", "IF [sk_level] = 1 THEN [Sk X1] + [Sk Node W] ELSE [Sk X2] + [Sk Node W] END")
+add("Sk Link X1", "real", "row", "IF [sk_level] = 1 THEN [Sk X2] ELSE [Sk X3] END")
 add("Sk Is Bottom", "boolean", "row", "[sk_point] >= [Sk Points]")
 add("Sk T Along", "real", "row",
     "IF [sk_point] < [Sk Points] THEN FLOAT([sk_point]) / ([Sk Points] - 1)\nELSE FLOAT(2 * [Sk Points] - 1 - [sk_point]) / ([Sk Points] - 1) END")
 add("Sk Ease", "real", "row", "[Sk T Along] * [Sk T Along] * (3 - 2 * [Sk T Along])")
-add("Sk Link N", "integer", "row", "IF [sk_level] = 1 THEN [Sk FP] ELSE [Sk RP] END")
-add("Sk Link H", "real", "row", "[Sk Link N] * [Sk Scale]")
-add("Sk Link X0", "real", "row", "IF [sk_level] = 1 THEN [Sk X1] + [Sk Node W] ELSE [Sk X2] + [Sk Node W] END")
-add("Sk Link X1", "real", "row", "IF [sk_level] = 1 THEN [Sk X2] ELSE [Sk X3] END")
-add("Sk Link Y0", "real", "row",
-    "IF [sk_level] = 1 THEN [Sk Y Flag] + [Sk FP Before] * [Sk Scale]\nELSE [Sk Y Risk] + [Sk RP Before] * [Sk Scale] END")
-add("Sk Link Y1", "real", "row",
-    "IF [sk_level] = 1 THEN [Sk Y Risk] + ([Sk F Before] - [Sk R Before] + [Sk FP Before]) * [Sk Scale]\nELSE [Sk Y Place] + [Sk PR Before] * [Sk Scale] END")
 
-# ---------- nodes, labels, headers
+# ---------- boxes
 add("Sk Node X", "real", "row", "CASE [sk_level] WHEN 1 THEN [Sk X1] WHEN 2 THEN [Sk X2] ELSE [Sk X3] END")
 add("Sk Node Y", "real", "row", "CASE [sk_level] WHEN 1 THEN [Sk Y Flag] WHEN 2 THEN [Sk Y Risk] ELSE [Sk Y Place] END")
 add("Sk Node N", "integer", "row", "CASE [sk_level] WHEN 1 THEN [Flag Gaps] WHEN 2 THEN [Risk Gaps] ELSE [Place Gaps] END")
-add("Sk Node H", "real", "row", "[Sk Node N] * [Sk Scale]")
+add("Sk Node H", "real", "row", "CASE [sk_level] WHEN 1 THEN [Sk FH This] WHEN 2 THEN [Sk RH This] ELSE [Sk PH This] END")
+add("Sk Show Count", "boolean", "row", "[Sk Node H] >= [Sk Count Min H]")
 
 # ---------- the two coordinates every mark uses
 add("Sk X", "real", "row", """CASE [sk_part]
   WHEN "Link"   THEN [Sk Link X0] + ([Sk Link X1] - [Sk Link X0]) * [Sk T Along]
   WHEN "Node"   THEN [Sk Node X] + IIF([sk_point] = 1 OR [sk_point] = 2, [Sk Node W], 0)
-  WHEN "Label"  THEN [Sk Node X] + [Sk Node W] + [Sk Label DX]
-  WHEN "Header" THEN [Sk Node X]
+  ELSE [Sk Node X] + [Sk Node W] / 2
 END""")
 add("Sk Y", "real", "row", """CASE [sk_part]
-  WHEN "Link"   THEN [Sk Link Y0] + ([Sk Link Y1] - [Sk Link Y0]) * [Sk Ease] + IIF([Sk Is Bottom], [Sk Link H], 0)
+  WHEN "Link"   THEN IF [Sk Is Bottom] THEN [Sk Link Y0] + [Sk Link H0] + ([Sk Link Y1] + [Sk Link H1] - [Sk Link Y0] - [Sk Link H0]) * [Sk Ease]
+                     ELSE [Sk Link Y0] + ([Sk Link Y1] - [Sk Link Y0]) * [Sk Ease] END
   WHEN "Node"   THEN [Sk Node Y] + IIF([sk_point] >= 2, [Sk Node H], 0)
   WHEN "Label"  THEN [Sk Node Y] + [Sk Node H] / 2 + [Sk Label DY]
+                     + IIF([Sk Show Count], IIF([sk_point] = 0, -6, 7), 0)
   WHEN "Header" THEN 10
 END""")
 add("Sk Y Shape", "real", "row", 'IF [sk_part] = "Link" OR [sk_part] = "Node" THEN [Sk Y] END')
-add("Sk Y Text", "real", "row", 'IF ([sk_part] = "Label" OR [sk_part] = "Header") AND [sk_level] > 1 THEN [Sk Y] END')
-# the flag labels and their header sit on their own sheet, left of the flag nodes, right-aligned (9N.2b)
-add("Sk Flag Y", "real", "row", 'IF ([sk_part] = "Label" OR [sk_part] = "Header") AND [sk_level] = 1 THEN [Sk Y] END')
-add("Sk Flag X", "integer", "row", "144")
+add("Sk Y Text", "real", "row", 'IF [sk_part] = "Label" OR [sk_part] = "Header" THEN [Sk Y] END')
 
 # ---------- what shows, in what order, in what colour
 add("Sk N", "integer", "row", 'CASE [sk_part] WHEN "Link" THEN [Sk Link N] WHEN "Header" THEN 1 ELSE [Sk Node N] END')
-add("Sk Show", "boolean", "row", "[Sk Row] AND [Sk N] > 0")
+add("Sk Show", "boolean", "row",
+    '[Sk Row] AND [Sk N] > 0 AND NOT ([sk_part] = "Label" AND [sk_point] = 1 AND NOT [Sk Show Count])')
 add("Sk Mark", "string", "row",
-    '[sk_part] + "|" + STR([sk_level]) + "|" + IFNULL([flag_code], "") + "|" + IFNULL([risk], "") + "|" + IFNULL([place], "")')
+    '[sk_part] + "|" + STR([sk_level]) + "|" + STR([sk_point]) + "|" + IFNULL([flag_code], "") + "|" + IFNULL([risk], "") + "|" + IFNULL([place], "")')
 add("Sk Draw", "real", "row", 'IF [sk_part] = "Link" THEN -[Sk Link N] ELSE 100000 END')
-add("Sk Colour", "string", "row",
-    'IF [sk_part] = "Link" THEN [place] + " ribbon" ELSEIF [sk_level] = 3 THEN [place] ELSE "Node" END')
+add("Sk Colour", "string", "row", """IF [sk_part] = "Link" THEN (IF [sk_level] = 1 THEN [flag_code] + " ribbon" ELSE "Risk ribbon" END)
+ELSEIF [sk_level] = 1 THEN [flag_code]
+ELSEIF [sk_level] = 2 THEN "Risk"
+ELSE [place] END""")
 
-# ---------- label text (one template: <Header><Place><Name> <Count> / <Sub>)
+# ---------- box labels: row 0 the name, row 1 the count (only when the box is tall enough); white on the slate risks
 add("Sk Lbl Header", "string", "row",
     'IF [sk_part] = "Header" THEN CASE [sk_level] WHEN 1 THEN "What differs" WHEN 2 THEN "What it puts at risk" ELSE "Where it is aligned" END END')
-add("Sk Lbl Name", "string", "row",
-    'IF [sk_part] = "Label" THEN CASE [sk_level] WHEN 1 THEN [flag_short] WHEN 2 THEN [risk] END END')
-add("Sk Lbl Count", "string", "row", 'IF [sk_part] = "Label" AND [sk_level] < 3 THEN STR([Sk Node N]) END')
-add("Sk Lbl Place", "string", "row", 'IF [sk_part] = "Label" AND [sk_level] = 3 THEN [place] + " " + STR([Sk Node N]) END')
-add("Sk Lbl Sub", "string", "row", 'IF [sk_part] = "Label" AND [sk_level] = 3 THEN [Place Sub] END')
+add("Sk Box Text", "string", "row", """IF [sk_part] = "Label" THEN
+  IF [sk_point] = 0 THEN CASE [sk_level] WHEN 1 THEN [flag_short] WHEN 2 THEN [risk] ELSE [place_label] END
+  ELSE "(" + STR([Sk Node N]) + ")" END
+END""")
+add("Sk Lbl Dark", "string", "row", "IF [sk_level] <> 2 THEN [Sk Box Text] END")
+add("Sk Lbl White", "string", "row", "IF [sk_level] = 2 THEN [Sk Box Text] END")
 
 # ---------- tooltips (row level: every number is an LOD of the selection)
 add("Sk Is Flag Node", "boolean", "row", '[sk_part] = "Node" AND [sk_level] = 1')
 add("Sk Tip Title", "string", "row", """CASE [sk_part]
-  WHEN "Link" THEN (IF [sk_level] = 1 THEN [flag_short] ELSE [risk] END) + ", aligned in " + [place]
+  WHEN "Link" THEN [flag_short] + ", aligned in " + [place]
   WHEN "Node" THEN CASE [sk_level] WHEN 1 THEN [flag_short] WHEN 2 THEN [risk] ELSE [place_label] END
 END""")
 add("Sk Tip Full", "string", "row", "IF [Sk Is Flag Node] THEN [flag_name] END")
@@ -188,8 +222,8 @@ ELSEIF [sk_part] = "Node" AND [sk_level] = 3 THEN "Worked by " + CASE [place] WH
 ELSEIF [sk_part] = "Node" THEN "Next steps differ by gap: see the gap list" END""")
 
 # ---------- a click picks a flag, a risk or a place (parameter actions; the gap list filters on Sk Pick Match)
-add("Sk Pick Flag", "string", "row", 'IF [sk_level] = 1 AND [sk_part] <> "Header" THEN [flag_code] ELSE "" END')
-add("Sk Pick Risk", "string", "row", 'IF [sk_level] = 2 AND [sk_part] <> "Header" THEN [risk] ELSE "" END')
+add("Sk Pick Flag", "string", "row", 'IF [sk_part] = "Link" OR ([sk_level] = 1 AND [sk_part] <> "Header") THEN [flag_code] ELSE "" END')
+add("Sk Pick Risk", "string", "row", 'IF [sk_level] = 2 AND ([sk_part] = "Node" OR [sk_part] = "Label") THEN [risk] ELSE "" END')
 add("Sk Pick Place", "string", "row", 'IF [sk_part] = "Link" OR ([sk_level] = 3 AND [sk_part] <> "Header") THEN [place] ELSE "" END')
 add("Sk Picked", "boolean", "row", '[p_SkFlag] <> "" OR [p_SkRisk] <> "" OR [p_SkPlace] <> ""')
 add("Sk Pick Match", "boolean", "row",
@@ -210,3 +244,8 @@ ELSE (IF MIN([Top Flag Prior Rank]) = 1 THEN "Same largest flag as " ELSE "New l
    + (IF ZN(MIN([Max Move])) = 0 THEN "No flag changed rank since a year ago" ELSE MIN([Sk Mover Text]) END)
 END)
 + (IF MIN([Clear Own Gaps]) > 0 THEN " · " + STR(MIN([Clear Own Gaps])) + " clear on their own by the next run" ELSE "" END)""")
+
+# v1 and revision 5 fields that v2 no longer uses (apply_sankey_v2.py removes them from the workbook)
+OBSOLETE = ["Sk N Max", "Sk Gap F", "Sk Gap R", "Sk Gap P", "Sk Link H", "Sk Label DX", "Sk Lbl Name", "Sk Lbl Count",
+            "Sk Lbl Place", "Sk Lbl Sub", "Sk Flag Y", "Sk Flag X"]
+OBSOLETE = [c for c in OBSOLETE if c not in {x[0] for x in C}]
