@@ -118,7 +118,7 @@ def dep_xml(colx, insts):
             f"{chr(10).join('            ' + i for i in insts)}\n          </datasource-dependencies>\n")
 
 
-def window(name):
+def window(name, zoom='entire-view'):
     return f"""    <window class='worksheet' name='{name}'>
       <cards>
         <edge name='left'>
@@ -141,7 +141,7 @@ def window(name):
         </edge>
       </cards>
       <viewpoint>
-        <zoom type='entire-view' />
+        <zoom type='{zoom}' />
       </viewpoint>
       <simple-id uuid='{{{str(uuid.uuid4()).upper()}}}' />
     </window>
@@ -218,7 +218,7 @@ title_sheet('Timeline Title', 'Timeline Title', 'Timeline Subtitle')
 GL_ROWS = [('sql', 'place_order', 'ok'), ('calc', 'WHERE ALIGNED', 'nk'), ('sql', 'gap_id', 'nk'), ('calc', 'WHAT DIFFERS', 'nk'),
            ('calc', 'CONTRACTOR', 'nk'), ('calc', 'KEYSTONE SHOWS', 'nk'), ('calc', 'BRIDGEWAY HAS', 'nk'), ('calc', 'TICKET', 'nk')]
 GL_DETAIL = ['What differs', 'What it puts at risk', 'Where it is aligned', 'zzTrue', 'zzFalse']
-GL_WIDTH = {'WHERE ALIGNED': 80, 'WHAT DIFFERS': 160, 'CONTRACTOR': 110, 'KEYSTONE SHOWS': 130, 'BRIDGEWAY HAS': 130, 'TICKET': 70}
+GL_WIDTH = {'WHERE ALIGNED': 90, 'WHAT DIFFERS': 150, 'CONTRACTOR': 110, 'KEYSTONE SHOWS': 125, 'BRIDGEWAY HAS': 125, 'TICKET': 70}
 TIP_SQL = ['contractor_name', 'bw_worker_id', 'person_id', 'supplier_name', 'flag_name', 'risk', 'keystone_shows', 'bridgeway_has', 'evidence',
            'next_step', 'ticket_title', 'ticket_status']
 caps = ['Gap List Row', 'DAYS OPEN', 'Days Band'] + [c for k_, c, _ in GL_ROWS if k_ == 'calc'] + GL_DETAIL
@@ -250,7 +250,7 @@ view = pdep + dep_xml(colx, insts) + flt + mnf + sort + f"          <slices>\n{s
 hide = ''.join(f"            <format attr='display' field='{r}' value='false' />\n" for r in (rows_refs[0], rows_refs[2]))
 last = rows_refs[-1]
 widths = ''.join(f"            <format attr='width' field='{D}.[none:{nm(c)}:nk]' value='{w}' />\n" for c, w in GL_WIDTH.items())
-style = ("          <style-rule element='cell'>\n            <format attr='width' value='46' />\n"
+style = ("          <style-rule element='cell'>\n            <format attr='width' value='56' />\n"
          f"            <format attr='height' field='{last}' value='30' />\n            <format attr='text-align' value='left' />\n            <format attr='vertical-align' value='center' />\n          </style-rule>\n"
          "          <style-rule element='header'>\n            <format attr='band-color' scope='rows' value='#00000000' />\n            <format attr='band-color' scope='cols' value='#00000000' />\n"
          f"{widths}          </style-rule>\n"
@@ -296,7 +296,7 @@ pane = (f"          <pane selection-relaxation-option='selection-relaxation-allo
         "              <style-rule element='pane'>\n                <format attr='minwidth' value='-1' />\n                <format attr='maxwidth' value='-1' />\n              </style-rule>\n"
         "            </style>\n          </pane>\n")
 x = wrap('Gap List', view, style, pane, ' / '.join(rows_refs), mn, "        <tooltip-style tooltip-mode='sticky' />\n")
-SHEETS.append(('Gap List', x, window('Gap List')))
+SHEETS.append(('Gap List', x, window('Gap List', 'fit-width')))
 COLORS.append(palette('Days Band', {'over 90': '#b8401f', '90 or less': '#13233a'}))
 
 # ---------------------------------------------------------------- Timeline (line + dots, dual axis, target line)
@@ -321,7 +321,7 @@ style = (f"          <style-rule element='axis'>\n"
          f"            <encoding attr='space' class='0' domain-expand='false' field='{R1}' field-type='quantitative' scope='rows' type='space' />\n"
          f"            <encoding attr='space' class='0' field='{R2}' field-type='quantitative' fold='true' scope='rows' synchronized='true' type='space' />\n"
          f"            <format attr='title' class='0' field='{R1}' scope='rows' value='' />\n"
-         f"            <format attr='display' class='0' field='{R2}' scope='rows' value='false' />\n"
+         f"            <format attr='display' class='0' field='{R2}' scope='rows' value='false' />\n            <format attr='display' class='0' field='{R1}' scope='rows' value='false' />\n"
          f"            <format attr='text-format' field='{R1}' scope='rows' value='*0.0%' />\n"
          "            <format attr='tick-color' value='#00000000' />\n          </style-rule>\n"
          "          <style-rule element='header'>\n            <format attr='border-width' data-class='total' value='0' />\n            <format attr='border-style' data-class='total' value='none' />\n          </style-rule>\n"
@@ -331,7 +331,7 @@ style = (f"          <style-rule element='axis'>\n"
          "          <style-rule element='table'>\n            <format attr='background-color' value='#00000000' />\n            <format attr='show-null-value-warning' value='false' />\n          </style-rule>\n"
          "          <style-rule element='refline'>\n            <format attr='fill-above' id='refline0' value='#00000000' />\n            <format attr='fill-below' id='refline0' value='#00000000' />\n"
          "            <format attr='stroke-size' id='refline0' value='1' />\n            <format attr='stroke-color' id='refline0' value='#8c8a84' />\n            <format attr='line-pattern-only' id='refline0' value='dashed' />\n            <format attr='line-visibility' id='refline0' value='on' />\n          </style-rule>\n"
-         "          <style-rule element='gridline'>\n            <format attr='line-visibility' value='on' />\n            <format attr='line-pattern-only' value='solid' />\n            <format attr='stroke-color' value='#e4e3dd' />\n            <format attr='stroke-size' scope='cols' value='0' />\n            <format attr='line-visibility' scope='cols' value='off' />\n          </style-rule>\n"
+         "          <style-rule element='gridline'>\n            <format attr='stroke-size' value='0' />\n            <format attr='line-visibility' value='off' />\n          </style-rule>\n"
          "          <style-rule element='zeroline'>\n            <format attr='stroke-size' value='0' />\n            <format attr='line-visibility' value='off' />\n          </style-rule>\n"
          "          <style-rule element='table-div'>\n            <format attr='stroke-size' scope='cols' value='0' />\n            <format attr='line-visibility' scope='cols' value='off' />\n            <format attr='stroke-size' scope='rows' value='0' />\n            <format attr='line-visibility' scope='rows' value='off' />\n          </style-rule>\n"
          "          <style-rule element='header-div'>\n            <format attr='stroke-size' scope='rows' value='0' />\n            <format attr='line-visibility' scope='rows' value='off' />\n            <format attr='stroke-size' scope='cols' value='0' />\n            <format attr='line-visibility' scope='cols' value='off' />\n          </style-rule>\n")
@@ -470,10 +470,10 @@ s = s[:s.rfind('\n', 0, p2) + 1] + edges + s[s.rfind('\n', 0, p2) + 1:]
 wi = s.index("<window class='dashboard' maximized='true' name='CW Reconciliation'")
 placed = ['Gap List Title', 'Gap List', 'Timeline Title', 'Timeline']
 vend = s.rfind('\n', 0, s.index('</viewpoints>', wi)) + 1
-vp = ''.join(f"        <viewpoint name='{n}'>\n          <zoom type='entire-view' />\n        </viewpoint>\n" for n in placed)
+vp = ''.join(f"        <viewpoint name='{n}'>\n          <zoom type='{'fit-width' if n == 'Gap List' else 'entire-view'}' />\n        </viewpoint>\n" for n in placed)
 s = s[:vend] + vp + s[vend:]
 vs, ve = s.index('<viewpoints>', wi) + len('<viewpoints>\n'), s.rfind('\n', 0, s.index('</viewpoints>', wi)) + 1
-vparts = re.findall(r"        <viewpoint name='[^']*'>\n          <zoom type='entire-view' />\n        </viewpoint>\n", s[vs:ve])
+vparts = re.findall(r"        <viewpoint name='[^']*'>\n          <zoom type='[a-z-]+' />\n        </viewpoint>\n", s[vs:ve])
 assert ''.join(vparts) == s[vs:ve], 'unexpected viewpoint layout'
 s = s[:vs] + ''.join(sorted(vparts, key=lambda v: re.search(r"name='([^']*)'", v).group(1))) + s[ve:]
 open(out, 'w', encoding='utf-8').write(s)
