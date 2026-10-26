@@ -53,7 +53,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 4 | Calculations | Claude | M | **Written into the workbook** 2026-10-25 (211 new; the 21 spike label and tooltip calcs rewritten in place) |
 | **5** | **Dashboard shell: rail, KPI band, three cards, footnote, with placeholders; the Sankey in its tile (section 8)** | Thiago | S | **Done 2026-10-26.** Rail items R1 to R27 written by `tableau/build/d4_fields/build_rail.py` (fixed heights sum to 850 with one flexible gap), card title placeholders for Timeline and Tickets, checked on screen. The three test parameter controls stay until step 7 |
 | 6 | The Sankey, **native v2** (section 9N.0): extension look, path highlight. Version A, the extension (section 9), stays in the workbook | Claude, Thiago | M | **Done** 2026-10-26: on the page, follows every filter, highlight and the four click actions are in. Open: ribbon and border colours (later), the select-and-fade click (step 14, `zz` deselect) |
-| 7 | Rail controls | Thiago | M | |
+| 7 | Rail controls | Claude, Thiago | M | **Drawn 2026-10-26** (checked on screen): the eight sheets `Close Field`, `Function Field`, `Department Field`, `Country Field`, `Show Toggle`, `Reset`, `Info Button`, `Rail As Of` are on the rail, written by `tableau/build/d4_fields/build_rail_sheets.py` and `patch_rail_sheets.py`. They follow the page parameters (capsule words, replay note). **Clicks do nothing until the actions of step 14.** The three test parameter controls stay until then |
 | 8 | Popovers: Point in time, Function, Department, Country, Info | Thiago | L | Needs S4 |
 | 9 | KPI band and hovers | Thiago | M | |
 | 10 | Gap list and the toggle | Thiago | M | Needs S2b |
@@ -1179,3 +1179,21 @@ Reused: `d2_info_open`, `d2_info_close`, `d2_popover_line_wide`, `d2_popover_lin
 ## Revision 10 (2026-10-26)
 
 Step 5 finished. The rail's 27 items and the two card title placeholders are written into the `CW Reconciliation` dashboard by script, and the d4 shapes exist. Placeholders are named in `friendly-name` (for example `Close field (placeholder)`) so step 7 knows which control sheet replaces which. Next: step 7, the rail control sheets, then remove the three test parameter controls.
+
+---
+
+## Revision 11 (2026-10-26)
+
+Step 7: the rail's control sheets are written into the workbook and sit in the rail in place of the placeholders. The page opens on Overview with `Current · Jun 2026`.
+
+What Tableau taught us when a script writes sheets (keep for the next dashboards):
+
+1. **A dashboard lists every sheet placed on it** in its window (`<viewpoint name='...'>`). A sheet zone without that entry fails to open: "Dashboard references sheet 'X' which has no visual representation in the workbook" (error 2805CF18). The message names the first sheet it reaches, not the broken one.
+2. **Keep `<worksheets>` in name order.**
+3. **A sheet's copy of a parameter has no member list.**
+4. **Declare every SQL column a sheet's calcs read** in the sheet's dependencies (`month_end_date`, `row_type`).
+5. **A shape map written in the data source style must not carry a `palette` attribute**: Tableau ignored the maps and drew default circles. Tableau's own save writes `<encoding attr='shape' field='...' type='shape'>` with no palette.
+6. **The file on the Mac can silently stay on the old version** after a write: check its checksum after every write.
+7. Find a defect by making test copies, each with one part switched off (here, sheets in the workbook but not placed, then one sheet placed at a time).
+
+Next: step 8, the popovers, then the actions (step 14) that make the controls respond.
