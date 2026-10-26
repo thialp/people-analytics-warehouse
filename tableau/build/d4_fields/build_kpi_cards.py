@@ -140,6 +140,9 @@ def deps(caps, extra_inst, filters):
     return params, pdep, dep, flt, slices
 
 
+SLICE_EMPTY = "          <slices>\n          </slices>\n"
+
+
 def window(name):
     return f"""    <window class='worksheet' name='{name}'>
       <cards>
@@ -188,7 +191,7 @@ text_caps += ['KPI 2 Known', 'KPI 2 Low']
 pt_caps = [f'kpi_pt {kd} {n}' for n in range(1, 6) for kd in ('Title', 'Value', 'Note')] + ['kpi_Corner TL', 'kpi_Corner BR']
 insts = [tinst(c)[1] for c in text_caps]
 insts += [f"<column-instance column='[{nm(c)}]' derivation='Collect' name='[clct:{nm(c)}:nk]' pivot='key' type='nominal' />" for c in pt_caps]
-params, pdep, dep, flt, slices = deps(text_caps + pt_caps + [SEL], insts, [SEL])
+params, pdep, dep, flt, slices = deps(text_caps + pt_caps, insts, [])
 
 FONT = {'title': ("Tableau Book", '9', '#5a6170'), 'note': ("Tableau Book", '9', '#5a6170'), 'value': ("Tableau Bold", '20', '#13223a')}
 
@@ -223,7 +226,7 @@ def pane(pid, title, text_cap_list, ptcap, kind, valcolor='#13223a'):
             face, size, colr = FONT[kind]
             dl = ("<style-rule element='datalabel'>\n<format attr='color-mode' value='user' />\n"
                   f"<format attr='font-family' value='{face}' />\n<format attr='font-size' value='{size}' />\n<format attr='color' value='{colr}' />\n</style-rule>\n")
-    cell = ("<style-rule element='cell'>\n<format attr='vertical-align' value='center' />\n<format attr='text-align' value='left' />\n</style-rule>\n"
+    cell = ("<style-rule element='cell'>\n<format attr='vertical-align' value='center' />\n<format attr='text-align' value='right' />\n</style-rule>\n"
             if text_cap_list is not None else '')
     labshow = "<format attr='mark-labels-show' value='true' />\n<format attr='mark-labels-cull' value='true' />\n" if text_cap_list is not None else ''
     inert = " inert='true'" if text_cap_list is not None else ''
@@ -311,7 +314,7 @@ for n in range(1, 6):
     pi, pix = tinst(f'KPI {n} Tip')
     hbase = nm(HC)
     hinst = f"<column-instance column='[{hbase}]' derivation='None' name='[none:{hbase}:nk]' pivot='key' type='nominal' />"
-    params, pdep, dep, flt, slices = deps([HC, f'KPI {n} Title', f'KPI {n} Tip', SEL], [hinst, tix, pix], [SEL])
+    params, pdep, dep, flt, slices = deps([HC, f'KPI {n} Title', f'KPI {n} Tip'], [hinst, tix, pix], [])
     href = f'{D}.[none:{hbase}:nk]'
     tip = (f"            <customized-tooltip show-buttons='false'>\n              <formatted-text>\n"
            f"                <run fontcolor='#13223a' fontname='Tableau Semibold' fontsize='10'><![CDATA[<{D}.{ti}>]]></run>\n"
@@ -436,6 +439,7 @@ vs, ve = s.index('<viewpoints>', wi) + len('<viewpoints>\n'), s.rfind('\n', 0, s
 vparts = re.findall(r"        <viewpoint name='[^']*'>\n          <zoom type='entire-view' />\n        </viewpoint>\n", s[vs:ve])
 assert ''.join(vparts) == s[vs:ve], 'unexpected viewpoint layout'
 s = s[:vs] + ''.join(sorted(vparts, key=lambda v: re.search(r"name='([^']*)'", v).group(1))) + s[ve:]
+s = s.replace(SLICE_EMPTY, '')
 open(out, 'w', encoding='utf-8').write(s)
 print('sheets', [x[0] for x in SHEETS], 'zones from id', nid, 'new calcs', len(NEW))
 
