@@ -12,6 +12,7 @@ import sys
 import uuid
 
 src, out = sys.argv[1], sys.argv[2]
+SKIP = set(sys.argv[3].split(',')) if len(sys.argv) > 3 else set()      # sheets to leave out (their placeholders stay)
 s = open(src, encoding='utf-8').read()
 DS = re.search(r"<datasource caption='CW Reconciliation' inline='true' name='(federated\.[a-z0-9]+)'", s).group(1)
 ds_start = s.index(f"<datasource caption='CW Reconciliation' inline='true' name='{DS}'")
@@ -266,6 +267,7 @@ SHEETS.append(sheet_xml('Rail As Of', ['zzFalse', 'zzTrue'], text=['Rail As Of L
                         label=[('Rail As Of Line 1', 'Tableau Semibold', LIGHT, '9'), ('Rail As Of Line 2', 'Tableau Book', '#B9C3D1', '9')],
                         label_align='left'))
 
+SHEETS = [x for x in SHEETS if not any(f"name='{n}'" in x[0][:60] for n in SKIP)]
 # worksheets and windows
 w_end = s.index('  </worksheets>')
 s = s[:w_end] + ''.join(x[0] for x in SHEETS) + s[w_end:]
@@ -312,6 +314,8 @@ TOGGLE_STYLE = ("<zone-style>\n<format attr='border-color' value='#000000' />\n<
                 "<format attr='margin' value='0' />\n<format attr='background-color' value='#1b2d45' />\n</zone-style>")
 n_done = 0
 for ph, sh in PLACE.items():
+    if sh in SKIP:
+        continue
     m = re.search(r"<zone ([^>]*?)friendly-name='" + re.escape(ph) + r"'([^>]*)>", d)
     assert m, ph
     start = m.start()
