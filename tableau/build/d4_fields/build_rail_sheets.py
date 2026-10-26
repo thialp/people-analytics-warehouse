@@ -62,8 +62,9 @@ def closure(captions):
 
 
 def sqlcol(name):
-    m = re.search(r"      <column (?:aggregation='\w+' )?datatype='\w+' name='\[" + name + r"\]'[^>]*/>", DSX)
-    return m.group(0).strip() if m else None
+    m = re.search(r"<column (?:aggregation='\w+' )?datatype='\w+' name='\[" + name + r"\]' role='\w+' type='\w+' />", s)
+    assert m, 'no declaration of SQL column ' + name
+    return m.group(0)
 
 
 def inst(cap, kind='nk'):
