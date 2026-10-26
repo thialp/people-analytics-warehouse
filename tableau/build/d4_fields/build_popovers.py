@@ -195,7 +195,7 @@ for i, (lead, txt) in enumerate(INFO):
 
 
 def info_body(x, y, w):
-    return text_zone('Info Body', x, y, w, 387, info_runs, BODY_PAD, fixed=387)
+    return text_zone('Info Body', x, y, w, 440, info_runs, BODY_PAD, fixed=440)
 
 
 POP = []     # (zone xml, zone id, parameter name)
@@ -212,7 +212,7 @@ POP.append(popover('Country Popover', 'p_CountryOpen', 216, 326, 624, 'Choose co
                    empty_body('Country List (placeholder)', 224), 'None chosen means all countries.',
                    clear=True, close='Country Close') + ('[Parameters].[Parameter 0725102600000009]',))
 POP.append(popover('Info Popover', 'p_InfoOpen', 216, 24, 591, 'How to read this page', 'd2_popover_line_info.png',
-                   (387, info_body), None) + ('[Parameters].[Parameter 0725102600000010]',))
+                   (440, info_body), None) + ('[Parameters].[Parameter 0725102600000010]',))
 
 # floating: direct children of <zones>, last so they sit above the cards; placed after the three test controls
 zend = d.index('  </zones>')
