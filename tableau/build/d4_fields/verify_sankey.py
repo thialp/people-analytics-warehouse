@@ -126,7 +126,7 @@ for key in sorted(polys, key=lambda k: (k[0], k[1])):
     draw, part, lvl, f, r, p = key
     pts = sorted(polys[key])
     if part == 'Link':
-        col, op = (FCOL[f], 0.45) if lvl == 1 else ('#4F6980', 0.45)
+        col, op = (FCOL[f], 0.45) if lvl == 1 else ('#4F6980', 0.25)
     else:
         col, op = ({1: FCOL.get(f), 2: '#4F6980', 3: PCOL.get(p)}[lvl], 1)
     svg.append(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for _, x, y in pts)}" fill="{col}" fill-opacity="{op}"/>')
