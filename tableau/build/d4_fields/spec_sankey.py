@@ -16,8 +16,8 @@ def add(cap, dt, kind, f):
     C.append((cap, dt, kind, f))
 
 # ---------- constants (v2: the Sankey is one 726 x 540 sheet; tune here, everything follows)
-for cap, v in (("Sk W", "726"), ("Sk H", "540"), ("Sk Top", "22"), ("Sk Bottom", "2"), ("Sk Node W", "140"),
-               ("Sk Pad", "6"), ("Sk X1", "0"), ("Sk X3", "586"), ("Sk Points", "25"),
+for cap, v in (("Sk W", "726"), ("Sk H", "540"), ("Sk Top", "36"), ("Sk Bottom", "2"), ("Sk Node W", "156"),
+               ("Sk Pad", "6"), ("Sk X1", "0"), ("Sk X3", "570"), ("Sk Points", "25"),
                ("Sk Min H", "14"), ("Sk Max Scale", "12"), ("Sk Count Min H", "28")):
     add(cap, "integer", "row", v)
 add("Sk X2", "real", "row", "([Sk X1] + [Sk Node W] + [Sk X3]) / 2 - [Sk Node W] / 2")
@@ -48,7 +48,7 @@ add("Sk Avail", "real", "row", "[Sk H] - [Sk Top] - [Sk Bottom]")
 # ---------- scale: a box is Sk Min H + its gaps x Sk Scale. Per column, n boxes fit when
 # n x Sk Min H + Sk Pad x (n - 1) + Total Gaps x scale = Sk Avail, so the column with the most boxes sets the scale.
 # One LOD, aggregates of raw rows only (the constants are written in as numbers, not as fields).
-_K = dict(H=540, Top=22, Bottom=2, Pad=6, MinH=14)
+_K = dict(H=540, Top=36, Bottom=2, Pad=6, MinH=14)
 _AV = _K["H"] - _K["Top"] - _K["Bottom"]
 _n = {c: f"COUNTD(IF [Sankey Gap Row] THEN [{k}] END)" for c, k in (("F", "flag_code"), ("R", "risk"), ("P", "place"))}
 _maxn = f"IF {_n['F']} >= {_n['R']} AND {_n['F']} >= {_n['P']} THEN {_n['F']} ELSEIF {_n['R']} >= {_n['P']} THEN {_n['R']} ELSE {_n['P']} END"
@@ -118,7 +118,9 @@ add("Sk Node X", "real", "row", "CASE [sk_level] WHEN 1 THEN [Sk X1] WHEN 2 THEN
 add("Sk Node Y", "real", "row", "CASE [sk_level] WHEN 1 THEN [Sk Y Flag] WHEN 2 THEN [Sk Y Risk] ELSE [Sk Y Place] END")
 add("Sk Node N", "integer", "row", "CASE [sk_level] WHEN 1 THEN [Flag Gaps] WHEN 2 THEN [Risk Gaps] ELSE [Place Gaps] END")
 add("Sk Node H", "real", "row", "CASE [sk_level] WHEN 1 THEN [Sk FH This] WHEN 2 THEN [Sk RH This] ELSE [Sk PH This] END")
-add("Sk Show Count", "boolean", "row", "[Sk Node H] >= [Sk Count Min H]")
+# lines of text a box can hold: places 3 (name, system, count and share), flags and risks 2 (name, count and share)
+add("Sk Lines", "integer", "row", "IF [sk_level] = 3 THEN IIF([Sk Node H] >= 40, 3, 1) ELSE IIF([Sk Node H] >= [Sk Count Min H], 2, 1) END")
+add("Sk Show Count", "boolean", "row", "[Sk Lines] >= 2")
 
 # ---------- the two coordinates every mark uses
 add("Sk X", "real", "row", """CASE [sk_part]
@@ -131,18 +133,22 @@ add("Sk Y", "real", "row", """CASE [sk_part]
                      ELSE [Sk Link Y0] + ([Sk Link Y1] - [Sk Link Y0]) * [Sk Ease] END
   WHEN "Node"   THEN [Sk Node Y] + IIF([sk_point] >= 2, [Sk Node H], 0)
   WHEN "Label"  THEN [Sk Node Y] + [Sk Node H] / 2 + [Sk Label DY]
-                     + IIF([Sk Show Count], IIF([sk_point] = 0, -6, 7), 0)
-  WHEN "Header" THEN 10
+                     + CASE [Sk Lines] WHEN 1 THEN 0 WHEN 2 THEN IIF([sk_point] = 0, -6, 7) ELSE IIF([sk_point] = 0, -12, 0) END
+  WHEN "Header" THEN 20
 END""")
 add("Sk Y Shape", "real", "row", 'IF [sk_part] = "Link" OR [sk_part] = "Node" THEN [Sk Y] END')
-add("Sk Y Text", "real", "row", 'IF [sk_part] = "Label" OR [sk_part] = "Header" THEN [Sk Y] END')
+# a place's third line rides on its box rows (the text layer averages the 4 corners to the box centre)
+add("Sk Y Text", "real", "row", """IF [sk_part] = "Label" OR [sk_part] = "Header" THEN [Sk Y]
+ELSEIF [sk_part] = "Node" AND [sk_level] = 3 AND [Sk Lines] = 3 THEN [Sk Node Y] + [Sk Node H] / 2 + 12 + [Sk Label DY] END""")
 
 # ---------- what shows, in what order, in what colour
 add("Sk N", "integer", "row", 'CASE [sk_part] WHEN "Link" THEN [Sk Link N] WHEN "Header" THEN 1 ELSE [Sk Node N] END')
 add("Sk Show", "boolean", "row",
     '[Sk Row] AND [Sk N] > 0 AND NOT ([sk_part] = "Label" AND [sk_point] = 1 AND NOT [Sk Show Count])')
+# one polygon per ribbon or box (sk_point is on Path, so it must not split the shape); a text mark per point
 add("Sk Mark", "string", "row",
-    '[sk_part] + "|" + STR([sk_level]) + "|" + STR([sk_point]) + "|" + IFNULL([flag_code], "") + "|" + IFNULL([risk], "") + "|" + IFNULL([place], "")')
+    '[sk_part] + "|" + STR([sk_level]) + "|" + IIF([sk_part] = "Link" OR [sk_part] = "Node", "", STR([sk_point]))'
+    ' + "|" + IFNULL([flag_code], "") + "|" + IFNULL([risk], "") + "|" + IFNULL([place], "")')
 add("Sk Draw", "real", "row", 'IF [sk_part] = "Link" THEN -[Sk Link N] ELSE 100000 END')
 add("Sk Colour", "string", "row", """IF [sk_part] = "Link" THEN (IF [sk_level] = 1 THEN [flag_code] + " ribbon" ELSE "Risk ribbon" END)
 ELSEIF [sk_level] = 1 THEN [flag_code]
@@ -152,9 +158,13 @@ ELSE [place] END""")
 # ---------- box labels: row 0 the name, row 1 the count (only when the box is tall enough); white on the slate risks
 add("Sk Lbl Header", "string", "row",
     'IF [sk_part] = "Header" THEN CASE [sk_level] WHEN 1 THEN "What differs" WHEN 2 THEN "What it puts at risk" ELSE "Where it is aligned" END END')
+add("Sk Pct Str", "string", "row", 'IF [Total Gaps] > 0 THEN STR(ROUND(100 * [Sk Node N] / [Total Gaps], 1)) + "%" END')
+add("Sk Count Str", "string", "row", 'STR([Sk Node N]) + " · " + [Sk Pct Str]')
 add("Sk Box Text", "string", "row", """IF [sk_part] = "Label" THEN
-  IF [sk_point] = 0 THEN CASE [sk_level] WHEN 1 THEN [flag_short] WHEN 2 THEN [risk] ELSE [place_label] END
-  ELSE "(" + STR([Sk Node N]) + ")" END
+  IF [sk_point] = 0 THEN CASE [sk_level] WHEN 1 THEN [flag_short] WHEN 2 THEN [risk] ELSE [place] END
+  ELSEIF [sk_level] = 3 THEN CASE [place] WHEN "Bridgeway" THEN "vendor system" WHEN "Keystone" THEN "HR system" ELSE "integration" END
+  ELSE [Sk Count Str] END
+ELSEIF [sk_part] = "Node" AND [sk_level] = 3 THEN [Sk Count Str]
 END""")
 add("Sk Lbl Dark", "string", "row", "IF [sk_level] <> 2 THEN [Sk Box Text] END")
 add("Sk Lbl White", "string", "row", "IF [sk_level] = 2 THEN [Sk Box Text] END")
@@ -249,11 +259,10 @@ OBSOLETE = [c for c in OBSOLETE if c not in {x[0] for x in C}]
 def _tint(h, a=0.45):
     h = h.lstrip('#'); r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
     return '#%02X%02X%02X' % tuple(round(a * v + (1 - a) * 255) for v in (r, g, b))
-FLAG_COLOURS = {'F01': '#6F8FB0', 'F02': '#97B0C9', 'F03': '#BFCFDF',   # Active headcount mismatch: blue-grey
-                'F04': '#C9A27E',                                     # Billing after the end date: sand
-                'F05': '#ADA79C',                                     # Cost center mismatch: warm grey
-                'F06': '#A38AA6', 'F07': '#C9B7CB',                   # PID mismatch: dusty plum
-                'F08': '#CDAE6E', 'F09': '#E3D0A6'}                   # Status mismatch: ochre
+# revision 8: nine independent hues at one strength (OKLCH lightness 0.68, chroma 0.11), none near the place hues
+# ordered so neighbouring flags contrast (no column of look-alike families)
+FLAG_COLOURS = {'F01': '#D47B7C', 'F02': '#3AA6CB', 'F03': '#90A250', 'F04': '#B582C4', 'F05': '#AE9740',
+                'F06': '#20ACB3', 'F07': '#CB7BA2', 'F08': '#70A969', 'F09': '#619DDA'}
 PALETTE = {**FLAG_COLOURS, **{f'{k} ribbon': _tint(v) for k, v in FLAG_COLOURS.items()},
-           'Risk': '#4F6980', 'Risk ribbon': _tint('#4F6980'),
+           'Risk': '#4F6980', 'Risk ribbon': _tint('#4F6980'),   # same tint as the flag ribbons; white borders show the crossings
            'Bridgeway': '#F89217', 'Keystone': '#7873C0', 'System feed': '#21B087'}
