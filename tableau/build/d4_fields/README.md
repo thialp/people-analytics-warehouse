@@ -34,4 +34,4 @@ python3 tableau/build/d4_fields/build_sankey.py "in.twb" "out.twb"
 
 Run on 2026-10-25: 142 `Sk` calcs and 3 parameters; `check.py` 374 formulas, no problems; `verify_sankey.py` matches the design at Jun 2026, Dec 2024 and Jun 2026 with Marketing.
 
-Revision 5 (flag labels on their own sheet) was typed into the open workbook by hand; `spec_sankey.py` carries the same formulas, so a fresh build from the spec gives the same fields. `build_sankey.py` refuses a workbook that already has `Sk` fields.
+Revision 5 (flag labels on their own sheet): `patch_flag_labels.py` changes `Sk W`, `Sk X3` and `Sk Y Text`, adds `Sk Flag Y` and `Sk Flag X`, sets the `Sankey Native` X axis to 0 to 576 and builds the `Sankey Flag Labels` sheet from `Sankey Native`'s data source references. `spec_sankey.py` carries the same formulas; `build_sankey.py` refuses a workbook that already has `Sk` fields.

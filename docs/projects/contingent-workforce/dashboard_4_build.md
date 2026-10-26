@@ -10,7 +10,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 2 | 2026-10-25 | Steps 3 and 4 done by a generator (`tableau/build/d4_fields/`): every parameter and calc written into the workbook and checked. Small changes to make the formulas valid as written: `Has Prior` is an aggregate; `Main Subtitle` is an aggregate with `Top Flag Prior Rank` and `Clear Own Gaps`; one `Tick Shape` and one `List Row` per list; `p_Close` allows All, opening on `Latest Close` |
 | 3 | 2026-10-25 | Status marks: 🟢 in the workbook, 🔴 still to add by hand (only the `kpi_` set, step 9). Folder `4 Contingent Workforce Reconciliation` (no leading zero) |
 | 4 | 2026-10-25 | **Native Sankey (D15, section 9N).** The Custom SQL gains the Sankey scaffold (2,188 rows) and `flag_short`; 3 parameters and 142 `Sk` calcs written into the workbook and checked against the data (`verify_sankey.py`). Version A, the extension, kept as section 9 |
-| 5 | 2026-10-25 | Flag labels left of the flag nodes, right-aligned, on their own 150 px sheet beside a 576 px Sankey (`Sk Flag Y`, `Sk Flag X`; `Sk Y Text`, `Sk W`, `Sk X3` changed). Thiago made the edits by hand in the open workbook; `spec_sankey.py` matches |
+| 5 | 2026-10-25 | Flag labels left of the flag nodes, right-aligned, on their own 150 px sheet beside a 576 px Sankey (`Sk Flag Y`, `Sk Flag X`; `Sk Y Text`, `Sk W`, `Sk X3` changed). Written into the workbook by `patch_flag_labels.py`, which also builds the `Sankey Flag Labels` sheet and sets the `Sankey Native` X axis to 0 to 576; `spec_sankey.py` matches |
 
 ## Contents
 
@@ -696,7 +696,7 @@ Text mark, `Main Title` and `Main Subtitle` on Label: line 1 Tableau Semibold 12
 
 **Flag labels on their own sheet (revision 5).** The flag names sit left of the flag nodes, right-aligned, as in the prototype. Label alignment is one setting per Marks card, so they get their own sheet beside the Sankey, tiled, not floating over it, so the Sankey keeps its hovers and clicks. `Sk Y Text` carries the risk and place labels only; `Sk Flag Y` and `Sk Flag X` (144) carry the flags and "What differs".
 
-**Sheet `Sankey Flag Labels`:** Filters `Sk Show` = True. Columns `Sk Flag X` (AVG), axis Fixed 0 to 150; Rows `Sk Flag Y` (AVG), axis Fixed 0 to 540, Reversed; headers and the null indicator hidden. Circle, smallest, opacity 0%; Detail `Sk Mark`; Label `<Sk Lbl Header><Sk Lbl Name> <Sk Lbl Count>` (names Book 9 navy, counts Book 9 `#6B7079`, header Book 8 `#6B7079`), alignment horizontal **Left** (the text ends at the point, 6 px before the nodes), vertical Middle, overlap allowed. Tooltip off; lines, borders and shading None. Optional: the three "Sankey picks" actions with this sheet as a second source.
+**Sheet `Sankey Flag Labels`** (🟢 built by `patch_flag_labels.py`; check it against this): Filters `Sk Show` = True. Columns `Sk Flag X` (AVG), axis Fixed 0 to 150; Rows `Sk Flag Y` (AVG), axis Fixed 0 to 540, Reversed; headers and the null indicator hidden. Circle, smallest, opacity 0%; Detail `Sk Mark`; Label `<Sk Lbl Header><Sk Lbl Name> <Sk Lbl Count>` (names Book 9 navy, counts Book 9 `#6B7079`, header Book 8 `#6B7079`), alignment horizontal **Left** (the text ends at the point, 6 px before the nodes), vertical Middle, overlap allowed. Tooltip off; lines, borders and shading None. Optional: the three "Sankey picks" actions with this sheet as a second source.
 
 | `Sk Colour` | Hex | What |
 |---|---|---|
