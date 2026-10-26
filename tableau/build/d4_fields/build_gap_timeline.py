@@ -478,3 +478,14 @@ assert ''.join(vparts) == s[vs:ve], 'unexpected viewpoint layout'
 s = s[:vs] + ''.join(sorted(vparts, key=lambda v: re.search(r"name='([^']*)'", v).group(1))) + s[ve:]
 open(out, 'w', encoding='utf-8').write(s)
 print('sheets', [x[0] for x in SHEETS], 'zones', GT, GL, SHOWCTL, 'hidden Main', MAIN_TITLE, MAIN_PANEL)
+
+# reference-line tooltips need their manifest flag (else error D2E8DA72: 'tooltip-type' not declared)
+s = open(out, encoding='utf-8').read()
+m0 = s.index('<document-format-change-manifest>')
+m1 = s.index('</document-format-change-manifest>')
+man = re.findall(r"    <[^>]+ />\n", s[m0:m1])
+for f in ('CustomReferenceLineTooltips',):
+    if f"<{f} />" not in s[m0:m1]:
+        man.append(f"    <{f} />\n")
+s = s[:m0] + '<document-format-change-manifest>\n' + ''.join(sorted(man, key=lambda x: x.strip().replace("_.fcp.", "").lower())) + '  ' + s[m1:]
+open(out, 'w', encoding='utf-8').write(s)
