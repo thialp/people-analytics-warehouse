@@ -14,6 +14,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 6 | 2026-10-25 | **Sankey v2 (9N.0):** the extension's look built natively, approved from a design board: colour boxes with labels inside, ribbons by flag × place so a path highlights, minimum box height, a scale cap for small selections. `apply_sankey_v2.py` wrote it into the workbook; the revision 5 flag-label sheet is gone |
 | 7 | 2026-10-25 | Sankey v2 refresh hang fixed: every intermediate is a FIXED LOD (`Sk Y` 168 million terms to 270; same output). Flag palette A, muted families, replaces Tableau 20 (no red and green). `sync_sankey.py` brings a v2 workbook to the spec |
 | 8 | 2026-10-25 | Revision 7 refreshed but the Sankey sheet query never finished (Tableau at 200% CPU): its LODs nested 12 deep, and Tableau builds each LOD as a subquery with the LODs it references nested inside. Every Sankey LOD now reads raw rows only (depth 1); a box is `Sk Min H` + gaps x `Sk Scale`, a closed form with no fitting loop, so 44 fitting fields are gone. Largest formula 1,710 terms, no nested subqueries |
+| 9 | 2026-10-26 | **Step 6 done.** Final Sankey look (nine independent flag hues at one strength, count and share labels, 156-wide boxes, white borders, risk ribbons at the flag ribbon tint), highlight action in, checked at Jun 2026, Dec 2024 and Marketing. Status table brought up to date: step 5 is partly built (see section 0). Open: ribbon and border colour polish, the click that fades everything (with step 14) |
 
 ## Contents
 
@@ -50,8 +51,8 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 2 | Workbook and data source | Thiago | S | Done in the spike workbook; step 2 makes it the real one |
 | 3 | Parameters | Claude | S | **Written into the workbook** 2026-10-25 (10; `kpi_` in step 9) |
 | 4 | Calculations | Claude | M | **Written into the workbook** 2026-10-25 (211 new; the 21 spike label and tooltip calcs rewritten in place) |
-| **5** | **Dashboard shell: rail, KPI band, three cards, footnote, with placeholders; the Sankey in its tile (section 8)** | Thiago | S | **Next** |
-| 6 | The Sankey, **native v2** (section 9N.0): extension look, path highlight. Version A, the extension (section 9), stays in the workbook | Claude, Thiago | M | **Sheet built and on the dashboard**; Thiago: extract refresh, the highlight action, the check |
+| **5** | **Dashboard shell: rail, KPI band, three cards, footnote, with placeholders; the Sankey in its tile (section 8)** | Thiago | S | **Half done:** page 1400 x 850, `Rail` container, KPI band image, the three cards, footnote and title placeholder are on the page. **Missing:** the rail's items R1 to R27 (8.3), the card title placeholders, and the three test parameter controls at the top to remove |
+| 6 | The Sankey, **native v2** (section 9N.0): extension look, path highlight. Version A, the extension (section 9), stays in the workbook | Claude, Thiago | M | **Done** 2026-10-26: on the page, follows every filter, highlight and the four click actions are in. Open: ribbon and border colours (later), the select-and-fade click (step 14, `zz` deselect) |
 | 7 | Rail controls | Thiago | M | |
 | 8 | Popovers: Point in time, Function, Department, Country, Info | Thiago | L | Needs S4 |
 | 9 | KPI band and hovers | Thiago | M | |
@@ -62,7 +63,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 14 | Actions (about 50) and the deselect audit | Thiago | M | |
 | 15 | Checks and click tests | Both | M | |
 | 16 | Publish, README, screenshot, profile | Both | S | Needs S6 |
-| | Shapes and images (section 20) | Claude | S | Before step 7 |
+| | Shapes and images (section 20) | Claude | S | Before step 7. **Not made yet:** `docs/brand/shapes/by_dashboard/d4/` does not exist |
 
 S is an hour or less, M a session, L more than one session. One screenshot per step; I check it against the expected values written in the step.
 
