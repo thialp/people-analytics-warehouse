@@ -331,5 +331,12 @@ for ph, sh in PLACE.items():
     d = d[:start] + new + d[end:]
     n_done += 1
 s = s[:a] + d + s[b:]
+
+# the dashboard's window keeps a viewpoint for every sheet placed on it
+placed = [sh for ph, sh in PLACE.items() if sh not in SKIP and not os.environ.get('NOSWAP')]
+wi = s.index("<window class='dashboard' maximized='true' name='CW Reconciliation'")
+vend = s.index('</viewpoints>', wi)
+vp = ''.join(f"        <viewpoint name='{sh}'>\n          <zoom type='entire-view' />\n        </viewpoint>\n" for sh in placed)
+s = s[:vend] + vp + s[vend:]
 open(out, 'w', encoding='utf-8').write(s)
 print('sheets', len(SHEETS), 'zones swapped', n_done)
