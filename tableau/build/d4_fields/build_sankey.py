@@ -125,7 +125,9 @@ s = s[:pend] + plines.lstrip(' ') + '    ' + s[pend:]
 
 # ---------- 4. calcs, before the data source's first <group
 ds_start = s.index(f"<datasource caption='CW Reconciliation' inline='true' name='{DS}'")
-g = s.index('      <group ', ds_start)
+ds_close = s.index('</datasource>', ds_start)
+cands = [s.find(t, ds_start, ds_close) for t in ('\n      <column-instance ', '\n      <group ')]
+g = min(c for c in cands if c != -1) + 1          # new columns go before any column-instance (schema order)
 s = s[:g] + ''.join(col_xml(*c) for c in C) + s[g:]
 
 open(out, 'w', encoding='utf-8').write(s)

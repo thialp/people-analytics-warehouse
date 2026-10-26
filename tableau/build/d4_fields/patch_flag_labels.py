@@ -44,7 +44,9 @@ def col(cap, dt, cid, f, ind):
     return (f"{ind}<column caption='{cap}' datatype='{dt}' name='[{cid}]' role='measure' type='quantitative'>\n"
             f"{ind}  <calculation class='tableau' formula='{esc('// ' + cap + chr(10) + f)}' />\n{ind}</column>\n")
 ds_start = s.index(f"<datasource caption='CW Reconciliation' inline='true' name='{DS}'")
-g = s.index('      <group ', ds_start)
+ds_close = s.index('</datasource>', ds_start)
+cands = [s.find(t, ds_start, ds_close) for t in ('\n      <column-instance ', '\n      <group ')]
+g = min(c for c in cands if c != -1) + 1          # new columns go before any column-instance (schema order)
 s = s[:g] + ''.join(col(*c, '      ') for c in NEWC) + s[g:]
 
 # ---------- Sankey Native: axis 0 to 576, no Measure Names colour on the text layer
@@ -86,14 +88,14 @@ sheet = f"""<worksheet name='Sankey Flag Labels'>
             <format attr='display' class='0' field='{Q}.[avg:{FX}:qk]' scope='cols' value='false' />
             <format attr='display' class='0' field='{Q}.[avg:{FY}:qk]' scope='rows' value='false' />
           </style-rule>
+          <style-rule element='table'>
+            <format attr='show-null-value-warning' value='false' />
+          </style-rule>
           <style-rule element='gridline'>
             <format attr='line-visibility' value='off' />
           </style-rule>
           <style-rule element='zeroline'>
             <format attr='line-visibility' value='off' />
-          </style-rule>
-          <style-rule element='table'>
-            <format attr='show-null-value-warning' value='false' />
           </style-rule>
         </style>
         <panes>
