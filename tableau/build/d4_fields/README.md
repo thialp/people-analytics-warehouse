@@ -39,3 +39,7 @@ Revision 5 (flag labels on their own sheet): `patch_flag_labels.py` changes `Sk 
 ## Sankey v2 (build doc 9N.0, revision 6)
 
 `apply_sankey_v2.py` takes a workbook with the v1 native Sankey to v2, the extension's look built natively: the new Custom SQL (ribbons by flag × place, two label rows per box), every `Sk` field to `spec_sankey.py` (134 rewritten, 70 added, 9 removed), the 23-colour palette, the `Sankey Native` sheet relabelled, the revision 5 flag-label sheet and its tiles removed. `patch_flag_labels.py` (revision 5) is kept for the record; v2 supersedes it.
+
+## Revision 7: the refresh hang, palette A
+
+Tableau pastes every referenced formula in again where it is used. The v2 chain expanded `Sk Y` to about 168 million terms and Tableau hung building the query. Every intermediate in `spec_sankey.py` is now its own FIXED LOD, computed once and referenced as a column (`Sk Y` is 270 terms); `verify_sankey.py` (which now builds one table per step) draws byte-identical output. `sync_sankey.py` brings a v2 workbook to the spec: formulas, new and obsolete fields, and the `PALETTE` (palette A, muted families).

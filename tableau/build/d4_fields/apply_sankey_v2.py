@@ -124,13 +124,7 @@ g = min(c for c in cands if c != -1) + 1
 s = s[:g] + ''.join(col_xml(c, '      ') for c in new_caps) + s[g:]
 
 # ---------- 5. the Sk Colour palette
-def tint(h, a=0.45):
-    h = h.lstrip('#'); r, g_, b_ = (int(h[i:i + 2], 16) for i in (0, 2, 4))
-    return '#%02X%02X%02X' % tuple(round(a * v + (1 - a) * 255) for v in (r, g_, b_))
-FCOL = {'F01': '#FF9D9A', 'F02': '#59A14F', 'F03': '#FFBE7D', 'F04': '#E15759', 'F05': '#FABFD2', 'F06': '#8CD17D',
-        'F07': '#D4A6C8', 'F08': '#F1CE63', 'F09': '#A0CBE8'}
-PAL = {**FCOL, **{f'{k} ribbon': tint(v) for k, v in FCOL.items()}, 'Risk': '#4F6980', 'Risk ribbon': tint('#4F6980'),
-       'Bridgeway': '#F89217', 'Keystone': '#7873C0', 'System feed': '#21B087'}
+from spec_sankey import PALETTE as PAL
 maps = ''.join(f"            <map to='{v.lower()}'>\n              <bucket>&quot;{k}&quot;</bucket>\n            </map>\n" for k, v in PAL.items())
 maps += "            <map to='#bab0ac'>\n              <bucket>%null%</bucket>\n            </map>\n"
 cc = cap2int['Sk Colour']
