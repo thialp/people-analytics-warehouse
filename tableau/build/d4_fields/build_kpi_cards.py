@@ -217,7 +217,7 @@ def pane(pid, title, text_cap_list, ptcap, kind, valcolor='#13223a'):
                 elif c.endswith('Low'):
                     runs += run('Tableau Semibold', '9', '#0e7d5f', tinst(c)[0])
                 else:
-                    runs += run('Tableau Book', '10', '#5a6170', tinst(c)[0], lead='  ')
+                    runs += run('Tableau Book', '10', '#5a6170', tinst(c)[0], lead=' ')
             lab = f"<customized-label>\n<formatted-text>\n{runs}</formatted-text>\n</customized-label>\n"
             dl = ("<style-rule element='datalabel'>\n<format attr='color-mode' value='user' />\n"
                   f"<format attr='font-family' value='Tableau Bold' />\n<format attr='font-size' value='20' />\n<format attr='color' value='{valcolor}' />\n</style-rule>\n")
