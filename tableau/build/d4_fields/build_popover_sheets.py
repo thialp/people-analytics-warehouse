@@ -151,7 +151,8 @@ def psheet(name, mark, dims, rows=None, cols=None, text=None, color=None, shape=
         enc += f"              <lod column='{D}.{iname}' />\n"
     lab = ''
     if label:
-        lab = (f"            <customized-label>\n              <formatted-text>\n                <run{label[1]}><![CDATA[<{ref(text)}>]]></run>\n"
+        pre = f"                <run{label[1]}>\u2003\u2003</run>\n" if mark == 'Shape' else ''
+        lab = (f"            <customized-label>\n              <formatted-text>\n{pre}                <run{label[1]}><![CDATA[<{ref(text)}>]]></run>\n"
                f"              </formatted-text>\n            </customized-label>\n")
     ax = ''
     for shelfref, key, scope in ((rows_ref, 'rows', 'rows'), (cols_refs[-1], 'cols', 'cols')):
@@ -214,6 +215,8 @@ def psheet(name, mark, dims, rows=None, cols=None, text=None, color=None, shape=
 {zero}          <style-rule element='gridline'>
             <format attr='stroke-size' scope='rows' value='0' />
             <format attr='line-visibility' scope='rows' value='off' />
+            <format attr='stroke-size' scope='cols' value='0' />
+            <format attr='line-visibility' scope='cols' value='off' />
           </style-rule>
           <style-rule element='table-div'>
             <format attr='stroke-size' scope='rows' value='0' />
@@ -364,7 +367,8 @@ ds_s = s.index(f"<datasource caption='CW Reconciliation' inline='true' name='{DS
 ds_e = s.index('</datasource>', ds_s)
 m = re.search(r"<style-rule element='mark'>\n", s[ds_s:ds_e])
 assert m, 'no mark style rule in the data source'
-pos = ds_s + m.end()
+pos = ds_s + m.end() + s[ds_s + m.end():ds_e].index('</style-rule>')
+pos = s.rfind('\n', 0, pos) + 1
 s = s[:pos] + enc_all + s[pos:]
 
 # swap placeholders for sheets
@@ -392,6 +396,12 @@ for ph, sh in PLACE.items():
            f"<format attr='border-color' value='#000000' />\n<format attr='border-style' value='none' />\n<format attr='border-width' value='0' />\n"
            f"<format attr='margin' value='0' />\n{PAD.get(sh, '')}</zone-style>\n</zone>")
     d = d[:start] + new + d[end:]
+# temporary test controls for the five open flags (removed in step 14)
+zend = d.index('  </zones>')
+tc = ''
+for i, pn in enumerate(('0725102600000006', '0725102600000007', '0725102600000008', '0725102600000009', '0725102600000010')):
+    tc += f"<zone h='5176' id='{260 + i}' mode='compact' param='[Parameters].[Parameter {pn}]' type-v2='paramctrl' w='7400' x='{62000 + i * 7600}' y='7700' />\n"
+d = d[:zend] + tc + d[zend:]
 s = s[:a] + d + s[b:]
 
 # the dashboard window needs a viewpoint for every sheet placed on it, kept in name order
