@@ -23,14 +23,10 @@ for cap, v in (("Sk W", "726"), ("Sk H", "540"), ("Sk Top", "22"), ("Sk Bottom",
 add("Sk X2", "real", "row", "([Sk X1] + [Sk Node W] + [Sk X3]) / 2 - [Sk Node W] / 2")
 add("Sk Label DY", "real", "row", "0")   # nudge (px, + is down) if the box labels sit high or low
 
-# Tableau pastes every referenced formula in again where it is used, so a deep chain of references grows the
-# query until it hangs. Each intermediate below is its own FIXED LOD (computed once, then referenced as one
-# column): L() for one value for the whole selection, LF/LR/LP for one value per flag, risk or place.
-L = lambda e: f"{{ FIXED : MIN({e}) }}"
-LF = lambda e: f"{{ FIXED [flag_code] : MIN({e}) }}"
-LR = lambda e: f"{{ FIXED [risk_order] : MIN({e}) }}"
-LP = lambda e: f"{{ FIXED [place_order] : MIN({e}) }}"
-
+# Revision 8: every LOD reads raw rows only (one level deep). Tableau turns each LOD into a subquery and nests
+# the LODs it references inside it; revision 7 nested them 12 deep and the sheet's query never finished.
+# Positions are now closed-form arithmetic on one-level LODs: a box is Sk Min H plus its gaps times one scale,
+# so no fitting loop is needed and every column fits by construction.
 # ---------- the rows
 add("Sk Row", "boolean", "row", '[row_type] = "Sankey"')
 add("Sk Fi", "integer", "row", "INT(MID([flag_code], 2, 2))")
@@ -49,35 +45,23 @@ add("Sk NR", "integer", "row", "{ FIXED : COUNTD(IF [Sankey Gap Row] THEN [risk]
 add("Sk NP", "integer", "row", "{ FIXED : COUNTD(IF [Sankey Gap Row] THEN [place] END) }")
 add("Sk Avail", "real", "row", "[Sk H] - [Sk Top] - [Sk Bottom]")
 
-# ---------- scale: the largest one where every column fits with boxes at least Sk Min H tall, at most Sk Max Scale
-# Per column: start from the plain fit, then twice take the boxes that fall under Sk Min H out of the share
-# (they get Sk Min H each) and refit the rest. Two passes settle the 9 / 5 / 3 columns.
-for col, n in COLS:
-    N = f"[Sk N{col}]"
-    add(f"Sk S0 {col}", "real", "row", L(f"IF [Total Gaps] > 0 THEN ([Sk Avail] - [Sk Pad] * ({N} - 1)) / [Total Gaps] END"))
-    for i in (1, 2):
-        prev = f"[Sk S{i - 1} {col}]"
-        small = lambda k: f"([Sk {col}{k}] > 0 AND [Sk {col}{k}] * {prev} < [Sk Min H])"
-        add(f"Sk Small N{i} {col}", "integer", "row", L(" + ".join(f"IIF({small(k)}, 1, 0)" for k in range(1, n + 1))))
-        add(f"Sk Small Sum{i} {col}", "integer", "row", L(" + ".join(f"IIF({small(k)}, [Sk {col}{k}], 0)" for k in range(1, n + 1))))
-        add(f"Sk S{i} {col}", "real", "row", L(
-            f"IF [Total Gaps] - [Sk Small Sum{i} {col}] > 0\n"
-            f"THEN ([Sk Avail] - [Sk Pad] * ({N} - 1) - [Sk Min H] * [Sk Small N{i} {col}]) / ([Total Gaps] - [Sk Small Sum{i} {col}])\n"
-            f"ELSE {prev} END"))
-add("Sk Fit Scale", "real", "row", L(
-    "IF [Sk S2 F] <= [Sk S2 R] AND [Sk S2 F] <= [Sk S2 P] THEN [Sk S2 F] ELSEIF [Sk S2 R] <= [Sk S2 P] THEN [Sk S2 R] ELSE [Sk S2 P] END"))
+# ---------- scale: a box is Sk Min H + its gaps x Sk Scale. Per column, n boxes fit when
+# n x Sk Min H + Sk Pad x (n - 1) + Total Gaps x scale = Sk Avail, so the column with the most boxes sets the scale.
+# One LOD, aggregates of raw rows only (the constants are written in as numbers, not as fields).
+_K = dict(H=540, Top=22, Bottom=2, Pad=6, MinH=14)
+_AV = _K["H"] - _K["Top"] - _K["Bottom"]
+_n = {c: f"COUNTD(IF [Sankey Gap Row] THEN [{k}] END)" for c, k in (("F", "flag_code"), ("R", "risk"), ("P", "place"))}
+_maxn = f"IF {_n['F']} >= {_n['R']} AND {_n['F']} >= {_n['P']} THEN {_n['F']} ELSEIF {_n['R']} >= {_n['P']} THEN {_n['R']} ELSE {_n['P']} END"
+add("Sk Fit Scale", "real", "row", "{ FIXED : IF SUM([Sankey Gap]) > 0\n"
+    f"  THEN ({_AV + _K['Pad']} - {_K['MinH'] + _K['Pad']} * ({_maxn})) / SUM([Sankey Gap]) END }}")
 add("Sk Capped", "boolean", "row", "[Sk Fit Scale] > [Sk Max Scale]")
-add("Sk Scale", "real", "row", L("IF [Sk Fit Scale] > [Sk Max Scale] THEN [Sk Max Scale] ELSE [Sk Fit Scale] END"))
+add("Sk Scale", "real", "row", "IF [Sk Fit Scale] > [Sk Max Scale] THEN [Sk Max Scale] ELSE [Sk Fit Scale] END")
 
-# ---------- box heights (proportional, never under Sk Min H), and each column's gap between boxes
-for col, n in COLS:
-    for k in range(1, n + 1):
-        v = f"[Sk {col}{k}]"
-        add(f"Sk {col}H{k}", "real", "row",
-            L(f"IF {v} > 0 THEN (IF {v} * [Sk Scale] > [Sk Min H] THEN {v} * [Sk Scale] ELSE [Sk Min H] END) ELSE 0 END"))
-    add(f"Sk {col} Used", "real", "row", L(" + ".join(f"[Sk {col}H{k}]" for k in range(1, n + 1))))
+# ---------- each column's space between boxes (all the room left over, or Sk Pad when a small selection is capped)
+for col in ("F", "R", "P"):
     add(f"Sk Gap {col}", "real", "row",
-        L(f"IF [Sk Capped] THEN [Sk Pad] ELSEIF [Sk N{col}] > 1 THEN ([Sk Avail] - [Sk {col} Used]) / ([Sk N{col}] - 1) ELSE 0 END"))
+        f"IF [Sk Capped] THEN [Sk Pad] ELSEIF [Sk N{col}] > 1\n"
+        f"THEN ([Sk Avail] - [Sk Min H] * [Sk N{col}] - [Sk Scale] * [Total Gaps]) / ([Sk N{col}] - 1) ELSE 0 END")
 
 
 def before(term, n, idx):
@@ -86,20 +70,17 @@ def before(term, n, idx):
 
 
 IDX = {"F": "[Sk Fi]", "R": "[risk_order]", "P": "[place_order]"}
-PER = {"F": LF, "R": LR, "P": LP}
 for col, n in COLS:
-    w = PER[col]
-    add(f"Sk {col} Before", "integer", "row", w(before(lambda j, c=col: f"[Sk {c}{j}]", n, IDX[col])))          # gaps before
-    add(f"Sk {col} H Before", "real", "row", w(before(lambda j, c=col: f"[Sk {c}H{j}]", n, IDX[col])))       # box heights before
-    add(f"Sk {col} NE Before", "integer", "row", w(before(lambda j, c=col: f"IIF([Sk {c}{j}] > 0, 1, 0)", n, IDX[col])))
-    add(f"Sk {col}H This", "real", "row", w(f"CASE {IDX[col]} " + " ".join(f"WHEN {k} THEN [Sk {col}H{k}]" for k in range(1, n + 1)) + " END"))
-add("Sk Y Flag", "real", "row", LF("[Sk Top] + [Sk F H Before] + [Sk F NE Before] * [Sk Gap F]"))
-add("Sk Y Risk", "real", "row", LR("[Sk Top] + [Sk R H Before] + [Sk R NE Before] * [Sk Gap R]"))
-add("Sk Y Place", "real", "row", LP("[Sk Top] + [Sk P H Before] + [Sk P NE Before] * [Sk Gap P]"))
-# one gap's height inside each box (boxes held at Sk Min H are taller than their share)
-add("Sk F Unit", "real", "row", LF("IF [Flag Gaps] > 0 THEN [Sk FH This] / [Flag Gaps] END"))
-add("Sk R Unit", "real", "row", LR("IF [Risk Gaps] > 0 THEN [Sk RH This] / [Risk Gaps] END"))
-add("Sk P Unit", "real", "row", LP("IF [Place Gaps] > 0 THEN [Sk PH This] / [Place Gaps] END"))
+    add(f"Sk {col} Before", "integer", "row", before(lambda j, c=col: f"[Sk {c}{j}]", n, IDX[col]))          # gaps before
+    add(f"Sk {col} NE Before", "integer", "row", before(lambda j, c=col: f"IIF([Sk {c}{j}] > 0, 1, 0)", n, IDX[col]))  # boxes before
+for col, gaps in (("F", "Flag Gaps"), ("R", "Risk Gaps"), ("P", "Place Gaps")):
+    add(f"Sk {col}H This", "real", "row", f"IF [{gaps}] > 0 THEN [Sk Min H] + [{gaps}] * [Sk Scale] ELSE 0 END")
+for col, nm in (("F", "Flag"), ("R", "Risk"), ("P", "Place")):
+    add(f"Sk Y {nm}", "real", "row", f"[Sk Top] + ([Sk Min H] + [Sk Gap {col}]) * [Sk {col} NE Before] + [Sk Scale] * [Sk {col} Before]")
+# one gap's height inside each box (the Sk Min H part is shared out too, so ribbons fill the box)
+add("Sk F Unit", "real", "row", "IF [Flag Gaps] > 0 THEN [Sk FH This] / [Flag Gaps] END")
+add("Sk R Unit", "real", "row", "IF [Risk Gaps] > 0 THEN [Sk RH This] / [Risk Gaps] END")
+add("Sk P Unit", "real", "row", "IF [Place Gaps] > 0 THEN [Sk PH This] / [Place Gaps] END")
 
 # ---------- ribbons: both links are one band per flag x place, so a flag's whole path can light up
 add("Sk FP", "integer", "row", "{ FIXED [flag_label], [place] : SUM([Sankey Gap]) }")
@@ -258,6 +239,10 @@ END)
 # v1 and revision 5 fields that v2 no longer uses (apply_sankey_v2.py removes them from the workbook)
 OBSOLETE = ["Sk N Max", "Sk Gap F", "Sk Gap R", "Sk Gap P", "Sk Link H", "Sk Label DX", "Sk Lbl Name", "Sk Lbl Count",
             "Sk Lbl Place", "Sk Lbl Sub", "Sk Flag Y", "Sk Flag X"]
+# revision 7 fitting loop and per-box heights, replaced by the closed form (revision 8)
+OBSOLETE += [f"Sk {x} {c}" for c in "FRP" for x in ("S0", "S1", "S2", "Small N1", "Small Sum1", "Small N2", "Small Sum2")]
+OBSOLETE += [f"Sk {c}H{k}" for c, n in (("F", 9), ("R", 5), ("P", 3)) for k in range(1, n + 1)]
+OBSOLETE += [f"Sk {c} Used" for c in "FRP"] + [f"Sk {c} H Before" for c in "FRP"]
 OBSOLETE = [c for c in OBSOLETE if c not in {x[0] for x in C}]
 
 # ---------- the Sk Colour palette (revision 7: palette A, muted families; risks slate, places as on the rest of the page)

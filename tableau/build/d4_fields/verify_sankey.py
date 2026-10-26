@@ -69,7 +69,15 @@ def to_sql(f, deps):
         dims = dims.replace('FIXED', '').strip()
         part = f' PARTITION BY {dims}' if dims else ''
         agg = agg.strip()
-        f = f[:a] + f'({agg} OVER ({part.strip()}))' + f[b + 1:]
+        over = f' OVER ({part.strip()})'
+        for fn_ in ('SUM', 'MIN', 'MAX', 'COUNTD'):           # every aggregate in the LOD becomes a window
+            i = 0
+            while True:
+                m = re.search(r'\b' + fn_ + r'\(', agg[i:])
+                if not m: break
+                st = i + m.end() - 1; en = match(agg, st)
+                agg = agg[:en + 1] + over + agg[en + 1:]; i = en + 1 + len(over)
+        f = f[:a] + f'({agg})' + f[b + 1:]
     f = fn(f, 'IIF', lambda a: f'(CASE WHEN {a[0]} THEN {a[1]} ELSE {a[2]} END)')
     f = fn(f, 'COUNTD', lambda a: f'COUNT(DISTINCT {a[0]})')
     f = fn(f, 'ZN', lambda a: f'COALESCE({a[0]}, 0)')
@@ -103,8 +111,7 @@ for i, n in enumerate(order):                       # one table per step: a flat
 q = f'SELECT * FROM t{len(order)}'
 rows = con.execute(f"""SELECT sk_part, sk_level, flag_code, risk, place, sk_point, "Sk X", "Sk Y", "Sk Draw", "Sk N", "Sk Node H"
                        FROM ({q}) WHERE row_type = 'Sankey' AND "Sk Show" ORDER BY "Sk Draw", sk_part, sk_level, flag_code, risk, place, sk_point""").fetchall()
-FCOL = {'F01': '#FF9D9A', 'F02': '#59A14F', 'F03': '#FFBE7D', 'F04': '#E15759', 'F05': '#FABFD2', 'F06': '#8CD17D',
-        'F07': '#D4A6C8', 'F08': '#F1CE63', 'F09': '#A0CBE8'}
+FCOL = spec_sankey.FLAG_COLOURS
 PCOL = {'Bridgeway': '#F89217', 'Keystone': '#7873C0', 'System feed': '#21B087'}
 SHORT = dict(con.execute("SELECT DISTINCT flag_code, flag_short FROM w.marts.mart_cw_reconciliation_dashboard WHERE flag_short IS NOT NULL").fetchall())
 PL = {'Bridgeway': 'Bridgeway (vendor system)', 'Keystone': 'Keystone (HR system)', 'System feed': 'System feed (integration)'}
