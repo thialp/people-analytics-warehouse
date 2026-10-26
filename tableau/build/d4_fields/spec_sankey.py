@@ -15,9 +15,9 @@ C = []
 def add(cap, dt, kind, f):
     C.append((cap, dt, kind, f))
 
-# ---------- constants (the tile is 726 x 540; tune here, everything follows)
-for cap, v in (("Sk W", "726"), ("Sk H", "540"), ("Sk Top", "26"), ("Sk Bottom", "4"), ("Sk Node W", "10"),
-               ("Sk Pad", "8"), ("Sk X1", "0"), ("Sk X3", "566"), ("Sk Points", "25"), ("Sk Label DX", "5")):
+# ---------- constants (the Sankey sheet is 576 x 540, beside a 150 px flag-label sheet: 726 in all)
+for cap, v in (("Sk W", "576"), ("Sk H", "540"), ("Sk Top", "26"), ("Sk Bottom", "4"), ("Sk Node W", "10"),
+               ("Sk Pad", "8"), ("Sk X1", "0"), ("Sk X3", "436"), ("Sk Points", "25"), ("Sk Label DX", "5")):
     add(cap, "integer", "row", v)
 add("Sk X2", "real", "row", "([Sk X1] + [Sk Node W] + [Sk X3]) / 2 - [Sk Node W] / 2")
 add("Sk Label DY", "real", "row", "0")   # nudge (px, + is down) if the one-line labels sit high
@@ -111,7 +111,10 @@ add("Sk Y", "real", "row", """CASE [sk_part]
   WHEN "Header" THEN 10
 END""")
 add("Sk Y Shape", "real", "row", 'IF [sk_part] = "Link" OR [sk_part] = "Node" THEN [Sk Y] END')
-add("Sk Y Text", "real", "row", 'IF [sk_part] = "Label" OR [sk_part] = "Header" THEN [Sk Y] END')
+add("Sk Y Text", "real", "row", 'IF ([sk_part] = "Label" OR [sk_part] = "Header") AND [sk_level] > 1 THEN [Sk Y] END')
+# the flag labels and their header sit on their own sheet, left of the flag nodes, right-aligned (9N.2b)
+add("Sk Flag Y", "real", "row", 'IF ([sk_part] = "Label" OR [sk_part] = "Header") AND [sk_level] = 1 THEN [Sk Y] END')
+add("Sk Flag X", "integer", "row", "144")
 
 # ---------- what shows, in what order, in what colour
 add("Sk N", "integer", "row", 'CASE [sk_part] WHEN "Link" THEN [Sk Link N] WHEN "Header" THEN 1 ELSE [Sk Node N] END')

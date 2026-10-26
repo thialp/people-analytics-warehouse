@@ -10,6 +10,7 @@ Companion documents: the release plan [release_4_plan.md](release_4_plan.md) (ph
 | 2 | 2026-10-25 | Steps 3 and 4 done by a generator (`tableau/build/d4_fields/`): every parameter and calc written into the workbook and checked. Small changes to make the formulas valid as written: `Has Prior` is an aggregate; `Main Subtitle` is an aggregate with `Top Flag Prior Rank` and `Clear Own Gaps`; one `Tick Shape` and one `List Row` per list; `p_Close` allows All, opening on `Latest Close` |
 | 3 | 2026-10-25 | Status marks: 🟢 in the workbook, 🔴 still to add by hand (only the `kpi_` set, step 9). Folder `4 Contingent Workforce Reconciliation` (no leading zero) |
 | 4 | 2026-10-25 | **Native Sankey (D15, section 9N).** The Custom SQL gains the Sankey scaffold (2,188 rows) and `flag_short`; 3 parameters and 142 `Sk` calcs written into the workbook and checked against the data (`verify_sankey.py`). Version A, the extension, kept as section 9 |
+| 5 | 2026-10-25 | Flag labels left of the flag nodes, right-aligned, on their own 150 px sheet beside a 576 px Sankey (`Sk Flag Y`, `Sk Flag X`; `Sk Y Text`, `Sk W`, `Sk X3` changed). Thiago made the edits by hand in the open workbook; `spec_sankey.py` matches |
 
 ## Contents
 
@@ -683,7 +684,7 @@ Text mark, `Main Title` and `Main Subtitle` on Label: line 1 Tableau Semibold 12
 1. New worksheet `Sankey Native`. Right-click `sk_point` in the Data pane > Convert to Dimension.
 2. Filters: `Sk Show` = True.
 3. Columns: `Sk X` (AVG). Rows: `Sk Y Shape` (AVG), then `Sk Y Text` (AVG). Right-click the second pill > Dual Axis; right-click its axis > Synchronize Axis.
-4. Axes: `Sk X` Fixed **0 to 726**. `Sk Y Shape` Fixed **0 to 540**, **Reversed** (check the right axis follows; set it the same if not). Then uncheck Show Header on all three. Right-click the null indicator, bottom right > Hide Indicator.
+4. Axes: `Sk X` Fixed **0 to 576**. `Sk Y Shape` Fixed **0 to 540**, **Reversed** (check the right axis follows; set it the same if not). Then uncheck Show Header on all three. Right-click the null indicator, bottom right > Hide Indicator.
 5. Marks card **AVG(Sk Y Shape)**: Polygon. Detail `Sk Mark`; Path `sk_point`; Color `Sk Colour` (table below), opacity **100%**, border None. On the `Sk Mark` pill: Sort > Field `Sk Draw`, Minimum, Ascending (wide ribbons first, thin ones on top, nodes last).
 6. Marks card **AVG(Sk Y Text)**: Circle, size smallest, opacity **0%**. Detail `Sk Mark`. Label: `Sk Lbl Header`, `Sk Lbl Place`, `Sk Lbl Name`, `Sk Lbl Count`, `Sk Lbl Sub`, written as:
    ```
@@ -692,6 +693,10 @@ Text mark, `Main Title` and `Main Subtitle` on Label: line 1 Tableau Semibold 12
    ```
    Fonts: Header Tableau Book 8 `#6B7079`; Place Tableau Semibold 10 navy `#13233A`; Name Tableau Book 9 navy; Count Tableau Book 9 `#6B7079`; Sub Tableau Book 9 `#5A6170`. Alignment: horizontal **Right** (the text starts right of the point), vertical **Middle**. Options: **Allow labels to overlap other marks** on. Tooltip: off on this card.
 7. Format: grid lines, zero lines and axis rulers None; borders None; worksheet shading None.
+
+**Flag labels on their own sheet (revision 5).** The flag names sit left of the flag nodes, right-aligned, as in the prototype. Label alignment is one setting per Marks card, so they get their own sheet beside the Sankey, tiled, not floating over it, so the Sankey keeps its hovers and clicks. `Sk Y Text` carries the risk and place labels only; `Sk Flag Y` and `Sk Flag X` (144) carry the flags and "What differs".
+
+**Sheet `Sankey Flag Labels`:** Filters `Sk Show` = True. Columns `Sk Flag X` (AVG), axis Fixed 0 to 150; Rows `Sk Flag Y` (AVG), axis Fixed 0 to 540, Reversed; headers and the null indicator hidden. Circle, smallest, opacity 0%; Detail `Sk Mark`; Label `<Sk Lbl Header><Sk Lbl Name> <Sk Lbl Count>` (names Book 9 navy, counts Book 9 `#6B7079`, header Book 8 `#6B7079`), alignment horizontal **Left** (the text ends at the point, 6 px before the nodes), vertical Middle, overlap allowed. Tooltip off; lines, borders and shading None. Optional: the three "Sankey picks" actions with this sheet as a second source.
 
 | `Sk Colour` | Hex | What |
 |---|---|---|
@@ -721,7 +726,7 @@ Ranks and year-ago lines show only with no group chosen (D10), as on version A.
 
 ### 9N.3 On the dashboard
 
-1. In `Card: Main`, remove `Sankey` (the sheet stays in the workbook) and drop `Sankey Native` in its place: **726 × 546, outer padding top 6** (drawn 726 × 540), Fit **Entire View**.
+1. In `Card: Main`, remove `Sankey` (the sheet stays in the workbook) and put a **horizontal container** in its place, 726 × 546: `Sankey Flag Labels` **150 × 546** and `Sankey Native` **576 × 546**, both with outer padding top 6 (drawn 540 high) and Fit **Entire View**. The two heights must match, or the labels drift from their nodes.
 2. `Main Title` sheet: replace `Main Title` and `Main Subtitle` with **`Sk Main Title`** and **`Sk Main Subtitle`** (the same sentences, with short flag names).
 3. Actions (Dashboard > Actions > Change Parameter, source `Sankey Native`, Run on **Select**, clearing **Set value to** empty):
 
@@ -751,7 +756,8 @@ The places read Bridgeway, Keystone, System feed in every state, and the flags 0
 |---|---:|---|
 | `Sk Pad` | 8 | Smallest gap between nodes in the fullest column |
 | `Sk Node W` | 10 | Node width |
-| `Sk X3` | 566 | Left edge of the place nodes; the place labels use the 150 px to its right |
+| `Sk X3` | 436 | Left edge of the place nodes on the 576 px sheet; the place labels use the 130 px to its right |
+| `Sk Flag X` | 144 | Right end of the flag labels on their 150 px sheet |
 | `Sk Top` | 26 | Room for the headers |
 | `Sk Label DX` | 5 | Gap between a node and its label |
 | `Sk Label DY` | 0 | Nudge if the one-line labels sit high (the template's empty second line can lift them) |
