@@ -190,6 +190,7 @@ for cap, sh, fld, prm in ACTS:
     out += (f"    <edit-parameter-action caption='{cap}' name='[Action{cnt[0]}_{uuid.uuid4().hex.upper()}]'>\n      <activation type='on-select' />\n"
             f"      <source dashboard='CW Reconciliation' type='sheet' worksheet='{sh}' />\n      <agg-type type='attr' />\n      <clear-option type='do-nothing' value='{clear}' />\n"
             f"      <params>\n        <param name='source-field' value='{src}' />\n        <param name='target-parameter' value='[Parameters].[{pid}]' />\n      </params>\n    </edit-parameter-action>\n")
+edit_xml, out = out, ''
 # deselect (filter the sheet to itself on zzFalse = zzTrue, auto-clear): the Dashboard #2 pattern
 DES = ['Page Title', 'Main Title', 'Gap List Title', 'Timeline Title', 'Tickets Title', 'Rail As Of', 'Close Field', 'Function Field', 'Department Field', 'Country Field',
        'Show Toggle', 'Reset', 'Info Button', 'Close Grid', 'Close Close', 'Function List', 'Function Clear', 'Function Close', 'Department List', 'Department Clear',
@@ -203,9 +204,13 @@ for sh in DES:
             f"      <source dashboard='CW Reconciliation' type='sheet' worksheet='{sh}' />\n"
             f"      <link caption='Deselect {sh}' delimiter=',' escape='\\' expression='tsl:{enc}?{dsq}.%5B{ZF}%5D~s0=&lt;[{DS}].[{ZT}]~na&gt;' include-null='true' multi-select='true' url-escape='true' />\n"
             f"      <command command='tsc:tsl-filter'>\n        <param name='target' value='{sh}' />\n      </command>\n    </action>\n")
-p = s.index('</actions>')
+# the schema wants every <action> before the first <edit-parameter-action>
+p = s.index('<edit-parameter-action')
 p = s.rfind('\n', 0, p) + 1
 s = s[:p] + out + s[p:]
+p = s.index('</actions>')
+p = s.rfind('\n', 0, p) + 1
+s = s[:p] + edit_xml + s[p:]
 
 # viewpoints for the two new sheets
 wi = s.index("<window class='dashboard' maximized='true' name='CW Reconciliation'")

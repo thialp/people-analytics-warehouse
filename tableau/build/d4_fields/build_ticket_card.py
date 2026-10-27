@@ -100,7 +100,7 @@ style = (f"          <style-rule element='axis'>\n{AX(DX, 0, 3, 'cols')}{AX(DY, 
          + FLAT + "          <style-rule element='refline'>\n"
          + ''.join(f"            <format attr='{a_}' id='refline{n}' value='{v}' />\n" for n in range(4) for a_, v in (('fill-above', '#00000000'), ('fill-below', '#00000000'), ('stroke-size', '1'), ('stroke-color', '#e4e3dd'), ('line-pattern-only', 'solid'), ('line-visibility', 'on')))
          + "          </style-rule>\n")
-refl = ''.join(f"            <reference-line axis-column='{ax}' enable-instant-analytics='false' formula='constant' id='refline{n}' label-type='none' scope='per-pane' tooltip-type='none' value='{v}' z-order='1' />\n"
+refl = ''.join(f"            <reference-line axis-column='{ax}' enable-instant-analytics='false' formula='constant' id='refline{n}' label-type='none' scope='per-pane' tooltip-type='none' value='{v}' value-column='{ax}' z-order='1' />\n"
                for n, (ax, v) in enumerate([(DX, 1), (DX, 2), (DY, 1), (DY, 2)]))
 tip = ("            <customized-tooltip show-buttons='false'>\n              <formatted-text>\n"
        + tr2('#13243a', 'Tableau Semibold', '10', f"<{A('ticket_title')}>") + NL
