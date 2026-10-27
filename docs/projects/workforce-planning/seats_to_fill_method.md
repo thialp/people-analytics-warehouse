@@ -119,7 +119,7 @@ Test f04 checks every run:
 |---|---|---|
 | `mart_pid_fill_quarter` | quarter × department × office (20 history quarters + the 4 forward) | Opened by type, filled by type, vacant at the end, employees at the start, the Budget allocated to the office |
 | `mart_fill_survival` | approval quarter × department × office × level band × requisition type × ten-day period (to 210 days) | At risk and filled: Tableau rebuilds Kaplan–Meier under any selection with `EXP(RUNNING_SUM(LN(1 - filled / at_risk)))` |
-| `mart_pid_forecast_draws` | forward quarter × department × office × draw (rows with all zeros dropped) | The six counts of section 1 |
+| `mart_pid_forecast_draws` | forward quarter × department × office × draw (396,400 rows: every cell the forecast touches has a row in every draw and quarter, zeros included, so percentiles across draws hold for any selection) | The six counts of section 1 |
 | `mart_pid_forecast_backtest` | origin × target quarter × department × office | Mean and variance of the forecast fills and vacancy, and the actuals; the page sums means and variances over a selection (cells are treated as independent) |
 | `mart_pid_forecast_accuracy` | origin × target quarter, company | P10, P50 and P90 against the actual, in range, error |
 | `mart_pid_forecast_model` | coefficient | Every term of the time-to-fill model at the report date |

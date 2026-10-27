@@ -167,6 +167,13 @@ def forward(inp: D.Inputs) -> tuple[pd.DataFrame, dict]:
     model, known = fit_at(inp, origin)
     out, demand, pool = SIM.run(inp, model, origin, targets, S.DRAWS, seed_key=0)
     out = label_targets(inp, out, targets)
+    # every department x office the forecast touches gets a row in every draw and quarter, zeros
+    # included: a percentile across draws needs all of them, even for a small selection
+    keys = out[["department_id", "location_id"]].drop_duplicates()
+    grid = keys.merge(pd.DataFrame({"quarter_offset": sorted(out["quarter_offset"].unique())}), how="cross") \
+               .merge(pd.DataFrame({"draw": range(1, S.DRAWS + 1)}), how="cross")
+    out = grid.merge(out, how="left", on=["department_id", "location_id", "quarter_offset", "draw"])
+    out[COUNTS] = out[COUNTS].fillna(0).astype(int)
     meta = run_meta("Forward", origin, known, model, len(targets), S.DRAWS, pool)
     return out[["quarter_offset", "department_id", "location_id", "draw", *COUNTS]], {"model": model, "meta": meta,
                                                                                        "demand": demand}

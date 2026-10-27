@@ -29,9 +29,9 @@ PRINT '1. Rows by type';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #s5) AS actual, 399560 AS expected
+              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #s5) AS actual, 542701 AS expected
     UNION ALL SELECT 'Quarter rows',   (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Quarter'), 21720
-    UNION ALL SELECT 'Draw rows',      (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Draw'), 253259
+    UNION ALL SELECT 'Draw rows',      (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Draw'), 396400
     UNION ALL SELECT 'Survival rows',  (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Survival'), 105294
     UNION ALL SELECT 'Backtest rows',  (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Backtest'), 19219
     UNION ALL SELECT 'Accuracy rows',  (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Accuracy'), 20
