@@ -10,7 +10,7 @@
 --   contractors_with_gap      contractors with at least one counted gap (not "Clears on its own"),
 --                             by their group in mart_cw_gap_close; a contractor can have a gap
 --                             without being in the population (Keystone only, ended in Bridgeway)
---   gap rate                  contractors_with_gap / contractors_working, against the 3% target
+--   gap rate                  contractors_with_gap / contractors_working, against the 3.5% target
 -- Executive officers' department (D-901) is excluded.
 CREATE OR REPLACE TABLE marts.mart_cw_gap_rate_close AS
 WITH pop AS (    -- grouped by Bridgeway's cost center (Keystone's for someone Bridgeway does not have working)

@@ -39,7 +39,7 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 | 📈 **1. [Headcount & FTE Walk](#case-study-1-headcount--fte-walk)** | *How did the workforce change, and why?* | Start + hires − leavers ± moves = end, for employees, contractors and both, for any team | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/arcadia_headcount_fte_walk/Dashboard)** |
 | 💵 **2. [Compensation Walk](#case-study-2-compensation-walk)** | *Why did pay in this group change?* | Each dollar of change traced to hires, exits, promotions, raises, employer costs or currency | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)** |
 | 🪑 **3. [Workforce Planning](#case-study-3-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)** |
-| 🔍 **4. [Contingent Workforce](#case-study-4-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | *in build: [prototype and plan](docs/projects/contingent-workforce/release_4_plan.md)* |
+| 🔍 **4. [Contingent Workforce](#case-study-4-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard)** |
 | 🗺️ **5. [Global Workforce Footprint](#case-study-5-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
 | 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | *coming soon* |
 | 🔮 **7. [PID Fill Forecast](#case-study-7-pid-fill-forecast-planned)** | *How many PIDs will we need to fill, and how fast can we fill them?* | Fill history of every vacant PID, then a forecast of the PIDs growth and attrition will open | *planned* |
@@ -121,7 +121,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 - **The workforce grew 7.2%**, from 39,154 to 41,955 people: employees +5.5%, contractors +11.5%.
 - **Total cost grew $403M (+9.5%).** A fair split ([Shapley values](#growth-mix-why-did-total-workforce-cost-change)) shows **$307M came from having more people** and **$140M from paying people more**, while currency moves *saved* $52M.
 - **270 contractors became employees.** Each conversion lowered run-rate cost: on average $121k a year of supplier billing was replaced by $73k of employee pay and employer costs.
-- **At the June close, 383 contractors (3.21%) have a mismatch that puts Finance's month-end report at risk**, above a 3% target and falling at every close since December: 407 gaps, 194 to align in the supplier system, 151 in the HR system, 62 in the feed between them. Counting every disagreement, including manager and office, 416 contractors (3.5%) differ; the largest group is 219 changed by hand in the HR system only.
+- **At the June close, 383 contractors (3.21%) have a mismatch that puts Finance's month-end report at risk**, below the provisional 3.5% target and falling at every close since December: 407 gaps, 194 to align in the supplier system, 151 in the HR system, 62 in the feed between them. Counting every disagreement, including manager and office, 416 contractors (3.5%) differ; the largest group is 219 changed by hand in the HR system only.
 - **Arcadia holds 51,163 PIDs**: 30,005 filled by employees, 11,941 by contractors, and 9,217 vacant (8,689 that someone left, 528 new ones waiting for a first hire). Hiring followed the plan at 79% for new PIDs and 93% for backfills.
 
 ### Why it is built this way
@@ -769,9 +769,27 @@ Finance runs its month-end report from Keystone, so the question that matters at
 | Helix Service Desk | A fictional ticket system: 3,091 tickets and 13,325 state changes since January 2021, replayed at each close, linked to gaps in tiers (ID, name in the text, none) |
 | One data source | [`custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql): gaps, populations and open tickets for all 61 closes in one union, so multi-select sets work across the page |
 
-**At the June 2026 close:** 407 gaps on 383 contractors, a **3.21% gap rate against a 3% target**, down from 3.89% in October. Bridgeway holds 194 of the gaps, Keystone 151, the system feed 62; 177 have no linked ticket and 277 are over 90 days old. At the December 2024 close the Keystone load failed for three nights, and 6 of that close's gaps existed only in the stale copy.
+**At the June 2026 close:** 407 gaps on 383 contractors, a **3.21% gap rate, below the provisional 3.5% target**, down from 3.89% in October. Bridgeway holds 194 of the gaps, Keystone 151, the system feed 62; 177 have no linked ticket and 277 are over 90 days old. At the December 2024 close the Keystone load failed for three nights, and 6 of that close's gaps existed only in the stale copy.
 
-Dashboard #4 is in build: [release plan](docs/projects/contingent-workforce/release_4_plan.md). On SQL Server the marts are views (`rpt.vw_cw_*`, [`04b`](sqlserver/04b_create_reporting_views_contingent.sql), [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql)).
+On SQL Server the marts are views (`rpt.vw_cw_*`, [`04b`](sqlserver/04b_create_reporting_views_contingent.sql), [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql)).
+
+### Tableau
+
+**Published:** [Contingent Workforce Reconciliation on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard) (release 4 data, one Custom SQL extract of 68,240 rows: gaps, populations, open tickets and the Sankey scaffold, for all 61 closes).
+
+[![Contingent Workforce Reconciliation on Tableau Public](docs/images/cw_reconciliation_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard)
+
+*The June 2026 close, all of Arcadia. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard)**: replay any month-end close since June 2021, pick one or more functions, departments or countries, hover a flag to light its path, and switch to the gap list to export the contractors behind it.*
+
+| Part | What it does |
+|---|---|
+| Rail and popovers | Point in time (a year-by-month grid of 61 closes) and multi-select Function, Department and Country. Each list toggles a name in or out of a string parameter (`\|Commercial\|Technology\|`), so several groups combine without sets, and every card follows |
+| KPI band | Contractors working, the gap rate against a provisional 3.5% target (a strip on the card turns peach above it, mint at or below), gaps still open from the prior close, gaps with no linked ticket, and gaps over 90 days; each card has a hover with its definition |
+| Sankey (native) | What differs (9 flags) → what it puts at risk (5 risks) → where it is aligned (Bridgeway, Keystone, the system feed). Drawn with polygons on a 2,805-row scaffold; every point is a FIXED LOD of the selection, kept one level deep so it draws in about a second. Boxes keep a readable minimum height, a small selection keeps its own scale, and hovering a flag lights its whole path |
+| Gap list | The same gaps, one row per contractor and flag, with the evidence and the next step in the tooltip; the Tableau Table extension adds column filters and an Excel download |
+| Timeline and tickets | The gap rate at the last 13 closes against the target, and every open Helix ticket as a dot by place and age |
+
+56 parameter actions and 29 deselect actions drive the page from one data source; flags, risks, places and gap-list rows tie at every close (test 83). Build guide with every calculation (including the full Sankey geometry), size, colour and expected value: [`dashboard_4_build.md`](docs/projects/contingent-workforce/dashboard_4_build.md).
 
 ---
 

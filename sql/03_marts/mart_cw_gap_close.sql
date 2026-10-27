@@ -10,7 +10,7 @@
 --                         alphabetically at every close (int_cw_flag_type explains why)
 --   flag_rank             rank of the flag by gaps at this close (1 = most), and at the prior close
 --                         and 12 closes earlier, so the page can say what moved
---   is_counted            counts against the 3% target (everything but "Clears on its own")
+--   is_counted            counts against the 3.5% target (everything but "Clears on its own")
 --   was_open_prior_close  the same gap episode was open at the prior close: the same contractor had
 --                         the same flag then, and this episode began on or before it (a flag that
 --                         cleared and came back between closes is a new episode, not carryover)

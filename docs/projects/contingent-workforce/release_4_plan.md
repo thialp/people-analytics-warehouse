@@ -9,6 +9,7 @@ This page tracks the release from top to bottom, from the data the generator wri
 | 1 | 2026-10-25 | Phases 1 to 6 done: generator, warehouse, SQL Server twin, Custom SQL, check tables, prototype. Phases 7 to 12 planned |
 | 2 | 2026-10-25 | Prototype approved. Section 9 added: lessons from the three published dashboards (an outside review), what this build adopts and what it does not, the action contract and acceptance checks. Carryover is now one continuous gap episode (KPI 3: 315, was 319). KPI 4 reads "No linked ticket". The dashboard is **#4** and the case study **4**: the README now orders case studies by dashboard |
 | 3 | 2026-10-25 | **Sankey redesign after spike S1** (section 10). The Sankey extension orders only its first column by the sort; every later column follows first appearance. So the taxonomy is now **9 flags, 5 risks, 3 places**, numbered and named so all three columns read alphabetically at every close (test 83 checks it), worded as mismatches rather than faults, and places labelled with what each system is. Failed feed events route to the system feed (release 3 names "Integration support" as their first fixer): about 15% of gaps. Keystone job data seeded a little more, so every flag is visible. Every number in sections 3 to 7 is refreshed; the prototype moves to a vertical rail. Dashboards #1 to #3 unchanged |
+| 4 | 2026-10-26 | **Published** on [Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard). Target set to **3.5%** (open item 5): Jun 2026 reads 3.21%, Low risk. Native Sankey instead of the extension; multi-select by string parameters (phase 8); the as-built guide replaces the build plan ([dashboard_4_build.md](dashboard_4_build.md)) |
 
 ## Contents
 
@@ -37,11 +38,11 @@ This page tracks the release from top to bottom, from the data the generator wri
 | 5 | Check tables (section 7) | Claude | **Done** (revision 3) | Numbers for Current (Jun 2026), May 2026, Jun 2025 and the Dec 2024 replay, from the marts |
 | 6 | Prototype with real numbers | Claude, reviewed by Thiago | Approved 2026-10-25; **revision 3 to review** (vertical rail, new Sankey) | Thiago approves the layout, the wording and the numbers on the canvas |
 | 7 | Spikes S1 to S7 on Tableau Public | Both | S1, S2, S3 **passed** 2026-10-25; S7 and S2b added (order under a filter; a click while the gap list is hidden); S4 to S7 run inside the build ([dashboard_4_build.md](dashboard_4_build.md) section 4) | Each passes or has its fallback chosen (section 10) |
-| 8 | Multi-select design session (function, department, country) | Both | To do | Mechanics agreed: set actions, the empty-set rule, the dim rule |
+| 8 | Multi-select design session (function, department, country) | Both | **Done**: string parameters toggled by parameter actions, no sets (build guide D4) | Mechanics agreed: set actions, the empty-set rule, the dim rule |
 | 9 | Figma: palette page and the mock | Thiago, with Claude | To do | Palette checked for colour blindness; the mock matches the prototype |
 | 10 | Build plan, step by step | Claude | **Written** 2026-10-25: [dashboard_4_build.md](dashboard_4_build.md), steps 0 to 16; the multi-select design (phase 8) is in it as a proposal for spike S4 | Every sheet, calculation, action and zone written down, with screenshots to compare |
-| 11 | Build in Tableau | Thiago (Mac) | **Started** with step 5 (the dashboard shell, so the Sankey is tuned in its tile) | Check tables and click tests pass; the saved .twb reviewed before publishing |
-| 12 | Publish: Tableau Public, README, screenshot, profile row, project docs | Both | To do | Live link in the README; the case study 4 section shows the page |
+| 11 | Build in Tableau | Thiago (Mac) | **Done** 2026-10-26 | Check tables and click tests pass; the saved .twb reviewed before publishing |
+| 12 | Publish: Tableau Public, README, screenshot, profile row, project docs | Both | **Done** 2026-10-26: [live](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard) | Live link in the README; the case study 4 section shows the page |
 
 ---
 
