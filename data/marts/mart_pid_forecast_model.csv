@@ -1,0 +1,312 @@
+term_group,term,coefficient
+baseline,periods 0-0,-3.852618
+baseline,periods 1-1,-2.192978
+baseline,periods 2-2,-0.960826
+baseline,periods 3-3,-0.394252
+baseline,periods 4-4,-0.04334
+baseline,periods 5-5,0.03568
+baseline,periods 6-6,0.261055
+baseline,periods 7-7,0.253893
+baseline,periods 8-8,0.156779
+baseline,periods 9-11,0.373079
+baseline,periods 12-14,0.356612
+baseline,periods 15+,0.35356
+level band,L1-L2,0.0
+level band,L3-L4,-0.646215
+level band,L5-L6,-1.216667
+level band,L7+,-1.767507
+function,Commercial,0.0
+function,Finance,0.023975
+function,Legal & Compliance,-0.230739
+function,Marketing,-0.095095
+function,Operations,0.369447
+function,People,-0.025981
+function,Product,-0.02253
+function,Technology,-0.287986
+country,AE,0.0
+country,AU,0.063925
+country,BR,0.032597
+country,CA,-0.044563
+country,CH,0.246706
+country,DE,0.048521
+country,ES,0.01177
+country,FR,-0.017451
+country,GB,0.04117
+country,IE,0.018961
+country,IN,0.016832
+country,JP,-0.065373
+country,KR,0.019459
+country,MX,0.050387
+country,NL,0.024568
+country,PH,0.054308
+country,PL,-0.005202
+country,PT,-0.251123
+country,SE,0.013552
+country,SG,0.055592
+country,US,0.034877
+country,ZA,-0.020764
+net-new,Net-new PID,-0.029532
+graduate season,AE month 01,-0.104377
+graduate season,AE month 02,-0.178689
+graduate season,AE month 03,-0.100465
+graduate season,AE month 04,0.664081
+graduate season,AE month 05,-0.279231
+graduate season,AE month 06,0.356346
+graduate season,AE month 07,0.415059
+graduate season,AE month 08,-0.051074
+graduate season,AE month 09,-0.069515
+graduate season,AE month 10,-0.148068
+graduate season,AE month 11,-0.610409
+graduate season,AE month 12,0.363243
+graduate season,AU month 01,0.542696
+graduate season,AU month 02,-0.139221
+graduate season,AU month 03,0.184932
+graduate season,AU month 04,-0.068101
+graduate season,AU month 05,0.00319
+graduate season,AU month 06,0.049434
+graduate season,AU month 07,-0.53389
+graduate season,AU month 08,-0.152563
+graduate season,AU month 09,-0.067859
+graduate season,AU month 10,-0.012781
+graduate season,AU month 11,-0.433932
+graduate season,AU month 12,0.068191
+graduate season,BR month 01,0.262243
+graduate season,BR month 02,-0.170753
+graduate season,BR month 03,0.021214
+graduate season,BR month 04,-0.166073
+graduate season,BR month 05,-0.001201
+graduate season,BR month 06,0.16661
+graduate season,BR month 07,-0.293058
+graduate season,BR month 08,-0.159401
+graduate season,BR month 09,-0.184789
+graduate season,BR month 10,-0.154685
+graduate season,BR month 11,0.431479
+graduate season,BR month 12,0.447694
+graduate season,CA month 01,-0.449006
+graduate season,CA month 02,-0.234461
+graduate season,CA month 03,-0.136231
+graduate season,CA month 04,0.158193
+graduate season,CA month 05,-0.023485
+graduate season,CA month 06,-0.247705
+graduate season,CA month 07,0.339515
+graduate season,CA month 08,0.377145
+graduate season,CA month 09,0.872742
+graduate season,CA month 10,0.285854
+graduate season,CA month 11,0.103273
+graduate season,CA month 12,-0.305862
+graduate season,CH month 01,0.421408
+graduate season,CH month 02,0.334072
+graduate season,CH month 03,-0.3253
+graduate season,CH month 04,-0.326754
+graduate season,CH month 05,0.143484
+graduate season,CH month 06,-0.038878
+graduate season,CH month 07,-0.125054
+graduate season,CH month 08,0.641517
+graduate season,CH month 09,-0.055441
+graduate season,CH month 10,0.065284
+graduate season,CH month 11,0.136121
+graduate season,CH month 12,-0.472648
+graduate season,DE month 01,-0.177739
+graduate season,DE month 02,-0.159728
+graduate season,DE month 03,-0.173868
+graduate season,DE month 04,-0.330991
+graduate season,DE month 05,0.19079
+graduate season,DE month 06,-0.131925
+graduate season,DE month 07,-0.018907
+graduate season,DE month 08,0.006127
+graduate season,DE month 09,0.089045
+graduate season,DE month 10,0.076996
+graduate season,DE month 11,-0.268927
+graduate season,DE month 12,-0.236901
+graduate season,ES month 01,-0.187114
+graduate season,ES month 02,-0.259019
+graduate season,ES month 03,-0.10954
+graduate season,ES month 04,-0.204795
+graduate season,ES month 05,0.206235
+graduate season,ES month 06,-0.127523
+graduate season,ES month 07,0.085996
+graduate season,ES month 08,0.493751
+graduate season,ES month 09,0.294583
+graduate season,ES month 10,0.526797
+graduate season,ES month 11,0.40156
+graduate season,ES month 12,-0.311774
+graduate season,FR month 01,0.07269
+graduate season,FR month 02,-0.060917
+graduate season,FR month 03,-0.206758
+graduate season,FR month 04,-0.107807
+graduate season,FR month 05,-0.328264
+graduate season,FR month 06,-0.093843
+graduate season,FR month 07,0.071463
+graduate season,FR month 08,0.559508
+graduate season,FR month 09,1.138435
+graduate season,FR month 10,0.630663
+graduate season,FR month 11,-0.282855
+graduate season,FR month 12,0.480705
+graduate season,GB month 01,0.031273
+graduate season,GB month 02,-0.170382
+graduate season,GB month 03,0.057034
+graduate season,GB month 04,-0.054922
+graduate season,GB month 05,-0.179486
+graduate season,GB month 06,0.190667
+graduate season,GB month 07,0.105008
+graduate season,GB month 08,0.366101
+graduate season,GB month 09,0.565491
+graduate season,GB month 10,0.228078
+graduate season,GB month 11,-0.034104
+graduate season,GB month 12,-0.145491
+graduate season,IE month 01,-0.320754
+graduate season,IE month 02,-0.237231
+graduate season,IE month 03,0.081624
+graduate season,IE month 04,-0.030765
+graduate season,IE month 05,-0.493707
+graduate season,IE month 06,-0.134499
+graduate season,IE month 07,0.023787
+graduate season,IE month 08,0.368462
+graduate season,IE month 09,0.295811
+graduate season,IE month 10,0.546006
+graduate season,IE month 11,0.081405
+graduate season,IE month 12,0.278757
+graduate season,IN month 01,-0.301534
+graduate season,IN month 02,-0.200378
+graduate season,IN month 03,-0.115005
+graduate season,IN month 04,-0.075007
+graduate season,IN month 05,-0.020387
+graduate season,IN month 06,0.191859
+graduate season,IN month 07,0.633285
+graduate season,IN month 08,0.257041
+graduate season,IN month 09,-0.115521
+graduate season,IN month 10,-0.091693
+graduate season,IN month 11,-0.153326
+graduate season,IN month 12,-0.32859
+graduate season,JP month 01,-0.315103
+graduate season,JP month 02,-0.487604
+graduate season,JP month 03,0.562686
+graduate season,JP month 04,0.612414
+graduate season,JP month 05,-0.64534
+graduate season,JP month 06,0.474531
+graduate season,JP month 07,-0.115383
+graduate season,JP month 08,0.137566
+graduate season,JP month 09,-0.318609
+graduate season,JP month 10,0.191541
+graduate season,JP month 11,0.220744
+graduate season,JP month 12,0.027309
+graduate season,KR month 01,0.289391
+graduate season,KR month 02,0.417361
+graduate season,KR month 03,-0.222382
+graduate season,KR month 04,-0.028114
+graduate season,KR month 05,0.0
+graduate season,KR month 06,-0.057324
+graduate season,KR month 07,0.317507
+graduate season,KR month 08,0.148595
+graduate season,KR month 09,-0.007696
+graduate season,KR month 10,-0.394749
+graduate season,KR month 11,0.251375
+graduate season,KR month 12,-0.139405
+graduate season,MX month 01,-0.03276
+graduate season,MX month 02,0.154456
+graduate season,MX month 03,-0.175063
+graduate season,MX month 04,0.11451
+graduate season,MX month 05,-0.499263
+graduate season,MX month 06,0.437131
+graduate season,MX month 07,0.471014
+graduate season,MX month 08,0.126333
+graduate season,MX month 09,0.078796
+graduate season,MX month 10,-0.400477
+graduate season,MX month 11,-0.144149
+graduate season,MX month 12,0.075289
+graduate season,NL month 01,0.169218
+graduate season,NL month 02,-0.171281
+graduate season,NL month 03,-0.173172
+graduate season,NL month 04,0.21316
+graduate season,NL month 05,-0.448862
+graduate season,NL month 06,-0.21465
+graduate season,NL month 07,-0.041698
+graduate season,NL month 08,-0.16838
+graduate season,NL month 09,0.41845
+graduate season,NL month 10,0.740879
+graduate season,NL month 11,-0.245031
+graduate season,NL month 12,-0.657943
+graduate season,PH month 01,-0.41924
+graduate season,PH month 02,-0.620903
+graduate season,PH month 03,-0.812267
+graduate season,PH month 04,-0.080982
+graduate season,PH month 05,0.733415
+graduate season,PH month 06,0.265006
+graduate season,PH month 07,-0.426186
+graduate season,PH month 08,-0.306345
+graduate season,PH month 09,0.019059
+graduate season,PH month 10,-0.610641
+graduate season,PH month 11,-0.164133
+graduate season,PH month 12,-0.346177
+graduate season,PL month 01,-0.08643
+graduate season,PL month 02,0.058485
+graduate season,PL month 03,0.060535
+graduate season,PL month 04,-0.209054
+graduate season,PL month 05,-0.172686
+graduate season,PL month 06,-0.026561
+graduate season,PL month 07,0.076737
+graduate season,PL month 08,0.692753
+graduate season,PL month 09,0.422604
+graduate season,PL month 10,-0.28665
+graduate season,PL month 11,-0.322951
+graduate season,PL month 12,0.326024
+graduate season,PT month 01,0.006829
+graduate season,PT month 02,-1.078592
+graduate season,PT month 03,0.316497
+graduate season,PT month 04,0.016871
+graduate season,PT month 05,0.476374
+graduate season,PT month 06,-0.015491
+graduate season,PT month 07,-0.304692
+graduate season,PT month 08,0.748962
+graduate season,PT month 09,0.496384
+graduate season,PT month 10,0.114791
+graduate season,PT month 11,0.162964
+graduate season,PT month 12,-0.578034
+graduate season,SE month 01,-0.212435
+graduate season,SE month 02,-0.402918
+graduate season,SE month 03,0.251523
+graduate season,SE month 04,0.176372
+graduate season,SE month 05,0.567644
+graduate season,SE month 06,-0.212802
+graduate season,SE month 07,0.192712
+graduate season,SE month 08,0.422667
+graduate season,SE month 09,0.098146
+graduate season,SE month 10,-0.222292
+graduate season,SE month 11,-0.425359
+graduate season,SE month 12,0.520483
+graduate season,SG month 01,-0.154118
+graduate season,SG month 02,0.244837
+graduate season,SG month 03,0.131107
+graduate season,SG month 04,-0.347067
+graduate season,SG month 05,0.13783
+graduate season,SG month 06,0.341696
+graduate season,SG month 07,1.207516
+graduate season,SG month 08,-0.318446
+graduate season,SG month 09,-0.103458
+graduate season,SG month 10,-0.24235
+graduate season,SG month 11,-0.014422
+graduate season,SG month 12,-0.423066
+graduate season,US month 01,-0.271504
+graduate season,US month 02,-0.170802
+graduate season,US month 03,-0.013509
+graduate season,US month 04,0.039462
+graduate season,US month 05,-0.046354
+graduate season,US month 06,-0.095206
+graduate season,US month 07,-0.069348
+graduate season,US month 08,0.309336
+graduate season,US month 09,0.375401
+graduate season,US month 10,-0.018281
+graduate season,US month 11,-0.17285
+graduate season,US month 12,-0.120014
+graduate season,ZA month 01,0.41379
+graduate season,ZA month 02,-0.313233
+graduate season,ZA month 03,0.243871
+graduate season,ZA month 04,0.172709
+graduate season,ZA month 05,-0.153315
+graduate season,ZA month 06,0.040007
+graduate season,ZA month 07,-0.156951
+graduate season,ZA month 08,-0.199145
+graduate season,ZA month 09,-0.139254
+graduate season,ZA month 10,0.205385
+graduate season,ZA month 11,0.076273
+graduate season,ZA month 12,0.128916
