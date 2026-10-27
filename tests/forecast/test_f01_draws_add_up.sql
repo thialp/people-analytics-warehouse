@@ -1,7 +1,8 @@
 -- Every simulated future adds up: in each draw, department x office and quarter, PIDs vacant at the
 -- end = vacant at the start + PIDs opened (backfills, net-new, immediate refills) - PIDs filled, and
 -- a quarter starts where the one before it ended. The first quarter starts with exactly the
--- requisitions waiting on the report date, in every draw.
+-- requisitions waiting on the report date, in every draw, and every department x office has a row
+-- in every draw and quarter (zeros included), so percentiles across draws hold for any selection.
 WITH d AS (SELECT * FROM forecast.mart_pid_forecast_draws),
 grid AS (
     SELECT k.department_id, k.location_id, k.draw, q.quarter_offset
@@ -29,3 +30,8 @@ UNION ALL
 SELECT 'first quarter does not start with the waiting requisitions', NULL, NULL, x.draw, 1
 FROM (SELECT draw, SUM(vacant_start) AS s FROM d WHERE quarter_offset = 1 GROUP BY draw) AS x, start_pool AS p
 WHERE x.s <> p.waiting
+UNION ALL
+SELECT 'a department x office misses a draw or a quarter', department_id, location_id, NULL, NULL
+FROM forecast.mart_pid_forecast_draws
+GROUP BY department_id, location_id
+HAVING COUNT(*) <> (SELECT COUNT(DISTINCT draw) * COUNT(DISTINCT quarter_offset) FROM forecast.mart_pid_forecast_draws)

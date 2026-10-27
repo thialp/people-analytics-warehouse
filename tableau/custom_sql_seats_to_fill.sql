@@ -2,7 +2,7 @@
   custom_sql_seats_to_fill.sql
   Tableau Custom SQL for Dashboard #5, Seats to Fill: FTE hiring forecast against plan (SQL Server,
   database ArcadiaHR). ONE data source for the whole page, so one In Scope calculation (the rail's
-  organisation and location selections) filters every card. About 400,000 rows.
+  organisation and location selections) filters every card. About 543,000 rows.
 
   Six row types, never summed together: filter row_type in every calculation.
     Quarter    department x office x quarter, 20 history quarters and the 4 forward ones

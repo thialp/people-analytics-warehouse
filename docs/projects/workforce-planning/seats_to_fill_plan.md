@@ -9,7 +9,7 @@ Case study 7 in the README for now (renumbered in the profile later) · Dashboar
 | Revision | Date | What changed |
 |---|---|---|
 | 1 | 2026-10-27 | Proposal agreed (sections 1 to 5). Phase 1 built: the report calendar, the forward budget, time-to-fill variation (section 6) |
-| 3 | 2026-10-27 | Phase 3 built: the forecast tables on SQL Server (`02b`, `03e`, schema `fc`), the page's one Custom SQL `tableau/custom_sql_seats_to_fill.sql` (six row types, 399,560 rows), `17_validate_seats_to_fill.sql` (section 7) |
+| 3 | 2026-10-27 | Phase 3 built: the forecast tables on SQL Server (`02b`, `03e`, schema `fc`), the page's one Custom SQL `tableau/custom_sql_seats_to_fill.sql` (six row types, 542,701 rows), `17_validate_seats_to_fill.sql` (section 7) |
 | 2 | 2026-10-27 | Phase 2 built: the forecast package `forecast/`, eight marts, tests f01 to f05, CI step; method and backtest in [seats_to_fill_method.md](seats_to_fill_method.md). The demand of section 4 is refined there: net-new opens at the median ratio of every known quarter, and each draw has its own demand level and hiring speed |
 
 ## 1. Decisions
@@ -79,7 +79,7 @@ Survival curves under any selection: the mart stores PIDs at risk and fills per 
 | 1 | Generator: report calendar, forward budget, time-to-fill variation; tests 89 to 91 | Claude | **Built** (section 6) |
 | 2 | Python models, marts, tests, CI step, methodology | Claude | **Built**: [seats_to_fill_method.md](seats_to_fill_method.md) |
 | 3 | SQL Server twin, Custom SQL, validate script; run on the Mac | Claude, then Thiago | **Built** (section 7); Mac run to do |
-| 4 | Spikes on Tableau Public (cascade, draws, Kaplan–Meier table calc) | Claude writes, Thiago runs | To do |
+| 4 | Spikes on Tableau Public (cascade, draws, Kaplan–Meier table calc) | Claude writes, Thiago runs | **Guide written**: [seats_to_fill_spikes.md](seats_to_fill_spikes.md); Thiago to run |
 | 5 | Check tables and a prototype with real numbers | Claude, Thiago approves | To do |
 | 6 | Build guide, then the build in Tableau | Claude, Thiago | To do |
 | 7 | Publish, README, Figma, profile | Both | To do |
@@ -125,7 +125,7 @@ The forecast runs in Python on the DuckDB warehouse; SQL Server receives its tab
 | `sqlserver/make_load_forecast.py` | Generates the two scripts below from the forecast tables, so they stay in step |
 | `sqlserver/02b_load_forecast.sql` | Lands the eight forecast CSVs from `data/marts/` into `raw` as text (BULK INSERT) |
 | `sqlserver/03e_build_dw_forecast.sql` | Types them into schema `fc`, with `fc.report_calendar` and `fc.report_quarter` |
-| `tableau/custom_sql_seats_to_fill.sql` | The page's one data source: six row types (Quarter 21,720 · Draw 253,259 · Survival 105,294 · Backtest 19,219 · Accuracy 20 · CW budget 48), department, office and calendar labels on every row; `quarter_months_label` carries the en dash ("Jul – Sep 26") |
+| `tableau/custom_sql_seats_to_fill.sql` | The page's one data source: six row types (Quarter 21,720 · Draw 396,400 · Survival 105,294 · Backtest 19,219 · Accuracy 20 · CW budget 48), department, office and calendar labels on every row; `quarter_months_label` carries the en dash ("Jul – Sep 26") |
 | `sqlserver/17_validate_seats_to_fill.sql` | Runs the Custom SQL as Tableau does and checks 19 values: rows by type, FY26 fills 6,849, 902 waiting, the FY27 plan 7,709, the median draw 6,838, survival and backtest totals, 6 of 8 in range, 13,097 planned contractors |
 
 `check_tsql_in_duckdb.py` builds `fc` from the CSVs, compares every row type of the Custom SQL with its forecast table (all six MATCH) and runs 17 (19 of 19 PASS).
@@ -141,4 +141,4 @@ D="$HOME/Documents/Tableau/Tableau Public/ArcadiaHR/5 Seats to Fill"
 mkdir -p "$D" && cp tableau/custom_sql_seats_to_fill.sql "$D/" && ls "$D"
 ```
 
-Expected: the build ends with `arcadia-build exited with code 0` and no `FAIL` or `Msg`; the validate prints only `Seats to Fill Custom SQL returned 399560 rows in N seconds`; the folder lists `custom_sql_seats_to_fill.sql`.
+Expected: the build ends with `arcadia-build exited with code 0` and no `FAIL` or `Msg`; the validate prints only `Seats to Fill Custom SQL returned 542701 rows in N seconds`; the folder lists `custom_sql_seats_to_fill.sql`.
