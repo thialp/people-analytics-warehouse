@@ -10,10 +10,12 @@
 :on error exit
 :r /repo/sqlserver/01_create_database.sql
 :r /repo/sqlserver/02_load_raw.sql
+:r /repo/sqlserver/02b_load_forecast.sql
 :r /repo/sqlserver/03_build_dw.sql
 :r /repo/sqlserver/03b_build_dw_workforce_planning.sql
 :r /repo/sqlserver/03c_build_dw_contingent.sql
 :r /repo/sqlserver/03d_build_dw_cw_reconciliation.sql
+:r /repo/sqlserver/03e_build_dw_forecast.sql
 :r /repo/sqlserver/04_create_reporting_views.sql
 :r /repo/sqlserver/04b_create_reporting_views_contingent.sql
 :r /repo/sqlserver/04c_create_reporting_views_reconciliation.sql
@@ -22,3 +24,4 @@
 :r /repo/sqlserver/12_validate_contingent_workforce.sql
 :r /repo/sqlserver/15_validate_cw_reconciliation.sql
 :r /repo/sqlserver/16_validate_report_calendar.sql
+:r /repo/sqlserver/17_validate_seats_to_fill.sql
