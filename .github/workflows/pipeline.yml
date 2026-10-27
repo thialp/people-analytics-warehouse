@@ -32,5 +32,8 @@ jobs:
       - name: Build warehouse and run data tests
         run: python pipeline/run_pipeline.py
 
+      - name: Run the PID fill forecast and its tests (Dashboard #5)
+        run: python forecast/run_forecast.py
+
       - name: Check committed marts match the SQL
         run: git diff --stat --exit-code data/marts

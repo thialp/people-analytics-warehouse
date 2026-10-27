@@ -9,6 +9,7 @@ Case study 7 in the README for now (renumbered in the profile later) · Dashboar
 | Revision | Date | What changed |
 |---|---|---|
 | 1 | 2026-10-27 | Proposal agreed (sections 1 to 5). Phase 1 built: the report calendar, the forward budget, time-to-fill variation (section 6) |
+| 2 | 2026-10-27 | Phase 2 built: the forecast package `forecast/`, eight marts, tests f01 to f05, CI step; method and backtest in [seats_to_fill_method.md](seats_to_fill_method.md). The demand of section 4 is refined there: net-new opens at the median ratio of every known quarter, and each draw has its own demand level and hiring speed |
 
 ## 1. Decisions
 
@@ -75,7 +76,7 @@ Survival curves under any selection: the mart stores PIDs at risk and fills per 
 |---|---|---|---|
 | 0 | Proposal | Both | **Done** 2026-10-27 |
 | 1 | Generator: report calendar, forward budget, time-to-fill variation; tests 89 to 91 | Claude | **Built** (section 6) |
-| 2 | Python models, marts, tests, CI step, methodology | Claude | To do |
+| 2 | Python models, marts, tests, CI step, methodology | Claude | **Built**: [seats_to_fill_method.md](seats_to_fill_method.md) |
 | 3 | SQL Server twin, Custom SQL, validate script; run on the Mac | Claude, then Thiago | To do |
 | 4 | Spikes on Tableau Public (cascade, draws, Kaplan–Meier table calc) | Claude writes, Thiago runs | To do |
 | 5 | Check tables and a prototype with real numbers | Claude, Thiago approves | To do |
