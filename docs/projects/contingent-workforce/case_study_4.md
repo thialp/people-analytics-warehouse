@@ -8,7 +8,7 @@ Arcadia runs its contingent workforce in **Bridgeway VMS**, the vendor managemen
 
 The warehouse cannot fix either system. It **finds every disagreement, says why it happened and who can fix it**, from the two systems and the feed log alone. Because the data is synthetic, the generator also wrote an answer key of everything it seeded ([Keystone and the feed](keystone_feed.md)), and the warehouse's findings are scored against it.
 
-**Release 4** recasts these findings as Finance meets them at a month-end close: 12 comparisons, 6 risks, 3 places to fix them, the warehouse's own load log and a ticket system, for Dashboard #4. See the [release 4 plan](release_4_plan.md).
+**Release 4** recasts these findings as Finance meets them at a month-end close: 9 flags, 5 risks, 3 places where each gap is aligned, the warehouse's own load log and a ticket system, for Dashboard #4, [live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard). See the [release 4 plan](release_4_plan.md) and the [build guide](dashboard_4_build.md).
 
 ## How it works
 

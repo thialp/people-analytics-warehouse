@@ -43,3 +43,18 @@ Revision 5 (flag labels on their own sheet): `patch_flag_labels.py` changes `Sk 
 ## Revision 7: the refresh hang, palette A
 
 Tableau pastes every referenced formula in again where it is used. The v2 chain expanded `Sk Y` to about 168 million terms and Tableau hung building the query. Every intermediate in `spec_sankey.py` is now its own FIXED LOD, computed once and referenced as a column (`Sk Y` is 270 terms); `verify_sankey.py` (which now builds one table per step) draws byte-identical output. `sync_sankey.py` brings a v2 workbook to the spec: formulas, new and obsolete fields, and the `PALETTE` (palette A, muted families).
+
+## Final rounds before publishing (2026-10-26)
+
+Each round reads the workbook Thiago saved and writes the next review copy (`… (rev NN to review).twb`), so his hand changes always carry forward. Usage for every file: `python3 <file> in.twb out.twb`.
+
+| File | What it changed |
+|---|---|
+| `patch_feedback_round_16.py` | Department tick logic (ticked inside the chosen functions), shape maps rewritten, ticket card height and dot style, KPI 2 title with the target, the load note removed, Sankey tooltip colours, the timeline dot palette |
+| `patch_final_round_17.py` | Titles and tips on the KPI hovers wrapped in `MIN()` so cards 1, 3, 4 and 5 show a tooltip; the coloured KPI 2 hover (`KPI 2 Pts Good`, `Pts Bad`, `Clear Own`); the rail top rebuilt (logo, spacer, info button row); peach and mint for the timeline dot; unique window ids for copied sheets |
+| `patch_final_round_18.py` | First KPI 2 strip as a Square sheet (superseded) |
+| `patch_final_round_19.py` | Removed the "Sankey opens the gap list" action (D14); deselect actions for the five KPI hovers, inserted before `<datasources>` inside `<actions>`; image strips with visibility (superseded: visibility does not follow a data calculation) |
+| `patch_final_round_20.py` | The KPI 2 strip as a Bar sheet coloured by `TL Dot`, floated on card 2's top edge |
+| `patch_final_round_21.py` | The strip moved 8 px in from each side, so it ends where the card's corners begin |
+
+By hand in Tableau on top of round 20: `KPI 2 Strip One` set to `1` (not `MIN(1)`), and `Timeline Row` = True added to the strip's filters (without it the colour never changes). The published workbook and every calculation, size and colour are documented in [`dashboard_4_build.md`](../../../docs/projects/contingent-workforce/dashboard_4_build.md).

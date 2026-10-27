@@ -77,7 +77,7 @@ SELECT
 FROM dw.CwGapClose;
 GO
 
-/* Dashboard #4: the gap rate per close x cost center, against the 3% target */
+/* Dashboard #4: the gap rate per close x cost center, against the 3.5% target */
 CREATE OR ALTER VIEW rpt.vw_cw_gap_rate_close AS
 SELECT
     MonthEndDate                 AS month_end_date,

@@ -9,7 +9,7 @@
     Gap         one per close x contractor x flag (rpt.vw_cw_gap_close): the Sankey (flag, risk,
                 place), the gap list, KPIs 3 to 5. gaps = 1.
     Population  one per close x cost center (rpt.vw_cw_gap_rate_close): the gap rate and KPI 1.
-                Gap rate = SUM(contractors_with_gap) / SUM(contractors_working), target 3%.
+                Gap rate = SUM(contractors_with_gap) / SUM(contractors_working), target 3.5%.
     Ticket      one per close x open Helix ticket (rpt.vw_itsm_ticket_close): the ticket card,
                 one dot at (dot_x, dot_y). tickets = 1.
     Sankey      2,805 scaffold rows for the native Sankey, from the flag, risk and place taxonomy

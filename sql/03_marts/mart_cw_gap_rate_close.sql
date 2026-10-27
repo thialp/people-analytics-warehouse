@@ -10,7 +10,7 @@
 --   contractors_with_gap      contractors with at least one counted gap (not "Clears on its own"),
 --                             by their group in mart_cw_gap_close; a contractor can have a gap
 --                             without being in the population (Keystone only, ended in Bridgeway)
---   gap rate                  contractors_with_gap / contractors_working, against the 3% target
+--   gap rate                  contractors_with_gap / contractors_working, against the 3.5% target
 -- Executive officers' department (D-901) is excluded.
 CREATE OR REPLACE TABLE marts.mart_cw_gap_rate_close AS
 WITH pop AS (    -- grouped by Bridgeway's cost center (Keystone's for someone Bridgeway does not have working)
@@ -64,7 +64,7 @@ SELECT
     COALESCE(g.gaps_over_90_days, 0)                                                 AS gaps_over_90_days,
     COALESCE(g.gaps_open_prior_close, 0)                                             AS gaps_open_prior_close,
     COALESCE(g.gaps_fixed_day_after, 0)                                              AS gaps_fixed_day_after,
-    0.03                                                                             AS gap_rate_target,
+    0.035                                                                            AS gap_rate_target,
     r.load_note
 FROM cells AS c
 JOIN intermediate.int_cw_close_run AS r USING (month_end_date)

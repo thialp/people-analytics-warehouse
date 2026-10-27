@@ -34,7 +34,7 @@
 --      Keystone holds a wrong Bridgeway ID (root cause CW06), Keystone aligns the record instead.
 --   3. A gap that exists because a load failed goes to the system feed, "Load failed".
 --   4. Otherwise the flag's default place (a conversion's two IDs are aligned in Keystone).
--- is_counted: the gap counts against the 3% target unless it clears on its own by the next run.
+-- is_counted: the gap counts against the 3.5% target unless it clears on its own by the next run.
 CREATE OR REPLACE TABLE intermediate.int_cw_flag AS
 WITH runs AS (SELECT * FROM intermediate.int_cw_close_run),
 snap AS (SELECT * FROM intermediate.int_cw_reconciliation_snapshot),

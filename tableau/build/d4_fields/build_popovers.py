@@ -180,7 +180,7 @@ def close_body(x, y, w):
 INFO = [
     ('The close.', "Finance reports contractors from Keystone, Arcadia's HR system. Bridgeway, the vendor system, holds every contractor's order. At 00:00 GMT on the 1st, the close run reads both and compares them, contractor by contractor."),
     ('Gaps.', "A gap is one difference for one contractor: Keystone shows one thing, Bridgeway another. Nine flags say what differs, five risks say what it puts at risk in the report, and three places say where it is aligned: Bridgeway (Vendor Management), Keystone (HR Operations) or the system feed between them (Data Engineering). The words say what differs, not which system is wrong."),
-    ('Gap rate.', "Contractors with at least one gap, divided by contractors working in Bridgeway. A change still in the feed that will land by the next run is left out. The 3% target is provisional: it flags risk, it does not certify the report."),
+    ('Gap rate.', "Contractors with at least one gap, divided by contractors working in Bridgeway. A change still in the feed that will land by the next run is left out. The 3.5% target is provisional: it flags risk, it does not certify the report."),
     ('Tickets.', "Open Helix tickets at the close, by the group working them now. A ticket links to a gap through the contractor's ID; a name alone is not enough when two contractors share it, so some tickets link to no gap and, without a contractor, to no group."),
     ('What a flag proves.', "“Active in Keystone, not working in Bridgeway” means Keystone still shows the contractor active after Bridgeway ended them, not that they used any access."),
     ('Data.', "Arcadia Systems, Keystone, Bridgeway and Helix are fictional. All data is synthetic."),
