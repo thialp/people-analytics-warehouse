@@ -78,8 +78,8 @@ Survival curves under any selection: the mart stores PIDs at risk and fills per 
 | 0 | Proposal | Both | **Done** 2026-10-27 |
 | 1 | Generator: report calendar, forward budget, time-to-fill variation; tests 89 to 91 | Claude | **Built** (section 6) |
 | 2 | Python models, marts, tests, CI step, methodology | Claude | **Built**: [seats_to_fill_method.md](seats_to_fill_method.md) |
-| 3 | SQL Server twin, Custom SQL, validate script; run on the Mac | Claude, then Thiago | **Built** (section 7); Mac run to do |
-| 4 | Spikes on Tableau Public (cascade, draws, Kaplan–Meier table calc) | Claude writes, Thiago runs | **Guide written**: [seats_to_fill_spikes.md](seats_to_fill_spikes.md); Thiago to run |
+| 3 | SQL Server twin, Custom SQL, validate script; run on the Mac | Claude, then Thiago | **Done**: Mac run passed (542,701 rows) |
+| 4 | Spikes on Tableau Public (cascade, draws, Kaplan–Meier table calc) | Claude writes, Thiago runs | **Passed** 2026-10-27, no fallback needed (section 8) |
 | 5 | Check tables and a prototype with real numbers | Claude, Thiago approves | To do |
 | 6 | Build guide, then the build in Tableau | Claude, Thiago | To do |
 | 7 | Publish, README, Figma, profile | Both | To do |
@@ -142,3 +142,21 @@ mkdir -p "$D" && cp tableau/custom_sql_seats_to_fill.sql "$D/" && ls "$D"
 ```
 
 Expected: the build ends with `arcadia-build exited with code 0` and no `FAIL` or `Msg`; the validate prints only `Seats to Fill Custom SQL returned 542701 rows in N seconds`; the folder lists `custom_sql_seats_to_fill.sql`.
+
+## 8. Phase 4: spike results
+
+Run on 2026-10-27 in Tableau Desktop 2026.2.3, then on Tableau Public ([D5 Spikes](https://public.tableau.com/app/profile/thialp/viz/D5Spikes/Spikes)), with the guide's expected values: [seats_to_fill_spikes.md](seats_to_fill_spikes.md).
+
+| Spike | Result | What was seen |
+|---|---|---|
+| S1 Function > Department | Pass | One click on a function updates `p_Functions` and cleans `p_DeptOff` (`REGEXP_REPLACE`) together. Aggregated pick fields drive parameter actions. People without Talent Acquisition: 175 · 21. The last ticked department locks; empty options dim |
+| S2 Region > Country > Office | Pass | Two-level clean-up works. Asia Pacific 2,025 · 280; without Pune 1,825 · 246; Portugal dims under Finance; Legal & Compliance in Latin America 7 · 2 |
+| S3 Range across draws | Pass | `PERCENTILE({INCLUDE [draw]: ...})` matches to the decimal: all 6,300.7 · 6,838.5 · 7,542.9; Asia Pacific without Pune 1,716.0 · 1,846.5 · 2,024.7 |
+| S4 Survival curve | Pass | The table calculation matches by level band exactly (L1–L2 38.1 / 87.7 / 97.4 … L7+ 0.0 / 27.3 / 54.5) and follows every list click |
+| S5 Tableau Public | Pass | Published as an extract (542,701 rows); the page and every click responded in normal time |
+
+**Decisions carried into the build:**
+- The cascade, the 100 draws and the Kaplan–Meier table calculation go into the page as designed. None of the fallbacks is needed.
+- Every "dim" test is wrapped in `ZN()`: an option with nothing behind it sums to NULL, not 0, and would otherwise never dim. The spike guide is corrected.
+- Tick shapes need a fixed size: with entire-view sizing they grow as the list shortens.
+- The all-levels readings table drew no values without a partitioning dimension; the page reads the curve from one table calculation with a dimension on Rows, as the by-band table did.
