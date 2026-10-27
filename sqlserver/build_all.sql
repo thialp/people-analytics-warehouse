@@ -21,3 +21,4 @@
 :r /repo/sqlserver/08_validate_workforce_planning.sql
 :r /repo/sqlserver/12_validate_contingent_workforce.sql
 :r /repo/sqlserver/15_validate_cw_reconciliation.sql
+:r /repo/sqlserver/16_validate_report_calendar.sql

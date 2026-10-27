@@ -324,6 +324,20 @@ REQ_MAX_OPEN_DAYS = 210                    # an approved requisition still open 
 REQ_CANCELLED_FREEZE_SHARE = 0.50          # a cancelled seat is frozen, otherwise eliminated
 TRANSFER_TAKES_OPEN_SEAT = 0.85            # an internal mover takes a ready open seat when one fits
 
+# Release 5: time to fill varies by function and by graduate season (Dashboard #5, Seats to Fill).
+# Applied to the approval date only: the hire date the simulation draws never moves, so headcount,
+# pay and contractors are unchanged. Net-new PIDs are approved this much earlier or later before
+# the hire; a filled external backfill has its approval moved, never more than
+# REQ_BACKFILL_EARLY_APPROVAL_DAYS before the person who left gave notice (their last day).
+REQ_TTF_FUNCTION_FACTOR = {"Technology": 1.15, "Legal & Compliance": 1.15, "Operations": 0.85}
+REQ_TTF_GRAD_LEVELS = (1, 2)               # graduate hiring: Associate and Analyst levels
+REQ_TTF_GRAD_FACTOR = 0.75                 # a fill in its country's graduate season takes 25% less time
+REQ_TTF_GRAD_SEASON_DEFAULT = (9, 10)      # September and October: North America and Europe
+REQ_TTF_GRAD_SEASON = {"BR": (12, 1), "ZA": (12, 1), "AU": (12, 1),   # southern hemisphere: Dec and Jan
+                       "IN": (7, 8), "SG": (7, 8), "PH": (6, 7), "MX": (7, 8),
+                       "JP": (4, 4), "KR": (2, 3)}
+REQ_BACKFILL_EARLY_APPROVAL_DAYS = 14
+
 # --------------------------------------------------------------------------------------
 # Workforce plan: a budget before each fiscal year, then a reforecast after each of the
 # first three quarters (RF1-RF3), each covering the quarters still ahead. Versions are
@@ -337,6 +351,13 @@ PLAN_BACKFILL_ERROR = {"Budget": (0.04, 0.20), "RF1": (0.02, 0.15), "RF2": (0.01
 PLAN_HEADCOUNT_ERROR = {"Budget": (0.012, 0.030), "RF1": (0.008, 0.020), "RF2": (0.004, 0.012), "RF3": (0.002, 0.007)}
 PLAN_COST_EXTRA_SD = 0.010                 # cost error on top of the headcount error
 PLAN_FY_BUDGET_SHIFT = {2024: (0.80, 0.035)}  # FY24 budget was set before the Feb 2024 restructuring
+
+# Release 5: the budget for the year after the report date (the forward budget), approved on May 15
+# before the report date, like every budget. Nothing after the report date has been simulated, so it
+# is a projection: each cost center's fills in the same quarter of the last fiscal year, scaled by
+# the planned growth, with the budget's planning error; headcount grows from the report date.
+FORWARD_BUDGET_NET_GROWTH = 0.050          # planned net headcount growth in the forward year
+FORWARD_BUDGET_CW_GROWTH = 0.060           # planned contingent headcount growth in the forward year
 
 # --------------------------------------------------------------------------------------
 # Candidates (applicant tracking): applicants per requisition with a real search,
