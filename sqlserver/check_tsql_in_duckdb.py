@@ -45,7 +45,7 @@ from sqlglot import exp
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DB = ROOT / "warehouse" / "arcadia.duckdb"
 BUILD = ["03_build_dw.sql", "03b_build_dw_workforce_planning.sql", "03c_build_dw_contingent.sql",
-         "03d_build_dw_cw_reconciliation.sql",
+         "03d_build_dw_cw_reconciliation.sql", "03e_build_dw_forecast.sql",
          "04_create_reporting_views.sql", "04b_create_reporting_views_contingent.sql",
          "04c_create_reporting_views_reconciliation.sql"]
 VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
@@ -66,6 +66,8 @@ VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_cw_gap_close", "rpt.vw_cw_gap_close"),
          ("mart_cw_gap_rate_close", "rpt.vw_cw_gap_rate_close"),
          ("mart_itsm_ticket_close", "rpt.vw_itsm_ticket_close")]
+FORECAST = ["mart_pid_fill_quarter", "mart_fill_survival", "mart_pid_forecast_draws", "mart_pid_forecast_backtest",
+            "mart_pid_forecast_accuracy", "mart_pid_forecast_model", "mart_pid_forecast_run", "mart_cw_budget_function"]
 SKIP = re.compile(r"^\s*(CREATE\s+(CLUSTERED\s+|UNIQUE\s+)?INDEX|ALTER\s+TABLE|SET\s+NOCOUNT|USE\s|PRINT\s|DECLARE\s"
                   r"|IF\s+DB_ID|IF\s+SCHEMA_ID)", re.I)
 
@@ -104,6 +106,8 @@ def to_duckdb(stmt: exp.Expression) -> str:
         elif dt.this == exp.DataType.Type.BIT:
             dt.set("this", exp.DataType.Type.BOOLEAN)
     sql = add_on_true(stmt.sql(dialect="duckdb"))
+    sql = re.sub(r"\bNCHAR\(", "CHR(", sql)                # T-SQL NCHAR(8211) is DuckDB CHR(8211)
+    sql = re.sub(r"(?<![\w'])N'", "'", sql)                  # N'...' Unicode literals are plain text in DuckDB
     if "UNION ALL" in sql and re.search(r"\bchain\b", sql) and "RECURSIVE" not in sql:
         sql = sql.replace("WITH ", "WITH RECURSIVE ", 1)
     return sql
@@ -125,12 +129,17 @@ def connect(path: Path) -> duckdb.DuckDBPyConnection:
 
 
 def build(con: duckdb.DuckDBPyConnection):
-    for s in ("raw", "dw", "rpt", "cs"):
+    for s in ("raw", "dw", "rpt", "cs", "fc"):
         con.execute(f"CREATE SCHEMA IF NOT EXISTS {s}")
     for csv in sorted((ROOT / "data" / "raw").glob("*.csv")):  # like BULK INSERT: text, empty not NULL
         con.execute(f"CREATE OR REPLACE TABLE raw.{csv.stem} AS SELECT * FROM read_csv('{csv}', header = true, all_varchar = true)")
         cols = [r[0] for r in con.execute(f"DESCRIBE raw.{csv.stem}").fetchall()]
         con.execute(f"UPDATE raw.{csv.stem} SET " + ", ".join(f'"{c}" = COALESCE("{c}", \'\')' for c in cols))
+    for table in FORECAST:                                     # 02b_load_forecast.sql: the forecast CSVs, as text
+        path = ROOT / "data" / "marts" / f"{table}.csv"
+        con.execute(f"CREATE OR REPLACE TABLE raw.{table} AS SELECT * FROM read_csv('{path}', header = true, all_varchar = true)")
+        cols = [r[0] for r in con.execute(f"DESCRIBE raw.{table}").fetchall()]
+        con.execute(f"UPDATE raw.{table} SET " + ", ".join(f'"{c}" = COALESCE("{c}", \'\')' for c in cols))
     for name in BUILD:
         for batch in batches(ROOT / "sqlserver" / name):
             for stmt in sqlglot.parse(batch, read="tsql"):
@@ -188,6 +197,38 @@ def custom_sql(con: duckdb.DuckDBPyConnection, file: str, name: str, extra_grid_
     con.execute(f"CREATE OR REPLACE TABLE cs.{name} AS {to_duckdb(sqlglot.parse_one(text, read='tsql'))}")
 
 
+def seats_to_fill(con: duckdb.DuckDBPyConnection) -> bool:
+    """Dashboard #5's Custom SQL holds each forecast table unchanged, under its row type."""
+    pairs = [("Quarter", "mart_pid_fill_quarter", {}),
+             ("Draw", "mart_pid_forecast_draws", {}),
+             ("Survival", "mart_fill_survival", {"quarter_offset": "cohort_quarter_offset", "sv_filled": "filled"}),
+             ("Backtest", "mart_pid_forecast_backtest", {}),
+             ("Accuracy", "mart_pid_forecast_accuracy", {}),
+             ("CW budget", "mart_cw_budget_function", {})]
+    ok = True
+    for row_type, table, rename in pairs:
+        cols = [(r[0], r[1]) for r in con.execute(f"DESCRIBE p.forecast.{table}").fetchall()]
+
+        def norm(q, d):
+            if d == "BOOLEAN":
+                return f"CASE WHEN LOWER(CAST({q} AS VARCHAR)) IN ('true', '1') THEN 1 ELSE 0 END"
+            if any(k in d for k in ("DOUBLE", "DECIMAL", "FLOAT", "INT")):
+                return f"ROUND(CAST({q} AS DOUBLE) + 1e-6, 4)"
+            return f"CAST({q} AS VARCHAR)"
+        mine = [(c, d) for c, d in cols if c not in ("cohort_quarter_offset", "filled") or table != "mart_fill_survival"]
+        back = {v: k for k, v in rename.items()}
+        a = ", ".join(f'{norm(chr(34) + c + chr(34), d)} AS "{c}"' for c, d in cols)
+        b = ", ".join(f'{norm(chr(34) + back.get(c, c) + chr(34), d)} AS "{c}"' for c, d in cols)
+        src_a = f"SELECT {a} FROM p.forecast.{table}"
+        src_b = f"SELECT {b} FROM cs.seats_to_fill WHERE row_type = '{row_type}'"
+        n_a, n_b = (con.execute(f"SELECT COUNT(*) FROM ({x})").fetchone()[0] for x in (src_a, src_b))
+        diff = con.execute(f"SELECT COUNT(*) FROM (({src_a}) EXCEPT ALL ({src_b}))").fetchone()[0]
+        good = n_a == n_b and diff == 0
+        ok &= good
+        print(f"   {'MATCH' if good else 'DIFF '}  cs.seats_to_fill {row_type:<10} {n_b:>9,} rows   vs forecast.{table:<28} {n_a:>9,} rows")
+    return ok
+
+
 def validation(con: duckdb.DuckDBPyConnection, name: str) -> bool:
     """Run the PASS/FAIL tables of a validation script; return False if any row fails."""
     ok = True
@@ -235,6 +276,8 @@ def static_checks() -> bool:
             if not src:
                 continue
             csv_path = ROOT / "data" / "raw" / f"{src.group(1)}.csv"
+            if not csv_path.exists():                  # release 5: the forecast tables land from data/marts
+                csv_path = ROOT / "data" / "marts" / f"{src.group(1)}.csv"
             with csv_path.open(newline="") as f:
                 rows = list(csv.reader(f))
             header = rows[0]
@@ -337,6 +380,10 @@ def main() -> int:
         ok &= compare(con, "mart_cw_reconciliation_dashboard", "cs.cw_reconciliation_dashboard")
         con.execute("CREATE OR REPLACE TABLE tmp_d6 AS SELECT * FROM cs.cw_reconciliation_dashboard")   # #d6 in 15_validate
         con.execute("CREATE OR REPLACE VIEW d6 AS SELECT * FROM tmp_d6")
+        custom_sql(con, "custom_sql_seats_to_fill.sql", "seats_to_fill")   # Dashboard #5: every row type against its table
+        ok &= seats_to_fill(con)
+        con.execute("CREATE OR REPLACE TABLE tmp_s5 AS SELECT * FROM cs.seats_to_fill")   # #s5 in 17_validate
+        con.execute("CREATE OR REPLACE VIEW s5 AS SELECT * FROM tmp_s5")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
@@ -347,6 +394,7 @@ def main() -> int:
         ok &= validation(con, "14_validate_workforce_planning_dashboard.sql")
         ok &= validation(con, "15_validate_cw_reconciliation.sql")
         ok &= validation(con, "16_validate_report_calendar.sql")
+        ok &= validation(con, "17_validate_seats_to_fill.sql")
         con.close()
     ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")
