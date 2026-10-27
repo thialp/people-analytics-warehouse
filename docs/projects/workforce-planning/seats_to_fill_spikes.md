@@ -120,8 +120,9 @@ Expected with every parameter empty: FY fills **6,849**, waiting **902**.
 ### Calculations
 
 ```
-// Function Dim   (the function has nothing in the chosen locations: clicking it does nothing)
-SUM(IF [Office In] THEN [Activity] END) = 0
+// Function Dim   (the function has nothing in the chosen locations: clicking it does nothing;
+//                 ZN because an option with nothing behind it sums to NULL, not 0)
+ZN(SUM(IF [Office In] THEN [Activity] END)) = 0
 
 // Function Toggle   (row-level: add or remove this function)
 IF CONTAINS([p_Functions], "|" + [function_name] + "|")
@@ -164,7 +165,7 @@ MIN({ FIXED : SUM(IF [Dept In] AND [Office In] THEN [Activity] END) })
 [Dept Ticked] AND ZN([Scope Total]) - ZN([Dept Scope]) = 0
 
 // Dept Dim
-SUM(IF [Office In] THEN [Activity] END) = 0
+ZN(SUM(IF [Office In] THEN [Activity] END)) = 0
 
 // Dept Toggle   (row-level)
 IF CONTAINS([p_DeptOff], "|" + [Dept Key] + "|")
@@ -235,7 +236,7 @@ Plus a deselect on each list: Filter action, source and target the same sheet, `
 The same pattern one level deeper. Every key carries its parents, so un-ticking a region strips its countries and its offices, and un-ticking a country strips its offices.
 
 ```
-// Region Dim       SUM(IF [Dept In] THEN [Activity] END) = 0
+// Region Dim       ZN(SUM(IF [Dept In] THEN [Activity] END)) = 0
 // Region Toggle    as Function Toggle, with p_Regions and [region]
 // Region Pick      IF [Region Dim] THEN [p_Regions] ELSE MIN([Region Toggle]) END
 // CountryOff Without Region   (row-level)
@@ -249,7 +250,7 @@ ELSE REGEXP_REPLACE([p_CountryOff], "\|" + [region] + ">[^|]*", "") END
 // Country Visible  [Region In]
 // Country Scope    SUM(IF [Dept In] AND [Office In] THEN [Activity] END)
 // Country Locked   MIN([Country In]) AND ZN([Scope Total]) - ZN([Country Scope]) = 0
-// Country Dim      SUM(IF [Dept In] THEN [Activity] END) = 0
+// Country Dim      ZN(SUM(IF [Dept In] THEN [Activity] END)) = 0
 // Country Toggle   as Dept Toggle, with p_CountryOff and [Country Key]
 // Country Pick     IF [Country Locked] OR [Country Dim] THEN [p_CountryOff] ELSE MIN([Country Toggle]) END
 // OfficeOff Without Country   (row-level: an office key is Region>Country>Office)
@@ -382,6 +383,10 @@ Read the value at `days_to` 29, 59 and 89 (filled within 30, 60 and 90 days).
 - the page opens in under 5 seconds.
 
 **Fallback:** 50 draws instead of 100 (`DRAWS` in `forecast/settings.py`), halving the Draw rows.
+
+## Results (2026-10-27)
+
+All five spikes passed in Desktop and on [Tableau Public](https://public.tableau.com/app/profile/thialp/viz/D5Spikes/Spikes); no fallback is needed. The record and the decisions carried into the build are in [seats_to_fill_plan.md](seats_to_fill_plan.md), section 8.
 
 ## Send back
 
