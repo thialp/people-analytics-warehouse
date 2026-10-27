@@ -3,7 +3,9 @@
 -- version covering that quarter; planned headcount and spend are never negative and spend is
 -- zero exactly when headcount is; and each version's total stays within 20% of the quarter's
 -- actual contingent headcount (a plan that far off would be a broken generator, not a bad plan).
-WITH qe AS (SELECT DISTINCT quarter_end_date FROM staging.stg_workforce_plan),
+-- Release 5: only quarters up to the report date have actuals; the forward budget is checked by test 90.
+WITH qe AS (SELECT DISTINCT quarter_end_date FROM staging.stg_workforce_plan
+            WHERE quarter_end_date <= (SELECT report_as_of_date FROM staging.stg_report_calendar)),
 actual AS (
     SELECT q.quarter_end_date, r.cost_center_code AS cost_center_id, COUNT(DISTINCT o.bw_worker_id) AS cw
     FROM qe AS q
@@ -19,7 +21,7 @@ versions AS (SELECT DISTINCT plan_version, quarter_end_date FROM staging.stg_wor
 totals AS (
     SELECT p.plan_version, p.quarter_end_date, SUM(p.planned_cw_headcount) AS planned,
            (SELECT SUM(cw) FROM actual AS a WHERE a.quarter_end_date = p.quarter_end_date) AS actual
-    FROM staging.stg_workforce_plan AS p GROUP BY ALL
+    FROM staging.stg_workforce_plan AS p WHERE p.quarter_end_date IN (SELECT quarter_end_date FROM qe) GROUP BY ALL
 )
 SELECT v.plan_version, a.cost_center_id, a.quarter_end_date, 'contingent workers but no plan line' AS problem
 FROM actual AS a

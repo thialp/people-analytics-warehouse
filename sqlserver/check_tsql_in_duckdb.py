@@ -346,6 +346,7 @@ def main() -> int:
         ok &= validation(con, "12_validate_contingent_workforce.sql")
         ok &= validation(con, "14_validate_workforce_planning_dashboard.sql")
         ok &= validation(con, "15_validate_cw_reconciliation.sql")
+        ok &= validation(con, "16_validate_report_calendar.sql")
         con.close()
     ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")

@@ -764,18 +764,13 @@ def to_currency(usd: float, currency: str, on: dt.date) -> float:
     return round_rate(usd / fx_rates.usd_per_local(currency, max(on, FX_FIRST_DAY)), currency)
 
 
-def plan_line(plan: pd.DataFrame, bw: dict[str, pd.DataFrame], stream: np.random.Generator) -> pd.DataFrame:
-    """The contingent line of the workforce plan (phase 5).
-
-    For every plan row (version x cost center x quarter), the planned contingent headcount at
-    the quarter end and the planned annualized spend run-rate, in USD at the plan's FX date.
-    Like the employee plan, each version is the quarter's actual (as Bridgeway held it on the
-    quarter end) with a version's planning error: the budget furthest out and least accurate.
-    """
+def _cw_actual(bw: dict[str, pd.DataFrame], quarter_ends) -> dict[tuple, dict]:
+    """Contingent headcount and annualized bill run-rate by billing currency, by (quarter end, cost
+    center), as Bridgeway held it on each date."""
     rev, so = bw["bw_service_order_revision"], bw["bw_service_order"]
     rev = rev[rev["status"].isin(["Approved", "Closed"])].merge(so[["service_order_id", "bw_worker_id"]])
     actual: dict[tuple, dict] = {}
-    for qe in sorted(plan["quarter_end_date"].unique()):
+    for qe in quarter_ends:
         cur = rev[(rev["effective_start_date"] <= qe)
                   & (rev["effective_end_date"].isna() | (rev["effective_end_date"].map(lambda d: d is not None and d >= qe)))
                   & (rev["assignment_start_date"] <= qe) & (rev["assignment_end_date"] >= qe)]
@@ -786,6 +781,66 @@ def plan_line(plan: pd.DataFrame, bw: dict[str, pd.DataFrame], stream: np.random
             a = actual.setdefault((qe, cc), {"headcount": 0, "annual_local": defaultdict(float)})
             a["headcount"] += 1
             a["annual_local"][cur_g] += float(ann)
+    return actual
+
+
+def forward_plan_line(plan: pd.DataFrame, bw: dict[str, pd.DataFrame], stream: np.random.Generator, *,
+                      as_of: dt.date, growth: float) -> pd.DataFrame:
+    """The contingent line of the forward budget (release 5): the year after the report date.
+
+    Nothing after the report date is simulated, so the budget projects from the report date: each
+    cost center's contingent headcount on that day, grown by the planned contingent growth through
+    the year, with the budget's planning error; spend is that headcount at the run-rate per worker
+    on the report date, at the budget's FX date. Cost centers with contingent workers on the report
+    date but no employee line get one, with zeros on the employee side.
+    """
+    if plan.empty:
+        return plan.assign(planned_cw_headcount=pd.Series(dtype=int), planned_cw_spend_usd=pd.Series(dtype=float))
+    actual = {cc: a for (qe, cc), a in _cw_actual(bw, [as_of]).items()}
+    v = plan.iloc[0]
+    have = set(plan["cost_center_id"])
+    quarters = plan[["fiscal_quarter", "quarter_end_date"]].drop_duplicates().sort_values("fiscal_quarter")
+    extra = [{"plan_version": v.plan_version, "version_type": v.version_type, "version_date": v.version_date,
+              "fiscal_year": v.fiscal_year, "fiscal_quarter": int(q.fiscal_quarter), "quarter_end_date": q.quarter_end_date,
+              "cost_center_id": cc, "planned_ending_headcount": 0, "planned_ending_fte": 0.0, "planned_net_new": 0,
+              "planned_backfills": 0, "planned_cost_usd": 0.0, "plan_fx_rate_date": v.version_date}
+             for cc in sorted(set(actual) - have) for q in quarters.itertuples(index=False)]
+    if extra:
+        plan = pd.concat([plan, pd.DataFrame(extra)], ignore_index=True)
+    plan = plan.sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"]).reset_index(drop=True)
+    mu, sd = ref.PLAN_CW_ERROR["Budget"]
+    hc_out, spend_out, z_cc = [], [], {}
+    for r in plan.itertuples(index=False):
+        if r.cost_center_id not in z_cc:
+            z_cc[r.cost_center_id] = stream.normal()
+        act = actual.get(r.cost_center_id)
+        z_q = stream.normal()
+        if not act:
+            hc_out.append(0)
+            spend_out.append(0.0)
+            continue
+        hc = int(round(act["headcount"] * (1 + growth) ** (r.fiscal_quarter / 4)
+                       * math.exp(mu + sd * math.sqrt(r.fiscal_quarter) * (0.7 * z_cc[r.cost_center_id] + 0.7 * z_q))))
+        usd = sum(x * fx_rates.usd_per_local(c, max(r.version_date, FX_FIRST_DAY)) for c, x in act["annual_local"].items())
+        usd *= (hc / act["headcount"]) * math.exp(stream.normal(0, ref.PLAN_CW_COST_EXTRA_SD))
+        hc_out.append(hc)
+        spend_out.append(round(usd, 2))
+    plan = plan.copy()
+    at = plan.columns.get_loc("planned_cost_usd") + 1
+    plan.insert(at, "planned_cw_headcount", hc_out)
+    plan.insert(at + 1, "planned_cw_spend_usd", spend_out)
+    return plan
+
+
+def plan_line(plan: pd.DataFrame, bw: dict[str, pd.DataFrame], stream: np.random.Generator) -> pd.DataFrame:
+    """The contingent line of the workforce plan (phase 5).
+
+    For every plan row (version x cost center x quarter), the planned contingent headcount at
+    the quarter end and the planned annualized spend run-rate, in USD at the plan's FX date.
+    Like the employee plan, each version is the quarter's actual (as Bridgeway held it on the
+    quarter end) with a version's planning error: the budget furthest out and least accurate.
+    """
+    actual = _cw_actual(bw, sorted(plan["quarter_end_date"].unique()))
     # cost centers with contingent workers but no employee plan line that year get one, with
     # zeros on the employee side, in every version covering the quarter
     first_q = {n: q for n, _, q in ref.PLAN_VERSIONS}

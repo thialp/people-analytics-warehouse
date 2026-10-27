@@ -188,7 +188,7 @@ One row per requisition (31,614; the requisitions open at the extract and their 
 |---|---|
 | `requisition_id`, `position_id` | Requisition and the seat it fills |
 | `req_type` | `Backfill` (the seat had an incumbent) or `Net-new` |
-| `opened_date`, `approved_date`, `target_start_date`, `filled_date`, `cancelled_date` | In order (test 48). Approval takes 0 to 14 days, and 8% are approved 30 to 75 days late; an approved requisition still open after 210 days is cancelled |
+| `opened_date`, `approved_date`, `target_start_date`, `filled_date`, `cancelled_date` | In order (test 48). Approval takes 0 to 14 days, and 8% are approved 30 to 75 days late; an approved requisition still open after 210 days is cancelled. Release 5: time to fill varies by function (Technology and Legal & Compliance 15% slower, Operations 15% faster) and graduate season (levels 1 and 2, 25% faster in their country's season); only approval dates move, never fills, and a backfill is never approved more than 14 days before the last day of the person who left (test 91) |
 | `status` | `Filled`, `Open` or `Cancelled` |
 | `department_id`, `cost_center_id`, `location_id`, `job_profile_id`, `job_level` | The seat when the requisition opened |
 | `hiring_manager_id` | The seat's manager (→ `dim_worker`) |
@@ -204,7 +204,7 @@ One row per applicant per stage reached (531,691): `candidate_event_id`, `candid
 Department × country (630): `cost_center_id` (`CC-1010-US`), `cost_center_name` (`Core Platform Engineering - United States`), `department_id`, `department_cost_center` (the department's own code, `CC-1010`), `country_code`, `function`. Every seat record and requisition carries the cost center of its department and its office's country (test 51).
 
 #### fact_workforce_plan
-The workforce plan, one row per plan version × cost center × fiscal quarter (29,415). Versions are never overwritten (test 49). Since release 3 it carries a **contingent line** beside the employee plan; 615 rows exist only for that line (cost centers with contingent workers and no employee plan that year), with zeros on the employee side.
+The workforce plan, one row per plan version × cost center × fiscal quarter (31,935: 29,415 for FY22 to FY26 and 2,520 for the forward budget). Versions are never overwritten (test 49). Since release 3 it carries a **contingent line** beside the employee plan; 615 rows exist only for that line (cost centers with contingent workers and no employee plan that year), with zeros on the employee side.
 
 | Column | Description |
 |---|---|
@@ -218,6 +218,8 @@ The workforce plan, one row per plan version × cost center × fiscal quarter (2
 | `planned_cw_spend_usd` | Planned contingent spend: the annualized bill run-rate at the quarter-end (hourly rate × contracted hours × 52, or monthly rate × 12), in USD at the FX of the version date (release 3). Test 76 checks the line is complete |
 
 The generator writes each version around what happened, with an error that shrinks from the budget to RF3; the FY24 budget predates the restructuring. The contingent line is looser (budgets run about 4% above the year-end contingent headcount) and has its own random stream, so no employee plan number moved when it was added. See [Workforce Planning, section 7](../projects/workforce-planning/workforce_planning.md#7-plan-versus-actual).
+
+**The forward budget (release 5).** The year after the report date has one version, its Budget (`FY27 Budget`, dated 2026-05-15, before the report date): four quarters for each of the 630 cost centers active in FY26. Nothing after the report date is simulated, so it is a projection, not a plan written around what happened: net-new from the same quarter of FY26 scaled to the planned growth (`FORWARD_BUDGET_NET_GROWTH`, 5%), backfills by headcount, headcount grown from Jun 30, 2026, with the budget's planning error; the contingent line grows each cost center's Jun 30, 2026 contingent headcount by `FORWARD_BUDGET_CW_GROWTH` (6%). It is written on its own random streams after every historic version, so FY22 to FY26 are unchanged, and it never reaches `mart_plan_vs_actual`, which joins plans to quarters that happened (test 90).
 
 ### External reference data
 
@@ -428,6 +430,15 @@ The 13 discrepancy types, CW00 to CW12, named after what happened in the systems
 | `what_a_manager_sees` | VARCHAR | What someone looking only at Keystone sees |
 | `who_can_fix_it` | VARCHAR | The team that can correct the source; the warehouse only flags |
 | `severity` | VARCHAR | Expected, Data hygiene, Cost risk, Access risk or Compliance risk |
+
+### Report calendar (release 5)
+
+Written by [`generator/report_calendar.py`](../../generator/report_calendar.py) from one setting, the report as-of date (`LAST_SNAPSHOT`). Dashboards read every date and fiscal-year label from these two tables and store offsets, not years, in their parameters, so moving the as-of date a year rolls every page forward without editing a calculation (test 89).
+
+| Table | Grain | Columns |
+|---|---|---|
+| `ref_report_calendar` | one row | `report_as_of_date` (2026-06-30), `report_as_of_label` (Jun 30, 2026), `current_fiscal_year` and `_label` (FY26), `forward_fiscal_year` and `_label` (FY27), `history_first_fiscal_year` and `_label` (FY22), `history_start_date`, `forward_start_date`, `forward_end_date`, `forward_period_label` (Jul 2026 to Jun 2027), `forward_budget_version` (FY27 Budget), `forward_budget_date` |
+| `ref_report_quarter` | fiscal quarter in the window (24: five history years and the forward year) | `fiscal_year`, `fiscal_year_label`, `fiscal_quarter`, `quarter_label` (FY27 Q1), `quarter_months_label` (Jul - Sep 26, ASCII), `quarter_start_date`, `quarter_end_date`, `fy_offset` (0 current, +1 forward), `quarter_offset` (0 = the quarter ending on the as-of date, -19 to 4), `is_forward` |
 
 ### Lineage registry (release 3)
 

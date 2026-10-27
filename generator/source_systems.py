@@ -128,6 +128,9 @@ RAW_TABLE_LINEAGE = [
     ("itsm_ticket_event", _HLX, "Tickets", "ticket x state change", "Transaction", 4),
     ("itsm_ticket_link", _HLX, "Tickets", "ticket x subject", "Type 1", 4),
     ("ref_ticket_category", _HLX, "Tickets", "ticket category", "Type 1", 4),
+    # Report calendar (release 5, Dashboard #5): every date label, from one as-of date
+    ("ref_report_calendar", _WH, "Report calendar", "report (one row)", "Type 1", 5),
+    ("ref_report_quarter", _WH, "Report calendar", "fiscal quarter in the report window", "Type 1", 5),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -328,6 +331,36 @@ RAW_COLUMNS.update({
         ("title_template", "VARCHAR", "Ticket title before the subject"),
     ],
 })
+
+# Release 5: the report calendar (generator/report_calendar.py)
+RAW_COLUMNS["ref_report_calendar"] = [
+    ("report_as_of_date", "DATE", "The report as-of date: the last day the data covers"),
+    ("report_as_of_label", "VARCHAR", "It in words, e.g. Jun 30, 2026"),
+    ("current_fiscal_year", "INTEGER", "The fiscal year the as-of date closes"),
+    ("current_fiscal_year_label", "VARCHAR", "e.g. FY26"),
+    ("forward_fiscal_year", "INTEGER", "The year after it: the forward budget's year, the one Dashboard #5 forecasts"),
+    ("forward_fiscal_year_label", "VARCHAR", "e.g. FY27"),
+    ("history_first_fiscal_year", "INTEGER", "First fiscal year of the five-year history window"),
+    ("history_first_fiscal_year_label", "VARCHAR", "e.g. FY22"),
+    ("history_start_date", "DATE", "First day of the history window"),
+    ("forward_start_date", "DATE", "First day of the forward year"),
+    ("forward_end_date", "DATE", "Last day of the forward year"),
+    ("forward_period_label", "VARCHAR", "The forward year in words, e.g. Jul 2026 to Jun 2027"),
+    ("forward_budget_version", "VARCHAR", "The forward budget's plan version, e.g. FY27 Budget"),
+    ("forward_budget_date", "DATE", "The day the forward budget was approved (May 15 before the as-of date)"),
+]
+RAW_COLUMNS["ref_report_quarter"] = [
+    ("fiscal_year", "INTEGER", "Fiscal year (July to June)"),
+    ("fiscal_year_label", "VARCHAR", "e.g. FY27"),
+    ("fiscal_quarter", "INTEGER", "1 to 4"),
+    ("quarter_label", "VARCHAR", "e.g. FY27 Q1"),
+    ("quarter_months_label", "VARCHAR", "The quarter's months, e.g. Jul - Sep 26 (ASCII; dashboards show an en dash)"),
+    ("quarter_start_date", "DATE", "First day of the quarter"),
+    ("quarter_end_date", "DATE", "Last day of the quarter"),
+    ("fy_offset", "INTEGER", "Fiscal years from the current one: 0 current, +1 forward, -1 last year"),
+    ("quarter_offset", "INTEGER", "Quarters from the one ending on the as-of date: 0 that quarter, +1 the next"),
+    ("is_forward", "BOOLEAN", "True for the forward year's quarters, after the as-of date"),
+]
 
 # The registry tables themselves, so test 61 covers them too
 RAW_COLUMNS["ref_cw_discrepancy_type"] = [

@@ -43,6 +43,7 @@ import fringe_research
 import fx_rates
 import helix_service_desk
 import keystone_feed
+import report_calendar
 import source_systems
 import reference_data as ref
 
@@ -363,6 +364,17 @@ def time_to_fill(level: int) -> int:
     med = ref.REQ_TIME_TO_FILL_MEDIAN[min(level, 11)]
     days = recruiting_rng.lognormal(math.log(med), ref.REQ_TIME_TO_FILL_SIGMA)
     return int(np.clip(round(days), ref.REQ_TIME_TO_FILL_MIN, 240))
+
+
+def ttf_factor(dept: str, loc: str, level: int, fill_day: dt.date) -> float:
+    """Release 5: how much longer or shorter than the level's time to fill this fill takes.
+    Slower and faster functions, and graduate hiring that moves faster in its country's season."""
+    f = ref.REQ_TTF_FUNCTION_FACTOR.get(DEPT[dept]["function"], 1.0)
+    if level in ref.REQ_TTF_GRAD_LEVELS:
+        season = ref.REQ_TTF_GRAD_SEASON.get(OFFICE[loc]["country"], ref.REQ_TTF_GRAD_SEASON_DEFAULT)
+        if fill_day.month in season:
+            f *= ref.REQ_TTF_GRAD_FACTOR
+    return f
 
 
 def approval_lag() -> int:
@@ -884,14 +896,16 @@ def demote(w: dict, on: dt.date):
 def net_new_seat(w: dict, on: dt.date, reason: str, recruited: bool) -> dict:
     """A seat created for `w`. A recruited seat was approved earlier, as long before the hire as
     recruiting takes; a seat created by an internal decision (team split, internal move) opens that day."""
-    approved = opened = on
+    approved = approved_sim = opened = on
     if recruited:
-        approved = on - dt.timedelta(days=time_to_fill(w["level"]))
-        earliest = max(OFFICE[w["loc"]]["opened"], REORG_DATE if w["dept"] == "D-108" else approved)
-        approved = max(approved, earliest)
+        ttf = time_to_fill(w["level"])
+        floor = [OFFICE[w["loc"]]["opened"]] + ([REORG_DATE] if w["dept"] == "D-108" else [])
+        approved_sim = max([on - dt.timedelta(days=ttf)] + floor)       # as drawn before release 5
+        approved = max([on - dt.timedelta(days=round(ttf * ttf_factor(w["dept"], w["loc"], w["level"], on)))] + floor)
         opened = approved - dt.timedelta(days=approval_lag())
     s = new_seat(approved, reason, w["dept"], w["family"], w["level"], w["loc"], w["is_pm"], w["fte"])
-    new_requisition(s, opened, approved, None)
+    r = new_requisition(s, opened, approved, None)
+    r["approved_sim"] = approved_sim
     return s
 
 
@@ -1466,6 +1480,37 @@ comp_rows.extend(corrections)
 
 
 # ======================================================================================
+# 6a. Release 5: backfill approval dates follow the function and the graduate season
+# ======================================================================================
+# A filled external backfill keeps its fill date (the hire the simulation drew); only its
+# approval moves, so time to fill (approval to fill) varies by function and graduate season
+# like a net-new PID's. Earlier approvals are bounded: never more than a couple of weeks before
+# the person who left gave notice. Deterministic, no random draw: nothing else moves.
+def _shift_backfill_approval(r: dict):
+    if r["req_type"] != "Backfill" or r["status"] != "Filled" or r["fill_source"] != "External":
+        return
+    ttf = (r["filled_date"] - r["approved_date"]).days
+    if ttf <= 0 or r["opened_date"] == r["filled_date"]:
+        return
+    target = r["filled_date"] - dt.timedelta(days=round(ttf * ttf_factor(r["department_id"], r["location_id"],
+                                                                         int(r["job_level"]), r["filled_date"])))
+    earliest = r["opened_date"] - dt.timedelta(days=ref.REQ_BACKFILL_EARLY_APPROVAL_DAYS)
+    approved = min(max(target, earliest), r["filled_date"])
+    delta = approved - r["approved_date"]
+    if delta.days == 0:
+        return
+    r.setdefault("approved_sim", r["approved_date"])
+    if delta.days < 0:
+        r["opened_date"] += delta                # opened during the notice period, approval lag kept
+    r["approved_date"] = approved
+    r["target_start_date"] = approved + dt.timedelta(days=45)
+
+
+for _r in req_rows.values():
+    _shift_backfill_approval(_r)
+
+
+# ======================================================================================
 # 6b. Cost centers, the workforce plan and candidates
 # ======================================================================================
 # Written after the simulation from what happened, so they never change it. The plan is
@@ -1543,6 +1588,43 @@ for fy in sorted({fiscal_year(q) for q in QUARTER_ENDS}):
                     "planned_net_new": net_new, "planned_backfills": backfills,
                     "planned_cost_usd": round(cost_usd, 2), "plan_fx_rate_date": version_date})
 
+# Release 5: the forward budget, for the fiscal year after the report date. Approved on May 15
+# before the report date, like every budget, but nothing after the report date is simulated, so it
+# is a projection: each cost center's fills in the same quarter of the last fiscal year, net-new
+# scaled from last year's growth to the planned growth, backfills by headcount; headcount grows
+# from the report date. Own stream, written after every historic version: nothing earlier moves.
+forward_rng = domain_stream("forward_budget")
+FORWARD_FY = fiscal_year(LAST_ME) + 1
+_last_fy = fiscal_year(LAST_ME)
+_last_q = [q for q in QUARTER_ENDS if fiscal_year(q) == _last_fy]
+_fwd_qe = [month_end(FORWARD_FY - 1 if m <= 12 else FORWARD_FY, (m - 1) % 12 + 1) for m in (9, 12, 15, 18)]
+_fwd_date = dt.date(FORWARD_FY - 1, 5, 15)
+_g_fwd = ref.FORWARD_BUDGET_NET_GROWTH
+_nn_scale = _g_fwd / ref.FY_NET_GROWTH[_last_fy] if ref.FY_NET_GROWTH.get(_last_fy) else 1.0
+_mu_n, _sd_n = ref.PLAN_NET_NEW_ERROR["Budget"]
+_mu_b, _sd_b = ref.PLAN_BACKFILL_ERROR["Budget"]
+_mu_h, _sd_h = ref.PLAN_HEADCOUNT_ERROR["Budget"]
+_fwd_ccs = [cc for cc in _cost_centers if any((q, cc) in _actual or (q, cc) in _fill for q in _last_q)]
+for cc in _fwd_ccs:
+    z_cc = forward_rng.normal()
+    act = _actual.get((LAST_ME, cc), {"headcount": 0, "fte": 0.0, "loaded_local": {}})
+    for q, (qe, last_qe) in enumerate(zip(_fwd_qe, _last_q), start=1):
+        fills = _fill.get((last_qe, cc), {"Net-new": 0, "Backfill": 0})
+        growth = (1 + _g_fwd) ** (q / 4)
+        z_q = forward_rng.normal()
+        net_new = int(forward_rng.poisson((fills["Net-new"] * _nn_scale + 0.05) * math.exp(_mu_n + _sd_n * (0.7 * z_cc + 0.7 * z_q))))
+        backfills = int(forward_rng.poisson((fills["Backfill"] * growth + 0.05) * math.exp(_mu_b + _sd_b * (0.7 * z_cc + 0.7 * z_q))))
+        hc = int(round(act["headcount"] * growth * math.exp(_mu_h + _sd_h * math.sqrt(q) * (0.7 * z_cc + 0.7 * forward_rng.normal()))))
+        fte_per_head = act["fte"] / act["headcount"] if act["headcount"] else 1.0
+        cost_usd = sum(v * fx_rates.usd_per_local(cur, _fwd_date) for cur, v in act["loaded_local"].items())
+        cost_usd *= (hc / act["headcount"] if act["headcount"] else 0.0) * math.exp(forward_rng.normal(0, ref.PLAN_COST_EXTRA_SD))
+        plan_rows.append({
+            "plan_version": f"FY{FORWARD_FY % 100:02d} Budget", "version_type": "Budget", "version_date": _fwd_date,
+            "fiscal_year": FORWARD_FY, "fiscal_quarter": q, "quarter_end_date": qe, "cost_center_id": cc,
+            "planned_ending_headcount": hc, "planned_ending_fte": round(hc * fte_per_head, 2),
+            "planned_net_new": net_new, "planned_backfills": backfills,
+            "planned_cost_usd": round(cost_usd, 2), "plan_fx_rate_date": _fwd_date})
+
 # cost centers: every department x country that ever held a seat or a plan line
 _cc_ids = sorted({r["cost_center_id"] for r in pos_rows} | {r["cost_center_id"] for r in plan_rows})
 cost_center_rows = []
@@ -1578,12 +1660,15 @@ _seq["candidate"] = 400000
 for r in req_rows.values():
     start = r["approved_date"]
     end = r["filled_date"] or r["cancelled_date"] or LAST_ME
-    if start > LAST_ME or start < FIRST_ME:        # approved before history starts: the search is not in the ATS
+    # Release 5 moved some approval dates (6a); which branch a requisition takes, and so every draw
+    # here, still follows the date the simulation drew, so no applicant elsewhere changes
+    sim = r.get("approved_sim", start)
+    if sim > LAST_ME or sim < FIRST_ME:            # approved before history starts: the search is not in the ATS
         if r["status"] == "Filled":
             _candidate(r["requisition_id"], ["Offer", "Accepted"], [r["filled_date"], r["filled_date"]],
                        r["fill_source"] == "Internal", r["filled_by_worker_id"])
         continue
-    search = (end - start).days >= 7
+    search = (end - sim).days >= 7
     if r["status"] == "Filled":
         if search:
             _candidate(r["requisition_id"], STAGES + ["Accepted"], _stage_dates(start, end, 5),
@@ -1632,6 +1717,7 @@ while _day <= LAST_ME + dt.timedelta(days=183):
         med = ref.REQ_TIME_TO_FILL_MEDIAN[min(lvl, 11)]
         ttf = int(np.clip(round(tail_rng.lognormal(math.log(med), ref.REQ_TIME_TO_FILL_SIGMA)),
                           ref.REQ_TIME_TO_FILL_MIN, 240))
+        ttf = round(ttf * ttf_factor(r0["department_id"], r0["location_id"], lvl, _day))   # release 5
         approved = _day - dt.timedelta(days=ttf)
         if approved > LAST_ME:
             continue
@@ -1834,6 +1920,9 @@ write(pd.DataFrame(fringe_cites).drop_duplicates(), "ref_fringe_source")
 
 # Release 3: where every raw table comes from (Keystone HR, Bridgeway VMS, the integration
 # log, public reference data) and the column contract of every table release 3 adds.
+# Release 5: the report calendar, every date label the dashboards show, from the one as-of date
+for _name, _df in report_calendar.build(LAST_ME).items():
+    write(_df, _name)
 write(pd.DataFrame(source_systems.SOURCE_SYSTEMS), "ref_source_system")
 write(pd.DataFrame(source_systems.lineage_rows()), "ref_raw_table_lineage")
 write(pd.DataFrame(source_systems.column_rows()), "ref_raw_column")
@@ -1935,7 +2024,12 @@ for _table in source_systems.RELEASE_4_TABLES:
 
 # The plan's contingent line, from its own stream so no employee plan number moves.
 _plan = pd.DataFrame(plan_rows).sort_values(["fiscal_year", "version_date", "cost_center_id", "fiscal_quarter"])
-write(contingent_workforce.plan_line(_plan, cw_tables, domain_stream("plan_cw")), "fact_workforce_plan")
+_hist, _fwd = _plan[_plan["fiscal_year"] <= fiscal_year(LAST_ME)], _plan[_plan["fiscal_year"] > fiscal_year(LAST_ME)]
+_plan = contingent_workforce.plan_line(_hist, cw_tables, domain_stream("plan_cw"))
+_plan = pd.concat([_plan, contingent_workforce.forward_plan_line(
+    _fwd, cw_tables, domain_stream("forward_budget_cw"), as_of=LAST_ME, growth=ref.FORWARD_BUDGET_CW_GROWTH)],
+    ignore_index=True)
+write(_plan, "fact_workforce_plan")
 
 print(f"Active headcount at {LAST_ME}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
       f"people managers: {sum(1 for w in active.values() if w['is_pm']):,}")

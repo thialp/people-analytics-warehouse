@@ -848,6 +848,50 @@ DECLARE @n_ref_raw_table_lineage INT = (SELECT COUNT(*) FROM raw.ref_raw_table_l
 PRINT CONCAT('raw.ref_raw_table_lineage', '           ', @n_ref_raw_table_lineage, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.ref_report_calendar;
+CREATE TABLE raw.ref_report_calendar (
+    [report_as_of_date]               NVARCHAR(400) NULL,
+    [report_as_of_label]              NVARCHAR(400) NULL,
+    [current_fiscal_year]             NVARCHAR(400) NULL,
+    [current_fiscal_year_label]       NVARCHAR(400) NULL,
+    [forward_fiscal_year]             NVARCHAR(400) NULL,
+    [forward_fiscal_year_label]       NVARCHAR(400) NULL,
+    [history_first_fiscal_year]       NVARCHAR(400) NULL,
+    [history_first_fiscal_year_label] NVARCHAR(400) NULL,
+    [history_start_date]              NVARCHAR(400) NULL,
+    [forward_start_date]              NVARCHAR(400) NULL,
+    [forward_end_date]                NVARCHAR(400) NULL,
+    [forward_period_label]            NVARCHAR(400) NULL,
+    [forward_budget_version]          NVARCHAR(400) NULL,
+    [forward_budget_date]             NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_report_calendar
+FROM '/repo/data/sqlserver/ref_report_calendar.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_report_calendar INT = (SELECT COUNT(*) FROM raw.ref_report_calendar);
+PRINT CONCAT('raw.ref_report_calendar', '             ', @n_ref_report_calendar, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ref_report_quarter;
+CREATE TABLE raw.ref_report_quarter (
+    [fiscal_year]          NVARCHAR(400) NULL,
+    [fiscal_year_label]    NVARCHAR(400) NULL,
+    [fiscal_quarter]       NVARCHAR(400) NULL,
+    [quarter_label]        NVARCHAR(400) NULL,
+    [quarter_months_label] NVARCHAR(400) NULL,
+    [quarter_start_date]   NVARCHAR(400) NULL,
+    [quarter_end_date]     NVARCHAR(400) NULL,
+    [fy_offset]            NVARCHAR(400) NULL,
+    [quarter_offset]       NVARCHAR(400) NULL,
+    [is_forward]           NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_report_quarter
+FROM '/repo/data/raw/ref_report_quarter.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_report_quarter INT = (SELECT COUNT(*) FROM raw.ref_report_quarter);
+PRINT CONCAT('raw.ref_report_quarter', '              ', @n_ref_report_quarter, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.ref_salary_range;
 CREATE TABLE raw.ref_salary_range (
     [fiscal_year]            NVARCHAR(400) NULL,

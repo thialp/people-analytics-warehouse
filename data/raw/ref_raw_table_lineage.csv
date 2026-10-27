@@ -48,3 +48,5 @@ itsm_ticket,HLX,Tickets,ticket,Accumulating snapshot,4
 itsm_ticket_event,HLX,Tickets,ticket x state change,Transaction,4
 itsm_ticket_link,HLX,Tickets,ticket x subject,Type 1,4
 ref_ticket_category,HLX,Tickets,ticket category,Type 1,4
+ref_report_calendar,WH,Report calendar,report (one row),Type 1,5
+ref_report_quarter,WH,Report calendar,fiscal quarter in the report window,Type 1,5
