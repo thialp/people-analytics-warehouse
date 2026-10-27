@@ -63,17 +63,19 @@ GO
 
 DROP TABLE IF EXISTS fc.mart_pid_forecast_backtest;
 SELECT
-    CAST(NULLIF([origin_quarter_offset], '') AS INT)  AS [origin_quarter_offset],
-    CAST(NULLIF([quarter_offset], '') AS INT)         AS [quarter_offset],
-    CAST(NULLIF([horizon], '') AS INT)                AS [horizon],
-    CAST(NULLIF([department_id], '') AS VARCHAR(10))  AS [department_id],
-    CAST(NULLIF([location_id], '') AS VARCHAR(10))    AS [location_id],
-    CAST(NULLIF([filled_mean], '') AS FLOAT)          AS [filled_mean],
-    CAST(NULLIF([filled_var], '') AS FLOAT)           AS [filled_var],
-    CAST(NULLIF([vacant_end_mean], '') AS FLOAT)      AS [vacant_end_mean],
-    CAST(NULLIF([vacant_end_var], '') AS FLOAT)       AS [vacant_end_var],
-    CAST(NULLIF([actual_filled], '') AS INT)          AS [actual_filled],
-    CAST(NULLIF([actual_vacant_end], '') AS INT)      AS [actual_vacant_end]
+    CAST(NULLIF([origin_quarter_offset], '') AS INT)   AS [origin_quarter_offset],
+    CAST(NULLIF([quarter_offset], '') AS INT)          AS [quarter_offset],
+    CAST(NULLIF([horizon], '') AS INT)                 AS [horizon],
+    CAST(NULLIF([department_id], '') AS VARCHAR(10))   AS [department_id],
+    CAST(NULLIF([location_id], '') AS VARCHAR(10))     AS [location_id],
+    CAST(NULLIF([filled_mean], '') AS FLOAT)           AS [filled_mean],
+    CAST(NULLIF([filled_var], '') AS FLOAT)            AS [filled_var],
+    CAST(NULLIF([vacant_end_mean], '') AS FLOAT)       AS [vacant_end_mean],
+    CAST(NULLIF([vacant_end_var], '') AS FLOAT)        AS [vacant_end_var],
+    CAST(NULLIF([filled_shared_cv], '') AS FLOAT)      AS [filled_shared_cv],
+    CAST(NULLIF([vacant_end_shared_cv], '') AS FLOAT)  AS [vacant_end_shared_cv],
+    CAST(NULLIF([actual_filled], '') AS INT)           AS [actual_filled],
+    CAST(NULLIF([actual_vacant_end], '') AS INT)       AS [actual_vacant_end]
 INTO fc.mart_pid_forecast_backtest
 FROM raw.mart_pid_forecast_backtest;
 GO
@@ -83,12 +85,22 @@ SELECT
     CAST(NULLIF([origin_quarter_offset], '') AS INT)                                           AS [origin_quarter_offset],
     CAST(NULLIF([quarter_offset], '') AS INT)                                                  AS [quarter_offset],
     CAST(NULLIF([horizon], '') AS INT)                                                         AS [horizon],
+    CAST(NULLIF([filled_mean], '') AS FLOAT)                                                   AS [filled_mean],
+    CAST(NULLIF([filled_low], '') AS FLOAT)                                                    AS [filled_low],
+    CAST(NULLIF([filled_high], '') AS FLOAT)                                                   AS [filled_high],
+    CAST(CASE LOWER([filled_in_band]) WHEN 'true' THEN 1 WHEN 'false' THEN 0 END AS BIT)       AS [filled_in_band],
+    CAST(NULLIF([filled_mean_error_pct], '') AS FLOAT)                                         AS [filled_mean_error_pct],
     CAST(NULLIF([filled_p10], '') AS FLOAT)                                                    AS [filled_p10],
     CAST(NULLIF([filled_p50], '') AS FLOAT)                                                    AS [filled_p50],
     CAST(NULLIF([filled_p90], '') AS FLOAT)                                                    AS [filled_p90],
     CAST(NULLIF([actual_filled], '') AS INT)                                                   AS [actual_filled],
     CAST(CASE LOWER([filled_in_range]) WHEN 'true' THEN 1 WHEN 'false' THEN 0 END AS BIT)      AS [filled_in_range],
     CAST(NULLIF([filled_error_pct], '') AS FLOAT)                                              AS [filled_error_pct],
+    CAST(NULLIF([vacant_end_mean], '') AS FLOAT)                                               AS [vacant_end_mean],
+    CAST(NULLIF([vacant_end_low], '') AS FLOAT)                                                AS [vacant_end_low],
+    CAST(NULLIF([vacant_end_high], '') AS FLOAT)                                               AS [vacant_end_high],
+    CAST(CASE LOWER([vacant_end_in_band]) WHEN 'true' THEN 1 WHEN 'false' THEN 0 END AS BIT)   AS [vacant_end_in_band],
+    CAST(NULLIF([vacant_end_mean_error_pct], '') AS FLOAT)                                     AS [vacant_end_mean_error_pct],
     CAST(NULLIF([vacant_end_p10], '') AS FLOAT)                                                AS [vacant_end_p10],
     CAST(NULLIF([vacant_end_p50], '') AS FLOAT)                                                AS [vacant_end_p50],
     CAST(NULLIF([vacant_end_p90], '') AS FLOAT)                                                AS [vacant_end_p90],

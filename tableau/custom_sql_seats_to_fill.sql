@@ -10,15 +10,19 @@
                allocated to the office (planned_net_new, planned_backfills). Forward quarters
                carry the plan only.
     Draw       forward quarter x department x office x draw (fc.mart_pid_forecast_draws): one
-               simulated future each. Sum a measure over the selection per draw, then take the
-               percentiles across draws for the likely range.
+               simulated future each. The page shows the average over draws (SUM / 100); sum a
+               measure over the selection per draw, then take P10 and P90 across draws for the range.
     Survival   approval quarter x department x office x level band x requisition type x ten-day
                period (fc.mart_fill_survival): at_risk and sv_filled for the Kaplan-Meier curve,
                EXP(RUNNING_SUM(LN(1 - SUM(sv_filled) / SUM(at_risk)))).
     Backtest   backtest origin x target quarter x department x office (fc.mart_pid_forecast_backtest):
-               forecast means and variances (they add up over a selection) and the actuals.
+               forecast means and variances (they add up over a selection), the shared cv (the
+               company-wide shocks every draw applies to all cells; one value per origin and quarter)
+               and the actuals. Range for a selection: SUM(mean) +- 1.2816 x
+               SQRT(SUM(var) + (MIN(shared cv) x SUM(mean))^2).
     Accuracy   backtest origin x target quarter, all of Arcadia (fc.mart_pid_forecast_accuracy): the
-               P10, P50 and P90 against the actual. No department or office.
+               mean with its 80% range (low, high), P10, P50 and P90, against the actual. No
+               department or office.
     CW budget  fiscal year x function (fc.mart_cw_budget_function): the contingent budget line.
 
   Every row carries the report calendar's labels (report_as_of_label, current_fiscal_year_label,
@@ -73,6 +77,8 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS filled_var,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_mean,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_var,
+    CAST(NULL AS FLOAT)                                                    AS filled_shared_cv,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_shared_cv,
     CAST(NULL AS INT)                                                      AS actual_filled,
     CAST(NULL AS INT)                                                      AS actual_vacant_end,
     CAST(NULL AS FLOAT)                                                    AS filled_p10,
@@ -85,6 +91,14 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS vacant_end_p90,
     CAST(NULL AS BIT)                                                      AS vacant_end_in_range,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS filled_low,
+    CAST(NULL AS FLOAT)                                                    AS filled_high,
+    CAST(NULL AS BIT)                                                      AS filled_in_band,
+    CAST(NULL AS FLOAT)                                                    AS filled_mean_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_low,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_high,
+    CAST(NULL AS BIT)                                                      AS vacant_end_in_band,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_mean_error_pct,
     CAST(NULL AS INT)                                                      AS planned_cw_headcount,
     CAST(NULL AS FLOAT)                                                    AS planned_cw_spend_usd,
     CAST(NULL AS FLOAT)                                                    AS planned_spend_per_worker_usd,
@@ -141,6 +155,8 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS filled_var,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_mean,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_var,
+    CAST(NULL AS FLOAT)                                                    AS filled_shared_cv,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_shared_cv,
     CAST(NULL AS INT)                                                      AS actual_filled,
     CAST(NULL AS INT)                                                      AS actual_vacant_end,
     CAST(NULL AS FLOAT)                                                    AS filled_p10,
@@ -153,6 +169,14 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS vacant_end_p90,
     CAST(NULL AS BIT)                                                      AS vacant_end_in_range,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS filled_low,
+    CAST(NULL AS FLOAT)                                                    AS filled_high,
+    CAST(NULL AS BIT)                                                      AS filled_in_band,
+    CAST(NULL AS FLOAT)                                                    AS filled_mean_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_low,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_high,
+    CAST(NULL AS BIT)                                                      AS vacant_end_in_band,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_mean_error_pct,
     CAST(NULL AS INT)                                                      AS planned_cw_headcount,
     CAST(NULL AS FLOAT)                                                    AS planned_cw_spend_usd,
     CAST(NULL AS FLOAT)                                                    AS planned_spend_per_worker_usd,
@@ -209,6 +233,8 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS filled_var,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_mean,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_var,
+    CAST(NULL AS FLOAT)                                                    AS filled_shared_cv,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_shared_cv,
     CAST(NULL AS INT)                                                      AS actual_filled,
     CAST(NULL AS INT)                                                      AS actual_vacant_end,
     CAST(NULL AS FLOAT)                                                    AS filled_p10,
@@ -221,6 +247,14 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS vacant_end_p90,
     CAST(NULL AS BIT)                                                      AS vacant_end_in_range,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS filled_low,
+    CAST(NULL AS FLOAT)                                                    AS filled_high,
+    CAST(NULL AS BIT)                                                      AS filled_in_band,
+    CAST(NULL AS FLOAT)                                                    AS filled_mean_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_low,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_high,
+    CAST(NULL AS BIT)                                                      AS vacant_end_in_band,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_mean_error_pct,
     CAST(NULL AS INT)                                                      AS planned_cw_headcount,
     CAST(NULL AS FLOAT)                                                    AS planned_cw_spend_usd,
     CAST(NULL AS FLOAT)                                                    AS planned_spend_per_worker_usd,
@@ -277,6 +311,8 @@ SELECT
     x.filled_var                                                           AS filled_var,
     x.vacant_end_mean                                                      AS vacant_end_mean,
     x.vacant_end_var                                                       AS vacant_end_var,
+    x.filled_shared_cv                                                     AS filled_shared_cv,
+    x.vacant_end_shared_cv                                                 AS vacant_end_shared_cv,
     x.actual_filled                                                        AS actual_filled,
     x.actual_vacant_end                                                    AS actual_vacant_end,
     CAST(NULL AS FLOAT)                                                    AS filled_p10,
@@ -289,6 +325,14 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS vacant_end_p90,
     CAST(NULL AS BIT)                                                      AS vacant_end_in_range,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS filled_low,
+    CAST(NULL AS FLOAT)                                                    AS filled_high,
+    CAST(NULL AS BIT)                                                      AS filled_in_band,
+    CAST(NULL AS FLOAT)                                                    AS filled_mean_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_low,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_high,
+    CAST(NULL AS BIT)                                                      AS vacant_end_in_band,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_mean_error_pct,
     CAST(NULL AS INT)                                                      AS planned_cw_headcount,
     CAST(NULL AS FLOAT)                                                    AS planned_cw_spend_usd,
     CAST(NULL AS FLOAT)                                                    AS planned_spend_per_worker_usd,
@@ -341,10 +385,12 @@ SELECT
     CAST(NULL AS INT)                                                      AS vacant_end,
     CAST(NULL AS INT)                                                      AS at_risk,
     CAST(NULL AS INT)                                                      AS sv_filled,
-    CAST(NULL AS FLOAT)                                                    AS filled_mean,
+    x.filled_mean                                                          AS filled_mean,
     CAST(NULL AS FLOAT)                                                    AS filled_var,
-    CAST(NULL AS FLOAT)                                                    AS vacant_end_mean,
+    x.vacant_end_mean                                                      AS vacant_end_mean,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_var,
+    CAST(NULL AS FLOAT)                                                    AS filled_shared_cv,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_shared_cv,
     x.actual_filled                                                        AS actual_filled,
     x.actual_vacant_end                                                    AS actual_vacant_end,
     x.filled_p10                                                           AS filled_p10,
@@ -357,6 +403,14 @@ SELECT
     x.vacant_end_p90                                                       AS vacant_end_p90,
     x.vacant_end_in_range                                                  AS vacant_end_in_range,
     x.vacant_end_error_pct                                                 AS vacant_end_error_pct,
+    x.filled_low                                                           AS filled_low,
+    x.filled_high                                                          AS filled_high,
+    x.filled_in_band                                                       AS filled_in_band,
+    x.filled_mean_error_pct                                                AS filled_mean_error_pct,
+    x.vacant_end_low                                                       AS vacant_end_low,
+    x.vacant_end_high                                                      AS vacant_end_high,
+    x.vacant_end_in_band                                                   AS vacant_end_in_band,
+    x.vacant_end_mean_error_pct                                            AS vacant_end_mean_error_pct,
     CAST(NULL AS INT)                                                      AS planned_cw_headcount,
     CAST(NULL AS FLOAT)                                                    AS planned_cw_spend_usd,
     CAST(NULL AS FLOAT)                                                    AS planned_spend_per_worker_usd,
@@ -411,6 +465,8 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS filled_var,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_mean,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_var,
+    CAST(NULL AS FLOAT)                                                    AS filled_shared_cv,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_shared_cv,
     CAST(NULL AS INT)                                                      AS actual_filled,
     CAST(NULL AS INT)                                                      AS actual_vacant_end,
     CAST(NULL AS FLOAT)                                                    AS filled_p10,
@@ -423,6 +479,14 @@ SELECT
     CAST(NULL AS FLOAT)                                                    AS vacant_end_p90,
     CAST(NULL AS BIT)                                                      AS vacant_end_in_range,
     CAST(NULL AS FLOAT)                                                    AS vacant_end_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS filled_low,
+    CAST(NULL AS FLOAT)                                                    AS filled_high,
+    CAST(NULL AS BIT)                                                      AS filled_in_band,
+    CAST(NULL AS FLOAT)                                                    AS filled_mean_error_pct,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_low,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_high,
+    CAST(NULL AS BIT)                                                      AS vacant_end_in_band,
+    CAST(NULL AS FLOAT)                                                    AS vacant_end_mean_error_pct,
     x.planned_cw_headcount                                                 AS planned_cw_headcount,
     x.planned_cw_spend_usd                                                 AS planned_cw_spend_usd,
     x.planned_spend_per_worker_usd                                         AS planned_spend_per_worker_usd,

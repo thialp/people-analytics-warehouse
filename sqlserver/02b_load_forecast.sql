@@ -81,6 +81,8 @@ CREATE TABLE raw.mart_pid_forecast_backtest (
     [filled_var]            NVARCHAR(400) NULL,
     [vacant_end_mean]       NVARCHAR(400) NULL,
     [vacant_end_var]        NVARCHAR(400) NULL,
+    [filled_shared_cv]      NVARCHAR(400) NULL,
+    [vacant_end_shared_cv]  NVARCHAR(400) NULL,
     [actual_filled]         NVARCHAR(400) NULL,
     [actual_vacant_end]     NVARCHAR(400) NULL
 );
@@ -93,21 +95,31 @@ GO
 
 DROP TABLE IF EXISTS raw.mart_pid_forecast_accuracy;
 CREATE TABLE raw.mart_pid_forecast_accuracy (
-    [origin_quarter_offset] NVARCHAR(400) NULL,
-    [quarter_offset]        NVARCHAR(400) NULL,
-    [horizon]               NVARCHAR(400) NULL,
-    [filled_p10]            NVARCHAR(400) NULL,
-    [filled_p50]            NVARCHAR(400) NULL,
-    [filled_p90]            NVARCHAR(400) NULL,
-    [actual_filled]         NVARCHAR(400) NULL,
-    [filled_in_range]       NVARCHAR(400) NULL,
-    [filled_error_pct]      NVARCHAR(400) NULL,
-    [vacant_end_p10]        NVARCHAR(400) NULL,
-    [vacant_end_p50]        NVARCHAR(400) NULL,
-    [vacant_end_p90]        NVARCHAR(400) NULL,
-    [actual_vacant_end]     NVARCHAR(400) NULL,
-    [vacant_end_in_range]   NVARCHAR(400) NULL,
-    [vacant_end_error_pct]  NVARCHAR(400) NULL
+    [origin_quarter_offset]     NVARCHAR(400) NULL,
+    [quarter_offset]            NVARCHAR(400) NULL,
+    [horizon]                   NVARCHAR(400) NULL,
+    [filled_mean]               NVARCHAR(400) NULL,
+    [filled_low]                NVARCHAR(400) NULL,
+    [filled_high]               NVARCHAR(400) NULL,
+    [filled_in_band]            NVARCHAR(400) NULL,
+    [filled_mean_error_pct]     NVARCHAR(400) NULL,
+    [filled_p10]                NVARCHAR(400) NULL,
+    [filled_p50]                NVARCHAR(400) NULL,
+    [filled_p90]                NVARCHAR(400) NULL,
+    [actual_filled]             NVARCHAR(400) NULL,
+    [filled_in_range]           NVARCHAR(400) NULL,
+    [filled_error_pct]          NVARCHAR(400) NULL,
+    [vacant_end_mean]           NVARCHAR(400) NULL,
+    [vacant_end_low]            NVARCHAR(400) NULL,
+    [vacant_end_high]           NVARCHAR(400) NULL,
+    [vacant_end_in_band]        NVARCHAR(400) NULL,
+    [vacant_end_mean_error_pct] NVARCHAR(400) NULL,
+    [vacant_end_p10]            NVARCHAR(400) NULL,
+    [vacant_end_p50]            NVARCHAR(400) NULL,
+    [vacant_end_p90]            NVARCHAR(400) NULL,
+    [actual_vacant_end]         NVARCHAR(400) NULL,
+    [vacant_end_in_range]       NVARCHAR(400) NULL,
+    [vacant_end_error_pct]      NVARCHAR(400) NULL
 );
 BULK INSERT raw.mart_pid_forecast_accuracy
 FROM '/repo/data/marts/mart_pid_forecast_accuracy.csv'

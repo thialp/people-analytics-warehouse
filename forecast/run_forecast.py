@@ -221,6 +221,13 @@ def backtest(inp: D.Inputs, hist: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
         stats = stats.rename(columns={"filled": "actual_filled", "vacant_end": "actual_vacant_end"})
         stats["origin_quarter_offset"] = o_off
         stats["horizon"] = stats["quarter_offset"] - o_off
+        # the draws share company-wide shocks (demand level, hiring speed), so cells are not independent.
+        # The shared part, as a share of the mean: what the company total varies beyond the sum of the cell variances.
+        tot = full.groupby(["quarter_offset", "draw"])[["filled", "vacant_end"]].sum().groupby("quarter_offset")
+        csum = stats.groupby("quarter_offset")[["filled_mean", "filled_var", "vacant_end_mean", "vacant_end_var"]].sum()
+        for m in ("filled", "vacant_end"):
+            shared = (tot[m].var() - csum[f"{m}_var"]).clip(lower=0) ** 0.5 / csum[f"{m}_mean"]
+            stats[f"{m}_shared_cv"] = stats["quarter_offset"].map(shared.round(6)).fillna(0)
         cell_rows.append(stats)
         comp = out.groupby(["quarter_offset", "draw"])[["filled", "vacant_end"]].sum().reset_index()
         for t_off, g in comp.groupby("quarter_offset"):
@@ -228,6 +235,11 @@ def backtest(inp: D.Inputs, hist: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
             row = {"origin_quarter_offset": o_off, "quarter_offset": int(t_off), "horizon": int(t_off - o_off)}
             for m in ("filled", "vacant_end"):
                 vals = g[m].to_numpy()
+                mean, sd = float(vals.mean()), float(vals.std(ddof=1))
+                low, high = mean - S.RANGE_Z * sd, mean + S.RANGE_Z * sd
+                row.update({f"{m}_mean": round(mean, 1), f"{m}_low": round(low, 1), f"{m}_high": round(high, 1),
+                            f"{m}_in_band": bool(low <= a[m] <= high),
+                            f"{m}_mean_error_pct": round((mean - a[m]) / a[m] * 100, 2) if a[m] else None})
                 p10, p50, p90 = np.percentile(vals, [10, 50, 90])
                 row.update({f"{m}_p10": round(float(p10), 1), f"{m}_p50": round(float(p50), 1),
                             f"{m}_p90": round(float(p90), 1), f"actual_{m}": int(a[m]),
@@ -237,6 +249,8 @@ def backtest(inp: D.Inputs, hist: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
     cells = pd.concat(cell_rows, ignore_index=True)
     for c in ("filled_mean", "filled_var", "vacant_end_mean", "vacant_end_var"):
         cells[c] = cells[c].round(4)
+    for c in ("filled_shared_cv", "vacant_end_shared_cv"):
+        cells[c] = cells[c].fillna(0)
     cells[["actual_filled", "actual_vacant_end"]] = cells[["actual_filled", "actual_vacant_end"]].astype(int)
     cells = cells[(cells[["filled_mean", "vacant_end_mean", "actual_filled", "actual_vacant_end"]] != 0).any(axis=1)]
     return cells, pd.DataFrame(company_rows), metas
@@ -300,7 +314,7 @@ def main():
     log("\n3. Backtest")
     bt_cells, bt_company, metas = backtest(inp, hist)
     log(f"   {bt_company['origin_quarter_offset'].nunique()} origins, {len(bt_company)} quarters forecast; next quarter "
-        f"in range: fills {int(bt_company.loc[bt_company['horizon'] == 1, 'filled_in_range'].sum())} of "
+        f"in range (mean ± 1.28 sd): fills {int(bt_company.loc[bt_company['horizon'] == 1, 'filled_in_band'].sum())} of "
         f"{int((bt_company['horizon'] == 1).sum())}")
     log("\n4. Writing tables")
     quarter = plan.merge(hist, how="outer", on=["quarter_offset", "department_id", "location_id"])
@@ -320,7 +334,8 @@ def main():
     write(con, "mart_pid_forecast_backtest", bt_cells.sort_values(
         ["origin_quarter_offset", "quarter_offset", "department_id", "location_id"])[
         ["origin_quarter_offset", "quarter_offset", "horizon", "department_id", "location_id", "filled_mean", "filled_var",
-         "vacant_end_mean", "vacant_end_var", "actual_filled", "actual_vacant_end"]].reset_index(drop=True))
+         "vacant_end_mean", "vacant_end_var", "filled_shared_cv", "vacant_end_shared_cv", "actual_filled",
+         "actual_vacant_end"]].reset_index(drop=True))
     write(con, "mart_pid_forecast_accuracy", bt_company)
     coef = info["model"].coefficients()
     coef["coefficient"] = coef["coefficient"].round(S.COEF_DECIMALS)

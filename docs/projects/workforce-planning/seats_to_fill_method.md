@@ -21,15 +21,17 @@ Every simulated future adds up: vacant at the end = vacant at the start + opened
 
 The plan figures below are allocated to offices; see section 3.
 
-**FY27, all of Arcadia, median and 80% range of the draws:**
+**FY27, all of Arcadia: the average of the draws and their 80% range.** The page shows the average, not the median: averages add up, so the quarters add to the year, the functions to the company, and the seat bridge (waiting + opened − filled = vacant) closes exactly. Medians do not add up (the median draw gives 7,612 to fill, 6,839 filled and 772 vacant, which leave a gap of 1).
 
-| | P10 | Median | P90 |
+| | P10 | Average | P90 |
 |---|---:|---:|---:|
-| PIDs to fill in the year (waiting on Jul 1 + opened) | 7,006 | 7,612 | 8,371 |
-| PIDs filled | 6,301 | 6,838 | 7,543 |
-| Vacant on Jun 30, 2027 | 696 | 772 | 892 |
+| PIDs to fill in the year (waiting on Jul 1 + opened) | 7,006 | 7,672 | 8,371 |
+| PIDs filled | 6,301 | 6,891 | 7,543 |
+| Vacant on Jun 30, 2027 | 696 | 781 | 892 |
 
-Planned fills (FY27 Budget, net-new plus backfills) total 7,709, so the median forecast reaches 89% of plan, in the 75–100% band. FY26 reached 88% (6,849 of 7,793).
+The bridge, in averages: 902 waiting + 4,391 backfills + 1,552 net-new + 828 immediate refills = 7,672 to fill; 6,891 filled; 781 vacant.
+
+Planned fills (FY27 Budget, net-new plus backfills) total 7,709, so the forecast reaches 89% of plan, in the 75–100% band. FY26 reached 88% (6,849 of 7,793). Every number for the selections the page is tested on: [seats_to_fill_check_tables.md](seats_to_fill_check_tables.md).
 
 ## 2. The three parts
 
@@ -73,7 +75,7 @@ Each of 100 draws is one possible future:
 3. **New PIDs.** It draws Poisson counts of new PIDs, with random approval days inside the quarter.
 4. **Filling.** It follows every waiting PID period by period: each period is a random draw against its fill chance.
 
-Tableau sums the draws over any selection and then takes P10, P50 and P90 across them. Percentiles do not add up across a selection; draws do.
+Tableau sums the draws over any selection: the average is the sum over draws divided by 100, and the range is P10 and P90 across the draws' totals. Percentiles do not add up across a selection; draws do.
 
 ## 3. What counts as the plan
 
@@ -83,27 +85,32 @@ Each fiscal year's Budget, as approved before the year. Budgets are set by cost 
 
 At each of the eight quarter-ends before the report date (Jun 30, 2024 to Mar 31, 2026), the whole method is refit on what was known that day. That means requisitions approved and fills known by then (test f02), and the latest plan version dated by then. It then forecasts the quarters that version covered and is compared with what happened.
 
-**Next quarter, all of Arcadia:**
+**Next quarter, all of Arcadia** (the average of the draws and the page's 80% range, the average ± 1.2816 standard deviations of the draws' totals):
 
-| Target quarter | P10 | Median | P90 | Actual | In range | Error |
+| Target quarter | Low | Average | High | Actual | In range | Error |
 |---|---:|---:|---:|---:|---|---:|
-| FY25 Q1 | 1,276 | 1,436 | 1,568 | 1,475 | yes | −2.7% |
-| FY25 Q2 | 1,288 | 1,435 | 1,598 | 1,466 | yes | −2.2% |
-| FY25 Q3 | 1,271 | 1,404 | 1,559 | 1,466 | yes | −4.2% |
-| FY25 Q4 | 1,374 | 1,492 | 1,595 | 1,445 | yes | +3.3% |
-| FY26 Q1 | 1,527 | 1,651 | 1,801 | 1,678 | yes | −1.6% |
-| FY26 Q2 | 1,501 | 1,663 | 1,769 | 1,782 | no | −6.7% |
-| FY26 Q3 | 1,509 | 1,571 | 1,645 | 1,672 | no | −6.1% |
-| FY26 Q4 | 1,584 | 1,656 | 1,736 | 1,717 | yes | −3.6% |
+| FY25 Q1 | 1,280 | 1,435 | 1,591 | 1,475 | yes | −2.7% |
+| FY25 Q2 | 1,287 | 1,436 | 1,585 | 1,466 | yes | −2.0% |
+| FY25 Q3 | 1,254 | 1,413 | 1,573 | 1,466 | yes | −3.6% |
+| FY25 Q4 | 1,369 | 1,487 | 1,605 | 1,445 | yes | +2.9% |
+| FY26 Q1 | 1,502 | 1,655 | 1,808 | 1,678 | yes | −1.4% |
+| FY26 Q2 | 1,530 | 1,658 | 1,785 | 1,782 | yes | −7.0% |
+| FY26 Q3 | 1,506 | 1,572 | 1,638 | 1,672 | no | −6.0% |
+| FY26 Q4 | 1,573 | 1,656 | 1,739 | 1,717 | yes | −3.5% |
 
-The 80% range holds the actual in 6 of 8 quarters; a calibrated 80% range should hold about 6.4. The median is off by 3.8% on average.
+The 80% range holds the actual in 7 of 8 quarters; a calibrated 80% range should hold about 6.4. The average is off by 3.6% on average. (The draws' own P10 to P90, which the accuracy table also keeps, hold 6 of 8.)
 
-The two misses are both low, in FY26. Two and more quarters ahead, the method runs about 6% low on fills and about 10% low on vacancy, because backfills rose faster than their eight-quarter rate in FY26. More internal moves to fill growth leave more PIDs to backfill. The page shows this honestly instead of correcting it after the fact. Linking backfills to net-new growth (vacancy chains) is the natural next improvement.
+The misses lean low, in FY26. Two and more quarters ahead, the method runs about 5% low on fills and 6 to 12% low on vacancy, because backfills rose faster than their eight-quarter rate in FY26. More internal moves to fill growth leave more PIDs to backfill. The page shows this honestly instead of correcting it after the fact. Linking backfills to net-new growth (vacancy chains) is the natural next improvement.
 
-Test f04 checks every run:
-- the range holds the actual in at least half of the next-quarter forecasts;
-- the range stays under 40% of the median;
-- the median error stays under 10%.
+**The range under a selection.** The page follows the rail, so the backtest is stored by department × office: each cell's mean and variance across the draws. Summing variances treats cells as independent, but every draw applies the same company-wide shocks to all cells (its demand level and hiring speed), so cells move together. Summed alone, the variances give a range about a third as wide as the draws' (sd 30 against 100 at the company level). Each backtest row therefore carries a **shared cv**: the part of the company total's spread that the cell variances miss, as a share of the mean, one value per origin and quarter. The page's range for any selection is
+
+> Σ mean ± 1.2816 × √( Σ variance + (shared cv × Σ mean)² )
+
+which assumes the shared shock moves each selection in proportion to its size. The low end is floored at zero for very small selections. Over the whole company it gives back the draws' own range exactly (test f06).
+
+Tests:
+- **f04:** the range holds the actual in at least half of the next-quarter forecasts (the page's range and the draws' P10 to P90 both); the range stays under 40% of the average; the average error stays under 10%.
+- **f06:** the formula above, summed over the company, matches the company draws within 1 PID, for fills and vacancy, at every origin and quarter.
 
 ## 5. Assumptions and limits
 
@@ -111,6 +118,7 @@ Test f04 checks every run:
 - **Headcount does not grow inside the year for the backfill rate.** The budget's growth enters through net-new.
 - **No cancellations are simulated.** Only 12 requisitions were ever cancelled.
 - **The synthetic history's budgets were drawn around what happened** (that is how the generator writes them). The backtest's net-new side is therefore a little favourable. The forward budget is a true projection.
+- **A new office is forecast only from its own history.** Pune opened on Jul 1, 2024, so the backtest from Jun 30, 2024 had nothing for it and its first quarter's 84 fills were not foreseen; for a few quarters after, it runs low while the office ramps up.
 - **A company-wide event**, such as a hiring freeze or a restructuring, is outside the range. It would be a scenario, not a forecast.
 
 ## 6. Tables (`forecast` schema in the warehouse, and `data/marts/`)
@@ -120,8 +128,8 @@ Test f04 checks every run:
 | `mart_pid_fill_quarter` | quarter × department × office (20 history quarters + the 4 forward) | Opened by type, filled by type, vacant at the end, employees at the start, the Budget allocated to the office |
 | `mart_fill_survival` | approval quarter × department × office × level band × requisition type × ten-day period (to 210 days) | At risk and filled: Tableau rebuilds Kaplan–Meier under any selection with `EXP(RUNNING_SUM(LN(1 - filled / at_risk)))` |
 | `mart_pid_forecast_draws` | forward quarter × department × office × draw (396,400 rows: every cell the forecast touches has a row in every draw and quarter, zeros included, so percentiles across draws hold for any selection) | The six counts of section 1 |
-| `mart_pid_forecast_backtest` | origin × target quarter × department × office | Mean and variance of the forecast fills and vacancy, and the actuals; the page sums means and variances over a selection (cells are treated as independent) |
-| `mart_pid_forecast_accuracy` | origin × target quarter, company | P10, P50 and P90 against the actual, in range, error |
+| `mart_pid_forecast_backtest` | origin × target quarter × department × office | Mean and variance of the forecast fills and vacancy, the shared cv of each origin and quarter, and the actuals; the page builds the range of any selection from them (section 4) |
+| `mart_pid_forecast_accuracy` | origin × target quarter, company | The average with its 80% range (low, high), and P10, P50 and P90, against the actual; in range and error for both |
 | `mart_pid_forecast_model` | coefficient | Every term of the time-to-fill model at the report date |
 | `mart_pid_forecast_run` | run (forward and each backtest origin) | Origin, latest data used, requisitions fit, waiting at the origin, draws |
 | `mart_cw_budget_function` | fiscal year × function | The contingent budget line: workers and annualized spend at year-end, spend per worker |
