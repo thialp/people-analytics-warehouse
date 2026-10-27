@@ -10,6 +10,7 @@ Case study 7 in the README for now (renumbered in the profile later) · Dashboar
 |---|---|---|
 | 1 | 2026-10-27 | Proposal agreed (sections 1 to 5). Phase 1 built: the report calendar, the forward budget, time-to-fill variation (section 6) |
 | 3 | 2026-10-27 | Phase 3 built: the forecast tables on SQL Server (`02b`, `03e`, schema `fc`), the page's one Custom SQL `tableau/custom_sql_seats_to_fill.sql` (six row types, 542,701 rows), `17_validate_seats_to_fill.sql` (section 7) |
+| 4 | 2026-10-27 | Phases 4 and 5: spikes passed (section 8); prototype Option B approved and check tables written (section 9). Central numbers are now the **average** of the draws (D11), and the backtest range under a selection carries the draws' shared shock (D9) |
 | 2 | 2026-10-27 | Phase 2 built: the forecast package `forecast/`, eight marts, tests f01 to f05, CI step; method and backtest in [seats_to_fill_method.md](seats_to_fill_method.md). The demand of section 4 is refined there: net-new opens at the median ratio of every known quarter, and each draw has its own demand level and hiring speed |
 
 ## 1. Decisions
@@ -24,7 +25,8 @@ Case study 7 in the README for now (renumbered in the profile later) · Dashboar
 | D6 | **More time-to-fill variation** by function and graduate season, applied to approval dates only (section 6) | Hires never move, so Dashboards #1, #2 and #4 are unchanged |
 | D7 | **Plan attainment in bands, not a hiring-speed scenario**: 0–25%, 25–50%, 50–75%, 75–100%, 100%+ of plan, like a sales quota | Hiring is seasonal and differs by country, so a flat speed slider is not a fair lever. Seasonality lives in the fill model |
 | D8 | **Quarters and fiscal years only.** Fiscal year over fiscal year, a quarter against its own year's budget and the same quarter a year earlier, year to date as a sum of quarters. No months | Budgets are analysed quarterly and yearly; quarter grain keeps every mart small |
-| D9 | The backtest follows the rail selection, using a mean and a variance per cell | Same scope as the rest of the page |
+| D9 | The backtest follows the rail selection: per cell a mean and a variance, plus each quarter's **shared cv** (the company-wide shocks every draw applies to all cells), so the range is Σ mean ± 1.2816 × √(Σ variance + (shared cv × Σ mean)²) | Same scope as the rest of the page. Variances alone treat cells as independent and give ranges about a third as wide as the draws' (method, section 4) |
+| D11 | **Central numbers are the average of the 100 draws**; ranges stay P10 to P90 | Averages add up: quarters to the year, functions to the company, and the seat bridge closes exactly (902 + 4,391 + 1,552 + 828 = 7,672; − 6,891 = 781). Medians leave gaps |
 | D10 | Rules carried: executive officers (D-901) excluded; the unit is the PID and empty ones are "vacant"; neutral wording; muted palette, no blue with orange, no red-and-green; no arrow glyphs in text; tooltip command buttons off; Custom SQL, not CSV | Every Arcadia dashboard |
 
 ## 2. Cascading multi-select
@@ -45,19 +47,19 @@ The child lists store **exclusions**, so every child of a chosen parent starts t
 - Sizes: Function 8, Department 31 plus 4 headings (3 columns × 12 slots), Region 5, Country 22 (2 × 12), Office 35 (3 × 12), 26 px slots. About 25 parameters and 45 parameter actions plus 18 deselects.
 - Rail (216 px, navy): logo and ⓘ · PERIOD · ORGANISATION capsule ("People" / "3 of 4 departments") · LOCATION capsule · Reset · "Data to <as-of>" / "Forecast <forward period>". Each capsule opens a cascade popover with its levels as side-by-side columns. The page subtitle repeats the selection.
 
-## 3. The page
+## 3. The page (approved prototype, Option B revised)
 
-| Where | What |
-|---|---|
-| KPI 1 | PIDs to fill in the forward year (median forecast, likely range) |
-| KPI 2 | Forward year Q1: PIDs to fill · fills expected |
-| KPI 3 | Vacant at the forward year's end (forecast) against today |
-| KPI 4 | Plan attainment, forecast: share of the forward budget filled, in its band |
-| KPI 5 | Median days to fill (last four quarters) · share filled within 30, 60, 90 days |
-| Main card | Quarters: 20 of history and 4 forecast. Fills against the budget for each quarter, fiscal years as bands behind them, each year labelled with its attainment band; the forecast dashed with its likely range |
-| Right top | How fast we fill: survival curve by level band, 30/60/90-day marks |
-| Right middle | Where the forward year's demand comes from (exits, internal moves, plan net-new, open on the as-of date); the contingent budget by function in its hover |
-| Right bottom | Can we trust it: the backtest, forecast range against what happened, eight quarters |
+1400 × 850, the Arcadia rail on the left. Prototype: the Design canvas "Seats to Fill prototype", row "Option B, revised".
+
+| Where | What | Hover |
+|---|---|---|
+| Hero card (navy, two columns wide) | PIDs filled in the forward year: average, likely range, attainment of the forward Budget and the current year for comparison; a quota bar with the five bands, the forecast as a tick and its range as a bracket | Text: one editorial sentence, then the range and the current year |
+| KPI 1 | PIDs to fill in FY## (label from the calendar): average, range, waiting today | Text: what the PIDs to fill are made of |
+| KPI 2 | Vacant at the forward year's end: average, range, change against today | **The seat bridge** (viz in tooltip): waiting + backfills + net-new + immediate refills = to fill; − filled = vacant |
+| KPI 3 | Median wait to fill (last four quarters) and the share filled within 90 days | Text: median, 90 days, the senior levels |
+| Main card | Quarters: 20 of history and 4 forecast; fills as a line, the forecast dashed with its fan (P10 to P90), the budget as a dashed step; fiscal years as bands with their attainment chip; a "data ends, forecast starts" marker. Title states the pace in words | Text per quarter: filled against budget, or the forecast with its range |
+| Right, top (no card background, navy rule) | How fast PIDs fill: Kaplan–Meier by level band, 30/60/90-day marks; the legend names the levels (L1–L2 Associate, L3–L4 Senior, L5–L6 Manager, L7+ Director) | Text: the share at that day and the band's median |
+| Right, bottom (no card background) | Can we trust it: the backtest, range against actual, eight quarters, in-range count and average error | Text: origin, range, actual |
 
 ## 4. Method
 
@@ -80,7 +82,7 @@ Survival curves under any selection: the mart stores PIDs at risk and fills per 
 | 2 | Python models, marts, tests, CI step, methodology | Claude | **Built**: [seats_to_fill_method.md](seats_to_fill_method.md) |
 | 3 | SQL Server twin, Custom SQL, validate script; run on the Mac | Claude, then Thiago | **Done**: Mac run passed (542,701 rows) |
 | 4 | Spikes on Tableau Public (cascade, draws, Kaplan–Meier table calc) | Claude writes, Thiago runs | **Passed** 2026-10-27, no fallback needed (section 8) |
-| 5 | Check tables and a prototype with real numbers | Claude, Thiago approves | To do |
+| 5 | Check tables and a prototype with real numbers | Claude, Thiago approves | **Done** 2026-10-27: Option B approved (section 9); [seats_to_fill_check_tables.md](seats_to_fill_check_tables.md) |
 | 6 | Build guide, then the build in Tableau | Claude, Thiago | To do |
 | 7 | Publish, README, Figma, profile | Both | To do |
 
@@ -126,7 +128,7 @@ The forecast runs in Python on the DuckDB warehouse; SQL Server receives its tab
 | `sqlserver/02b_load_forecast.sql` | Lands the eight forecast CSVs from `data/marts/` into `raw` as text (BULK INSERT) |
 | `sqlserver/03e_build_dw_forecast.sql` | Types them into schema `fc`, with `fc.report_calendar` and `fc.report_quarter` |
 | `tableau/custom_sql_seats_to_fill.sql` | The page's one data source: six row types (Quarter 21,720 · Draw 396,400 · Survival 105,294 · Backtest 19,219 · Accuracy 20 · CW budget 48), department, office and calendar labels on every row; `quarter_months_label` carries the en dash ("Jul – Sep 26") |
-| `sqlserver/17_validate_seats_to_fill.sql` | Runs the Custom SQL as Tableau does and checks 19 values: rows by type, FY26 fills 6,849, 902 waiting, the FY27 plan 7,709, the median draw 6,838, survival and backtest totals, 6 of 8 in range, 13,097 planned contractors |
+| `sqlserver/17_validate_seats_to_fill.sql` | Runs the Custom SQL as Tableau does and checks 22 values: rows by type, FY26 fills 6,849, 902 waiting, the FY27 plan 7,709, the median draw 6,838, survival and backtest totals, 6 of 8 in the draws' P10 to P90 and 7 of 8 in the page's range, the FY26 Q4 range rebuilt from the backtest rows (1,573 to 1,739), 13,097 planned contractors |
 
 `check_tsql_in_duckdb.py` builds `fc` from the CSVs, compares every row type of the Custom SQL with its forecast table (all six MATCH) and runs 17 (19 of 19 PASS).
 
@@ -160,3 +162,22 @@ Run on 2026-10-27 in Tableau Desktop 2026.2.3, then on Tableau Public ([D5 Spike
 - Every "dim" test is wrapped in `ZN()`: an option with nothing behind it sums to NULL, not 0, and would otherwise never dim. The spike guide is corrected.
 - Tick shapes need a fixed size: with entire-view sizing they grow as the list shortens.
 - The all-levels readings table drew no values without a partitioning dimension; the page reads the curve from one table calculation with a dimension on Rows, as the by-band table did.
+
+## 9. Phase 5: the prototype and the check tables
+
+**Prototype.** A Design canvas with four directions (A classic, B bento hero, C quota board, D editorial headline), researched against Viz of the Day and current dashboard practice: one clear finding, rounded cards (native in Tableau 2026.1), a size hierarchy, muted colour with one accent. **Option B was chosen and revised** (2026-10-27):
+- the seat bridge card is removed; the bridge becomes the hover of the vacant card, and the two remaining right panels get the space;
+- every other hover is text, written like D's headline;
+- KPI 1 reads "PIDs to fill in FY27"; KPI 3 shows only the share within 90 days;
+- the survival legend names the levels; the right panels lose their card background (D's navy rule).
+
+Boards on the canvas: all of Arcadia, Technology selected, Asia Pacific selected, the vacant card's hover, and the hover text sheet.
+
+**Check tables.** [seats_to_fill_check_tables.md](seats_to_fill_check_tables.md), generated by `forecast/check_tables.py` from the marts: the KPI band, the bridge, the fiscal-year chips, the main chart, time to fill and the backtest, for six selections (all; Technology; People without Talent Acquisition; Asia Pacific; Asia Pacific without Pune; Legal & Compliance in Latin America).
+
+**Found while building the prototype:**
+- **Averages, not medians** (D11), so the bridge reconciles.
+- **The backtest range under a selection** (D9): summing cell variances gave ranges a third as wide as the draws' and 3 of 8 in range. Each backtest row now carries the shared cv; the page's range holds **7 of 8** for the company (3.6% average error), Technology 6 of 8, Asia Pacific 7 of 8. Test f06 ties the formula to the draws.
+- **New offices:** Pune opened on Jul 1, 2024, so the first backtest has no forecast for it (Asia Pacific without Pune shows the same FY25 Q1 range as Asia Pacific). Written into the method's limits.
+- **Small selections:** a range never goes below zero.
+- **Small selections (levels):** L7+ has few PIDs under most selections (none for People without Talent Acquisition); the page shows the band only when it has PIDs at risk, and its hover says "few PIDs" under 20.

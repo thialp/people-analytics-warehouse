@@ -8,7 +8,7 @@ place. Arcadia Systems is fictional; all data is synthetic.
 from __future__ import annotations
 
 SEED = 20260630                 # one seed for the whole forecast; each origin draws its own stream from it
-DRAWS = 100                     # simulated futures per forecast (the likely range is P10 to P90 of these)
+DRAWS = 100                     # simulated futures per forecast: the page shows their average and the range P10 to P90
 
 # Time to fill is modelled in 10-day periods after approval, so 30, 60 and 90 days fall on a
 # period boundary and the survival curve reads them exactly.
@@ -36,5 +36,6 @@ MIX_QUARTERS = 8                # level-band mix and office shares: the last eig
 # known plan versions cover (up to four), using only what was known on the origin date.
 BACKTEST_ORIGINS = 8
 BACKTEST_DRAWS = 100
+RANGE_Z = 1.2816                # the backtest range on the page: mean ± this many standard deviations (an 80% normal range)
 
 EXCLUDED_DEPARTMENT = "D-901"   # executive officers, excluded from every Arcadia dashboard

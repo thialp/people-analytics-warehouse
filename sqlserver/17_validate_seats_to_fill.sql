@@ -65,6 +65,14 @@ FROM (
     UNION ALL SELECT 'backtest actual fills', (SELECT SUM(actual_filled) FROM #s5 WHERE row_type = 'Backtest'), 31711
     UNION ALL SELECT 'backtest next-quarter forecasts in range',
                      (SELECT SUM(CAST(filled_in_range AS INT)) FROM #s5 WHERE row_type = 'Accuracy' AND horizon = 1), 6
+    UNION ALL SELECT 'backtest next-quarter forecasts in the page range (mean +- 1.2816 sd)',
+                     (SELECT SUM(CAST(filled_in_band AS INT)) FROM #s5 WHERE row_type = 'Accuracy' AND horizon = 1), 7
+    UNION ALL SELECT 'FY26 Q4 range rebuilt from the backtest rows, low',
+                     (SELECT CAST(ROUND(SUM(filled_mean) - 1.2816 * SQRT(SUM(filled_var) + POWER(MIN(filled_shared_cv) * SUM(filled_mean), 2)), 0) AS INT)
+                      FROM #s5 WHERE row_type = 'Backtest' AND origin_quarter_offset = -1 AND quarter_offset = 0), 1573
+    UNION ALL SELECT 'FY26 Q4 range rebuilt from the backtest rows, high',
+                     (SELECT CAST(ROUND(SUM(filled_mean) + 1.2816 * SQRT(SUM(filled_var) + POWER(MIN(filled_shared_cv) * SUM(filled_mean), 2)), 0) AS INT)
+                      FROM #s5 WHERE row_type = 'Backtest' AND origin_quarter_offset = -1 AND quarter_offset = 0), 1739
     UNION ALL SELECT 'forward contingent budget, workers at year-end',
                      (SELECT SUM(planned_cw_headcount) FROM #s5 WHERE row_type = 'CW budget' AND fy_offset = 1), 13097
 ) AS c;
