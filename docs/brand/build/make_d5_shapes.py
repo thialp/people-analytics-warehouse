@@ -7,10 +7,12 @@ dashboard px.
 
   d5_chip_teal       56 x 18   pill #9FD6C3 (the 75-100% and 100%+ bands): a fiscal year at or above 75% of plan
   d5_chip_slate      56 x 18   pill #B9C3D1 (the bands under 75%)
+  d5_dot_in          12 x 12   navy dot: a backtest quarter whose actual fell inside the range
+  d5_dot_out         12 x 12   navy ring, no fill: a quarter outside the range
                                Tableau writes the percentage on top (FY Chips sheet, build guide 7.4)
   d5_main_legend     600 x 20  image: PIDs filled (navy line), Forecast (teal line), Likely range (teal light),
                                Budget (slate line)
-  d5_backtest_legend 388 x 18  image: Forecast range, Average, Actual in range (navy dot), Outside (white dot, navy ring)
+  d5_backtest_legend 388 x 18  image: Forecast range, Average, Actual in range (navy dot), Outside (navy ring, no fill)
 
 The chips are shapes (Shapes/Arcadia D5); the two legends are images placed on the dashboard (Fit Image).
 """
@@ -43,6 +45,18 @@ def chip(colour):
     return finish(im, W, H)
 
 
+def dot(open_ring):
+    W = H = 48                                         # 12 x 12
+    im = canvas(W, H)
+    d = ImageDraw.Draw(im)
+    box = (2 * S, 2 * S, (W - 2) * S - 1, (H - 2) * S - 1)
+    if open_ring:
+        d.ellipse(box, outline=NAVY, width=6 * S)
+    else:
+        d.ellipse(box, fill=NAVY)
+    return finish(im, W, H)
+
+
 def legend(items, w, h, gap=72):
     """items: (kind, colour, label); kind line, dash, band, dot, ring. Drawn on the 4x grid."""
     W, H = w * 4, h * 4
@@ -72,7 +86,7 @@ def legend(items, w, h, gap=72):
             if kind == "dot":
                 d.ellipse(box, fill=colour)
             else:
-                d.ellipse(box, fill=(255, 255, 255, 255), outline=colour, width=6 * S)
+                d.ellipse(box, outline=colour, width=6 * S)
             x += 2 * r + 20
         tb = d.textbbox((0, 0), label, font=font)
         d.text((x * S, cy * S - (tb[1] + tb[3]) / 2), label, font=font, fill=SLATE)
@@ -83,6 +97,8 @@ def legend(items, w, h, gap=72):
 def main():
     chip(CHIP_TEAL).save(os.path.join(OUT, "d5_chip_teal.png"))
     chip(CHIP_SLATE).save(os.path.join(OUT, "d5_chip_slate.png"))
+    dot(False).save(os.path.join(OUT, "d5_dot_in.png"))
+    dot(True).save(os.path.join(OUT, "d5_dot_out.png"))
     legend([("line", NAVY, "PIDs filled"), ("line", TEAL_D, "Forecast"), ("band", TEAL_L, "Likely range"),
             ("line", SLATE, "Budget")], 600, 20).save(os.path.join(OUT, "d5_main_legend.png"))
     legend([("band", TEAL_L, "Forecast range"), ("tick", TEAL_D, "Average"), ("dot", NAVY, "Actual, in range"),
