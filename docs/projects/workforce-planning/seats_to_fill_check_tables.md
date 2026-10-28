@@ -186,3 +186,22 @@ Share filled within 30, 60 and 90 days, and the median wait, by level band (L1�
 
 Each cell: the range, then the actual fills in bold. The forecast origin is the quarter-end before the target quarter.
 
+## 7. The Period capsule: one forward quarter
+
+With a quarter chosen, the KPI band reads that quarter: fills in it, PIDs to fill (waiting as it opens + opened in it), vacant at its end, its budget, and the same quarter a year earlier. Averages; ranges P10 to P90.
+
+| Selection | Quarter | Fills (range) | Budget · attainment | Same quarter a year earlier (att.) | Waiting as it opens | To fill (range) | Vacant at its end (range) |
+|---|---|---|---|---|---:|---|---|
+| Nothing chosen (all of Arcadia) | FY27 Q1 | **1,847.3** (1,747.5 to 1,965.2) | 1,852 · 100% | FY26 Q1: 1,678 (89%) | 902.0 | **2,658.9** (2,465.6 to 2,890.5) | **811.6** (720.9 to 924.7) |
+|  | FY27 Q2 | **1,733.7** (1,574.4 to 1,930.5) | 2,055 · 84% | FY26 Q2: 1,782 (86%) | 811.6 | **2,556.4** (2,313.8 to 2,840.3) | **822.7** (733.6 to 932.1) |
+|  | FY27 Q3 | **1,662.5** (1,503.5 to 1,811.0) | 1,810 · 92% | FY26 Q3: 1,672 (87%) | 822.7 | **2,418.7** (2,194.3 to 2,670.3) | **756.2** (654.9 to 858.4) |
+|  | FY27 Q4 | **1,647.7** (1,470.7 to 1,823.5) | 1,992 · 83% | FY26 Q4: 1,717 (89%) | 756.2 | **2,429.1** (2,178.8 to 2,702.5) | **781.4** (696.1 to 891.5) |
+| Technology | FY27 Q1 | **654.4** (610.7 to 701.1) | 715 · 92% | FY26 Q1: 632 (87%) | 332.0 | **1,000.0** (915.1 to 1,089.0) | **345.6** (294.6 to 401.2) |
+|  | FY27 Q2 | **637.0** (559.9 to 718.5) | 688 · 93% | FY26 Q2: 628 (85%) | 345.6 | **963.9** (854.7 to 1,081.5) | **326.9** (285.9 to 370.1) |
+|  | FY27 Q3 | **603.5** (540.8 to 672.0) | 696 · 87% | FY26 Q3: 647 (87%) | 326.9 | **917.5** (819.2 to 1,031.1) | **313.9** (265.0 to 365.1) |
+|  | FY27 Q4 | **609.3** (535.9 to 699.0) | 767 · 79% | FY26 Q4: 655 (95%) | 313.9 | **932.2** (812.0 to 1,044.7) | **322.9** (278.8 to 366.0) |
+| Asia Pacific | FY27 Q1 | **548.5** (513.8 to 584.4) | 542 · 101% | FY26 Q1: 511 (89%) | 280.0 | **792.6** (733.7 to 865.8) | **244.1** (212.7 to 280.1) |
+|  | FY27 Q2 | **509.3** (462.7 to 566.1) | 601 · 85% | FY26 Q2: 529 (84%) | 244.1 | **756.7** (683.6 to 841.4) | **247.3** (212.0 to 284.2) |
+|  | FY27 Q3 | **496.2** (439.9 to 547.0) | 505 · 98% | FY26 Q3: 483 (79%) | 247.3 | **724.1** (641.4 to 806.1) | **227.9** (196.0 to 258.0) |
+|  | FY27 Q4 | **493.8** (434.9 to 552.2) | 599 · 82% | FY26 Q4: 502 (89%) | 227.9 | **726.2** (641.0 to 815.2) | **232.4** (202.8 to 263.1) |
+
