@@ -27,8 +27,8 @@ The [executive summary](#executive-summary) is a two-minute read for anyone. The
 
 | 👥 Employees | 🧰 Contractors | 🌍 Offices | 💱 Currencies | 📅 History |
 |:---:|:---:|:---:|:---:|:---:|
-| **30,014** | **11,941** | **35** in **22** countries | **17** | **5** fiscal years |
-| on Arcadia's payroll | through **23** suppliers | across five regions | real ECB rates | July 2021 – June 2026 |
+| **30,005** | **11,941** | **35** in **22** countries | **17** | **5** fiscal years |
+| on Arcadia's payroll, executive officers aside | through **23** suppliers | across five regions | real ECB rates | July 2021 – June 2026 |
 
 Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees (pay plus employer costs) and $1.24B at contractors' bill rates.
 
@@ -118,7 +118,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 
 ### What the data says (fiscal year to June 2026)
 
-- **The workforce grew 7.2%**, from 39,154 to 41,955 people: employees +5.5%, contractors +11.5%.
+- **The workforce grew 7.2%**, from 39,145 to 41,946 people: employees +5.5%, contractors +11.5%.
 - **Total cost grew $403M (+9.5%).** A fair split ([Shapley values](#growth-mix-why-did-total-workforce-cost-change)) shows **$307M came from having more people** and **$140M from paying people more**, while currency moves *saved* $52M.
 - **270 contractors became employees.** Each conversion lowered run-rate cost: on average $121k a year of supplier billing was replaced by $73k of employee pay and employer costs.
 - **At the June close, 383 contractors (3.21%) have a mismatch that puts Finance's month-end report at risk**, below the provisional 3.5% target and falling at every close since December: 407 gaps, 194 to align in the supplier system, 151 in the HR system, 62 in the feed between them. Counting every disagreement, including manager and office, 416 contractors (3.5%) differ; the largest group is 219 changed by hand in the HR system only.
@@ -150,7 +150,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 
 The case studies share one warehouse. This section covers what they have in common; each case study below covers its question, approach, results and dashboard.
 
-**The company.** Arcadia Systems has 30,014 employees in 35 offices across 22 countries and five regions, organized under a CEO, eight function heads, four sub-function heads and 31 department heads, with every person in one reporting line that ends at the CEO ([org chart](docs/company/org_chart.md)). Every employee and every contractor sits in a **PID** (position), and every employee hire since July 2021 came through a requisition on one. Pay follows a 12-level ladder with salary ranges that move every July 1, raises on each hire anniversary, promotions one level at a time and an annual bonus set by the performance rating ([organization and pay model](docs/company/organization_and_pay_model.md)). Beside them work 11,941 **contingent workers** (contractors, consultants and outsourced BPO staff) from 23 suppliers, engaged through service orders in Bridgeway VMS and fed into Keystone HR, where each gets an Arcadia ID and a PID, by a one-way feed ([Bridgeway simulation](docs/projects/contingent-workforce/bridgeway_simulation.md), [Keystone and the feed](docs/projects/contingent-workforce/keystone_feed.md)). [Company profile](docs/company/README.md).
+**The company.** Arcadia Systems has 30,014 employees in 35 offices across 22 countries and five regions (30,005 without the CEO and the eight function heads, whom every dashboard leaves out), organized under a CEO, eight function heads, four sub-function heads and 31 department heads, with every person in one reporting line that ends at the CEO ([org chart](docs/company/org_chart.md)). Every employee and every contractor sits in a **PID** (position), and every employee hire since July 2021 came through a requisition on one. Pay follows a 12-level ladder with salary ranges that move every July 1, raises on each hire anniversary, promotions one level at a time and an annual bonus set by the performance rating ([organization and pay model](docs/company/organization_and_pay_model.md)). Beside them work 11,941 **contingent workers** (contractors, consultants and outsourced BPO staff) from 23 suppliers, engaged through service orders in Bridgeway VMS and fed into Keystone HR, where each gets an Arcadia ID and a PID, by a one-way feed ([Bridgeway simulation](docs/projects/contingent-workforce/bridgeway_simulation.md), [Keystone and the feed](docs/projects/contingent-workforce/keystone_feed.md)). [Company profile](docs/company/README.md).
 
 ### Data architecture
 
@@ -498,17 +498,17 @@ Since release 3 the walk covers the **whole workforce**: employees from Keystone
 
 ### Results
 
-Company-wide headcount walk by fiscal year, employees:
+Company-wide headcount walk by fiscal year, employees (the 9 executive officers excluded, as on Dashboard #1; they have no movements in any year):
 
 | Movement | FY22 | FY23 | FY24 | FY25 | FY26 |
 |---|---:|---:|---:|---:|---:|
-| **Opening** | **23,516** | **25,061** | **26,941** | **27,217** | **28,447** |
+| **Opening** | **23,507** | **25,052** | **26,932** | **27,208** | **28,438** |
 | Hires | +4,452 | +5,313 | +3,421 | +4,135 | +4,965 |
 | Conversions from contingent | +225 | +225 | +213 | +241 | +270 |
 | Voluntary terminations | −2,511 | −2,943 | −2,343 | −2,532 | −2,942 |
 | Involuntary terminations | −621 | −715 | −1,015 | −614 | −726 |
 | Internal moves (in = out) | 2,870 | 3,069 | 3,327 | 4,432 | 3,633 |
-| **Closing** | **25,061** | **26,941** | **27,217** | **28,447** | **30,014** |
+| **Closing** | **25,052** | **26,932** | **27,208** | **28,438** | **30,005** |
 
 Contingent workers (Bridgeway VMS):
 
@@ -521,10 +521,10 @@ Contingent workers (Bridgeway VMS):
 | **Closing** | **9,288** | **10,228** | **9,910** | **10,707** | **11,941** |
 
 - **FY26 grew 5.5%** in employees (+1,567) on 4,965 hires and 270 conversions against 3,668 leavers. Voluntary turnover was 10.1% annualized, highest in Commercial (14.8% including involuntary).
-- **Contractors grew faster, +11.5%,** to 11,941: 28% of a 41,955-person workforce. 71% are Contractors, 13% Consultants and 17% outsourced (BPO) staff; India hosts 41%.
+- **Contractors grew faster, +11.5%,** to 11,941: 28% of a 41,946-person workforce. 71% are Contractors, 13% Consultants and 17% outsourced (BPO) staff; India hosts 41%.
 - **FY24's restructuring shows twice:** involuntary terminations rose to 1,015, the highest of the five years, and hires fell to 3,421, so employee headcount barely moved (+276). It is also the one year the contingent workforce shrank.
 - **FY25's internal moves jumped to 4,432** with the reorganization into Data & AI Platform: a large shift between departments with no effect on the company total, which test 16 checks every month.
-- **FTE equals headcount** (30,014 at FY26 close): every Arcadia employee is full-time, and a contingent worker counts 1.0. Tests 13 and 72 hold every slice, worker type and month to opening + movements = closing.
+- **FTE equals headcount** (30,005 at FY26 close): every Arcadia employee is full-time, and a contingent worker counts 1.0. Tests 13 and 72 hold every slice, worker type and month to opening + movements = closing.
 
 ### Performance: choosing the grain of history
 
