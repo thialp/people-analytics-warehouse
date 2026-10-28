@@ -10,8 +10,8 @@ Arcadia Systems is fictional; all data is synthetic.
 |---|---|---|
 | 1 | Prototype, check tables, the Custom SQL with its chart scaffold | Done 2026-10-27 |
 | 2 | This guide | Written 2026-10-27 |
-| 3 | The build, written straight into the workbook in stages, each spot-checked in Desktop | Next |
-| 4 | Publish, README, Figma, profile | |
+| 3 | The build, written straight into the workbook in stages, each spot-checked in Desktop | Done 2026-10-27 (section 16: as built) |
+| 4 | Publish, README, Figma, profile | Next |
 
 ## Contents
 
@@ -26,11 +26,12 @@ Arcadia Systems is fictional; all data is synthetic.
 8. How fast PIDs fill (the survival panel and its legend)
 9. Can we trust it (the backtest panel)
 10. The rail (capsules, Reset, the data line)
-11. The popovers (Period, Organisation, Location, Info)
+11. The popovers (Period, Organization, Location, Info)
 12. Assembling the dashboard
 13. Actions
 14. Checks and click tests
 15. Publishing
+16. As built: what the workbook does differently from this guide, and why
 
 ---
 
@@ -861,7 +862,7 @@ IF [chart_point] = 6 THEN [Bridge Size] END
 
 Formats: `Bridge Label Plain` Number `#,##0`; `Bridge Label Plus` Custom `+#,##0`; `Bridge Label Minus` Custom `"−"#,##0` (a minus sign, not a hyphen). Aliases on `chart_series`: Waiting → "Waiting as it opens", To fill → "PIDs to fill", Filled → "Filled", Vacant → "Vacant at the end".
 
-Sheet **Bridge Tip**: Filter `Bridge Row` = True. Columns `chart_point` (discrete, header hidden), then `chart_series` (discrete; header at the bottom, Book 9 `#5A6170`, wrap on). Rows `MIN(Bridge Start)`: Marks **Gantt Bar**, Size `MIN(Bridge Size)`; axis hidden, starting at 0. Color `Bridge Kind`: waiting navy `#13233A`, opens `#9FB0C6`, to fill teal `#0F6E56`, filled `#5DCAA5`, vacant slate `#5A6170`. Label `<MIN(Bridge Label Plain)><MIN(Bridge Label Plus)><MIN(Bridge Label Minus)>` Tableau Semibold 9 navy, alignment top, centre. Shading None, every line None. Size on its own: 400 × 210.
+Sheet **Bridge Tip**: Filter `Bridge Row` = True. Columns `chart_point` (discrete, header hidden), then `chart_series` (discrete; header at the bottom, Book 9 `#5A6170`, wrap on). Rows `MIN(Bridge Start)`: Marks **Gantt Bar**, Size `MIN(Bridge Size)`; axis hidden, starting at 0. Color `Bridge Kind`: waiting navy `#13233A`, opens `#9FB0C6`, to fill teal `#0F6E56`, filled `#5DCAA5`, vacant slate `#5A6170`. Label `<MIN(Bridge Label Plain)><MIN(Bridge Label Plus)><MIN(Bridge Label Minus)>` Tableau Semibold 9 navy, alignment top, center. Shading None, every line None. Size on its own: 400 × 210.
 
 Expected (check tables, section 2): 902 · +4,391 · +1,552 · +828 · 7,672 · −6,891 · 781. Technology 332 · +1,605 · +637 · +254 · 2,827 · −2,504 · 323. FY27 Q2: 812 · +1,121 · +418 · +206 (opened in Q2) · 2,556 · −1,734 · 823.
 
@@ -929,7 +930,7 @@ Sheet **Main Chart**:
 1. Filter `Main Chart Row` = True.
 2. Columns `MIN(chart_x)`: axis Fixed **0 to 24**, hidden (no header).
 3. Rows `MIN(Fan Y)`, then `MIN(Line Y)`; Dual Axis; Synchronize Axis. Left axis: shown, no title, Automatic range with **Include zero off**, labels Tableau Book 9 `#8C9BB0`, format Number `#,##0`; right axis hidden. Drag the left axis to **44 px** wide (the two helper sheets in 7.4 use the same width, so the quarters line up).
-4. Marks `MIN(Fan Y)`: **Polygon**; Path `chart_point`; Detail `chart_part`; Color one colour, teal light `#D3EEE4`, opacity 100%, no border. Tooltip: `Likely range: 8 in 10 simulated futures` Book 9.
+4. Marks `MIN(Fan Y)`: **Polygon**; Path `chart_point`; Detail `chart_part`; Color one color, teal light `#D3EEE4`, opacity 100%, no border. Tooltip: `Likely range: 8 in 10 simulated futures` Book 9.
 5. Marks `MIN(Line Y)`: **Line**; Path `chart_point`; Detail `chart_series`; Color `chart_series`: Filled navy `#13233A`, Forecast teal `#0F6E56`, Budget slate `#5A6170`; Size `chart_series`: Filled and Forecast large, Budget small (two steps of the slider). If your Tableau offers a line pattern on the Path card, set Forecast and Budget **dashed**. Label `MIN(End Label)`, Tableau Bold 10 teal `#0F6E56`, alignment right, label only the marks that have one.
 6. Analytics, on the Columns axis:
    - **Reference Band**, constant **20 to 24**, fill teal tint `#EEF7F3`, no line: the forecast year.
@@ -1012,9 +1013,9 @@ MIN(0)
 
 Sheet **FY Chips**: Filter `Budget Row` = True. Columns `FY Label X` then `FY Chip X`; Dual Axis, Synchronize; both Fixed **0 to 24**, hidden. Rows `Axis Pad`: axis shown, **44 px wide**, no labels, no ticks, no title (a spacer). Detail `fiscal_year_label` on both cards.
 - Card `FY Label X`: **Text**, `<fiscal_year_label>` Tableau Semibold 10 navy, left.
-- Card `FY Chip X`: **Shape** `FY Chip Shape` (palette **Arcadia D5**: `d5_chip_teal.png`, `d5_chip_slate.png`, 56 × 18 pills), size so the pill is 56 px; Label `<FY Att>` (Percentage, 0 decimals) Tableau Semibold 9 navy, centre, middle, on top of the pill.
+- Card `FY Chip X`: **Shape** `FY Chip Shape` (palette **Arcadia D5**: `d5_chip_teal.png`, `d5_chip_slate.png`, 56 × 18 pills), size so the pill is 56 px; Label `<FY Att>` (Percentage, 0 decimals) Tableau Semibold 9 navy, center, middle, on top of the pill.
 
-Sheet **Quarter Axis**: Filter `Quarter Tick Row` = True. Columns `MIN(chart_x)`, Fixed 0 to 24, hidden; Rows `Axis Pad` as above (44 px spacer). Detail `quarter_offset`. Marks Text `<Quarter Tick Text>`, Book 9 `#8C9BB0`, centre. (`MIN(chart_x)` of the left end plus the label centred on the half: put `MIN(chart_x) + 0.5` on Columns instead if your labels sit at the quarter's edge.)
+Sheet **Quarter Axis**: Filter `Quarter Tick Row` = True. Columns `MIN(chart_x)`, Fixed 0 to 24, hidden; Rows `Axis Pad` as above (44 px spacer). Detail `quarter_offset`. Marks Text `<Quarter Tick Text>`, Book 9 `#8C9BB0`, center. (`MIN(chart_x)` of the left end plus the label centered on the half: put `MIN(chart_x) + 0.5` on Columns instead if your labels sit at the quarter's edge.)
 
 Both: shading None, every line None, tooltip off. Expected chips (check tables, section 3): 82% · 87% · **68%** (slate) · 84% · 88% · 89%; People without Talent Acquisition 71% · 82% · 59% · 77% · 73% · 72% (four slate).
 
@@ -1150,8 +1151,8 @@ WINDOW_AVG(ABS([BT Mean] - [BT Actual]) / [BT Actual])
 ```
 
 Sheet **Backtest**: Filter `BT Row` = True. Columns `quarter_offset` (discrete, header hidden), then `quarter_label` (header at the bottom, Book 8 `#8C9BB0`). Rows `BT Low`, then `BT Actual`; Dual Axis, Synchronize; left axis shown, no title, Book 9 `#8C9BB0`, `#,##0`, include zero off; right hidden.
-- Card `BT Low`: **Gantt Bar**, Size `BT Span`, colour teal light `#D3EEE4`, width about 40%. Analytics: **Reference Line**, Per Cell, `BT Mean`, solid 2 px teal `#0F6E56`, no label.
-- Card `BT Actual`: **Shape**, Shape `BT In`: in range → filled circle, outside → open circle (default palette); colour navy; size small.
+- Card `BT Low`: **Gantt Bar**, Size `BT Span`, color teal light `#D3EEE4`, width about 40%. Analytics: **Reference Line**, Per Cell, `BT Mean`, solid 2 px teal `#0F6E56`, no label.
+- Card `BT Actual`: **Shape**, Shape `BT In`: in range → filled circle, outside → open circle (default palette); color navy; size small.
 - Tooltip (both): `<quarter_label>, forecast one quarter ahead: <BT Low> to <BT High> fills; <BT Actual> filled, <BT In>.`
 
 Sheet **Backtest Title**: Filter `BT Row` = True; Detail `quarter_offset`; table-calculation filter `SV Is Last`-style: create `BT Is Last` = `LAST() = 0` and filter True; Compute Using `quarter_offset` for every table calculation. Text `<BT Title>` Semibold 13 navy / `<BT Subtitle>` Book 10 `#5A6170`. Tooltip off.
@@ -1226,7 +1227,7 @@ Expected: nothing chosen "All functions" (dark) "8 functions · 31 departments";
 
 Each hangs from the rail's right edge (x 216): a navy `#13233A` vertical container, padding 0, no border, shown by its open flag; header 44 px (title Tableau Bold 12 white, ✕ at the right), line 9 px (`d2_popover_line_wide.png`), body, footer 28 px (Book 9 `#8FA0B8`). The ✕ sheets (**Period Close**, **Org Close**, **Loc Close**) are the #4 pattern: Text `✕` Book 12 `#B8C0CC`, Detail `zzFalse`, `zzTrue`, `Close Panel`, tooltip "Close".
 
-The list sheets are the spikes' lists, restyled for the navy body: Marks **Shape** with the tick files `d4_tick_on.png` / `d4_tick_off.png` (Arcadia D4; the files carry the state, so no colour on the shape), the name as the label in three runs so a dimmed or locked option reads differently:
+The list sheets are the spikes' lists, restyled for the navy body: Marks **Shape** with the tick files `d4_tick_on.png` / `d4_tick_off.png` (Arcadia D4; the files carry the state, so no color on the shape), the name as the label in three runs so a dimmed or locked option reads differently:
 
 ```
 // Function Shape     IF [Function Tick] = "on" THEN "d4_tick_on" ELSE "d4_tick_off" END
@@ -1315,7 +1316,7 @@ The rail sits in front of every page item; the popovers in front of everything.
 | Container `Rail Top`: logo `arcadia_logo_horizontal_reverse.png` 200 × 40, Blank 12, `Info Button` row 28 (Blank 172 + 28 × 28) | 80 |
 | Blank | 28 |
 | Text PERIOD (Semibold 8 `#B8C4D6`) · Blank 6 · `Period Field` 32 · Blank 24 | 78 |
-| Text ORGANISATION · Blank 6 · `Org Field` 32 · `Org Sub` 18 · Blank 24 | 96 |
+| Text ORGANIZATION · Blank 6 · `Org Field` 32 · `Org Sub` 18 · Blank 24 | 96 |
 | Text LOCATION · Blank 6 · `Loc Field` 32 · `Loc Sub` 18 | 72 |
 | Image `arcadia_rail_divider.png` | 24 |
 | `Reset` | 32 |
@@ -1323,7 +1324,7 @@ The rail sits in front of every page item; the popovers in front of everything.
 | `Rail As Of` | 56 |
 | Blank | 24 |
 
-The popovers' tops line up with their headings: Period y 108, Organisation y 188, Location y 268.
+The popovers' tops line up with their headings: Period y 108, Organization y 188, Location y 268.
 
 ---
 
@@ -1388,7 +1389,7 @@ Every number for six selections and the four quarters is in [the check tables](s
 | 2 | Click every control, title, card and list row | Nothing stays highlighted |
 | 3 | Open each popover in turn | One open at a time |
 | 4 | Period > FY27 Q2 | Popover closes; capsule "FY27 Q2 forecast"; hero 1,734 (84% of 2,055; FY26 Q2 1,782, 86%); KPI 1 2,556, "812 waiting as the quarter opens"; KPI 2 823, "11 more than as the quarter opens"; Q2 shaded on the chart; survival and backtest unchanged |
-| 5 | Organisation > People, untick Talent Acquisition | Capsule "People" (white) "3 of 4 departments"; hero 181; subtitle "People (3 of 4 departments)" |
+| 5 | Organization > People, untick Talent Acquisition | Capsule "People" (white) "3 of 4 departments"; hero 181; subtitle "People (3 of 4 departments)" |
 | 6 | People off | Every department back; `p_DeptOff` empty (the clean-up) |
 | 7 | Legal & Compliance only, untick Legal | Compliance & Risk locked (grey name; a click changes nothing) |
 | 8 | Location > Asia Pacific, untick Pune | Loc Sub "6 countries · 8 of 9 offices"; hero 1,861 |
@@ -1410,3 +1411,41 @@ Every number for six selections and the four quarters is in [the check tables](s
 6. On the web: the click tests of 14.3; the first load and a click timed; the screenshot (1400 × 850) for the repo.
 
 **Assets to place before building** (in `My Tableau Repository/Shapes/Arcadia D5/` and the dashboard folder): `d5_chip_teal.png`, `d5_chip_slate.png` (shapes); `d5_main_legend.png`, `d5_backtest_legend.png` (images). The D4 shapes and rail images are reused as they are.
+
+---
+
+## 16. As built
+
+The workbook was not built by hand from this guide: [`tableau/builder/d5/`](../../../tableau/builder/d5/) writes it into the saved base workbook (the Custom SQL and its extract, section 2.2), reading every formula from this guide's code blocks. Sections 0 to 15 stay the design; this section records where Tableau needed something different, found in the Desktop spot checks of 2026-10-27. The numbers did not change: every value in section 0 and the check tables reads the same on the page.
+
+```
+D4_TWB="…/4 Contingent Workforce Reconciliation/Contingent Workforce Reconciliation.twb" \
+python3 tableau/builder/d5/build_d5.py base.twb "Seats to Fill.twb" 3      # Tableau closed first
+```
+
+### 16.1 Formulas
+
+| Guide | As built | Why |
+|---|---|---|
+| Text calcs mix aggregates with row-level fields (`Hero Line 3`, the hover sentences, `Waiting Text`) | Row-level and parameter-only fields inside an aggregate formula are wrapped in `MIN()` | Tableau refuses to mix aggregate and non-aggregate arguments |
+| `SV Median Days Str`, `KPI 3 Tip 1`, `BT Title`, `BT Subtitle` read other table calculations | Each repeats the inner table calculation in full | A table calculation read by another loses its Compute Using: the backtest read "1 of 8" and the medians were wrong until inlined. Every SV calc defaults to Compute Using `days_to`, every BT calc to `quarter_offset` |
+| `Quota From`, `Quota Width`, `Quota Att/Lo/Hi` × 100 | Kept as fractions (0.25 a band, axis 0 to 1.25, Percentage format) | No custom `0"%"` format needed |
+| `KPI 2 Title` "Vacant at the end of FY27 Q2" | "Vacant at the end of Q2" for a quarter | The card is 174 px wide; a label that does not fit becomes `####` |
+| `Waiting Text`, `Vacant Change Text` "as the quarter opens" | "as Q2 opens" | Same width limit |
+| `Hero Line 3` "… the FY27 Budget plans for FY27 Q2 · …" | "89% of the 7,709 in the FY27 Budget · FY26 filled 6,849 (88%)" | Same width limit; the kicker already names the quarter |
+| KPI 3 line 4 "PIDs approved in the last four quarters" | "Approved in the past year"; line 3 "92% within 90 days" | Same width limit |
+| `Line Tip 1` one sentence | `Line Tip Head` (Semibold navy) + `Line Tip Body` | Hovers are color-coded: counts navy, plan and likely figures teal |
+| Backtest from `BT Low` … with a per-cell reference line | `QBT Mean/Var/CV/Actual` FIXED by `quarter_offset`, drawn on the scaffold rows (`BTS Row`): range and average are two Gantt marks of the same width, the actual is a shape | A reference line spans the whole column, wider than the bars; the values are the same formula |
+| Added | `Tick X`, `Quarter Tick X`, `Chip Row`, `Year Under`, `Ref X4…20`, `Ref D29…89` (30/60/90), `Days Plus One`, `Close X`, `Tip Waiting Words`, `Tip Span Word`, the list `Shape`/`Name` fields, `Quota Band Text`, `Quota … Mark` | Helpers for the layout below |
+
+### 16.2 Sheets and layout
+
+- **KPI cards**: each card's text sheet sits in a white container (radius 14, padding 18/20); every card, KPI 3 included, has an invisible hover cover. `Hover KPI 3` carries `days_to` on Detail and the `SV Is Last` filter so its tooltip can read the survival numbers.
+- **Hero quota bar**: the five bands are reference bands (they always fill the strip); the likely range is a translucent white band edged by two 1.5 px white lines; the forecast a 3 px white line. The strip is 44 px, with a hidden `Tick X` axis on Rows so it has height.
+- **Main chart**: the forecast year (20 to 24) and the chosen period are reference bands built in the file; left axis 44 px, Include zero off; the FY chips sit centered over each year and the year names sit under each Q1 on the Quarter Axis sheet.
+- **Survival**: step lines; the 30/60/90-day labels are the x-axis (ticks every 30), not reference-line labels, so they sit under the curves. Chart 158 px, legend 4 px lower.
+- **Backtest**: columns fiscal year / Q1–Q4 (two rows of headers instead of "FY25 Q1"); dots are the shapes `d5_dot_in.png` (navy dot) and `d5_dot_out.png` (navy ring, no fill) in `Shapes/Arcadia D5`.
+- **Lists**: every list is flat, one row per option, the tick on a hidden axis at the left, rows 18 px, fit width. Departments, countries and offices are sorted by their parent instead of grouped under it: a group of one row loses its label in Tableau (every single-office country showed a blank). Offices read "Country · Office".
+- **Popovers**: x 216, joined to the rail, 12 px inner padding on the left; footers fixed at the bottom (30 px, one line); Period 360 × 190; Organization 640 × 700 at y 140; Location 640 × 720 at y 130; Info 591 × 420.
+- **Rail**: capsules drawn at shape size 12 (the whole pill visible), Reset at 10.6.
+- **Wording**: American spelling (Organization).
