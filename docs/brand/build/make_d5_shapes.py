@@ -10,7 +10,7 @@ dashboard px.
                                Tableau writes the percentage on top (FY Chips sheet, build guide 7.4)
   d5_main_legend     600 x 20  image: PIDs filled (navy line), Forecast (teal line), Likely range (teal light),
                                Budget (slate line)
-  d5_backtest_legend 388 x 18  image: Forecast range, Average, Actual in range (filled), Outside (open)
+  d5_backtest_legend 388 x 18  image: Forecast range, Average, Actual in range (navy dot), Outside (grey dot)
 
 The chips are shapes (Shapes/Arcadia D5); the two legends are images placed on the dashboard (Fit Image).
 """
@@ -86,7 +86,7 @@ def main():
     legend([("line", NAVY, "PIDs filled"), ("line", TEAL_D, "Forecast"), ("band", TEAL_L, "Likely range"),
             ("line", SLATE, "Budget")], 600, 20).save(os.path.join(OUT, "d5_main_legend.png"))
     legend([("band", TEAL_L, "Forecast range"), ("tick", TEAL_D, "Average"), ("dot", NAVY, "Actual, in range"),
-            ("ring", NAVY, "Outside")], 388, 18, gap=48).save(os.path.join(OUT, "d5_backtest_legend.png"))
+            ("dot", (167, 178, 194, 255), "Outside")], 388, 18, gap=48).save(os.path.join(OUT, "d5_backtest_legend.png"))
     for f in sorted(os.listdir(OUT)):
         im = Image.open(os.path.join(OUT, f))
         print(f"   {f:<24}{im.size[0]:>5} x {im.size[1]}")
