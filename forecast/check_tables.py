@@ -225,6 +225,27 @@ def main():
         err = sum(abs(m - act) / act for _, lo, m, hi, act in d["backtest"] if act) / len(d["backtest"]) * 100
         L.append(f"| {name} | " + " | ".join(cells) + f" | {n_in} of {len(d['backtest'])} | {err:.1f}% |")
     L += ["", "Each cell: the range, then the actual fills in bold. The forecast origin is the quarter-end before the target quarter.", ""]
+
+    L += ["## 7. The Period capsule: one forward quarter", "",
+          "With a quarter chosen, the KPI band reads that quarter: fills in it, PIDs to fill (waiting as it opens + opened in it), "
+          "vacant at its end, its budget, and the same quarter a year earlier. Averages; ranges P10 to P90.", "",
+          "| Selection | Quarter | Fills (range) | Budget · attainment | Same quarter a year earlier (att.) | Waiting as it opens | To fill (range) | Vacant at its end (range) |",
+          "|---|---|---|---|---|---:|---|---|"]
+    for name, w in SELECTIONS[:2] + SELECTIONS[3:4]:
+        rows = c.execute(f"""
+            WITH x AS (SELECT quarter_offset, draw, SUM(filled) f, SUM(vacant_start) vs,
+                              SUM(vacant_start + opened_backfill + opened_net_new + opened_immediate) tf, SUM(vacant_end) v
+                       FROM {scoped('mart_pid_forecast_draws', w)} GROUP BY 1, 2)
+            SELECT quarter_offset, AVG(f), QUANTILE_CONT(f, .1), QUANTILE_CONT(f, .9), AVG(vs), AVG(tf), QUANTILE_CONT(tf, .1),
+                   QUANTILE_CONT(tf, .9), AVG(v), QUANTILE_CONT(v, .1), QUANTILE_CONT(v, .9) FROM x GROUP BY 1 ORDER BY 1""").fetchall()
+        q = {r[0]: r for r in S[name]["quarters"]}
+        for i, (qo, f, flo, fhi, vs, tf, tlo, thi, v, vlo, vhi) in enumerate(rows):
+            plan = q[qo][4]
+            ly = q[qo - 4]
+            L.append(f"| {name if i == 0 else ''} | {qlabel[qo]} | **{f1(f)}** ({f1(flo)} to {f1(fhi)}) | {f0(plan)} · {f / plan * 100:.0f}% | "
+                     f"{qlabel[qo - 4]}: {f0(ly[3])} ({ly[3] / ly[4] * 100:.0f}%) | {f1(vs)} | **{f1(tf)}** ({f1(tlo)} to {f1(thi)}) | "
+                     f"**{f1(v)}** ({f1(vlo)} to {f1(vhi)}) |")
+    L.append("")
     OUT.write_text("\n".join(L) + "\n")
     print(f"Wrote {OUT.relative_to(ROOT)}")
 

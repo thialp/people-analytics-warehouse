@@ -10,6 +10,7 @@ Case study 7 in the README for now (renumbered in the profile later) · Dashboar
 |---|---|---|
 | 1 | 2026-10-27 | Proposal agreed (sections 1 to 5). Phase 1 built: the report calendar, the forward budget, time-to-fill variation (section 6) |
 | 3 | 2026-10-27 | Phase 3 built: the forecast tables on SQL Server (`02b`, `03e`, schema `fc`), the page's one Custom SQL `tableau/custom_sql_seats_to_fill.sql` (six row types, 542,701 rows), `17_validate_seats_to_fill.sql` (section 7) |
+| 5 | 2026-10-27 | Phase 6 started: the build guide [seats_to_fill_build.md](seats_to_fill_build.md); the Custom SQL gains 94 `Scaffold` rows (chart positions for the main chart, the bridge and the quota bar; seven row types, 542,795 rows); a Period capsule (the forward year or one quarter, B7) |
 | 4 | 2026-10-27 | Phases 4 and 5: spikes passed (section 8); prototype Option B approved and check tables written (section 9). Central numbers are now the **average** of the draws (D11), and the backtest range under a selection carries the draws' shared shock (D9) |
 | 2 | 2026-10-27 | Phase 2 built: the forecast package `forecast/`, eight marts, tests f01 to f05, CI step; method and backtest in [seats_to_fill_method.md](seats_to_fill_method.md). The demand of section 4 is refined there: net-new opens at the median ratio of every known quarter, and each draw has its own demand level and hiring speed |
 
@@ -83,7 +84,7 @@ Survival curves under any selection: the mart stores PIDs at risk and fills per 
 | 3 | SQL Server twin, Custom SQL, validate script; run on the Mac | Claude, then Thiago | **Done**: Mac run passed (542,701 rows) |
 | 4 | Spikes on Tableau Public (cascade, draws, Kaplan–Meier table calc) | Claude writes, Thiago runs | **Passed** 2026-10-27, no fallback needed (section 8) |
 | 5 | Check tables and a prototype with real numbers | Claude, Thiago approves | **Done** 2026-10-27: Option B approved (section 9); [seats_to_fill_check_tables.md](seats_to_fill_check_tables.md) |
-| 6 | Build guide, then the build in Tableau | Claude, Thiago | To do |
+| 6 | Build guide, then the build in Tableau | Claude, Thiago | **Guide written** 2026-10-27; the build next, written into the workbook in stages |
 | 7 | Publish, README, Figma, profile | Both | To do |
 
 ## 6. Phase 1: what changed in the data

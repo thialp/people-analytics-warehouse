@@ -29,15 +29,18 @@ PRINT '1. Rows by type';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #s5) AS actual, 542701 AS expected
+              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #s5) AS actual, 542795 AS expected
     UNION ALL SELECT 'Quarter rows',   (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Quarter'), 21720
     UNION ALL SELECT 'Draw rows',      (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Draw'), 396400
     UNION ALL SELECT 'Survival rows',  (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Survival'), 105294
     UNION ALL SELECT 'Backtest rows',  (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Backtest'), 19219
     UNION ALL SELECT 'Accuracy rows',  (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Accuracy'), 20
     UNION ALL SELECT 'CW budget rows', (SELECT COUNT(*) FROM #s5 WHERE row_type = 'CW budget'), 48
-    UNION ALL SELECT 'rows without a department (Accuracy and CW budget only)',
-                     (SELECT COUNT(*) FROM #s5 WHERE department_id IS NULL), 68
+    UNION ALL SELECT 'Scaffold rows',  (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Scaffold'), 94
+    UNION ALL SELECT 'Scaffold: fan vertices, budget step points',
+                     (SELECT COUNT(*) FROM #s5 WHERE row_type = 'Scaffold' AND (chart_part = 'Fan' OR chart_series = 'Budget')), 57
+    UNION ALL SELECT 'rows without a department (Accuracy, CW budget and Scaffold only)',
+                     (SELECT COUNT(*) FROM #s5 WHERE department_id IS NULL), 162
     UNION ALL SELECT 'rows without the report date label', (SELECT COUNT(*) FROM #s5 WHERE report_as_of_label IS NULL), 0
 ) AS c;
 GO
