@@ -1,6 +1,6 @@
 # Seats to Fill: plan (Dashboard #5)
 
-Case study 7 in the README for now (renumbered in the profile later) · Dashboard #5 · warehouse release 5. Arcadia Systems is fictional and all data is synthetic.
+Case study 5 in the README · Dashboard #5 · warehouse release 5. Arcadia Systems is fictional and all data is synthetic.
 
 **Seats to Fill** · *FTE hiring forecast against plan*. Tableau Public title: "Seats to Fill: Hiring Forecast | Arcadia Systems"; the description starts with "Workforce forecasting:", and the tags are forecasting, workforce planning, survival analysis, Python, HR analytics.
 

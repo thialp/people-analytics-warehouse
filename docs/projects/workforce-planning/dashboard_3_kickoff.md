@@ -32,4 +32,4 @@ Sections 5 → 7 (workbook, sources, parameters, calcs; checkpoints 1–2), then
 
 ## Later
 
-Case study 7, PID Fill Forecast: its own dashboard after this one is published (plan section 18).
+Case study 7, PID Fill Forecast (since published as case study 5, Seats to Fill): its own dashboard after this one is published (plan section 18).
