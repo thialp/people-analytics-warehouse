@@ -11,7 +11,7 @@ Arcadia Systems is fictional; all data is synthetic.
 | 1 | Prototype, check tables, the Custom SQL with its chart scaffold | Done 2026-10-27 |
 | 2 | This guide | Written 2026-10-27 |
 | 3 | The build, written straight into the workbook in stages, each spot-checked in Desktop | Done 2026-10-27 (section 16: as built) |
-| 4 | Publish, README, Figma, profile | Next |
+| 4 | Publish, README, Figma, profile | Done 2026-10-27: [live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard) |
 
 ## Contents
 
@@ -1360,11 +1360,11 @@ The popovers' tops line up with their headings: Period y 108, Organization y 188
 | Open info | Info Button | `p_InfoOpen` | `Toggle Info` |
 | Info closes others | Info Button | `p_PeriodOpen`, `p_OrgOpen`, `p_LocOpen` | `Close Panel` |
 
-41 in all.
+40 in all.
 
 ### 13.2 Deselect
 
-One Filter action per clickable sheet: source and target the same sheet, run on Select, clearing **Show all values**, `zzTrue` → `zzFalse`. Sheets: Page Title, Hero Text, KPI 1, KPI 2, KPI 3, Hover Hero, Hover KPI 1, Hover KPI 2, Main Title, Backtest Title, Level Legend, Period Field, Org Field, Loc Field, Org Sub, Loc Sub, Reset, Info Button, Rail As Of, Period List, Function List, Dept List, Region List, Country List, Office List, Period Close, Org Close, Loc Close (28). Not on `Main Chart`, `Survival` or `Backtest`: a selection there is useful.
+One Filter action per clickable sheet: source and target the same sheet, run on Select, clearing **Show all values**, `zzTrue` → `zzFalse`. Sheets: Page Title, Hero Text, KPI 1, KPI 2, KPI 3, Hover Hero, Hover KPI 1, Hover KPI 2, Main Title, Backtest Title, Level Legend, Period Field, Org Field, Loc Field, Org Sub, Loc Sub, Reset, Info Button, Rail As Of, Period List, Function List, Dept List, Region List, Country List, Office List, Period Close, Org Close, Loc Close, and Hover KPI 3 as built (29). Not on `Main Chart`, `Survival` or `Backtest`: a selection there is useful.
 
 ---
 

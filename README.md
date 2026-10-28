@@ -40,9 +40,9 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 | 💵 **2. [Compensation Walk](#case-study-2-compensation-walk)** | *Why did pay in this group change?* | Each dollar of change traced to hires, exits, promotions, raises, employer costs or currency | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard)** |
 | 🪑 **3. [Workforce Planning](#case-study-3-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)** |
 | 🔍 **4. [Contingent Workforce](#case-study-4-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard)** |
-| 🗺️ **5. [Global Workforce Footprint](#case-study-5-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
+| 🔮 **5. [Seats to Fill](#case-study-5-seats-to-fill-hiring-forecast)** | *How many PIDs will we fill next year, how many will still be vacant, and can we trust it?* | A survival model of time to fill and 100 simulated futures, against the Budget, tested on eight past quarters | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard)** |
 | 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | *coming soon* |
-| 🔮 **7. [PID Fill Forecast](#case-study-7-pid-fill-forecast-planned)** | *How many PIDs will we need to fill, and how fast can we fill them?* | Fill history of every vacant PID, then a forecast of the PIDs growth and attrition will open | *planned* |
+| 🗺️ **7. [Global Workforce Footprint](#case-study-7-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
 
 ### How it works, in one picture
 
@@ -144,7 +144,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 
 # Technical deep dive
 
-**Contents:** [The platform](#the-platform) · [Case study 1](#case-study-1-headcount--fte-walk) · [2](#case-study-2-compensation-walk) · [3](#case-study-3-workforce-planning) · [4](#case-study-4-contingent-workforce-reconciliation) · [5](#case-study-5-global-workforce-footprint) · [6](#case-study-6-workforce-cost-bridge) · [7](#case-study-7-pid-fill-forecast-planned) · [Run it yourself](#run-it-yourself) · [SQL Server](#run-it-on-sql-server-with-tableau) · [Repository layout](#repository-layout)
+**Contents:** [The platform](#the-platform) · [Case study 1](#case-study-1-headcount--fte-walk) · [2](#case-study-2-compensation-walk) · [3](#case-study-3-workforce-planning) · [4](#case-study-4-contingent-workforce-reconciliation) · [5](#case-study-5-seats-to-fill-hiring-forecast) · [6](#case-study-6-workforce-cost-bridge) · [7](#case-study-7-global-workforce-footprint) · [Run it yourself](#run-it-yourself) · [SQL Server](#run-it-on-sql-server-with-tableau) · [Repository layout](#repository-layout)
 
 ## The platform
 
@@ -794,41 +794,78 @@ On SQL Server the marts are views (`rpt.vw_cw_*`, [`04b`](sqlserver/04b_create_r
 ---
 
 
-## Case study 5: Global Workforce Footprint
-
-![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
-
-*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard).*
+## Case study 5: Seats to Fill (hiring forecast)
 
 ### Business problem
 
-Location strategy questions (where to hire next, which hubs are growing, whether people are moving toward engineering centers or away from headquarters) are usually answered from a country column. A country hides the difference between two offices in the same country, and it can't show movement. This case study answers them at the office level, with every number tied back to the headcount walk.
+*How many PIDs will Arcadia fill in the next fiscal year, how many will still be vacant at its end, and can the forecast be trusted?*
+
+Workforce planning is decided in PIDs: the Budget opens net-new ones, people who leave or move open backfills, and Recruiting can fill only so many a quarter. Case study 3 shows where Arcadia stands today. Leaders also need the year ahead, read the way budgets are read (by quarter and by year, as attainment against plan), with an honest range around it rather than a single confident number.
 
 ### Approach
 
-| Model | What it does |
-|---|---|
-| [`int_worker_movement`](sql/02_intermediate/int_worker_movement.sql) | Carries each worker's office at both month-ends |
-| [`mart_location_headcount`](sql/03_marts/mart_location_headcount.sql) | One row per office per month and worker type (Employee, Contingent since release 3): opening, hires or contingent starts, leavers by type or contingent ends, conversions, relocations in and out, closing (headcount and FTE) |
-| [`mart_mobility_flows`](sql/03_marts/mart_mobility_flows.sql) | Origin and destination office for every relocation, with both ends' coordinates, so Tableau can draw `MAKELINE` without relating the location table twice |
-| [`mart_dim_location`](sql/03_marts/mart_dim_location.sql) | 35 offices with real postal codes and their GeoNames coordinates (street addresses are fictional), the pay zone and the date each office opened |
+```mermaid
+flowchart LR
+    REQ["Requisitions since FY22<br/>approved · filled · still waiting"] --> TTF["Time to fill<br/>discrete-time survival model"]
+    PLAN["FY27 Budget<br/>net-new and backfills"] --> DEM["Demand<br/>PIDs expected to open"]
+    HC["Employees and their<br/>backfill rates"] --> DEM
+    TTF --> SIM["100 simulated futures<br/>quarter by quarter"]
+    DEM --> SIM
+    SIM --> MARTS["Draws by department × office<br/>so any selection adds up"]
+    SIM --> BT["Backtest<br/>8 past quarters, refit each time"]
+    MARTS --> PAGE["Tableau: averages, ranges,<br/>attainment against plan"]
+    BT --> PAGE
 
-A relocation is any change of office between two month-ends, including between two offices in the same country, which the slice-level walk in case study 1 can't see (Bengaluru to Hyderabad is the busiest corridor, and both are in India). Four tests (19 to 22) tie the office walk to the company walk and the flows to the office walk.
+    classDef in fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+    classDef model fill:#ede9fe,stroke:#6d28d9,color:#0f172a
+    classDef out fill:#dcfce7,stroke:#15803d,color:#0f172a
+    class REQ,PLAN,HC in
+    class TTF,DEM,SIM,BT model
+    class MARTS,PAGE out
+```
 
-### Results (FY26)
+| Step | Code | What it does |
+|---|---|---|
+| Time to fill | [`forecast/fill_model.py`](forecast/fill_model.py) | A logistic model on ten-day periods (so 30, 60 and 90 days fall on a boundary), by level band, function, country, net-new or backfill, and each country's graduate season. A requisition still open at the report date counts as "not filled yet" for every period it was seen (censored), so recent quarters are not read as fast. 27,201 requisitions, 143,307 requisition-periods, fit with Newton–Raphson in numpy |
+| Demand | [`forecast/simulate.py`](forecast/simulate.py) | Backfills from each function and country's rate per head and the quarter's season; net-new from the FY27 Budget and how many PIDs past budgets actually opened; immediate refills at their recent pace |
+| Simulation | [`forecast/simulate.py`](forecast/simulate.py) | 100 futures. Each draws its own demand level and hiring speed (company-wide shocks sized from how much past quarters varied), then follows every waiting PID period by period |
+| Backtest | [`forecast/run_forecast.py`](forecast/run_forecast.py) | At each of the eight quarter-ends before the report date, the whole method is refit on only what was known that day and compared with what happened |
+| One data source | [`custom_sql_seats_to_fill.sql`](tableau/custom_sql_seats_to_fill.sql) | Seven row types side by side (history, 396,400 draw rows, survival, backtest, budget, chart scaffold), 542,795 rows, about two seconds on SQL Server |
 
-| Finding | Number |
-|---|---|
-| Fastest-growing region | Latin America, +5.9% (2,225 → 2,356), against +5.5% company-wide; Europe next at +5.7% |
-| Share in the three India engineering centers | 23% of the company (6,967 people in Bengaluru, Hyderabad and Pune), more than twice headquarters in Austin (3,224) |
-| New offices | Six opened since 2022; Manila, Guadalajara and Pune passed 200 people each |
-| Relocations | 857 office moves month by month (146 between countries); 725 people were in a different office at the end of the year than at the start |
-| Busiest corridor | Bengaluru ↔ Hyderabad, 122 moves |
-| Within 1,000 km of London | Paris, Amsterdam, Dublin, Zurich, Munich and Berlin: 4,240 people across seven offices, London included |
+Every number on the page is an **average of the 100 futures**, so quarters add to the year, functions add to the company and the seat bridge closes exactly; ranges are the 10th to 90th percentile across the futures' totals. The range for any selection is rebuilt from per-cell variances plus a shared company-wide term, so it stays honest when one office is chosen. Method, assumptions and limits: [`seats_to_fill_method.md`](docs/projects/workforce-planning/seats_to_fill_method.md).
+
+### Results (FY27, from the 30 June 2026 report date)
+
+| | Average | Likely range |
+|---|---:|---:|
+| PIDs to fill in the year | **7,672** | 7,006 to 8,371 |
+| PIDs filled | **6,891** | 6,301 to 7,543 |
+| Vacant on 30 June 2027 | **781** | 696 to 892 |
+
+- **Plan attainment: 89%** of the 7,709 fills the FY27 Budget plans (FY26 reached 88%), likely between 82% and 98%.
+- **The seat bridge:** 902 waiting today + 4,391 backfills + 1,552 net-new + 828 refilled the day they open = 7,672 to fill; minus 6,891 filled = 781 still vacant.
+- **Time to fill:** half the PIDs approved in the past year were filled within **43 days**, 92% within 90. Seniority is the biggest driver: L1–L2 35 days, L3–L4 44, L5–L6 57, L7+ 88.
+- **Can we trust it?** The range held the actual in **7 of 8 past quarters** (a calibrated 80% range should hold about 6.4), with a **3.6% average error**. The misses lean low in FY26, when backfills rose faster than their eight-quarter rate; the page shows that instead of correcting it after the fact.
+
+Six forecast tests (f01 to f06 in [`tests/forecast/`](tests/forecast/)) check that every future adds up, that the backtest never sees data after its origin, that history ties to the warehouse and that the range is calibrated; CI reruns the forecast and checks every mart reproduces byte for byte.
 
 ### Tableau
 
-Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_guide.md`](docs/projects/workforce-footprint/tableau_workforce_map_guide.md). One map with four layers (countries, relocation paths with `MAKELINE`, a `BUFFER` radius around the selected office, offices with `MAKEPOINT`), a parameter action that moves the radius when an office is clicked, `DISTANCE` to count the people inside it, and the 2025 viewport parameter and dynamic color range where Tableau Public supports them.
+**Published:** [Seats to Fill: Hiring Forecast on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard) (release 5 data, one Custom SQL extract of 542,795 rows).
+
+[![Seats to Fill on Tableau Public](docs/images/seats_to_fill_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard)
+
+*FY27, all of Arcadia. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard)**: choose the year or one of its quarters, any functions and departments, any regions, countries and offices; hover the vacant card for the seat bridge, a quarter for its forecast, a curve or a backtest quarter for its reading.*
+
+| Part | What it does |
+|---|---|
+| Rail and popovers | Period (FY27 or one quarter), Organization (Function > Department) and Location (Region > Country > Office), each a cascading multi-select: a parent's click cleans its children, the last ticked option is locked, and an option with nothing behind it is greyed out |
+| KPI band | PIDs filled against plan with a quota bar (five attainment bands, the forecast tick and its likely range), PIDs to fill, vacant at the end (its hover is the seat bridge, a chart inside the tooltip) and the median wait to fill |
+| Main chart | Twenty quarters filled, the FY27 forecast with its range and the Budget as a step; a chip per fiscal year shows attainment; the title says whether hiring holds, picks up or slows |
+| How fast PIDs fill | Kaplan–Meier curves by level, rebuilt in Tableau as a table calculation from PIDs at risk and filled per ten-day period, so they hold under any selection |
+| Can we trust it | The eight backtest quarters: the forecast range, its average and what happened |
+
+40 parameter actions and 29 deselects drive the page from one data source. The workbook is written by [`tableau/builder/d5/`](tableau/builder/d5/) from the build guide's own formulas: [`seats_to_fill_build.md`](docs/projects/workforce-planning/seats_to_fill_build.md) (section 16 records what Tableau needed done differently, and why).
 
 ---
 
@@ -965,20 +1002,41 @@ Step-by-step connection guide: [`docs/setup/tableau_public_guide.md`](docs/setup
 
 ---
 
-## Case study 7: PID Fill Forecast (planned)
+## Case study 7: Global Workforce Footprint
+
+![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
+
+*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard).*
 
 ### Business problem
 
-Workforce planning is decided in PIDs: how many positions the plan opens, how many fall vacant when people leave, and how many Recruiting can fill each quarter. Case study 3 shows where Arcadia stands today. The next question is forward-looking: **given planned growth and expected attrition, how many PIDs will need filling each quarter, and how many will still be vacant at quarter-end?**
+Location strategy questions (where to hire next, which hubs are growing, whether people are moving toward engineering centers or away from headquarters) are usually answered from a country column. A country hides the difference between two offices in the same country, and it can't show movement. This case study answers them at the office level, with every number tied back to the headcount walk.
 
-### Approach (planned)
+### Approach
 
-1. **Fill history.** For every vacant PID since FY22: how long it took to fill, by level, function, country and worker type, and the share filled within 30, 60 and 90 days. Survival curves, because a PID still vacant at the extract is censored, not missing.
-2. **Inflows of vacancies.** PIDs that open from attrition (voluntary, involuntary, internal moves), from contractor assignments ending, and from net-new growth in the plan.
-3. **Forecast.** Quarter by quarter, vacancies opened minus vacancies filled, with the fill rate from step 1, against the plan's net-new and backfill lines. Scenarios for faster hiring, a hiring freeze or higher attrition.
-4. **Validation.** Back-test on FY24–FY26 (forecast from each quarter-end, compare with what happened), so the error is a reported number.
+| Model | What it does |
+|---|---|
+| [`int_worker_movement`](sql/02_intermediate/int_worker_movement.sql) | Carries each worker's office at both month-ends |
+| [`mart_location_headcount`](sql/03_marts/mart_location_headcount.sql) | One row per office per month and worker type (Employee, Contingent since release 3): opening, hires or contingent starts, leavers by type or contingent ends, conversions, relocations in and out, closing (headcount and FTE) |
+| [`mart_mobility_flows`](sql/03_marts/mart_mobility_flows.sql) | Origin and destination office for every relocation, with both ends' coordinates, so Tableau can draw `MAKELINE` without relating the location table twice |
+| [`mart_dim_location`](sql/03_marts/mart_dim_location.sql) | 35 offices with real postal codes and their GeoNames coordinates (street addresses are fictional), the pay zone and the date each office opened |
 
-Inputs already in the warehouse: `fact_requisition` (approval, fill and cancel dates), `mart_vacancy_pool` and `mart_pid_month_end` (every vacant PID and its age, every month-end), `fact_workforce_plan`, and the attrition rates behind Dashboard #2.
+A relocation is any change of office between two month-ends, including between two offices in the same country, which the slice-level walk in case study 1 can't see (Bengaluru to Hyderabad is the busiest corridor, and both are in India). Four tests (19 to 22) tie the office walk to the company walk and the flows to the office walk.
+
+### Results (FY26)
+
+| Finding | Number |
+|---|---|
+| Fastest-growing region | Latin America, +5.9% (2,225 → 2,356), against +5.5% company-wide; Europe next at +5.7% |
+| Share in the three India engineering centers | 23% of the company (6,967 people in Bengaluru, Hyderabad and Pune), more than twice headquarters in Austin (3,224) |
+| New offices | Six opened since 2022; Manila, Guadalajara and Pune passed 200 people each |
+| Relocations | 857 office moves month by month (146 between countries); 725 people were in a different office at the end of the year than at the start |
+| Busiest corridor | Bengaluru ↔ Hyderabad, 122 moves |
+| Within 1,000 km of London | Paris, Amsterdam, Dublin, Zurich, Munich and Berlin: 4,240 people across seven offices, London included |
+
+### Tableau
+
+Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_guide.md`](docs/projects/workforce-footprint/tableau_workforce_map_guide.md). One map with four layers (countries, relocation paths with `MAKELINE`, a `BUFFER` radius around the selected office, offices with `MAKEPOINT`), a parameter action that moves the radius when an office is clicked, `DISTANCE` to count the people inside it, and the 2025 viewport parameter and dynamic color range where Tableau Public supports them.
 
 ## Run it yourself
 
@@ -1048,12 +1106,13 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 │                         growth mix, contingent spend, discrepancy work list, reconciliation trend,
 │                         engagement cap, detection score, gaps and gap rate at each close, open tickets,
 │                         cost snapshot, org chart, fringe, dimensions
-├── tests/                88 data-quality and reconciliation tests (SQL)
+├── tests/                88 data-quality and reconciliation tests, and 6 forecast tests (SQL)
 ├── pipeline/             build runner, control totals, org chart and dashboard check-table writers
+├── forecast/             the PID fill forecast: survival model, simulation, backtest, check tables (Python)
 ├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, validation, and the DuckDB checker
 ├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
-├── tableau/              Tableau Custom SQL and connection settings
+├── tableau/              Tableau Custom SQL, connection settings and the Seats to Fill workbook builder
 └── docs/                 documentation, grouped by project (see docs/README.md)
     ├── company/          Arcadia profile, org chart, organization and pay model
     ├── warehouse/        data dictionary, source systems and lineage
