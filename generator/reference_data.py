@@ -277,6 +277,10 @@ SPAN_OF_CONTROL_MAX = 9        # above this a team is split at month-end
 FISCAL_YEAR_START_MONTH = 7            # FY2026 = 2025-07-01 .. 2026-06-30
 FIRST_SNAPSHOT = "2021-06-30"
 LAST_SNAPSHOT = "2026-06-30"
+# Release 6: Keystone's Core HR and Compensation modules are read every night, so the warehouse holds them up to
+# the latest nightly extract: the data-through date, past the report date. Every other module and system is loaded
+# at the report date (the month-end close). generator/core_hr_extract.py writes the extension.
+DATA_THROUGH = "2026-07-05"
 START_HEADCOUNT = 23_500               # non-executive population at the first month-end (about 25,000 by Jun 2022)
 COMP_CONVERSION_DATE = "2021-03-01"    # pay history starts at the HR system conversion
 
@@ -358,6 +362,10 @@ PLAN_FY_BUDGET_SHIFT = {2024: (0.80, 0.035)}  # FY24 budget was set before the F
 # the planned growth, with the budget's planning error; headcount grows from the report date.
 FORWARD_BUDGET_NET_GROWTH = 0.050          # planned net headcount growth in the forward year
 FORWARD_BUDGET_CW_GROWTH = 0.060           # planned contingent headcount growth in the forward year
+# Release 6: the simulation runs on to the data-through date, into the forward year, so it hires to the forward
+# budget's growth and moves the pay structure on July 1 as in the last two years.
+FY_NET_GROWTH[2027] = FORWARD_BUDGET_NET_GROWTH
+RANGE_STRUCTURE_INCREASE[2027] = 0.030
 
 # --------------------------------------------------------------------------------------
 # Candidates (applicant tracking): applicants per requisition with a real search,

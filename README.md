@@ -136,7 +136,7 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 | | |
 |---|---|
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
-| **Scale** | 46,980 employees and 43,484 contractors over five years · 61 month-ends · 64,914 PIDs (33,650 employee, 31,264 contractor) · 31,614 requisitions · 189,964 applicants · 58,276 supplier orders · 632,504 timesheets |
+| **Scale** | 47,056 employees and 43,484 contractors over five years · 61 month-ends, and every day to the Jul 5, 2026 extract · 64,914 PIDs (33,650 employee, 31,264 contractor) · 31,614 requisitions · 189,964 applicants · 58,276 supplier orders · 632,504 timesheets |
 | **Output** | 28 Tableau-ready marts and 7 dimension files in [`data/marts/`](data/marts/); 19 Tableau Custom SQL queries and 18 reporting views on SQL Server |
 | **Controls** | 88 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
 
@@ -244,6 +244,7 @@ The same model is built in T-SQL on **SQL Server** for a live Tableau connection
 3. **Model in layers** with plain SQL files in run order, so each step can be read and tested on its own.
 4. **Test everything that must be true**, and fail the build if it isn't.
 5. **Export flat marts** that Tableau Public can read directly, and generate each dashboard's check table from them.
+6. **Close the month, then keep reading the HR system (release 6).** Every table is loaded as of the report date, Jun 30, 2026, the month-end close every dashboard reports. Keystone's Core HR and Compensation are also read every night, so workers, jobs and pay run on to the latest extract, the **data-through date** (Jul 5, 2026): [`generator/core_hr_extract.py`](generator/core_hr_extract.py) runs the simulation past the close and adds only the days after it, and checks that no row up to the close changed. Positions, requisitions, plans and contingent workers stay at the close, as they would between two month-end loads. `mart_daily_headcount` counts employees on every day to the data-through date, for year, quarter and month to date.
 
 ### Data model
 
@@ -291,9 +292,9 @@ erDiagram
 
 | Raw table | Grain | Rows |
 |---|---|---:|
-| `dim_worker` | worker (fictional names) | 46,980 |
-| `fact_job_history` | worker × effective-dated job record (SCD2), with seat, manager and leadership role | 96,129 |
-| `fact_compensation_history` | worker × effective-dated pay record (SCD2), incl. corrections | 186,191 |
+| `dim_worker` | worker (fictional names) | 47,056 |
+| `fact_job_history` | worker × effective-dated job record (SCD2), with seat, manager and leadership role | 98,120 |
+| `fact_compensation_history` | worker × effective-dated pay record (SCD2), incl. corrections | 188,501 |
 | `fact_performance_review` | worker × fiscal year rating | 154,151 |
 | `fact_bonus_payout` | worker × fiscal year bonus | 154,151 |
 | `dim_position` | seat × effective-dated record (SCD2): status, grade, office, cost center | 99,398 |
@@ -1048,6 +1049,7 @@ cd people-analytics-warehouse
 pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
+python generator/core_hr_extract.py    # then extend Core HR to the data-through date (release 6)
 python pipeline/run_pipeline.py        # build the warehouse, run the 88 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 

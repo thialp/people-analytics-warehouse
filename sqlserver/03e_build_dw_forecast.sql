@@ -151,6 +151,8 @@ DROP TABLE IF EXISTS fc.report_calendar;
 SELECT
     CONVERT(DATE, NULLIF([report_as_of_date], ''))                      AS [report_as_of_date],
     CAST(NULLIF([report_as_of_label], '') AS VARCHAR(20))               AS [report_as_of_label],
+    CONVERT(DATE, NULLIF([data_through_date], ''))                      AS [data_through_date],
+    CAST(NULLIF([data_through_label], '') AS VARCHAR(20))               AS [data_through_label],
     CAST(NULLIF([current_fiscal_year], '') AS INT)                      AS [current_fiscal_year],
     CAST(NULLIF([current_fiscal_year_label], '') AS VARCHAR(10))        AS [current_fiscal_year_label],
     CAST(NULLIF([forward_fiscal_year], '') AS INT)                      AS [forward_fiscal_year],

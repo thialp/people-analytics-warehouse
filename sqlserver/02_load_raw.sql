@@ -852,6 +852,8 @@ DROP TABLE IF EXISTS raw.ref_report_calendar;
 CREATE TABLE raw.ref_report_calendar (
     [report_as_of_date]               NVARCHAR(400) NULL,
     [report_as_of_label]              NVARCHAR(400) NULL,
+    [data_through_date]               NVARCHAR(400) NULL,
+    [data_through_label]              NVARCHAR(400) NULL,
     [current_fiscal_year]             NVARCHAR(400) NULL,
     [current_fiscal_year_label]       NVARCHAR(400) NULL,
     [forward_fiscal_year]             NVARCHAR(400) NULL,

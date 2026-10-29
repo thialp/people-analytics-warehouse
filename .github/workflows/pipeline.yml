@@ -26,6 +26,9 @@ jobs:
       - name: Regenerate synthetic data
         run: python generator/generate_data.py
 
+      - name: Extend Core HR to the data-through date (release 6)
+        run: python generator/core_hr_extract.py
+
       - name: Check raw data is reproducible from the generator
         run: git diff --stat --exit-code data/raw
 

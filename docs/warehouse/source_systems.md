@@ -30,6 +30,12 @@ flowchart LR
 | `HLX` | **Helix Service Desk** (release 4) | Tickets raised to fix records, their state changes, what each is about; seeded with contingent worker tickets | Vendor Management, HR Operations, Data Engineering, anyone who reports a problem |
 | `ETL` | **Arcadia warehouse load log** (release 4) | Every scheduled read of a source: when it ran, whether it was late or failed, how many rows it read | Data Engineering; the dashboards, to say how fresh each source is |
 
+### Two load dates (release 6)
+
+Every system is loaded as of the **report date**, Jun 30, 2026: the month-end close that every dashboard reports. Keystone's **Core HR and Compensation** modules (`dim_worker`, `fact_job_history`, `fact_compensation_history`) are also read every night, so the warehouse holds them to the latest extract, the **data-through date** (Jul 5, 2026). Seats, requisitions, applicants, the plan and the contingent worker profile stay at the close.
+
+So between the two dates a hire can be in Core HR before their seat assignment is in position management, as it would be between two month-end loads. Tests that compare the two modules (43, 46, 47) compare them as of the report date, and `mart_daily_headcount` is the only mart that reads past it. Both dates are in `ref_report_calendar`.
+
 The same list is a raw table, `ref_source_system`, written from [`generator/source_systems.py`](../../generator/source_systems.py).
 
 ## How a contingent worker enters, and where each fact lives
