@@ -33,7 +33,7 @@ SOURCE_SYSTEMS = [
     {"system_code": "KS", "system_name": "Keystone HR", "system_type": "HR system of record",
      "record_of": "Employees, jobs, pay, seats, requisitions, applicants, workforce plan; the HR profile of every contingent worker",
      "used_by": "Managers, employees, HR Operations, Talent Acquisition, Finance planning",
-     "extract": "Nightly full extract of current and history tables"},
+     "extract": "Nightly full extract of current and history tables. Core HR and Compensation are loaded to the latest night (the data-through date); every other module at the month-end close (the report date)"},
     {"system_code": "BW", "system_name": "Bridgeway VMS", "system_type": "Vendor management system",
      "record_of": "Suppliers, contingent workers, service orders and their revisions, bill rates, timesheets",
      "used_by": "Vendor Management, hiring managers raising requests, suppliers",
@@ -334,8 +334,10 @@ RAW_COLUMNS.update({
 
 # Release 5: the report calendar (generator/report_calendar.py)
 RAW_COLUMNS["ref_report_calendar"] = [
-    ("report_as_of_date", "DATE", "The report as-of date: the last day the data covers"),
+    ("report_as_of_date", "DATE", "The report as-of date: the month-end close, the last day every table covers"),
     ("report_as_of_label", "VARCHAR", "It in words, e.g. Jun 30, 2026"),
+    ("data_through_date", "DATE", "Release 6: the last day Keystone's Core HR and Compensation tables cover (the latest nightly extract)"),
+    ("data_through_label", "VARCHAR", "It in words, e.g. Jul 5, 2026"),
     ("current_fiscal_year", "INTEGER", "The fiscal year the as-of date closes"),
     ("current_fiscal_year_label", "VARCHAR", "e.g. FY26"),
     ("forward_fiscal_year", "INTEGER", "The year after it: the forward budget's year, the one Dashboard #5 forecasts"),

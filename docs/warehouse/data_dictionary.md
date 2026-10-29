@@ -1,6 +1,6 @@
 # Data Dictionary
 
-Arcadia Systems is fictional and all data is synthetic. History runs from 2021-06-30 to 2026-06-30 (61 month-ends; the dashboards show pairs ending after 2022-06-30, the first year being lead-in). Dates are ISO (`YYYY-MM-DD`). The fiscal year starts July 1 (FY2026 = 2025-07-01 to 2026-06-30).
+Arcadia Systems is fictional and all data is synthetic. History runs from 2021-06-30 to 2026-06-30 (61 month-ends; the dashboards show pairs ending after 2022-06-30, the first year being lead-in). Release 6: Keystone's Core HR and Compensation tables (`dim_worker`, `fact_job_history`, `fact_compensation_history`) run on to the data-through date, 2026-07-05, the latest nightly extract; every other table stops at the report date, 2026-06-30, and every month-end mart reports at it. `ref_report_calendar` holds both dates. Dates are ISO (`YYYY-MM-DD`). The fiscal year starts July 1 (FY2026 = 2025-07-01 to 2026-06-30).
 
 ## Raw tables (`data/raw/`)
 
@@ -9,7 +9,7 @@ Forty-nine tables in eight groups: people and their history, the organization, t
 ### People and history
 
 #### dim_worker
-One row per worker ever employed (46,980).
+One row per worker ever employed (47,056, of whom 79 were hired between the report date and the data-through date).
 
 | Column | Description |
 |---|---|
@@ -639,6 +639,9 @@ Grain: **month-end × worker type × department × country × job family × grad
 Rules: headcount includes executive officers. A move is booked out of the old slice and into the new one at the worker's prior FTE, so moves net to zero at any roll-up that contains both slices. A contingent worker hired as an employee is booked −1 Contingent and +1 Employee as Conversions in the same month; the employee is not in Hires. A contingent worker counts 1.0 in `fte`. **Lapsed: approved late** is a contingent worker whose extension or renewal was approved after the old end date: the month-end report of the time did not count them, and the history is never restated, so they end one month and return (*Returned after a lapse*) the next. When several slice attributes change in one month, one reason is recorded: department (Reorganization if a reorg action is on file, otherwise Transfer), then country, then grade, then job family.
 
 **Walking across several months:** take Opening from the first month, Closing from the last month, and sum every other line in between. Test 14 guarantees the months chain together.
+
+### mart_daily_headcount
+Release 6. One row per day × department with anybody in it, from 2021-06-30 to the data-through date (55,572 rows). Employees are counted like the month-end snapshot (employed that day, the job in effect that day, executive officers excluded), so every month-end equals it (test 92): 30,005 on 2026-06-30. Columns: `as_of_date`, `is_closed` (on or before the report date; later days are the period to date), `function_name`, `sub_function`, `department_name`, `employees`. The source for year, quarter and month to date.
 
 ### mart_dim_month
 One row per walked month-end: `month_end_date`, `prior_month_end_date`, `fiscal_year`, `fiscal_year_label` (`FY26`), `fiscal_quarter_label`, `fiscal_period`, `fiscal_month`, `is_fiscal_year_end`.

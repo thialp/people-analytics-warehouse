@@ -42,6 +42,7 @@ EXPORTS = [
     "mart_compensation_walk",
     "mart_workforce_cost_snapshot",
     "mart_headcount_fte_walk",
+    "mart_daily_headcount",
     "mart_dim_month",
     "mart_dim_department",
     "mart_dim_country",

@@ -50,6 +50,18 @@ import reference_data as ref
 SEED = 20261009
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "data" / "raw"
+
+# Release 6: `--simulate-through DATE --out DIR` runs the day-by-day simulation on past the report date, to the
+# month-end of DATE, and writes every table to DIR. Only core_hr_extract.py uses it, to take the Core HR rows
+# after the report date. Every reporting section (positions, recruiting, plans, contingent workers, the report
+# calendar) still stops at the report month-end, and a plain run is unchanged.
+import argparse
+_cli = argparse.ArgumentParser(description="Generate the Arcadia raw tables.")
+_cli.add_argument("--simulate-through", type=dt.date.fromisoformat, default=None)
+_cli.add_argument("--out", type=Path, default=None)
+ARGS = _cli.parse_args()
+if ARGS.out:
+    OUT_DIR = ARGS.out
 rng = np.random.default_rng(SEED)
 name_rng = np.random.default_rng(SEED + 1)   # names draw from their own stream, so they never shift the simulation
 
@@ -104,7 +116,8 @@ def anniversary(hire: dt.date, year: int) -> dt.date:
 
 MONTH_ENDS: list[dt.date] = []
 _d = dt.date.fromisoformat(ref.FIRST_SNAPSHOT)
-while _d <= dt.date.fromisoformat(ref.LAST_SNAPSHOT):
+_sim_end = max(dt.date.fromisoformat(ref.LAST_SNAPSHOT), ARGS.simulate_through or dt.date.min)
+while _d <= month_end(_sim_end.year, _sim_end.month):
     MONTH_ENDS.append(_d)
     _d = month_end((_d + ONE_DAY).year, (_d + ONE_DAY).month)
 
@@ -118,7 +131,7 @@ DEPT = {d[0]: dict(zip(["id", "name", "sub_function", "function", "families", "p
 REORG_DATE = dt.date.fromisoformat(ref.REORGANIZATION["date"])
 RESTRUCTURE_DATE = dt.date.fromisoformat(ref.RESTRUCTURING["date"])
 CONVERSION_DATE = dt.date.fromisoformat(ref.COMP_CONVERSION_DATE)
-FIRST_ME, LAST_ME = MONTH_ENDS[0], MONTH_ENDS[-1]
+FIRST_ME, LAST_ME = MONTH_ENDS[0], dt.date.fromisoformat(ref.LAST_SNAPSHOT)   # the report month-end
 
 
 # ======================================================================================
@@ -1516,6 +1529,8 @@ for _r in req_rows.values():
 # Written after the simulation from what happened, so they never change it. The plan is
 # drawn around the actuals with an error that shrinks with each reforecast; candidates
 # are the applicant pipeline behind each requisition.
+# Everything below reports at the report month-end, even when the simulation ran on (--simulate-through).
+MONTH_ENDS = [me for me in MONTH_ENDS if me <= LAST_ME]
 QUARTER_ENDS = [me for me in MONTH_ENDS if me.month in (3, 6, 9, 12) and fiscal_year(me) > fiscal_year(FIRST_ME)]
 FRINGE_RATE = {(r["country_code"], r["year"]): r["fringe_rate"] for r in fringe_research.build()[0]}
 
@@ -1921,7 +1936,7 @@ write(pd.DataFrame(fringe_cites).drop_duplicates(), "ref_fringe_source")
 # Release 3: where every raw table comes from (Keystone HR, Bridgeway VMS, the integration
 # log, public reference data) and the column contract of every table release 3 adds.
 # Release 5: the report calendar, every date label the dashboards show, from the one as-of date
-for _name, _df in report_calendar.build(LAST_ME).items():
+for _name, _df in report_calendar.build(LAST_ME, data_through=dt.date.fromisoformat(ref.DATA_THROUGH)).items():
     write(_df, _name)
 write(pd.DataFrame(source_systems.SOURCE_SYSTEMS), "ref_source_system")
 write(pd.DataFrame(source_systems.lineage_rows()), "ref_raw_table_lineage")
@@ -2031,5 +2046,5 @@ _plan = pd.concat([_plan, contingent_workforce.forward_plan_line(
     ignore_index=True)
 write(_plan, "fact_workforce_plan")
 
-print(f"Active headcount at {LAST_ME}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
+print(f"Active headcount at {month_end(_sim_end.year, _sim_end.month)}: {len(active):,}  |  workers ever employed: {len(workers):,}  |  "
       f"people managers: {sum(1 for w in active.values() if w['is_pm']):,}")

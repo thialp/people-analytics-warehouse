@@ -2,6 +2,8 @@
   05_validate.sql
   Control checks after the build. Every "expected" value below comes from the
   DuckDB pipeline in this repo, so SQL Server and the published CSVs must agree.
+  Release 6: workers, jobs and pay run to the data-through date (Jul 5, 2026), so their
+  row counts include the 79 hires and the job and pay records of Jul 1-5, 2026.
 */
 SET NOCOUNT ON;
 USE ArcadiaHR;
@@ -11,10 +13,10 @@ PRINT '1. Row counts';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'dw.DimWorker rows'                   AS check_name, (SELECT COUNT(*) FROM dw.DimWorker)               AS actual, 46980   AS expected
-    UNION ALL SELECT 'dw.FactJobHistory rows',                            (SELECT COUNT(*) FROM dw.FactJobHistory),                    96129
-    UNION ALL SELECT 'dw.FactCompensationHistory rows',                   (SELECT COUNT(*) FROM dw.FactCompensationHistory),           185063
-    UNION ALL SELECT 'corrected pay records resolved',                    (SELECT COUNT(*) FROM dw.FactCompensationHistory WHERE WasCorrected = 1), 1128
+              SELECT 'dw.DimWorker rows'                   AS check_name, (SELECT COUNT(*) FROM dw.DimWorker)               AS actual, 47056   AS expected
+    UNION ALL SELECT 'dw.FactJobHistory rows',                            (SELECT COUNT(*) FROM dw.FactJobHistory),                    98120
+    UNION ALL SELECT 'dw.FactCompensationHistory rows',                   (SELECT COUNT(*) FROM dw.FactCompensationHistory),           187363
+    UNION ALL SELECT 'corrected pay records resolved',                    (SELECT COUNT(*) FROM dw.FactCompensationHistory WHERE WasCorrected = 1), 1138
     UNION ALL SELECT 'dw.FactPerformanceReview rows',                     (SELECT COUNT(*) FROM dw.FactPerformanceReview),             154151
     UNION ALL SELECT 'dw.FactBonusPayout rows',                           (SELECT COUNT(*) FROM dw.FactBonusPayout),                   154151
     UNION ALL SELECT 'dw.MonthEndCalendar rows',                          (SELECT COUNT(*) FROM dw.MonthEndCalendar),                  61

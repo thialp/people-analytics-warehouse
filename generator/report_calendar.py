@@ -68,8 +68,13 @@ def _months_label(start: dt.date, end: dt.date) -> str:
     return f"{_MONTH[start.month - 1]} {start.year % 100:02d} - {_MONTH[end.month - 1]} {end.year % 100:02d}"
 
 
-def build(as_of: dt.date, budget_month_day: tuple[int, int] = (5, 15)) -> dict[str, pd.DataFrame]:
-    """Both calendar tables for a report as-of date, which must be a fiscal quarter end."""
+def build(as_of: dt.date, budget_month_day: tuple[int, int] = (5, 15),
+          data_through: dt.date | None = None) -> dict[str, pd.DataFrame]:
+    """Both calendar tables for a report as-of date, which must be a fiscal quarter end. Release 6: data_through is
+    the last day Keystone's Core HR extract covers (on or after the as-of date; the as-of date if not given)."""
+    data_through = data_through or as_of
+    if data_through < as_of:
+        raise ValueError(f"The data-through date {data_through} is before the report as-of date {as_of}")
     cur_fy = fiscal_year(as_of)
     cur_q = (as_of.month - FY_START_MONTH) % 12 // 3 + 1
     if _quarter_bounds(cur_fy, cur_q)[1] != as_of:
@@ -82,6 +87,8 @@ def build(as_of: dt.date, budget_month_day: tuple[int, int] = (5, 15)) -> dict[s
     calendar = pd.DataFrame([{
         "report_as_of_date": as_of,
         "report_as_of_label": day_label(as_of),
+        "data_through_date": data_through,
+        "data_through_label": day_label(data_through),
         "current_fiscal_year": cur_fy,
         "current_fiscal_year_label": fy_label(cur_fy),
         "forward_fiscal_year": fwd_fy,
