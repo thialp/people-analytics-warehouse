@@ -30,5 +30,9 @@ SELECT
     v.sequential_effect_usd,
     v.order_bias_usd,
     v.opening_headcount,
-    v.closing_headcount
+    v.closing_headcount,
+    v.opening_employees,
+    v.closing_employees,
+    v.opening_contingent,
+    v.closing_contingent
 FROM rpt.vw_workforce_cost_growth_mix AS v

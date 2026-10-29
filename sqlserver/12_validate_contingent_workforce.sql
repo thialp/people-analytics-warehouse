@@ -151,6 +151,16 @@ FROM (
     UNION ALL SELECT 'growth mix FY26: volume effect, company (whole dollars)',
                      (SELECT CAST(ROUND(shapley_effect_usd, 0) AS BIGINT) FROM rpt.vw_workforce_cost_growth_mix
                       WHERE to_month_end = '2026-06-30' AND view_name = 'Company' AND factor = 'Volume'), 307094838
+    UNION ALL SELECT 'growth mix: rows where employees + contingent is not the headcount',
+                     (SELECT COUNT(*) FROM rpt.vw_workforce_cost_growth_mix
+                      WHERE opening_employees + opening_contingent <> opening_headcount
+                         OR closing_employees + closing_contingent <> closing_headcount), 0
+    UNION ALL SELECT 'growth mix FY26: closing employees, company',
+                     (SELECT closing_employees FROM rpt.vw_workforce_cost_growth_mix
+                      WHERE to_month_end = '2026-06-30' AND view_name = 'Company' AND factor = 'Closing cost'), 30005
+    UNION ALL SELECT 'growth mix FY26: closing contingent workers, company',
+                     (SELECT closing_contingent FROM rpt.vw_workforce_cost_growth_mix
+                      WHERE to_month_end = '2026-06-30' AND view_name = 'Company' AND factor = 'Closing cost'), 11941
 ) AS c;
 GO
 

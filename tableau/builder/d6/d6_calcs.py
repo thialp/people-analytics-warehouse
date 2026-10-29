@@ -46,6 +46,7 @@ def all_calcs():
         ('S Constant Txt', smoney('[S Constant Change]')), ('S Currency Abs Txt', money('[S Currency]')),
         ('S Workforce Num', snum('[S Workforce]')), ('S Location Num', snum('[S Location]')), ('S Level Num', snum('[S Level]')),
         ('S HC Open Str', fill(P['Comma'], '[S HC Open]')), ('S HC Close Str', fill(P['Comma'], '[S HC Close]')),
+        ('S Emp Close Str', fill(P['Comma'], '[S Emp Close]')), ('S CW Close Str', fill(P['Comma'], '[S CW Close]')),
         ('S HC Change Str', f'(IF [S HC Change] >= 0 THEN "+" ELSE "−" END) + {fill(P["Comma"], "[S HC Change]")}'),
         ('S Change Pct Str', f'(IF ROUND([S Change Pct] * 100, 1) >= 0 THEN "+" ELSE "−" END) + {fill(P["Pct1"], "[S Change Pct]")} + "%"'),
         ('S Vol Share Str', 'STR(INT(ROUND([S Vol Share] * 100, 0))) + "%"'),

@@ -105,7 +105,7 @@ GO
 /* ------------------------------------------------------------------ growth mix
    Year-over-year total workforce cost (employees' loaded pay + contingent bill run-rate) split
    into volume, workforce mix, location mix, level mix, rate and currency, by Shapley values and
-   sequentially. Precomputed in dw.WorkforceCostGrowthMix (03c_build_dw_contingent.sql).
+   sequentially. Precomputed in dw.WorkforceCostGrowthMix (03f_build_dw_cost_growth_mix.sql).
    Methodology: docs/projects/workforce-cost-bridge/methodology.md */
 CREATE OR ALTER VIEW rpt.vw_workforce_cost_growth_mix AS
 SELECT
@@ -124,7 +124,11 @@ SELECT
     g.SequentialEffectUsd                      AS sequential_effect_usd,
     g.OrderBiasUsd                             AS order_bias_usd,
     g.OpeningHeadcount                         AS opening_headcount,
-    g.ClosingHeadcount                         AS closing_headcount
+    g.ClosingHeadcount                         AS closing_headcount,
+    g.OpeningEmployees                         AS opening_employees,
+    g.ClosingEmployees                         AS closing_employees,
+    g.OpeningContingent                        AS opening_contingent,
+    g.ClosingContingent                        AS closing_contingent
 FROM dw.WorkforceCostGrowthMix AS g;
 GO
 

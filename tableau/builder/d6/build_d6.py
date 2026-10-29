@@ -106,8 +106,8 @@ s = new('Bridge Title')
 s.pane('Text', enc=ZZ, valign='top', label=[
     [('From ', 'bold', 13, NAVY), ('{S Opening Txt}', 'bold', 13, SLATE), (' to ', 'bold', 13, NAVY), ('{S Closing Txt}', 'bold', 13, PLUM),
      (', one factor at a time', 'bold', 13, NAVY)],
-    [("Each factor's average effect over every order of the six steps, $M; the axis starts at ", 'book', 10, SLATE),
-     ('{Floor Text|attr}', 'semi', 10, NAVY), (' so the factors are visible', 'book', 10, SLATE)]])
+    [("Each factor's average effect over every order of the steps, $M · the axis starts at ", 'book', 10, SLATE),
+     ('{Floor Text|attr}', 'semi', 10, NAVY)]])
 
 s = new('Bridge', deselect=False)
 s.filter_member('In Selection', 'true')
@@ -210,14 +210,14 @@ s.pane('Text', enc=ZZ, valign='top', label=[[('{Year Note|attr}', 'book', 9, SLA
 # ===================================================================================================== rail controls
 
 
-def control(name, shape=None, shape_field=None, lod=(), label=None, tip=None, size='12', mark='Shape', align='left'):
+def control(name, shape=None, shape_field=None, lod=(), label=None, tip=None, size='12', mark='Shape', align='left', valign='center'):
     s = new(name)
     enc = ZZ + [('lod', n, 'agg' if m.level(n) == 'agg' else ('ord' if m.role(n)[1] == 'ordinal' else 'dim')) for n in lod]
     if shape_field:
         enc.append(('shape', shape_field, 'dim'))
     fmt = f"<format attr='shape' value='{shape}' />" if shape else ''
     s.pane(mark, enc=enc, label=label, size=size if mark == 'Shape' else None, transparency='255', stroke='false',
-           extra_mark_fmt=fmt, align=align, tooltip=[[(tip, 'book', 9, SLATE)]] if tip else None)
+           extra_mark_fmt=fmt, align=align, valign=valign, tooltip=[[(tip, 'book', 9, SLATE)]] if tip else None)
     return s
 
 
@@ -229,7 +229,9 @@ for nm, lab in (('Date This', [[('{To Date Text|attr}', 'semi', 9, WHITE)]]), ('
 control('Org Field', shape_field='Org Capsule Shape', lod=('Toggle Org Panel', 'Close Panel'), size='11.5',
         label=[[('        {Org Text Light}', 'semi', 10, NAVY), ('{Org Text Dark}', 'medium', 10, PALE2)]],
         tip='Choose all of Arcadia or one function')
-control('Org Sub', mark='Text', label=[[('{Org Sub Text}', 'book', 9, '#8a97a8')]])
+control('Org Sub', mark='Text', valign='top', label=[[('{Org Sub Text}', 'book', 9, '#8a97a8')],
+                                                   [('{S Emp Close Str}', 'semi', 9, PALE2), ('{Org Sub Emp|attr}', 'book', 9, '#8a97a8')],
+                                                   [('{S CW Close Str}', 'semi', 9, PALE2), ('{Org Sub CW|attr}', 'book', 9, '#8a97a8')]])
 control('Reset', shape='Arcadia D4/d4_reset.png', lod=('Zero Pair', 'Default Group', 'Default Span', 'Close Panel'), size='11.5',
         tip='Reset to default view', align='center')
 control('Info Button', shape_field='Info Shape', lod=('Toggle Info', 'Close Panel'), size='2', align='center',
@@ -440,8 +442,8 @@ zones.append(sheet_zone('Period Field', 14, 124, 188, 30))
 for key, sheet, y, h in (('This', 'Date This', 172, 22), ('Against', 'Date Against', 198, 22), ('Span', 'Date Span', 224, 36)):
     zones.append(text_zone(14, y, 62, h, [(key, MUTED, 9, 'Book')], pad=(3, 0, 0, 4)))
     zones.append(sheet_zone(sheet, 76, y, 136, h))
-zones += [sheet_zone('Org Field', 14, 310, 188, 30), sheet_zone('Org Sub', 14, 348, 190, 18),
-          image_zone(D4IMG + 'arcadia_rail_divider.png', 14, 386, 188, 24), sheet_zone('Reset', 14, 422, 188, 30),
+zones += [sheet_zone('Org Field', 14, 310, 188, 30), sheet_zone('Org Sub', 14, 346, 190, 52),
+          image_zone(D4IMG + 'arcadia_rail_divider.png', 14, 412, 188, 24), sheet_zone('Reset', 14, 452, 188, 30),
           sheet_zone('Rail As Of', 14, 762, 190, 60)]
 
 VIS = {}

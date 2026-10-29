@@ -374,6 +374,18 @@ MIN(IF [In Selection] THEN [closing_headcount] END)
 // S HC Change
 [S HC Close] - [S HC Open]
 
+// S Emp Close
+MIN(IF [In Selection] THEN [closing_employees] END)
+
+// S CW Close
+MIN(IF [In Selection] THEN [closing_contingent] END)
+
+// S CW Share Open
+MIN(IF [In Selection] THEN [opening_contingent] END) / [S HC Open]
+
+// S CW Share Close
+[S CW Close] / [S HC Close]
+
 // S Vol Share
 [S Volume] / [S Change]
 
@@ -412,6 +424,7 @@ Text fields (the pattern of 4.4 on each number):
 | `S Currency Abs Txt` | Money | `[S Currency]` |
 | `S Workforce Num`, `S Location Num`, `S Level Num` | Signed number | `[S Workforce]`, `[S Location]`, `[S Level]` |
 | `S HC Open Str`, `S HC Close Str` | Comma | `[S HC Open]`, `[S HC Close]` |
+| `S Emp Close Str`, `S CW Close Str` | Comma | `[S Emp Close]`, `[S CW Close]` |
 | `S HC Change Str` | Sign + Comma (sign on `[S HC Change]`, whole number) | `[S HC Change]` |
 | `S Change Pct Str` | Sign + Pct1 + "%" | `[S Change Pct]` |
 | `S Vol Share Str` | `STR(INT(ROUND(x * 100, 0))) + "%"` | `[S Vol Share]` |
@@ -537,10 +550,9 @@ ELSE (IF SUM([Effect M]) < 0 THEN "−" ELSE "+" END) + STR(INT(ROUND(ABS(SUM([E
 
 // Rib Mix Dir
 IF ABS(SUM([Effect M])) < 0.05 THEN "no real shift"
-ELSEIF SUM([Effect M]) > 0 THEN
-  CASE MIN([factor_order]) WHEN 4 THEN "shift to higher grades" WHEN 3 THEN "shift to costlier countries" ELSE "shift to costlier workers" END
-ELSE
-  CASE MIN([factor_order]) WHEN 4 THEN "shift to lower grades" WHEN 3 THEN "shift to cheaper countries" ELSE "shift to cheaper workers" END
+ELSEIF MIN([factor_order]) = 2 THEN (IF [S CW Share Close] >= [S CW Share Open] THEN "more contingent" ELSE "more employees" END)
+ELSEIF MIN([factor_order]) = 3 THEN (IF SUM([Effect M]) > 0 THEN "higher-cost countries" ELSE "lower-cost countries" END)
+ELSE (IF SUM([Effect M]) > 0 THEN "more senior grades" ELSE "more junior grades" END)
 END
 
 // Rib Note
@@ -602,9 +614,9 @@ Expected, default: More people **+$307.1M** · 76% · +2,801 people | Higher rat
 
 The headline (6.1) already states the answer, so the bridge's title says what the chart shows.
 
-Sheet **Bridge Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `From ` Tableau Bold 13 navy `#13233A` · `<S Opening Txt>` Bold 13 slate `#5A6170` · ` to ` Bold 13 navy · `<S Closing Txt>` Bold 13 plum `#5B3A63` · `, one factor at a time` Bold 13 navy. Line 2: `Each factor's average effect over every order of the six steps, $M; the axis starts at ` Tableau Book 10 slate `#5A6170` · `<ATTR(Floor Text)>` Semibold 10 navy · ` so the factors are visible` Book 10 slate.
+Sheet **Bridge Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `From ` Tableau Bold 13 navy `#13233A` · `<S Opening Txt>` Bold 13 slate `#5A6170` · ` to ` Bold 13 navy · `<S Closing Txt>` Bold 13 plum `#5B3A63` · `, one factor at a time` Bold 13 navy. Line 2: `Each factor's average effect over every order of the steps, $M · the axis starts at ` Tableau Book 10 slate `#5A6170` · `<ATTR(Floor Text)>` Semibold 10 navy (short enough for the longest floor, "$290M", to stay on one line).
 
-Expected: "From **$4,245.2M** to **$4,648.1M**, one factor at a time" / "… the axis starts at **$4.0B** so the factors are visible".
+Expected: "From **$4,245.2M** to **$4,648.1M**, one factor at a time" / "… the axis starts at **$4.0B**".
 
 ### 7.2 The axis floor
 
@@ -963,6 +975,12 @@ IF [Is Company] THEN [Org Field Text] END
 // Org Sub Text
 <Comma on [S HC Close]> + " people on " + MIN([To Date Text])
 
+// Org Sub Emp
+" employees (FTE)"
+
+// Org Sub CW
+" contingent workers"
+
 // Toggle Period Panel
 NOT [p_PeriodOpen]
 
@@ -996,7 +1014,7 @@ Each: Detail `zzTrue`, `zzFalse`; tooltip off.
 |---|---|---|---|---|
 | **Period Field** | `d4_field_capsule.png` (always white: the period is always a choice) | `<Period Field Text>` Tableau Semibold 9 navy `#13233A`, left | `Toggle Period Panel`, `Close Panel`, `zzTrue`, `zzFalse` | "Choose the two dates to compare" |
 | **Org Field** | `Org Capsule Shape` | `<Org Text Light>` Tableau Semibold 9 navy `#13233A` + `<Org Text Dark>` Tableau Medium 9 `#E4E9F0`, left | `Toggle Org Panel`, `Close Panel`, `zzTrue`, `zzFalse` | "Choose all of Arcadia or one function" |
-| **Org Sub** | none (Text) | `<Org Sub Text>` Tableau Book 8 `#8A97A8` | `zzTrue`, `zzFalse` | off |
+| **Org Sub** | none (Text) | Three lines: `<Org Sub Text>` Tableau Book 9 `#8A97A8`; `<S Emp Close Str>` Tableau Semibold 9 `#E4E9F0` + ` employees (FTE)` Book 9 `#8A97A8`; `<S CW Close Str>` Semibold 9 `#E4E9F0` + ` contingent workers` Book 9 `#8A97A8` (every Arcadia employee is full time, so employees = FTE) | `zzTrue`, `zzFalse` | off |
 | **Reset** | `d4_reset.png` | none | `Zero Pair`, `Default Group`, `Close Panel`, `zzTrue`, `zzFalse` | "Reset to default view" |
 | **Info Button** | `Info Shape` | none | `Toggle Info`, `Close Panel`, `zzTrue`, `zzFalse` | "How the bridge works" |
 | **Rail As Of** | none (Text) | `<Rail Line 1>` Tableau Semibold 9 `#E4E9F0` / `USD at month-end ECB rates` Tableau Book 9 `#B9C3D1` / `Employees and contingent workers` Tableau Book 9 `#B9C3D1` | `zzTrue`, `zzFalse` | off |
@@ -1376,3 +1394,11 @@ python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workfor
 | The text in the Compare and Organization pills touched the pill's left curve | Eight leading spaces in both labels, so the text starts inside the pill |
 | Reset still too small | Shape size 11.5, the same as the two pills, in a 30 px zone |
 | The ribbon order did not match the bridge below it | The ribbon follows `factor_order`, the bridge's order: people, worker mix, country mix, grade mix, rates, exchange rates. The mix cells get a note that changes with the pick: the share of the change and the way the mix moved (`Rib Mix Share`, `Rib Mix Dir`), for example "+6% · shift to higher grades", or "no real shift" under $0.05M |
+
+**Build 9 review (2026-10-29), carried into build 10.**
+
+| Seen in build 9 | Changed |
+|---|---|
+| The bridge subtitle truncated when the axis floor was in millions ("$290M") | Shorter line: "Each factor's average effect over every order of the steps, $M · the axis starts at $290M" |
+| The rail gave only total people under Organization | Three lines: people, employees (FTE), contingent workers at the later date. Needs release 6.1: `opening_employees`, `closing_employees`, `opening_contingent`, `closing_contingent` added to the mart, `dw.WorkforceCostGrowthMix` (now built alone by `sqlserver/03f_build_dw_cost_growth_mix.sql`), the view and the Custom SQL; three new checks in 12. Divider and Reset move down to make room |
+| "Cheaper" read as cheap, and the country note was crowded | Shorter notes without "shift to": "+6% · more senior grades", "−2% · lower-cost countries", "−1% · more contingent". The worker note now says which way the contingent share moved (from the new headcounts), not just whether cost rose |

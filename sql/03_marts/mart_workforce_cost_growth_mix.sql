@@ -159,7 +159,11 @@ balances AS (
 
 heads AS (
     SELECT from_month_end, to_month_end, view_name, group_name,
-           SUM(n0) AS opening_headcount, SUM(n1) AS closing_headcount
+           SUM(n0) AS opening_headcount, SUM(n1) AS closing_headcount,
+           SUM(n0) FILTER (WHERE t = 'Employee')   AS opening_employees,
+           SUM(n1) FILTER (WHERE t = 'Employee')   AS closing_employees,
+           SUM(n0) FILTER (WHERE t = 'Contingent') AS opening_contingent,
+           SUM(n1) FILTER (WHERE t = 'Contingent') AS closing_contingent
     FROM factors GROUP BY ALL
 ),
 
@@ -194,7 +198,11 @@ SELECT
     CAST(ROUND(l.sequential, 2) AS DECIMAL(18, 2))                     AS sequential_effect_usd,
     CAST(ROUND(l.sequential - l.shapley, 2) AS DECIMAL(18, 2))         AS order_bias_usd,
     h.opening_headcount,
-    h.closing_headcount
+    h.closing_headcount,
+    COALESCE(h.opening_employees, 0)                                   AS opening_employees,
+    COALESCE(h.closing_employees, 0)                                   AS closing_employees,
+    COALESCE(h.opening_contingent, 0)                                  AS opening_contingent,
+    COALESCE(h.closing_contingent, 0)                                  AS closing_contingent
 FROM lines AS l
 JOIN pairs AS p ON p.to_month_end = l.to_month_end
 JOIN heads AS h
