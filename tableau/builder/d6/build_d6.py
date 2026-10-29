@@ -67,8 +67,8 @@ def no_field_labels(s, scope):
 s = new('Page Title')
 s.pane('Text', enc=ZZ, valign='top', label=[
     [('WORKFORCE COST BRIDGE', 'semi', 10, PLUM)],
-    [('{Head Verb}', 'bold', 22, INK), ('{S Change Abs Txt}', 'bold', 22, PLUM), (' to ', 'bold', 22, INK), ('{S Closing Txt}', 'bold', 22, PLUM),
-     ('{Head Mid}', 'bold', 22, INK), ('{Head Pct}', 'bold', 22, PLUM), ('{Head Of}', 'bold', 22, INK), ('{Head Driver}', 'bold', 22, PLUM)],
+    [('{Head Verb}', 'bold', 20, INK), ('{S Change Abs Txt}', 'bold', 20, PLUM), (' to ', 'bold', 20, INK), ('{S Closing Txt}', 'bold', 20, PLUM),
+     ('{Head Mid}', 'bold', 20, INK), ('{Head Pct}', 'bold', 20, PLUM), ('{Head Of}', 'bold', 20, INK), ('{Head Driver}', 'bold', 20, PLUM)],
     [('{From Date Text|attr}', 'semi', 11, NAVY), (' to ', 'book', 11, SLATE), ('{To Date Text|attr}', 'semi', 11, NAVY),
      (' · {S Change Pct Str} · {Scope Words|attr} · {S HC Open Str} to {S HC Close Str} people · nominal USD', 'book', 11, SLATE)]])
 
@@ -89,17 +89,17 @@ def ribbon(name):
 
 s, ro = ribbon('Ribbon Top')
 s.pane('Text', enc=ZZ + [('color', 'Cell Kind', 'agg')], valign='top', tooltip=RIB_TIP,
-       label=[[('{Rib Name}', 'book', 10, SLATE)], [('{Rib Value}', 'bold', 20, None)]])
+       label=[[('  {Rib Name}', 'book', 10, SLATE)], [('  {Rib Value}', 'bold', 20, None)]])
 s, ro = ribbon('Ribbon Bars')
 z0 = s.f('Rib Zero', 'agg')
 s.cols = f'({ro} / {z0})'
-axis_rules = [f"<encoding attr='space' class='0' field='{z0}' field-type='quantitative' max='1' min='0' range-type='fixed' scope='cols' type='space' />",
+axis_rules = [f"<encoding attr='space' class='0' field='{z0}' field-type='quantitative' max='1.07' min='-0.07' range-type='fixed' scope='cols' type='space' />",
               f"<format attr='display' class='0' field='{z0}' scope='cols' value='false' />", "<format attr='tick-color' value='#00000000' />"]
 s.axis_rules += axis_rules
-s.pane('GanttBar', enc=ZZ + [('color', 'Rib Bar Kind', 'agg'), ('size', 'Rib Bar Size', 'agg')], size='1', transparency='255',
+s.pane('GanttBar', enc=ZZ + [('color', 'Rib Bar Kind', 'agg'), ('size', 'Rib Bar Size', 'agg')], size='0.6', transparency='255',
        stroke='false', tooltip=RIB_TIP, refs=s.refband(0, z0, 0, 1, TRACK))
 s, ro = ribbon('Ribbon Note')
-s.pane('Text', enc=ZZ, valign='top', label=[[('{Rib Note}', 'book', 9, SLATE)]])
+s.pane('Text', enc=ZZ, valign='top', label=[[('  {Rib Note}', 'book', 9, SLATE)]])
 
 # ===================================================================================================== bridge
 s = new('Bridge Title')
@@ -141,7 +141,7 @@ s.pane('Text', pane_id=4, y_axis=ly, order=ORDER, align='center', valign='center
 s = new('Bias Title')
 s.pane('Text', enc=ZZ, valign='top', label=[
     [('{Bias Lead}', 'bold', 14, NAVY), ('{Bias Amount}', 'bold', 14, PLUM)],
-    [('Shapley averages every order of the six steps; one fixed order (volume first, currency last) shifts the credit, $M', 'book', 10, SLATE)]])
+    [('Shapley against one fixed order (volume first, currency last), $M', 'book', 10, SLATE)]])
 
 
 def bias_sheet(name, deselect=True):
@@ -212,8 +212,9 @@ def control(name, shape=None, shape_field=None, lod=(), label=None, tip=None, si
 
 control('Period Field', shape='Arcadia D4/d4_field_capsule.png', lod=('Toggle Period Panel', 'Close Panel'),
         label=[[('    {Period Field Text}', 'semi', 9, NAVY)]], tip='Choose the two dates to compare')
-control('Period Dates', mark='Text', label=[[('{To Date Text|attr}', 'semi', 9, WHITE)], [('{From Date Text|attr}', 'semi', 9, WHITE)],
-                                            [('{Span Words|attr}', 'book', 9, MIST)]])
+control('Date This', mark='Text', label=[[('{To Date Text|attr}', 'semi', 9, WHITE)]])
+control('Date Against', mark='Text', label=[[('{From Date Text|attr}', 'semi', 9, WHITE)]])
+control('Date Span', mark='Text', label=[[('{Span Line 1|attr}', 'book', 9, MIST)], [('{Span Line 2|attr}', 'book', 9, MIST)]])
 control('Org Field', shape_field='Org Capsule Shape', lod=('Toggle Org Panel', 'Close Panel'),
         label=[[('    {Org Text Light}', 'semi', 9, NAVY), ('{Org Text Dark}', 'medium', 9, PALE2)]],
         tip='Choose all of Arcadia or one function')
@@ -382,42 +383,42 @@ def image_zone(path, px, py, pw, ph):
     return f"<zone {z(px, py, pw, ph)} id='{nid()}' is-centered='0' is-scaled='1' param='{xesc(path)}' type-v2='bitmap' />"
 
 
-zones = [sheet_zone('Page Title', 240, 12, 1136, 112)]
-zones.append(rule_zone(240, 134, 1136, 2, PLUM))
-zones += [sheet_zone('Ribbon Top', 240, 142, 1136, 56), sheet_zone('Ribbon Bars', 240, 200, 1136, 14),
-          sheet_zone('Ribbon Note', 240, 216, 1136, 24)]
-zones.append(rule_zone(240, 246, 1136, 1, RULE))
+zones = [sheet_zone('Page Title', 240, 12, 1136, 116)]
+zones.append(rule_zone(240, 136, 1136, 2, PLUM))
+zones += [sheet_zone('Ribbon Top', 240, 144, 1136, 60), sheet_zone('Ribbon Bars', 240, 208, 1136, 12),
+          sheet_zone('Ribbon Note', 240, 222, 1136, 22)]
+zones.append(rule_zone(240, 252, 1136, 1, RULE))
 for k in range(1, 6):
-    zones.append(rule_zone(round(240 + k * 1136 / 6), 142, 1, 98, RULE))
-zones.append(rule_zone(240, 262, 708, 2, PLUM))
-zones += [sheet_zone('Bridge Title', 240, 272, 708, 52), sheet_zone('Bridge', 240, 328, 708, 456)]
-zones.append(text_zone(240, 790, 708, 18, [('Plum adds cost', PLUM, 9, 'Semibold'), (', ', SLATE, 9, 'Book'),
+    zones.append(rule_zone(round(240 + k * 1136 / 6), 146, 1, 100, RULE))
+zones.append(rule_zone(240, 266, 708, 2, PLUM))
+zones += [sheet_zone('Bridge Title', 240, 276, 708, 54), sheet_zone('Bridge', 240, 334, 708, 452)]
+zones.append(text_zone(240, 792, 708, 18, [('Plum adds cost', PLUM, 9, 'Semibold'), (', ', SLATE, 9, 'Book'),
                                             ('sand takes it away', SAND_D, 9, 'Semibold'),
                                             ('; the six effects add up to the change exactly.', SLATE, 9, 'Book')]))
-zones.append(rule_zone(988, 262, 388, 2, PLUM))
-zones.append(sheet_zone('Bias Title', 988, 272, 388, 58))
+zones.append(rule_zone(988, 266, 388, 2, PLUM))
+zones.append(sheet_zone('Bias Title', 988, 276, 388, 80))
 for (lbl, x0, w0, al) in (('Factor', 988, 104, 'left'), ('Shapley', 1092, 68, 'right'), ('Fixed order', 1160, 76, 'right'), ('Bias', 1236, 140, 'center')):
-    zones.append(text_zone(x0, 334, w0, 16, [(lbl, AXIS, 9, 'Book')])
+    zones.append(text_zone(x0, 360, w0, 16, [(lbl, AXIS, 9, 'Book')])
                  .replace("<run fontcolor", f"<run fontalignment='{ {'left': 0, 'center': 1, 'right': 2}[al] }' fontcolor", 1))
 for name, x0, w0 in (('Bias Names', 988, 104), ('Bias Shapley', 1092, 68), ('Bias Seq', 1160, 76), ('Bias Bars', 1236, 140)):
-    zones.append(sheet_zone(name, x0, 352, w0, 150))
-zones.append(rule_zone(988, 520, 388, 2, PLUM))
-zones += [sheet_zone('Year Title', 988, 530, 388, 62), sheet_zone('Year Table', 988, 594, 388, 194), sheet_zone('Year Note', 988, 790, 388, 20)]
-zones.append(text_zone(240, 826, 1136, 16, [(
+    zones.append(sheet_zone(name, x0, 378, w0, 144))
+zones.append(rule_zone(988, 536, 388, 2, PLUM))
+zones += [sheet_zone('Year Title', 988, 546, 388, 76), sheet_zone('Year Table', 988, 624, 388, 176), sheet_zone('Year Note', 988, 802, 388, 18)]
+zones.append(text_zone(240, 828, 1136, 16, [(
     'Arcadia Systems is fictional; all data is synthetic. Executive officers excluded. Effects are Shapley values: each '
     "factor's average effect over every order of the six steps, so they add up to the change.", SLATE, 9, 'Book')]))
 zones.append(rule_zone(0, 0, 216, 850, NAVY))
-zones.append(image_zone(D4IMG + 'arcadia_logo_horizontal_reverse.png', 8, 24, 160, 40))
-zones.append(sheet_zone('Info Button', 180, 30, 28, 28))
-for lbl, y in (('COMPARE', 92), ('ORGANIZATION', 212)):
-    zones.append(text_zone(8, y, 200, 16, [(lbl, '#b8c4d6', 8, 'Semibold')], pad=(0, 0, 0, 4)))
-zones += [sheet_zone('Period Field', 8, 110, 200, 32),
-          text_zone(8, 148, 56, 50, [('This', MUTED, 9, 'Book'), ('\n', None, None, None), ('Against', MUTED, 9, 'Book'),
-                                     ('\n', None, None, None), ('Span', MUTED, 9, 'Book')], pad=(3, 0, 0, 4)),
-          sheet_zone('Period Dates', 64, 148, 144, 50),
-          sheet_zone('Org Field', 8, 230, 200, 32), sheet_zone('Org Sub', 8, 262, 200, 20),
-          image_zone(D4IMG + 'arcadia_rail_divider.png', 8, 292, 200, 24), sheet_zone('Reset', 8, 322, 200, 32),
-          sheet_zone('Rail As Of', 8, 760, 200, 66)]
+zones.append(image_zone(D4IMG + 'arcadia_logo_horizontal_reverse.png', 12, 24, 156, 40))
+zones.append(sheet_zone('Info Button', 178, 30, 28, 28))
+for lbl, y in (('COMPARE', 96), ('ORGANIZATION', 248)):
+    zones.append(text_zone(12, y, 192, 16, [(lbl, '#b8c4d6', 8, 'Semibold')], pad=(0, 0, 0, 4)))
+zones.append(sheet_zone('Period Field', 12, 116, 192, 32))
+for key, sheet, y, h in (('This', 'Date This', 160, 18), ('Against', 'Date Against', 178, 18), ('Span', 'Date Span', 196, 32)):
+    zones.append(text_zone(12, y, 60, h, [(key, MUTED, 9, 'Book')], pad=(2, 0, 0, 4)))
+    zones.append(sheet_zone(sheet, 76, y, 128, h))
+zones += [sheet_zone('Org Field', 12, 268, 192, 32), sheet_zone('Org Sub', 12, 304, 192, 18),
+          image_zone(D4IMG + 'arcadia_rail_divider.png', 12, 338, 192, 24), sheet_zone('Reset', 12, 374, 192, 32),
+          sheet_zone('Rail As Of', 12, 740, 192, 86)]
 
 VIS = {}
 
@@ -443,9 +444,9 @@ def popover(name, param, px, py, pw, ph, title, body, footer):
     return hide_all(x)
 
 
-zones.append(popover('Period', 'p_PeriodOpen', 216, 132, 360, 470, 'Compare', sheet_zone('Pair List', 228, 177, 348, 395),
+zones.append(popover('Period', 'p_PeriodOpen', 216, 150, 360, 470, 'Compare', sheet_zone('Pair List', 228, 195, 348, 395),
                      'Each choice compares a quarter-end with the same date a year before.'))
-zones.append(popover('Org', 'p_OrgOpen', 216, 252, 360, 300, 'Organization', sheet_zone('Group List', 228, 297, 348, 225),
+zones.append(popover('Org', 'p_OrgOpen', 216, 302, 360, 300, 'Organization', sheet_zone('Group List', 228, 347, 348, 225),
                      'Each function is its own bridge: its effects add up to its own change.'))
 INFO = [('What is measured.', "Total workforce cost on a date: employees' loaded pay run-rate (base pay × FTE × (1 + the country's fringe rate)) plus contingent workers' annualized bill run-rate, converted to USD at the ECB rate on that date. It is a run-rate, not spend: what a year would cost at that day's workforce and pay."),
         ('The six factors.', 'Cost is people × the mix of people × what each costs × currency. Volume is the number of people; workforce mix the balance of employees and contingent workers; location mix the countries; level mix the grades (or contingent types); rate the cost per head at constant exchange rates; currency what exchange rates did to the reported cost.'),
