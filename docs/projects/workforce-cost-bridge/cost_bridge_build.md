@@ -8,8 +8,9 @@ Arcadia Systems is fictional; all data is synthetic.
 |---|---|---|
 | 1 | Marts, Custom SQL, method, tests (test 78: the six effects add up to the change) | Done in release 3, unchanged through release 6 |
 | 2 | This guide and its check values | Written 2026-10-29 |
-| 3 | The build: `tableau/builder/d6` writes the workbook from this guide into the saved base workbook (2.2), then spot checks in Desktop | Next |
-| 4 | Publish, README, Figma values, profile, LinkedIn | After the build |
+| 3 | Three first-impression directions on a design canvas (A hero total, B headline ribbon, C answer card); **B chosen** 2026-10-29, C kept for #7 | Done |
+| 4 | The build: `tableau/builder/d6` writes the workbook from this guide into the saved base workbook (2.2), then spot checks in Desktop | Build 1 checked; build 2 (template B) next |
+| 5 | Publish, README, Figma values, profile, LinkedIn | After the build |
 
 ## Contents
 
@@ -19,7 +20,7 @@ Arcadia Systems is fictional; all data is synthetic.
 3. Parameters
 4. Core calculations (selection, labels, number text)
 5. The selection's numbers
-6. The KPI band
+6. The headline and the factor ribbon
 7. The bridge
 8. The order of the steps (Shapley against one fixed order)
 9. Five fiscal years
@@ -38,46 +39,47 @@ Arcadia Systems is fictional; all data is synthetic.
 
 **The answer:** total workforce cost (employees' loaded pay run-rate plus contingent workers' annualized bill run-rate, nominal USD) is split into six factors with Shapley values. Each factor gets its average effect over every order of the six steps, so no factor is favored by the order it is computed in, and the six effects add up to the change exactly.
 
-| Factor | Meaning |
-|---|---|
-| Volume | More or fewer people |
-| Workforce mix | The balance of employees and contingent workers |
-| Location mix | Which countries the people are in, within each worker type |
-| Level mix | Which grades (or contingent types) the people are in, within type and country |
-| Rate | What each person costs at constant exchange rates: pay and bill rates |
-| Currency | What exchange rates did to the reported cost |
+| Factor | On the page | Meaning |
+|---|---|---|
+| Volume | More people | More or fewer people |
+| Workforce mix | Worker mix | The balance of employees and contingent workers |
+| Location mix | Country mix | Which countries the people are in, within each worker type |
+| Level mix | Grade mix | Which grades (or contingent types) the people are in, within type and country |
+| Rate | Higher rates | What each person costs at constant exchange rates: pay and bill rates |
+| Currency | Exchange rates | What exchange rates did to the reported cost |
+
+**Template B, the headline ribbon.** The page's title *is* the answer, in one sentence with its numbers in plum. Under it a ribbon of the six factors, each with its value, a bar sized to the largest factor and one line of context. No boxes anywhere: the bridge, the order table and the five-year table are open panels under a 2 px plum rule, so the page reads like an editorial spread. It was chosen from three directions drawn with real numbers (A hero total, B headline ribbon, C answer card) because it is the boldest and gives each of the six factors its own KPI.
 
 ```
-x 0      216 240         456 470       686 700       916 930      1146 1160     1376 1400
-y 0  ┌────────┬──────────────────────────────────────────────────────────────────────┐
-     │  RAIL  │ Workforce Cost Bridge                                                │ 16–72
-     │  navy  │ Why total workforce cost changed · <span> · <scope> · nominal USD …  │
-  86 │        │ ┌ KPI 1 ──┐ ┌ KPI 2 ──┐ ┌ KPI 3 ──┐ ┌ KPI 4 ──┐ ┌ KPI 5 ──┐          │ 86–172
-     │        │ │ total   │ │ volume  │ │ rates   │ │ mix     │ │ currency│          │
- 186 │        │ ┌ Bridge card ─────────────────────────┐ ┌ Order of the steps ──────┐ │ 186–488
-     │        │ │ title (the answer in words)          │ │ Shapley vs fixed order   │ │
-     │        │ │ Opening · six factors · Closing      │ │ six factors, bias column │ │
-     │        │ │ (Gantt waterfall, labels on top)     │ └──────────────────────────┘ │
-     │        │ │                                      │ ┌ Five fiscal years ───────┐ │ 502–812
-     │        │ │ note                                 │ │ FY × Volume Mix Rate Cur │ │
- 812 │        │ └──────────────────────────────────────┘ └──────────────────────────┘ │
- 826 │        │ footnote                                                             │
- 850 └────────┴──────────────────────────────────────────────────────────────────────┘
+x 0      216 240                                                  948  988               1376 1400
+y 0  ┌────────┬──────────────────────────────────────────────────────────────────────────┐
+     │  RAIL  │ WORKFORCE COST BRIDGE (kicker)                                           │ 12–116
+     │  navy  │ Workforce cost grew $402.9M to $4,648.1M, and 76% of it was more people  │
+     │        │ Jun 30, 2025 to Jun 30, 2026 · +9.5% · all of Arcadia · 39,145 to …      │
+ 136 │        │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ plum rule
+     │        │ More people │ Higher rates │ Grade mix │ Country mix │ Worker mix │ Exch. │ 140–240
+     │        │ +$307.1M    │ +$139.8M     │ +$22.4M   │ −$9.3M      │ −$4.8M     │ −$52.2M│
+     │        │ ▬▬▬▬▬▬▬▬    │ ▬▬▬▬         │ ▬         │ ▪           │ ▪          │ ▬▬    │
+     │        │ 76% · +2,801│ 35% · pay …  │ toward …  │ toward …    │ toward …   │ +$455…│
+ 262 │        │ ━━ From $4,245.2M to $4,648.1M ━━━━━━━━━━━━━   ━━ A fixed order would … ━━│
+     │        │ waterfall: Opening · six factors · Closing      Factor Shapley Fixed Bias │ 262–510
+     │        │                                                 ━━ Rates rose every … ━━━│
+     │        │                                                 FY × People Mix Rates Cur │ 520–812
+ 826 │        │ footnote                                                                 │
+ 850 └────────┴──────────────────────────────────────────────────────────────────────────┘
 ```
 
 | Where | What it answers | Default view (FY26 vs FY25, all of Arcadia) |
 |---|---|---|
-| Title | What am I looking at? | **Workforce Cost Bridge** · "Why total workforce cost changed · Jun 30, 2025 to Jun 30, 2026 · all of Arcadia · nominal USD · employees and contingent workers" |
-| KPI 1 | How much did cost change? | Total cost, FY26 **$4,648.1M** · +$402.9M vs FY25 (+9.5%) |
-| KPI 2 | How much was more people? | More people (volume) **+$307.1M** · 76% of the change · headcount +2,801 |
-| KPI 3 | How much was rates? | Higher rates **+$139.8M** · pay and bill rates, constant FX |
-| KPI 4 | How much was mix? | Mix of people **+$8.3M** · level +22.4 · location −9.3 · workforce −4.8 |
-| KPI 5 | How much was currency? | Currency **−$52.2M** · +$455.2M before exchange rates |
-| Bridge card | Why did it change? | "Cost grew $403M, and 76% of it was more people". Opening 4,245.2 · +307.1 · −4.8 · −9.3 · +22.4 · +139.8 · −52.2 · Closing 4,648.1 |
-| Order of the steps | Why Shapley? | "A fixed order would move Rate by +$5.5M". Shapley and sequential bars per factor, the bias beside each |
-| Five fiscal years | Is this year different? | "Rates rose every year; currency swung both ways". FY22 to FY26, Volume, Mix, Rate, Currency |
+| Headline | What happened, in one sentence? | "Workforce cost grew **$402.9M** to **$4,648.1M**, and **76%** of it was **more people**" |
+| Subtitle | Which dates, which scope? | "**Jun 30, 2025** to **Jun 30, 2026** · +9.5% · all of Arcadia · 39,145 to 41,946 people · nominal USD" |
+| Factor ribbon | How big is each factor? | More people **+$307.1M** (76% · +2,801 people) · Higher rates **+$139.8M** (35% · pay and bill rates) · Grade mix **+$22.4M** (toward higher grades) · Country mix **−$9.3M** (toward lower-cost countries) · Worker mix **−$4.8M** (toward the less costly worker type) · Exchange rates **−$52.2M** (+$455.2M without them) |
+| Bridge | How does it add up? | "From **$4,245.2M** to **$4,648.1M**, one factor at a time": 4,245.2 · +307.1 · −4.8 · −9.3 · +22.4 · +139.8 · −52.2 · 4,648.1 |
+| Order table | Why Shapley? | "A fixed order would overstate rates by **$5.5M**": Shapley, fixed order and bias per factor |
+| Five fiscal years | Is this year different? | "Rates rose every year; currency swung both ways" · "In **FY24** headcount changed by only **−42**, yet cost rose **$93.5M**" |
+| Rail | Which dates exactly? | Capsule "FY26 vs FY25 · year-end"; This **Jun 30, 2026** · Against **Jun 30, 2025** · Span 12 months, year-end to year-end |
 
-**The palette.** Navy `#13233A` (rail, titles, Shapley bars, level labels), slate `#5A6170` (secondary text), ink `#1F2329`, axis text `#8C9BB0`, grid `#ECEDEA`, page `#F3F3EF`, cards `#FFFFFF` with a 1 px `#E4E3DD` border and 14 px corners. Opening and closing bars: blue-gray `#8C9BB0`. A factor that adds cost: teal `#0F6E56` (bar and text). A factor that takes cost away: sand `#B8A888` (bar), dark sand `#7D6A45` (text, so it stays legible on white). Sequential bars: mist `#B9C3D1`. No red and green pair, no blue and orange pair.
+**The palette.** Rail navy `#13233A` (the Arcadia rail, the same on every dashboard). Page `#F6F4F1` (warm paper). Ink `#1F2329`, slate `#5A6170`, axis text `#8C9BB0`. **Plum `#5B3A63`**: this dashboard's accent: the kicker, the rules, every number that adds cost and the headline's numbers. **Sand `#C2A878`** for bars that take cost away, **dark sand `#8A6A35`** for their text (legible on the paper). Opening and closing bars `#9AA5B4`. Light rules and dividers `#E0DCD6`, grid `#E7E3DD`, ribbon bar track `#ECE8E2`, small bias bars `#D5DBE4`. No red and green pair, no blue and orange pair.
 
 ---
 
@@ -96,7 +98,11 @@ y 0  ┌────────┬───────────────
 | C9 | **Selections are tested inside each formula** (`[In Selection] AND [factor_order] = 5`), not with context filters; the bridge, the bias bars and the lists filter on a row-level boolean only | A FIXED LOD runs before ordinary filters; with the test inside the formula there is no filter order to remember |
 | C10 | **The axis floor is a FIXED LOD**, 95% of the lower of opening and closing, rounded down to a round number (`$4.0B` by default), shown as a reference line labeled "Axis starts at …" | The factors are 0.1% to 7% of the total; from zero they would be invisible. Across all 153 pair-and-group views the path never dips below 96% of the lower end, so the floor always sits under every bar |
 | C11 | **Every text that follows the data is a calculation**; money in sentences uses the money pattern (4.4) | Tableau has no number format inside a string |
-| C12 | **Hovers are sentences, color-coded**: adds in teal, takes away in dark sand, levels and counts in navy. Tooltip command buttons off on every sheet; every clickable sheet has a deselect (`zzTrue` → `zzFalse`) | Rich tooltips carry the detail; nothing stays highlighted after a click |
+| C12 | **Hovers are sentences, color-coded**: adds in plum, takes away in dark sand, dates, levels and counts in navy. Tooltip command buttons off on every sheet; every clickable sheet has a deselect (`zzTrue` → `zzFalse`) | Rich tooltips carry the detail; nothing stays highlighted after a click |
+| C14 | **Template B, the headline ribbon** (chosen 2026-10-29 from three directions drawn with real numbers; C, the answer card, is kept for #7): the title states the answer with its numbers in plum, six factor cells replace the five KPI cards, every panel is open (no white cards) | The first impression must answer the question from a screenshot; the six factors are the page's KPIs; open panels give #6 its own look beside #5's cards |
+| C15 | **Plum and sand**, on warm paper `#F6F4F1` | Professional but different from #1 to #5 (navy and teal); plum adds, sand takes away, never red with green |
+| C16 | **Dates spelled out** (the How-To #2 lesson): the capsule says year-end or quarter-end, the rail lists This, Against and Span, and the subtitle names both dates in bold | A visitor must know exactly which two days are compared without opening the picker |
+| C17 | **Numbers in sentences are colored and bold**: plum for what adds cost, dark sand for what takes it away, navy for dates and counts; in titles, subtitles and every hover | The eye finds the numbers first |
 | C13 | Rules carried: executive officers excluded upstream; neutral wording ("takes away", "lowered", never "wrong"); American spelling; integer font sizes; no arrow glyphs in text | Every Arcadia dashboard |
 
 ---
@@ -262,11 +268,20 @@ IF [Is Company] THEN "All of Arcadia" ELSE [p_Group] END
 // Scope Words
 IF [Is Company] THEN "all of Arcadia" ELSE [p_Group] END
 
-// Page Subtitle
-"Why total workforce cost changed · " + [Span Text] + " · " + [Scope Words] + " · nominal USD · employees and contingent workers"
+// Pair Is Year
+{ MIN(IF [In Pair] THEN (IF RIGHT([fiscal_quarter_label], 2) = "Q4" THEN 1 ELSE 0 END) END) } = 1
+
+// Pair Kind
+IF [Pair Is Year] THEN " · year-end" ELSE " · quarter-end" END
+
+// Period Field Text
+[Pair Label] + [Pair Kind]
+
+// Span Words
+IF [Pair Is Year] THEN "12 months, year-end to year-end" ELSE "12 months, quarter-end to quarter-end" END
 ```
 
-Expected with `p_Pair` 0: Pair Label "FY26 vs FY25", Span Text "Jun 30, 2025 to Jun 30, 2026". With 1: "FY26 Q3 vs FY25 Q3", "Mar 31, 2025 to Mar 31, 2026". With 8: "FY24 vs FY23". A pair ending on the fiscal year's last quarter reads as the fiscal year; any other reads with its quarter.
+Expected with `p_Pair` 0: Pair Label "FY26 vs FY25", Period Field Text "FY26 vs FY25 · year-end", Span Text "Jun 30, 2025 to Jun 30, 2026", Span Words "12 months, year-end to year-end". With 1: "FY26 Q3 vs FY25 Q3 · quarter-end", "Mar 31, 2025 to Mar 31, 2026". With 8: "FY24 vs FY23". A pair ending on the fiscal year's last quarter reads as the fiscal year; any other reads with its quarter.
 
 ### 4.4 Numbers inside text
 
@@ -384,6 +399,7 @@ Text fields (the pattern of 4.4 on each number):
 | `S Opening Txt` | Money | `[S Opening]` |
 | `S Closing Txt` | Money | `[S Closing]` |
 | `S Change Txt` | Signed money | `[S Change]` |
+| `S Change Abs Txt` | Money (no sign) | `[S Change]` |
 | `S Volume Txt` | Signed money | `[S Volume]` |
 | `S Rate Txt` | Signed money | `[S Rate]` |
 | `S Mix Txt` | Signed money | `[S Mix]` |
@@ -400,7 +416,7 @@ Text fields (the pattern of 4.4 on each number):
 
 **Expected, default view:** S Opening 4,245.2 · S Closing 4,648.1 · S Change +402.9 (+9.5%) · Volume +307.1 · Workforce −4.8 · Location −9.3 · Level +22.4 · Rate +139.8 · Currency −52.2 · S Mix +8.3 · S Constant Change +455.2 · headcount 39,145 to 41,946 (+2,801) · S Vol Share 76%.
 
-### 5.1 The largest factor (for the bridge title)
+### 5.1 The largest factor (for the headline)
 
 ```
 // Max Abs Effect
@@ -443,108 +459,124 @@ IF ROUND(ABS([S Change]), 1) < 10 THEN "$" + <M1 on [S Change]> + "M" ELSE "$" +
 
 ---
 
-## 6. The KPI band
+## 6. The headline and the factor ribbon
 
-Five white cards, 216 × 86 each, at y 86: x **240, 470, 700, 930, 1160** (14 px gaps). Each card is a container (white `#FFFFFF`, border 1 px `#E4E3DD`, **corner radius 14**, inner padding 12 top and bottom, 14 sides) holding one text sheet, with an invisible hover cover over it (6.2).
-
-```
-// K1 Title
-"Total cost, " + [To Label]
-
-// K1 Line
-[S Change Txt] + " vs " + MIN([From Label]) + " (" + [S Change Pct Str] + ")"
-
-// K2 Title
-IF [S Volume] >= 0 THEN "More people (volume)" ELSE "Fewer people (volume)" END
-
-// HC Words
-"headcount " + [S HC Change Str]
-
-// K2 Line
-IF [S Vol Share] >= 0 AND [S Vol Share] <= 1 THEN [S Vol Share Str] + " of the change · " + [HC Words] ELSE [HC Words] END
-
-// K3 Title
-IF [S Rate] >= 0 THEN "Higher rates" ELSE "Lower rates" END
-
-// K3 Line
-MIN("pay and bill rates, constant FX")
-
-// K4 Title
-MIN("Mix of people")
-
-// K4 Line
-"level " + [S Level Num] + " · location " + [S Location Num] + " · workforce " + [S Workforce Num]
-
-// K5 Title
-MIN("Currency")
-
-// K5 Line
-[S Constant Txt] + " before exchange rates"
-```
-
-A volume share outside 0 to 100% (volume larger than the whole change, or the opposite sign) is not a share; the line then shows only the headcount change.
-
-Every KPI sheet: Marks **Text**, left aligned, vertical top; Detail `zzTrue`, `zzFalse`; worksheet shading None; tooltip off (the hover cover carries it). Three lines:
-
-| Sheet | Line 1 (Tableau Book 10, slate `#5A6170`) | Line 2 (Tableau Bold 22, navy `#13233A`) | Line 3 (Tableau Book 9, slate `#5A6170`) |
-|---|---|---|---|
-| **KPI 1** | `<K1 Title>` | `<S Closing Txt>` | `<K1 Line>` |
-| **KPI 2** | `<K2 Title>` | `<S Volume Txt>` | `<K2 Line>` |
-| **KPI 3** | `<K3 Title>` | `<S Rate Txt>` | `<K3 Line>` |
-| **KPI 4** | `<K4 Title>` | `<S Mix Txt>` | `<K4 Line>` |
-| **KPI 5** | `<K5 Title>` | `<S Currency Txt>` | `<K5 Line>` |
-
-Expected, default: KPI 1 "Total cost, FY26 · $4,648.1M · +$402.9M vs FY25 (+9.5%)"; KPI 2 "More people (volume) · +$307.1M · 76% of the change · headcount +2,801"; KPI 3 "Higher rates · +$139.8M · pay and bill rates, constant FX"; KPI 4 "Mix of people · +$8.3M · level +22.4 · location −9.3 · workforce −4.8"; KPI 5 "Currency · −$52.2M · +$455.2M before exchange rates".
-
-### 6.1 Hover sentences
+### 6.1 The headline
 
 ```
-// K1 Tip 1
-"Total workforce cost was " + [S Closing Txt] + " on " + MIN([To Date Text]) + ", against " + [S Opening Txt]
-+ " on " + MIN([From Date Text]) + "."
+// Head Verb
+IF [S Change] >= 0 THEN "Workforce cost grew " ELSE "Workforce cost fell " END
 
-// K1 Tip 2
-"Employees' loaded pay run-rate plus contingent workers' annualized bill run-rate. Headcount "
-+ [S HC Open Str] + " to " + [S HC Close Str] + " (" + [S HC Change Str] + ")."
+// Head Share Form
+[Driver Share] >= 0.5 AND [Driver Share] <= 1
 
-// K2 Tip 1
-"Volume " + [S Volume Txt] + (IF [S Vol Share] >= 0 AND [S Vol Share] <= 1 THEN ", " + [S Vol Share Str] + " of the change." ELSE "." END)
+// Head Mid
+IF [Head Share Form] THEN ", and " ELSE "; the largest effect was " END
 
-// K2 Tip 2
-"What the change in headcount alone did to cost, with mix, rates and currency at their average over every order of the steps."
+// Head Pct
+IF [Head Share Form] THEN STR(INT(ROUND([Driver Share] * 100, 0))) + "%" ELSE "" END
 
-// K3 Tip 1
-"Rates " + [S Rate Txt] + ": what each person costs moved, at constant exchange rates."
+// Head Of
+IF [Head Share Form] THEN " of it was " ELSE "" END
 
-// K3 Tip 2
-"Pay raises for employees and bill-rate changes for contingent workers. Promotions to a higher grade count under level mix."
-
-// K4 Tip 1
-"Mix " + [S Mix Txt] + " in all: level " + [S Level Num] + ", location " + [S Location Num] + ", workforce " + [S Workforce Num] + "."
-
-// K4 Tip 2
-"A positive mix effect means the workforce moved toward costlier grades, countries or worker types; a negative one, toward less costly ones."
-
-// K5 Tip 1
-"Exchange rates " + (IF [S Currency] >= 0 THEN "raised" ELSE "lowered" END) + " the reported cost by " + [S Currency Abs Txt] + "."
-
-// K5 Tip 2
-"Without the Currency effect the change would be " + [S Constant Txt] + "."
+// Head Driver
+[Driver Words] + (IF [Head Share Form] THEN "" ELSE " (" + [Driver Txt] + ")" END)
 ```
 
-Expected, default: "Total workforce cost was $4,648.1M on Jun 30, 2026, against $4,245.2M on Jun 30, 2025." / "… Headcount 39,145 to 41,946 (+2,801)." · "Volume +$307.1M, 76% of the change." · "Rates +$139.8M: …" · "Mix +$8.3M in all: level +22.4, location −9.3, workforce −4.8." · "Exchange rates lowered the reported cost by $52.2M." / "Without the Currency effect the change would be +$455.2M."
+The share form is used when one factor explains half to all of the change; otherwise the headline names the largest effect and its size, so it never reads "127% of it".
 
-### 6.2 Hover covers
+Sheet **Page Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Three lines:
 
-Sheets **Hover K1** to **Hover K5**: Rows and Columns `Hover Cell` (headers hidden); Marks **Square**, size slider far right, opacity **0%**, no border; Detail `Hover Cell`, `zzTrue`, `zzFalse`. Command buttons off. Each floats over its card at the card's size (216 × 86).
+| Line | Runs |
+|---|---|
+| 1 | `WORKFORCE COST BRIDGE` Tableau Semibold 10 plum `#5B3A63` |
+| 2 | `<Head Verb>` Tableau Bold 22 ink `#1F2329` · `<S Change Abs Txt>` Bold 22 plum `#5B3A63` · ` to ` Bold 22 ink · `<S Closing Txt>` Bold 22 plum · `<Head Mid>` Bold 22 ink · `<Head Pct>` Bold 22 plum · `<Head Of>` Bold 22 ink · `<Head Driver>` Bold 22 plum |
+| 3 | `<ATTR(From Date Text)>` Tableau Semibold 11 navy `#13233A` · ` to ` Book 11 slate `#5A6170` · `<ATTR(To Date Text)>` Semibold 11 navy · ` · <S Change Pct Str> · <ATTR(Scope Words)> · <S HC Open Str> to <S HC Close Str> people · nominal USD` Book 11 slate |
 
-| Sheet | Tooltip, line 1 (Tableau Book 11, ink `#1F2329`) | Line 2 (Tableau Book 10, slate `#5A6170`) |
-|---|---|---|
-| Hover K1 | `<K1 Tip 1>` | `<K1 Tip 2>` |
-| Hover K2 | `<K2 Tip 1>` | `<K2 Tip 2>` |
-| Hover K3 | `<K3 Tip 1>` | `<K3 Tip 2>` |
-| Hover K4 | `<K4 Tip 1>` | `<K4 Tip 2>` |
-| Hover K5 | `<K5 Tip 1>` | `<K5 Tip 2>` |
+Expected: "Workforce cost grew **$402.9M** to **$4,648.1M**, and **76%** of it was **more people**" / "**Jun 30, 2025** to **Jun 30, 2026** · +9.5% · all of Arcadia · 39,145 to 41,946 people · nominal USD". FY24 vs FY23: "Workforce cost grew $93.5M to $3,817.4M; the largest effect was higher rates (+$118.7M)".
+
+### 6.2 The factor ribbon
+
+Six cells, one per factor, in the order a reader weighs them: people, rates, grades, countries, worker mix, exchange rates. Three sheets share the same six columns, stacked: **Ribbon Top** (name and value), **Ribbon Bars** (the bar), **Ribbon Note** (one line of context).
+
+```
+// Ribbon Order
+CASE [factor_order] WHEN 1 THEN 1 WHEN 5 THEN 2 WHEN 4 THEN 3 WHEN 3 THEN 4 WHEN 2 THEN 5 WHEN 6 THEN 6 END
+
+// Rib Name
+CASE MIN([factor_order])
+WHEN 1 THEN (IF SUM([Effect M]) >= 0 THEN "More people" ELSE "Fewer people" END)
+WHEN 5 THEN (IF SUM([Effect M]) >= 0 THEN "Higher rates" ELSE "Lower rates" END)
+WHEN 4 THEN "Grade mix" WHEN 3 THEN "Country mix" WHEN 2 THEN "Worker mix" ELSE "Exchange rates" END
+
+// Rib Value
+<Sign on SUM([Effect M])> + "$" + <M1 on SUM([Effect M])> + "M"
+
+// Rib Share
+SUM([Effect M]) / MIN([Sel Change LOD])
+
+// Rib Share Ok
+[Rib Share] >= 0 AND [Rib Share] <= 1
+
+// Rib HC Change
+MIN([closing_headcount]) - MIN([opening_headcount])
+
+// Rib HC Txt
+(IF [Rib HC Change] >= 0 THEN "+" ELSE "−" END) + <Comma on [Rib HC Change]> + " people"
+
+// Rib Without FX
+MIN([Sel Change LOD]) - SUM([Effect M])
+
+// Rib Note
+CASE MIN([factor_order])
+WHEN 1 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% · " ELSE "" END) + [Rib HC Txt]
+WHEN 5 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% · " ELSE "" END) + "pay and bill rates"
+WHEN 4 THEN (IF SUM([Effect M]) >= 0 THEN "toward higher grades" ELSE "toward lower grades" END)
+WHEN 3 THEN (IF SUM([Effect M]) >= 0 THEN "toward higher-cost countries" ELSE "toward lower-cost countries" END)
+WHEN 2 THEN (IF SUM([Effect M]) >= 0 THEN "toward the costlier worker type" ELSE "toward the less costly worker type" END)
+ELSE <Sign on [Rib Without FX]> + "$" + <M1 on [Rib Without FX]> + "M without them" END
+
+// Rib Bar Kind
+IF ROUND(SUM([Effect M]), 1) >= 0 THEN "adds" ELSE "takes away" END
+
+// Rib Max
+{ MAX(IF [In Selection] AND [Is Factor] THEN ABS([Effect M]) END) }
+
+// Rib Bar Size
+ABS(SUM([Effect M])) / MIN([Rib Max])
+
+// Rib Zero
+MIN(0.0)
+
+// Rib Val Adds
+IF [Cell Kind] = "adds" THEN [Rib Value] END
+
+// Rib Val Takes
+IF [Cell Kind] = "takes away" THEN [Rib Value] END
+
+// Rib Share Txt
+IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% of the change" ELSE "" END
+
+// Rib Tip Extra
+CASE MIN([factor_order])
+WHEN 1 THEN "Headcount " + <Comma on MIN([opening_headcount])> + " to " + <Comma on MIN([closing_headcount])> + ", with mix, rates and currency at their average over every order of the steps."
+WHEN 5 THEN "Raises and bill-rate changes at constant exchange rates; promotions to a higher grade count under grade mix."
+WHEN 6 THEN "Without the Currency effect the change would be " + <Sign on [Rib Without FX]> + "$" + <M1 on [Rib Without FX]> + "M."
+ELSE "" END
+```
+
+`Cell Kind` (section 9) colors every factor number on the page: adds plum, takes away dark sand. `Rib Max` is the largest factor in the selection, so the largest bar always fills its cell.
+
+All three sheets: Filters `In Selection` = True and `Is Factor` = True; Columns `Ribbon Order` (discrete, header hidden); Fit Entire View; shading None; every line None; Detail `zzTrue`, `zzFalse`.
+
+- **Ribbon Top**: Marks **Text**; Color `Cell Kind` (adds plum `#5B3A63`, takes away dark sand `#8A6A35`); left, top. Line 1 `<Rib Name>` Tableau Book 10 slate `#5A6170`; line 2 `<Rib Value>` Tableau Bold 20, no font color (the mark color carries plum or sand).
+- **Ribbon Bars**: Columns `Ribbon Order` then `Rib Zero` (continuous, axis Fixed 0 to 1, hidden). Marks **Gantt Bar**, Size `Rib Bar Size`, Color `Rib Bar Kind` (the same test as `Cell Kind`, its own field so its colors can differ: adds plum `#5B3A63`, takes away light sand `#C2A878`), size slider so the bar is 6 px tall. Analytics: **Reference Band**, per pane, constant 0 to 1, fill `#ECE8E2` (the track), no line.
+- **Ribbon Note**: Marks **Text**, `<Rib Note>` Tableau Book 9 slate `#5A6170`, left, top.
+- **Tooltip** (Ribbon Top and Ribbon Bars, command buttons off): line 1 `<Rib Name>: ` Tableau Semibold 11 navy `#13233A`, `<Rib Val Adds>` Tableau Bold 11 plum `#5B3A63`, `<Rib Val Takes>` Tableau Bold 11 dark sand `#8A6A35`; line 2 `<Rib Share Txt>` Tableau Semibold 10 navy; line 3 `<ATTR(factor_meaning)>` Tableau Book 10 ink `#1F2329`; line 4 `<Rib Tip Extra>` Tableau Book 9 slate `#5A6170`.
+
+Lines between the cells are five 1 px blanks `#E0DCD6` on the dashboard (12.2), at the cell edges, from the plum rule to the bottom rule.
+
+Expected, default: More people **+$307.1M** · 76% · +2,801 people | Higher rates **+$139.8M** · 35% · pay and bill rates | Grade mix **+$22.4M** · toward higher grades | Country mix **−$9.3M** · toward lower-cost countries | Worker mix **−$4.8M** · toward the less costly worker type | Exchange rates **−$52.2M** · +$455.2M without them. Bars: 100%, 46%, 7%, 3%, 2%, 17% of a cell. Hover on More people: "More people: **+$307.1M**" / "**76% of the change**" / "More or fewer people" / "Headcount 39,145 to 41,946, with mix, rates and currency at their average over every order of the steps."
 
 ---
 
@@ -552,20 +584,11 @@ Sheets **Hover K1** to **Hover K5**: Rows and Columns `Hover Cell` (headers hidd
 
 ### 7.1 The title
 
-```
-// Bridge Title
-"Cost " + (IF [S Change] >= 0 THEN "grew " ELSE "fell " END) + [Change Words]
-+ (IF [Driver Share] >= 0.5 AND [Driver Share] <= 1
-   THEN ", and " + STR(INT(ROUND([Driver Share] * 100, 0))) + "% of it was " + [Driver Words]
-   ELSE "; the largest effect was " + [Driver Words] + " (" + [Driver Txt] + ")" END)
+The headline (6.1) already states the answer, so the bridge's title says what the chart shows.
 
-// Bridge Subtitle
-"Shapley split of the change, " + MIN([Span Text]) + ", $M nominal · each factor's average effect over every order of the steps"
-```
+Sheet **Bridge Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `From ` Tableau Bold 14 navy `#13233A` · `<S Opening Txt>` Bold 14 slate `#5A6170` · ` to ` Bold 14 navy · `<S Closing Txt>` Bold 14 plum `#5B3A63` · `, one factor at a time` Bold 14 navy. Line 2: `Each factor's average effect over every order of the six steps, $M; the axis starts at ` Tableau Book 10 slate `#5A6170` · `<ATTR(Floor Text)>` Semibold 10 navy · ` so the factors are visible` Book 10 slate.
 
-The first form is used when one factor explains half to all of the change; otherwise the title names the largest effect and its size, so it never reads "127% of it". Expected: default "Cost grew $403M, and 76% of it was more people"; FY24 vs FY23 "Cost grew $94M; the largest effect was higher rates (+$118.7M)"; FY25 Q1 vs FY24 Q1 "Cost grew $238M, and 53% of it was higher rates".
-
-Sheet **Bridge Title**: Text, `<Bridge Title>` Tableau Semibold 14 navy `#13233A` / `<Bridge Subtitle>` Tableau Book 10 slate `#5A6170`; left, top; Detail `zzTrue`, `zzFalse`; tooltip off.
+Expected: "From **$4,245.2M** to **$4,648.1M**, one factor at a time" / "… the axis starts at **$4.0B** so the factors are visible".
 
 ### 7.2 The axis floor
 
@@ -602,7 +625,8 @@ IF MIN([factor_order]) = 0 OR MIN([factor_order]) = 7 THEN -(RUNNING_SUM(SUM([St
 ELSE -SUM([Step M]) END
 
 // Label Y
-IF SUM([Step M]) < 0 THEN RUNNING_SUM(SUM([Step M])) - SUM([Step M]) ELSE RUNNING_SUM(SUM([Step M])) END
+(IF SUM([Step M]) < 0 THEN RUNNING_SUM(SUM([Step M])) - SUM([Step M]) ELSE RUNNING_SUM(SUM([Step M])) END)
++ 0.035 * (WINDOW_MAX(RUNNING_SUM(SUM([Step M]))) - MIN([Axis Floor]))
 
 // Bar Kind
 IF MIN([factor_order]) = 0 OR MIN([factor_order]) = 7 THEN "level"
@@ -626,17 +650,17 @@ WHEN 1 THEN "people" WHEN 2 THEN "employees, contingent" WHEN 3 THEN "countries"
 WHEN 4 THEN "grades" WHEN 5 THEN "pay, bill rates" ELSE "exchange rates" END
 ```
 
-How it closes: the running sum of Step M at row k is the cost after k factors have moved; the closing row adds 0, so its running sum is the closing cost. Each factor's Gantt bar hangs from that point by minus its effect, so it spans the previous level to the new one. The opening and closing bars hang down to the axis floor. `Label Y` is the top of each bar, so every label sits above its bar. Bar Kind and Label Kind are the same test twice, so the bars and the labels get separate color legends.
+How it closes: the running sum of Step M at row k is the cost after k factors have moved; the closing row adds 0, so its running sum is the closing cost. Each factor's Gantt bar hangs from that point by minus its effect, so it spans the previous level to the new one. The opening and closing bars hang down to the axis floor. `Label Y` is the top of each bar plus 3.5% of the chart's height, so every label sits clear above its bar (build 1 put the label's middle on the bar's top edge). Bar Kind and Label Kind are the same test twice, so the bars and the labels get separate color legends.
 
 Sheet **Bridge**:
 1. Filter `In Selection` = True.
 2. Columns `factor_order` (discrete, header hidden), then `Factor Head` (header at the bottom, Tableau Semibold 9 ink `#1F2329`), then `Factor Sub` (header at the bottom, Tableau Book 8 slate `#5A6170`). Headers wrap; column width even.
 3. Rows `Bar Top`, then `Label Y`; Dual Axis; Synchronize Axis. Every table calculation: **Compute Using Specific Dimensions `factor_order`, `Factor Head` and `Factor Sub`**, sorted by `factor_order`. (`Factor Head` and `Factor Sub` are on Columns only to label the bars; left out of the addressing, they would partition every column and restart the running sum.)
 4. Left axis: no title, Automatic, **Include zero off**, labels Tableau Book 8 axis gray `#8C9BB0`, format Number Custom `$#,##0"M"`; right axis hidden.
-5. Marks `Bar Top`: **Gantt Bar**; Size `Bar Size`; Color `Bar Kind`: level `#8C9BB0`, adds teal `#0F6E56`, takes away sand `#B8A888`; opacity 100%, no border; size slider at about 60% (the bars a little wider than their gaps).
-6. Marks `Label Y`: **Text**; Text `Bar Label`; Color `Label Kind`: level navy `#13233A`, adds teal `#0F6E56`, takes away dark sand `#7D6A45`; Tableau Semibold 10; alignment center, **bottom** (the label sits on the point, above the bar).
+5. Marks `Bar Top`: **Gantt Bar**; Size `Bar Size`; Color `Bar Kind`: level `#9AA5B4`, adds plum `#5B3A63`, takes away sand `#C2A878`; opacity 100%, no border; size slider at about 60% (the bars a little wider than their gaps).
+6. Marks `Label Y`: **Text**; Text `Bar Label`; Color `Label Kind`: level navy `#13233A`, adds plum `#5B3A63`, takes away dark sand `#8A6A35`; Tableau Bold 10; alignment center, middle.
 7. Analytics: **Reference Line**, Entire Table, on the left axis, value `MIN(Axis Floor)`: solid 1 px `#D5DBE4`; label custom `Axis starts at <Floor Text>` (insert the field), Tableau Book 8 slate `#5A6170`, at the left, below the line. The reference line also holds the automatic axis down at the floor.
-8. Grid lines: rows solid 1 px `#ECEDEA`; columns none. Zero line, axis rulers, borders and row/column dividers None. Shading None (the card is white).
+8. Grid lines: rows solid 1 px `#E7E3DD`; columns none. Zero line, axis rulers, borders and row/column dividers None. Shading None (the panel is open on the page's paper).
 9. Tooltip (both cards; command buttons off): see 7.4.
 
 Expected bars, default (labels): Opening **4,245.2** · Volume **+307.1** · Workforce mix **−4.8** · Location mix **−9.3** · Level mix **+22.4** · Rate **+139.8** · Currency **−52.2** · Closing **4,648.1**. Running levels: 4,245.2 · 4,552.3 · 4,547.5 · 4,538.2 · 4,560.6 · 4,700.4 · 4,648.1 · 4,648.1. Axis starts at $4.0B. Under each bar: Opening / FY25, Volume / people, Workforce mix / employees, contingent, Location mix / countries, Level mix / grades, Rate / pay, bill rates, Currency / exchange rates, Closing / FY26.
@@ -675,22 +699,22 @@ THEN "One fixed order of the steps would give " + <Sign on SUM([Seq M])> + "$" +
 On a bar, `S Change` would sum over that bar's one row and come back empty, so `Tip Share` reads the selection's change from the FIXED LOD `Sel Change LOD`.
 
 Tooltip layout:
-- Line 1: `<Tip Head>` Tableau Semibold 11 navy `#13233A`, a space, then `<Tip Value Level>` Tableau Bold 11 navy, `<Tip Value Adds>` Tableau Bold 11 teal `#0F6E56`, `<Tip Value Takes>` Tableau Bold 11 dark sand `#7D6A45` (only one is ever not empty).
+- Line 1: `<Tip Head>` Tableau Semibold 11 navy `#13233A`, a space, then `<Tip Value Level>` Tableau Bold 11 navy, `<Tip Value Adds>` Tableau Bold 11 plum `#5B3A63`, `<Tip Value Takes>` Tableau Bold 11 dark sand `#8A6A35` (only one is ever not empty).
 - Line 2: `<ATTR(factor_meaning)>` Tableau Book 10 ink `#1F2329` (a dimension only on the tooltip must be ATTR, or the pill turns red and the sheet blanks).
-- Line 3: `<Tip Share>` Tableau Book 10 slate `#5A6170`.
+- Line 3: `<Tip Share>` Tableau Semibold 10 navy `#13233A`.
 - Line 4: `<Tip Order>` Tableau Book 9 slate `#5A6170`.
 
 Expected, default, the Rate bar: "Rate, Jun 30, 2025 to Jun 30, 2026: **+$139.8M**" / "What each person costs at constant exchange rates: pay and bill rates" / "35% of the change" / "One fixed order of the steps would give +$145.2M, a bias of +$5.5M." The Volume bar: "… 76% of the change · headcount 39,145 to 41,946". The Closing bar: "Closing, Jun 30, 2026: $4,648.1M" / "Total workforce cost at the later date" / "41,946 people".
 
 ### 7.5 The note under the chart
 
-Sheet **Bridge Note**: Text, one mark; `Axis starts at <MIN(Floor Text)> so the factors are visible.` Tableau Book 9 slate `#5A6170`, then ` Teal adds cost, sand takes it away; the six effects add up to the change exactly.` Tableau Book 9 slate. Detail `zzTrue`, `zzFalse`; tooltip off.
+A dashboard text object under the chart (static): `Plum adds cost` Tableau Semibold 9 plum `#5B3A63` · `, ` · `sand takes it away` Semibold 9 dark sand `#8A6A35` · `; the six effects add up to the change exactly.` Tableau Book 9 slate `#5A6170`.
 
 ---
 
 ## 8. The order of the steps
 
-Shapley against one fixed order (the sequential split in the order Volume, Workforce mix, Location mix, Level mix, Rate, Currency). The bars show how close the two are; the bias column shows what the order alone would have moved.
+Shapley against one fixed order (the sequential split: Volume, Workforce mix, Location mix, Level mix, Rate, Currency). A table, one row per factor: the two values side by side and the bias (fixed order minus Shapley) as a small diverging bar on its own scale. Build 1's paired bars put a $5M difference beside $300M bars, where it could not be seen.
 
 ```
 // Bias Max Abs
@@ -709,41 +733,65 @@ CASE [Bias Driver] WHEN "Volume" THEN [S Bias Volume] WHEN "Workforce mix" THEN 
 WHEN "Location mix" THEN [S Bias Location] WHEN "Level mix" THEN [S Bias Level]
 WHEN "Rate" THEN [S Bias Rate] ELSE [S Bias Currency] END
 
-// Bias Subtitle
-"A fixed order would move " + [Bias Driver] + " by " + <Sign on [Bias Driver Value]> + "$" + <M1 on [Bias Driver Value]> + "M; Shapley averages every order"
+// Bias Driver Effect
+CASE [Bias Driver] WHEN "Volume" THEN [S Volume] WHEN "Workforce mix" THEN [S Workforce]
+WHEN "Location mix" THEN [S Location] WHEN "Level mix" THEN [S Level]
+WHEN "Rate" THEN [S Rate] ELSE [S Currency] END
+
+// Bias Word
+CASE [Bias Driver] WHEN "Volume" THEN "volume" WHEN "Workforce mix" THEN "the worker mix" WHEN "Location mix" THEN "the country mix"
+WHEN "Level mix" THEN "the grade mix" WHEN "Rate" THEN "rates" ELSE "currency" END
+
+// Bias Lead
+"A fixed order would " + (IF [Bias Driver Value] * [Bias Driver Effect] >= 0 THEN "overstate " ELSE "understate " END) + [Bias Word] + " by "
+
+// Bias Amount
+"$" + <M1 on [Bias Driver Value]> + "M"
 
 // Bias Text
 <Sign on SUM([Bias M])> + <M1 on SUM([Bias M])>
 
-// Bias Notable
-IF ABS(SUM([Bias M])) >= 1 THEN "notable" ELSE "small" END
+// Bias Kind
+IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELSE "takes away" END
+
+// Bias Shap Txt
+<Sign on SUM([Effect M])> + <M1 on SUM([Effect M])>
+
+// Bias Seq Txt
+<Sign on SUM([Seq M])> + <M1 on SUM([Seq M])>
+
+// Bias Axis
+{ MAX(IF [In Selection] AND [Is Factor] THEN ABS([Bias M]) END) } * 1.9
+
+// Bias Axis Neg
+-[Bias Axis]
 ```
 
-Sheet **Bias Title**: Text, `The order of the steps changes the answer` Tableau Semibold 14 navy `#13233A` / `<Bias Subtitle>` Tableau Book 10 slate `#5A6170` / legend line: `■` Tableau Book 10 navy `#13233A`, ` Shapley (every order)   ` Tableau Book 9 slate, `■` Tableau Book 10 mist `#B9C3D1`, ` One fixed order   ` Tableau Book 9 slate, `Bias = fixed order − Shapley, $M` Tableau Book 9 slate. Left, top; Detail `zzTrue`, `zzFalse`; tooltip off.
+"Overstate" when the fixed order moves the factor further in its own direction (a bias with the same sign as the effect), "understate" otherwise. `Bias Axis` keeps the diverging bars symmetric and leaves room for their labels.
 
-Sheet **Bias Bars**:
-1. Filters `In Selection` = True and `Is Factor` = True.
-2. Rows `factor_order` (header hidden), `Factor Head` (header shown at the left, Tableau Book 10 ink `#1F2329`, left aligned), `Measure Names` (header hidden).
-3. Columns `Measure Values` with two measures only: `SUM(Effect M)` renamed **Shapley**, `SUM(Seq M)` renamed **One fixed order**.
-4. Marks **Bar**; Color `Measure Names`: Shapley navy `#13233A`, One fixed order mist `#B9C3D1`; size about 70% of the row.
-5. Label the values: Tableau Book 8 slate `#5A6170`, at the bar end, format Number Custom `+#,##0.0;"−"#,##0.0`.
-6. Axis hidden; zero line solid 1 px `#D5DBE4`; grid none; row dividers none; shading None.
-7. Tooltip: `<Factor Head>` Tableau Semibold 10 navy / `Shapley <SUM(Effect M)> · one fixed order <SUM(Seq M)> · bias <Bias Text>` Tableau Book 10 slate (the numbers formatted as in 5).
+Sheet **Bias Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `<Bias Lead>` Tableau Bold 14 navy `#13233A` · `<Bias Amount>` Bold 14 plum `#5B3A63`. Line 2: `Shapley averages every order of the six steps; one fixed order (volume first, currency last) shifts the credit, $M` Tableau Book 10 slate `#5A6170`.
 
-Sheet **Bias Column**: same filters; Rows `factor_order` (header hidden); Marks **Text**, `<Bias Text>`; Color `Bias Notable`: notable navy `#13233A`, small axis gray `#8C9BB0`; Tableau Semibold 10, right aligned, middle. Shading None, no lines, tooltip off, Detail `zzTrue`, `zzFalse`. It floats beside Bias Bars at the same height, so its six rows line up with the six factor pairs.
+Four sheets side by side make the table; each: Filters `In Selection` = True and `Is Factor` = True; Rows `factor_order` (discrete, header hidden); Fit Entire View; shading None; row dividers solid 1 px `#E7E3DD`; Detail `zzTrue`, `zzFalse`; tooltip off unless stated. Same height and top, so the six rows line up.
 
-Expected, default:
+| Sheet | Width | Mark | Content |
+|---|---:|---|---|
+| **Bias Names** | 104 | Text | `<Factor Head>` Tableau Book 10 ink `#1F2329`, left |
+| **Bias Shapley** | 68 | Text | `<Bias Shap Txt>` Tableau Semibold 10 navy `#13233A`, right |
+| **Bias Seq** | 76 | Text | `<Bias Seq Txt>` Tableau Book 10 slate `#5A6170`, right |
+| **Bias Bars** | 140 | Bar | Columns `SUM(Bias M)`, axis hidden; Color `Bias Kind`: adds plum `#5B3A63`, takes away sand `#C2A878`, small `#D5DBE4`; size 50%; Label `<Bias Text>` Tableau Semibold 9 slate `#5A6170` at the bar end; zero line solid 1 px `#D5DBE4`; two reference lines at `MIN(Bias Axis)` and `MIN(Bias Axis Neg)` with no line (they only hold the axis symmetric). Tooltip: `<Factor Head>` Semibold 10 navy / `Shapley ` Book 10 ink, `<Bias Shap Txt>` Semibold 10 navy, ` · one fixed order ` Book 10 ink, `<Bias Seq Txt>` Semibold 10 slate, ` · bias ` Book 10 ink, `<Bias Text>` Bold 10 plum |
 
-| Factor | Shapley | One fixed order | Bias |
+Column headers are four dashboard text objects above the table: `Factor` (left), `Shapley`, `Fixed order` (right aligned), `Bias` (centered), Tableau Book 9 axis gray `#8C9BB0`.
+
+Expected, default: title "A fixed order would overstate rates by **$5.5M**".
+
+| Factor | Shapley | Fixed order | Bias |
 |---|---:|---:|---:|
-| Volume | +307.1 | +303.8 | −3.3 |
-| Workforce mix | −4.8 | −5.3 | −0.5 |
-| Location mix | −9.3 | −9.1 | +0.1 |
-| Level mix | +22.4 | +23.5 | +1.1 |
-| Rate | +139.8 | +145.2 | **+5.5** |
-| Currency | −52.2 | −55.2 | −2.9 |
-
-Subtitle "A fixed order would move Rate by +$5.5M; Shapley averages every order". Notable (navy): Volume, Level mix, Rate, Currency.
+| Volume | +307.1 | +303.8 | −3.3 (sand) |
+| Workforce mix | −4.8 | −5.3 | −0.5 (small) |
+| Location mix | −9.3 | −9.1 | +0.1 (small) |
+| Level mix | +22.4 | +23.5 | +1.1 (plum) |
+| Rate | +139.8 | +145.2 | **+5.5** (plum) |
+| Currency | −52.2 | −55.2 | −2.9 (sand) |
 
 ---
 
@@ -753,8 +801,8 @@ The selected group's five fiscal years, each against the year before: the pairs 
 
 ```
 // Table Column
-CASE [factor_order] WHEN 1 THEN "Volume" WHEN 2 THEN "Mix" WHEN 3 THEN "Mix" WHEN 4 THEN "Mix"
-WHEN 5 THEN "Rate" WHEN 6 THEN "Currency" END
+CASE [factor_order] WHEN 1 THEN "People" WHEN 2 THEN "Mix" WHEN 3 THEN "Mix" WHEN 4 THEN "Mix"
+WHEN 5 THEN "Rates" WHEN 6 THEN "Currency" END
 
 // Table Col Order
 CASE [factor_order] WHEN 1 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 2 WHEN 4 THEN 2 WHEN 5 THEN 3 WHEN 6 THEN 4 END
@@ -787,8 +835,41 @@ IF ROUND(SUM([Effect M]), 1) >= 0 THEN "adds" ELSE "takes away" END
 + "; currency " + (IF [Y Cur Min] < 0 AND [Y Cur Max] > 0 THEN "swung both ways"
  ELSEIF [Y Cur Max] < 0 THEN "lowered cost every year" ELSE "raised cost every year" END)
 
-// Year Subtitle
-(IF [Is Company] THEN "All of Arcadia" ELSE [p_Group] END) + ", $M nominal, each fiscal year against the year before"
+// Row HC Change
+[closing_headcount] - [opening_headcount]
+
+// Y HC Min
+{ MIN(IF [In Group] AND [Is Year Pair] THEN ABS([Row HC Change]) END) }
+
+// Is Quiet Year
+[In Group] AND [Is Year Pair] AND ABS([Row HC Change]) = [Y HC Min]
+
+// Quiet Flag
+IF [Is Quiet Year] THEN 1 ELSE 0 END
+
+// Quiet FY
+{ MIN(IF [Is Quiet Year] THEN [Row To Label] END) }
+
+// Quiet HC
+{ MIN(IF [Is Quiet Year] THEN [Row HC Change] END) }
+
+// Quiet Change
+{ SUM(IF [Is Quiet Year] AND [factor_order] = 7 THEN [Effect M] END) - SUM(IF [Is Quiet Year] AND [factor_order] = 0 THEN [Effect M] END) }
+
+// Quiet HC Txt
+(IF [Quiet HC] >= 0 THEN "+" ELSE "−" END) + <Comma on [Quiet HC]>
+
+// Quiet Verb
+IF [Quiet Change] >= 0 THEN ", yet cost rose " ELSE ", and cost fell " END
+
+// Quiet Change Txt
+"$" + <M1 on [Quiet Change]> + "M"
+
+// Cell Text Hi
+IF MIN([Quiet Flag]) = 1 THEN [Cell Text] END
+
+// Cell Text Lo
+IF MIN([Quiet Flag]) = 0 THEN [Cell Text] END
 
 // Year Row Label
 [Row To Label]
@@ -797,24 +878,26 @@ IF ROUND(SUM([Effect M]), 1) >= 0 THEN "adds" ELSE "takes away" END
 { MIN(IF [Pair Offset] = 0 THEN LEFT(DATENAME('month', [to_month_end]), 3) + " " + STR(DAY([to_month_end])) END) }
 
 // Year Note
-"Mix = workforce + location + level mix. Each row: " + [FY End Words] + " against the " + [FY End Words] + " a year before."
+"Mix = worker + country + grade mix. Each row: " + [FY End Words] + " against the " + [FY End Words] + " a year before; the year headcount moved least is in bold."
 ```
 
-Sheet **Year Title**: Text, `<MIN(Year Title)>` Tableau Semibold 14 navy `#13233A` (wraps to two lines) / `<MIN(Year Subtitle)>` Tableau Book 10 slate `#5A6170`. Left, top; Detail `zzTrue`, `zzFalse`; tooltip off.
+The quiet year is the one whose headcount changed least: the year where volume explains least and the other factors carry the change. Its row is bold in the table and named in the subtitle.
+
+Sheet **Year Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `<ATTR(Year Title)>` Tableau Bold 14 navy `#13233A`. Line 2: `In ` Tableau Book 10 slate `#5A6170` · `<ATTR(Quiet FY)>` Semibold 10 navy · ` headcount changed by only ` Book 10 slate · `<ATTR(Quiet HC Txt)>` Semibold 10 navy · `<ATTR(Quiet Verb)>` Book 10 slate · `<ATTR(Quiet Change Txt)>` Bold 10 plum `#5B3A63`.
 
 Sheet **Year Table**:
 1. Filter `Year Row` = True.
 2. Rows `Year Row Label` (sorted by `fiscal_year` ascending; header at the left, Tableau Semibold 10 navy `#13233A`, header title "FY").
 3. Columns `Table Col Order` (header hidden), `Table Column` (header at the top, Tableau Semibold 9 slate `#5A6170`).
-4. Marks **Text**, `<Cell Text>`; Color `Cell Kind`: adds teal `#0F6E56`, takes away dark sand `#7D6A45`; Tableau Book 10; alignment left, middle.
-5. Header band: Format > Shading > Header, `#F3F3EF` (the column titles sit on a light band); rows white, no banding; row dividers solid 1 px `#ECEDEA` between rows; no column dividers.
+4. Marks **Text**, `<Cell Text Hi>` Tableau Bold 10 then `<Cell Text Lo>` Tableau Book 10 (only one is ever not empty); Color `Cell Kind`: adds plum `#5B3A63`, takes away dark sand `#8A6A35`; alignment right, middle.
+5. No shading (open on the paper); column titles Tableau Semibold 9 slate `#5A6170`; row dividers solid 1 px `#E7E3DD`; no column dividers.
 6. Tooltip: `<Year Row Label> · <Table Column>: <Cell Text>` Tableau Book 10 ink `#1F2329`. Both fields are already in the view, so nothing goes on the Tooltip shelf (a Rows field is never repeated there).
 
 Sheet **Year Note**: Text, `<MIN(Year Note)>` Tableau Book 9 slate `#5A6170`; Detail `zzTrue`, `zzFalse`; tooltip off.
 
-Expected, all of Arcadia (title "Rates rose every year; currency swung both ways"; note "Mix = workforce + location + level mix. Each row: Jun 30 against the Jun 30 a year before."):
+Expected, all of Arcadia (title "Rates rose every year; currency swung both ways"; subtitle "In **FY24** headcount changed by only **−42**, yet cost rose **$93.5M**"; FY24 bold):
 
-| FY | Volume | Mix | Rate | Currency |
+| FY | People | Mix | Rates | Currency |
 |---|---:|---:|---:|---:|
 | FY22 | +220.3 | −8.4 | +98.0 | −138.9 |
 | FY23 | +277.1 | −9.5 | +112.1 | +36.2 |
@@ -862,19 +945,20 @@ MIN([Company Name])
 "Report date " + [As Of Text]
 ```
 
+The dates block under the Period capsule (the How-To #2 lesson: a visitor reads exactly which two days are compared): a static text object with three keys, `This`, `Against`, `Span` (Tableau Book 9 `#8FA0B8`, one per line), beside the sheet **Period Dates**: Text, `<ATTR(To Date Text)>` Tableau Semibold 9 white `#FFFFFF` / `<ATTR(From Date Text)>` Semibold 9 white / `<ATTR(Span Words)>` Book 9 `#B9C3D1`; Detail `zzTrue`, `zzFalse`; tooltip off.
+
 | Sheet | Shape | Label | Detail | Tooltip |
 |---|---|---|---|---|
-| **Period Field** | `d4_field_capsule.png` (always white: the period is always a choice) | `<Pair Label>` Tableau Semibold 9 navy `#13233A`, left | `Toggle Period Panel`, `Close Panel`, `zzTrue`, `zzFalse` | "Choose the two dates to compare" |
-| **Period Sub** | none (Text) | `<Span Text>` Tableau Book 8 `#8A97A8` | `zzTrue`, `zzFalse` | off |
+| **Period Field** | `d4_field_capsule.png` (always white: the period is always a choice) | `<Period Field Text>` Tableau Semibold 9 navy `#13233A`, left | `Toggle Period Panel`, `Close Panel`, `zzTrue`, `zzFalse` | "Choose the two dates to compare" |
 | **Org Field** | `Org Capsule Shape` | `<Org Text Light>` Tableau Semibold 9 navy `#13233A` + `<Org Text Dark>` Tableau Medium 9 `#E4E9F0`, left | `Toggle Org Panel`, `Close Panel`, `zzTrue`, `zzFalse` | "Choose all of Arcadia or one function" |
 | **Org Sub** | none (Text) | `<Org Sub Text>` Tableau Book 8 `#8A97A8` | `zzTrue`, `zzFalse` | off |
 | **Reset** | `d4_reset.png` | none | `Zero Pair`, `Default Group`, `Close Panel`, `zzTrue`, `zzFalse` | "Reset to default view" |
 | **Info Button** | `Info Shape` | none | `Toggle Info`, `Close Panel`, `zzTrue`, `zzFalse` | "How the bridge works" |
-| **Rail As Of** | none (Text) | `<Rail Line 1>` Tableau Semibold 9 `#E4E9F0` / `Nominal USD, ECB month-end rates` Tableau Book 9 `#B9C3D1` / `Employees and contingent workers` Tableau Book 9 `#B9C3D1` | `zzTrue`, `zzFalse` | off |
+| **Rail As Of** | none (Text) | `<Rail Line 1>` Tableau Semibold 9 `#E4E9F0` / `Nominal USD at month-end ECB rates` Tableau Book 9 `#B9C3D1` / `Employees and contingent workers` Tableau Book 9 `#B9C3D1` | `zzTrue`, `zzFalse` | off |
 
-Capsules are drawn at shape size 12 (the whole pill shows), Reset at 10. Sheet **Page Title**: Text, `Workforce Cost Bridge` Tableau Bold 20 navy `#13233A` / `<Page Subtitle>` Tableau Book 11 slate `#5A6170`; left, top; Detail `zzTrue`, `zzFalse`; tooltip off.
+Capsules are drawn at shape size 12 (the whole pill shows), Reset at 10. The rail's first heading reads **COMPARE**.
 
-Expected: default Period "FY26 vs FY25" / "Jun 30, 2025 to Jun 30, 2026"; Organization "All of Arcadia" (dark capsule) / "41,946 people on Jun 30, 2026"; Technology "Technology" (white capsule) / "19,157 people on Jun 30, 2026"; rail foot "Report date Jun 30, 2026".
+Expected: default Period "FY26 vs FY25 · year-end"; This Jun 30, 2026 · Against Jun 30, 2025 · Span 12 months, year-end to year-end; Organization "All of Arcadia" (dark capsule) / "41,946 people on Jun 30, 2026"; Technology "Technology" (white capsule) / "19,157 people on Jun 30, 2026"; rail foot "Report date Jun 30, 2026".
 
 ---
 
@@ -882,7 +966,7 @@ Expected: default Period "FY26 vs FY25" / "Jun 30, 2025 to Jun 30, 2026"; Organi
 
 Each hangs from the rail's right edge (x 216): a navy `#13233A` vertical container, padding 0, no border, shown by its open flag (Layout > Control visibility using value). Inside: header 44 px (title Tableau Bold 12 white `#FFFFFF`, 12 px from the left; ✕ at the right), the line image `d2_popover_line_wide.png` 9 px, the body, a footer 30 px (Tableau Book 9 `#8FA0B8`, one line, 12 px from the left). The ✕ sheets (**Period Close**, **Org Close**, **Info Close**): Text `✕` Tableau Book 12 `#B8C0CC`, Detail `zzFalse`, `zzTrue`, `Close Panel`, tooltip "Close".
 
-The list sheets: one row per option, Marks **Shape** with the tick files `d4_tick_on.png` (12) / `d4_tick_off.png` (11) from **Arcadia D4** (the files carry the state, so no color on the shape), the tick on a hidden axis at the left, **every tick at shape size 8 in every list** (a fixed size, never sized by the view, so ticks do not grow when a list is short), rows 22 px, fit width; row banding none; tooltip off.
+The list sheets: one row per option, Marks **Shape** with the tick files `d4_tick_on.png` (12) / `d4_tick_off.png` (11) from **Arcadia D4** (the files carry the state, so no color on the shape), the tick on a hidden axis at the left, **every tick at shape size 1.8 in every list** (a fixed size, never sized by the view, so ticks do not grow when a list is short; build 1's size 8 drew stacked, oversized ticks), rows 22 px, fit width; row banding none; tooltip off.
 
 ```
 // Pair Option Row
@@ -901,6 +985,9 @@ MIN([Row To Label]) + " vs " + MIN([Row From Label])
 // Group Option Row
 [In Pair] AND [factor_order] = 0
 
+// Group Key
+STR([view_order]) + " " + [group_name]
+
 // Group Shape
 IF MIN([group_name]) = [p_Group] THEN "d4_tick_on" ELSE "d4_tick_off" END
 
@@ -914,7 +1001,7 @@ IF MIN([view_name]) = "Company" THEN "All of Arcadia" ELSE MIN([group_name]) END
 | Popover | x, y, w × h | Body |
 |---|---|---|
 | **Period Popover** | 216, 132, 360 × 470 | Title "Compare". **Pair List**: Filter `Pair Option Row` = True (17 rows). Rows `Pair Offset` (header hidden, sorted ascending: the latest first). Shape `Pair Shape`; label `  <Pair Option Name>` Tableau Book 10 `#E4E9F0` then `   <Pair Option Date>` Tableau Book 9 `#8FA0B8`. Detail `Pair Offset`, `Close Panel`, `zzTrue`, `zzFalse`. Footer "Each choice compares a quarter-end with the same date a year before." |
-| **Org Popover** | 216, 228, 360 × 300 | Title "Organization". **Group List**: Filter `Group Option Row` = True (9 rows). Rows `view_order`, `group_name` (headers hidden; the company first, then the functions A to Z). Shape `Group Shape`; label `  <Group Option Name>` Tableau Book 10 `#E4E9F0` then `   <Group Option People>` Tableau Book 9 `#8FA0B8`. Detail `group_name`, `Close Panel`, `zzTrue`, `zzFalse`. Footer "Each function is its own bridge: its effects add up to its own change." |
+| **Org Popover** | 216, 228, 360 × 300 | Title "Organization". **Group List**: Filter `Group Option Row` = True (9 rows). Rows `Group Key` (header hidden; the company first, then the functions A to Z; one row field, because build 1's two row fields drew the rows on top of each other). Shape `Group Shape`; label `  <Group Option Name>` Tableau Book 10 `#E4E9F0` then `   <Group Option People>` Tableau Book 9 `#8FA0B8`. Detail `group_name`, `Close Panel`, `zzTrue`, `zzFalse`. Footer "Each function is its own bridge: its effects add up to its own change." |
 | **Info Popover** | 216, 24, 591 × 420 | Title "How the bridge works", then the text below |
 
 Pair List expected: "FY26 vs FY25 · full year · Jun 30" (ticked by default), "FY26 Q3 vs FY25 Q3 · Mar 31", "FY26 Q2 vs FY25 Q2 · Dec 31", … "FY22 vs FY21 · full year · Jun 30". Group List: "All of Arcadia · 41,946 people", "Commercial · …", … "Technology · 19,157 people".
@@ -937,42 +1024,56 @@ Pair List expected: "FY26 vs FY25 · full year · Jun 30" (ticked by default), "
 
 ### 12.1 The page
 
-New dashboard **Dashboard**, **Fixed 1400 × 850**, title off, shading **`#F3F3EF`**. Every item floating unless inside a container; show title off; padding 0 unless stated. Corner radius is under Layout > Background (Tableau 2026.1+).
+New dashboard **Dashboard**, **Fixed 1400 × 850**, title off, shading **`#F6F4F1`** (warm paper). Every item floating; show title off; padding 0 unless stated. No cards: every panel sits on the paper under a rule.
 
 ### 12.2 Floating items, back to front
 
 | # | Item | x | y | w | h | Format |
 |---:|---|---:|---:|---:|---:|---|
-| 1 | `Page Title` | 240 | 16 | 1136 | 56 | |
-| 2–6 | Containers `KPI 1` … `KPI 5`, each holding its sheet | 240, 470, 700, 930, 1160 | 86 | 216 | 86 | white `#FFFFFF`, border 1 px `#E4E3DD`, **radius 14**, inner padding 12 top and bottom, 14 sides |
-| 7–11 | `Hover K1` … `Hover K5` | 240, 470, 700, 930, 1160 | 86 | 216 | 86 | over their cards |
-| 12 | Container `Card: Bridge` (vertical) | 240 | 186 | 724 | 626 | white, border 1 px `#E4E3DD`, **radius 14**, inner padding 16 top, 14 sides, 12 bottom: `Bridge Title` 696 × 50 · `Bridge` 696 × 512 · `Bridge Note` 696 × 36 |
-| 13 | Container `Card: Order` (vertical) | 988 | 186 | 388 | 302 | white, border 1 px `#E4E3DD`, **radius 14**, inner padding 16 top, 14 sides, 12 bottom: `Bias Title` 360 × 74 · horizontal container 360 × 200 holding `Bias Bars` 304 × 200 and `Bias Column` 56 × 200 |
-| 14 | Container `Card: Years` (vertical) | 988 | 502 | 388 | 310 | white, border 1 px `#E4E3DD`, **radius 14**, inner padding 16 top, 14 sides, 12 bottom: `Year Title` 360 × 58 · `Year Table` 360 × 204 · `Year Note` 360 × 20 |
-| 15 | Footnote text | 240 | 826 | 1136 | 16 | "Arcadia Systems is fictional; all data is synthetic. Executive officers excluded. Effects are Shapley values: each factor's average effect over every order of the six steps, so they add up to the change." Tableau Book 9 slate `#5A6170` |
-| 16 | Container `Rail` (vertical) | 0 | 0 | 216 | 850 | navy `#13233A`, inner padding 8 left and right (12.3) |
-| 17 | `Period Popover` | 216 | 132 | 360 | 470 | visibility `p_PeriodOpen` |
-| 18 | `Org Popover` | 216 | 228 | 360 | 300 | visibility `p_OrgOpen` |
-| 19 | `Info Popover` | 216 | 24 | 591 | 420 | visibility `p_InfoOpen` |
+| 1 | `Page Title` | 240 | 12 | 1136 | 112 | |
+| 2 | Blank, plum `#5B3A63` | 240 | 134 | 1136 | 2 | the ribbon's top rule |
+| 3 | `Ribbon Top` | 240 | 142 | 1136 | 56 | |
+| 4 | `Ribbon Bars` | 240 | 200 | 1136 | 14 | |
+| 5 | `Ribbon Note` | 240 | 216 | 1136 | 24 | |
+| 6 | Blank `#E0DCD6` | 240 | 246 | 1136 | 1 | the ribbon's bottom rule |
+| 7–11 | Blanks `#E0DCD6`, the cell dividers | 429, 619, 808, 997, 1187 | 142 | 1 | 98 | |
+| 12 | Blank, plum | 240 | 262 | 708 | 2 | |
+| 13 | `Bridge Title` | 240 | 272 | 708 | 52 | |
+| 14 | `Bridge` | 240 | 328 | 708 | 456 | |
+| 15 | Text: the bridge's note (7.5) | 240 | 790 | 708 | 18 | |
+| 16 | Blank, plum | 988 | 262 | 388 | 2 | |
+| 17 | `Bias Title` | 988 | 272 | 388 | 58 | |
+| 18 | Four text objects: the order table's headers | 988, 1092, 1160, 1236 | 334 | 104, 68, 76, 140 | 16 | Tableau Book 9 `#8C9BB0` |
+| 19 | `Bias Names`, `Bias Shapley`, `Bias Seq`, `Bias Bars` | 988, 1092, 1160, 1236 | 352 | 104, 68, 76, 140 | 150 | |
+| 20 | Blank, plum | 988 | 520 | 388 | 2 | |
+| 21 | `Year Title` | 988 | 530 | 388 | 62 | |
+| 22 | `Year Table` | 988 | 594 | 388 | 194 | |
+| 23 | `Year Note` | 988 | 790 | 388 | 20 | |
+| 24 | Footnote text | 240 | 826 | 1136 | 16 | "Arcadia Systems is fictional; all data is synthetic. Executive officers excluded. Effects are Shapley values: each factor's average effect over every order of the six steps, so they add up to the change." Tableau Book 9 slate `#5A6170` |
+| 25 | Blank, navy `#13233A` (the rail) | 0 | 0 | 216 | 850 | |
+| 26 | Rail items (12.3) | | | | | |
+| 27 | `Period Popover` | 216 | 132 | 360 | 470 | visibility `p_PeriodOpen` |
+| 28 | `Org Popover` | 216 | 252 | 360 | 300 | visibility `p_OrgOpen` |
+| 29 | `Info Popover` | 216 | 24 | 591 | 420 | visibility `p_InfoOpen` |
 
-The rail sits in front of every page item; the popovers in front of everything.
+The ribbon's cells are 1136 ÷ 6 = 189.3 px; the dividers sit on their edges.
 
-### 12.3 Inside the rail (tiled, 200 wide, every item fixed height except the flexible blank)
+### 12.3 The rail (floating over the navy blank, 200 wide at x 8)
 
-| Item | h | y |
+| Item | y | h |
 |---|---:|---:|
-| Blank | 24 | 0 |
-| Container `Rail Top`: logo `arcadia_logo_horizontal_reverse.png` 200 × 40, Blank 12, `Info Button` row 28 (Blank 172 + 28 × 28) | 80 | 24 |
-| Blank | 28 | 104 |
-| Text PERIOD (Tableau Semibold 8 `#B8C4D6`) 16 · Blank 6 · `Period Field` 32 · `Period Sub` 18 · Blank 24 | 96 | 132 |
-| Text ORGANIZATION 16 · Blank 6 · `Org Field` 32 · `Org Sub` 18 · Blank 24 | 96 | 228 |
-| Image `arcadia_rail_divider.png` | 24 | 324 |
-| `Reset` | 32 | 348 |
-| Blank (flexible) | rest | |
-| `Rail As Of` | 56 | 770 |
-| Blank | 24 | 826 |
+| Logo `arcadia_logo_horizontal_reverse.png` (160 wide) and `Info Button` (28 × 28 at x 180) | 24 | 40 |
+| Text COMPARE (Tableau Semibold 8 `#B8C4D6`) | 92 | 16 |
+| `Period Field` | 110 | 32 |
+| Keys text (`This` / `Against` / `Span`, 56 wide) and `Period Dates` (x 64, 144 wide) | 148 | 50 |
+| Text ORGANIZATION | 212 | 16 |
+| `Org Field` | 230 | 32 |
+| `Org Sub` | 262 | 20 |
+| Image `arcadia_rail_divider.png` | 292 | 24 |
+| `Reset` | 322 | 32 |
+| `Rail As Of` | 760 | 66 |
 
-The popovers' tops line up with their headings: Period y 132, Organization y 228.
+The popovers' tops line up with their capsules: Period y 132 (just under the capsule), Organization y 252.
 
 ### 12.4 Actions
 
@@ -999,7 +1100,7 @@ The popovers' tops line up with their headings: Period y 132, Organization y 228
 
 21 in all.
 
-**Deselect:** one Filter action per clickable sheet: source and target the same sheet, run on Select, clearing **Show all values**, `zzTrue` → `zzFalse`. Sheets: Page Title, KPI 1 to KPI 5, Hover K1 to Hover K5, Bridge Title, Bridge Note, Bias Title, Bias Column, Year Title, Year Note, Period Field, Period Sub, Org Field, Org Sub, Reset, Info Button, Rail As Of, Pair List, Group List, Period Close, Org Close, Info Close (29). Not on `Bridge`, `Bias Bars` or `Year Table`: a selection there is useful.
+**Deselect:** one Filter action per clickable sheet: source and target the same sheet, run on Select, clearing **Show all values**, `zzTrue` → `zzFalse`. Every sheet except `Bridge`, `Bias Bars` and `Year Table` (a selection there is useful).
 
 ---
 
@@ -1008,10 +1109,10 @@ The popovers' tops line up with their headings: Period y 132, Organization y 228
 ### 13.1 Ties at every state
 
 - The bridge closes: Opening + the six labels = Closing (to 0.1 from rounding the labels).
-- KPI 1's change = KPI 2 + KPI 3 + KPI 4 + KPI 5 (Volume + Rate + Mix + Currency).
-- KPI 5's "before exchange rates" = KPI 1's change − KPI 5.
+- The six ribbon values add up to the headline's change.
+- The exchange-rates cell's "without them" = the headline's change − its value.
 - The FY rows of the five-year table equal the bridge at `p_Pair` 0, 4, 8, 12, 16 (Mix = the three mix bars).
-- The Shapley bars of the order card equal the bridge's factor labels.
+- The order table's Shapley column equals the bridge's factor labels.
 
 ### 13.2 Values
 
@@ -1041,45 +1142,61 @@ Computed by `python3 tableau/builder/d6/check_values.py`; `--verify` also confir
 
 **Page texts, all of Arcadia, every pair:**
 
-| p_Pair | Bridge title | KPI 2 title · line | KPI 5 line | Order-card subtitle (before "; Shapley averages every order") |
+| p_Pair | Headline | Order-card title | People note | Exchange-rates note |
 |---:|---|---|---|---|
-| 0 | Cost grew $403M, and 76% of it was more people | More people (volume) · 76% of the change · headcount +2,801 | +$455.2M before exchange rates | A fixed order would move Rate by +$5.5M |
-| 1 | Cost grew $482M, and 57% of it was more people | More people (volume) · 57% of the change · headcount +2,561 | +$425.2M before exchange rates | A fixed order would move Volume by −$6.6M |
-| 2 | Cost grew $540M; the largest effect was more people (+$252.0M) | More people (volume) · 47% of the change · headcount +2,356 | +$399.2M before exchange rates | A fixed order would move Volume by −$8.6M |
-| 3 | Cost grew $396M, and 60% of it was more people | More people (volume) · 60% of the change · headcount +2,194 | +$379.0M before exchange rates | A fixed order would move Volume by −$4.5M |
-| 4 | Cost grew $428M, and 50% of it was more people | More people (volume) · 50% of the change · headcount +2,027 | +$341.4M before exchange rates | A fixed order would move Volume by −$5.6M |
-| 5 | Cost grew $250M, and 62% of it was more people | More people (volume) · 62% of the change · headcount +1,480 | +$276.3M before exchange rates | A fixed order would move Rate by +$3.1M |
-| 6 | Cost grew $111M; the largest effect was higher rates (+$123.8M) | More people (volume) · 93% of the change · headcount +997 | +$214.8M before exchange rates | A fixed order would move Currency by −$3.6M |
-| 7 | Cost grew $238M, and 53% of it was higher rates | More people (volume) · 21% of the change · headcount +476 | +$169.3M before exchange rates | A fixed order would move Currency by +$1.7M |
-| 8 | Cost grew $94M; the largest effect was higher rates (+$118.7M) | Fewer people (volume) · headcount −42 | +$120.2M before exchange rates | A fixed order would move Level mix by +$1.2M |
-| 9 | Cost grew $188M, and 60% of it was higher rates | More people (volume) · 37% of the change · headcount +680 | +$180.3M before exchange rates | A fixed order would move Volume by −$1.1M |
-| 10 | Cost grew $304M; the largest effect was more people (+$137.9M) | More people (volume) · 45% of the change · headcount +1,368 | +$246.1M before exchange rates | A fixed order would move Volume by −$3.1M |
-| 11 | Cost grew $383M, and 53% of it was more people | More people (volume) · 53% of the change · headcount +2,051 | +$300.3M before exchange rates | A fixed order would move Volume by −$5.2M |
-| 12 | Cost grew $416M, and 67% of it was more people | More people (volume) · 67% of the change · headcount +2,820 | +$379.7M before exchange rates | A fixed order would move Volume by −$5.5M |
-| 13 | Cost grew $298M, and 88% of it was more people | More people (volume) · 88% of the change · headcount +2,657 | +$366.0M before exchange rates | A fixed order would move Rate by +$5.2M |
-| 14 | Cost grew $262M, and 94% of it was more people | More people (volume) · 94% of the change · headcount +2,498 | +$353.4M before exchange rates | A fixed order would move Rate by +$6.0M |
-| 15 | Cost grew $156M; the largest effect was more people (+$229.3M) | More people (volume) · headcount +2,371 | +$334.2M before exchange rates | A fixed order would move Currency by −$10.0M |
-| 16 | Cost grew $171M; the largest effect was more people (+$220.3M) | More people (volume) · headcount +2,269 | +$310.0M before exchange rates | A fixed order would move Currency by −$6.8M |
+| 0 | Workforce cost grew $402.9M to $4,648.1M, and 76% of it was more people | A fixed order would overstate rates by $5.5M | More people · 76% · +2,801 people | +$455.2M without them |
+| 1 | Workforce cost grew $482.4M to $4,517.4M, and 57% of it was more people | A fixed order would understate volume by $6.6M | More people · 57% · +2,561 people | +$425.2M without them |
+| 2 | Workforce cost grew $539.9M to $4,448.1M; the largest effect was more people (+$252.0M) | A fixed order would understate volume by $8.6M | More people · 47% · +2,356 people | +$399.2M without them |
+| 3 | Workforce cost grew $396.1M to $4,342.0M, and 60% of it was more people | A fixed order would understate volume by $4.5M | More people · 60% · +2,194 people | +$379.0M without them |
+| 4 | Workforce cost grew $427.8M to $4,245.2M, and 50% of it was more people | A fixed order would understate volume by $5.6M | More people · 50% · +2,027 people | +$341.4M without them |
+| 5 | Workforce cost grew $250.0M to $4,034.9M, and 62% of it was more people | A fixed order would overstate rates by $3.1M | More people · 62% · +1,480 people | +$276.3M without them |
+| 6 | Workforce cost grew $110.8M to $3,908.2M; the largest effect was higher rates (+$123.8M) | A fixed order would overstate currency by $3.6M | More people · 93% · +997 people | +$214.8M without them |
+| 7 | Workforce cost grew $237.6M to $3,946.0M, and 53% of it was higher rates | A fixed order would overstate currency by $1.7M | More people · 21% · +476 people | +$169.3M without them |
+| 8 | Workforce cost grew $93.5M to $3,817.4M; the largest effect was higher rates (+$118.7M) | A fixed order would overstate the grade mix by $1.2M | Fewer people · −42 people | +$120.2M without them |
+| 9 | Workforce cost grew $187.6M to $3,785.0M, and 60% of it was higher rates | A fixed order would understate volume by $1.1M | More people · 37% · +680 people | +$180.3M without them |
+| 10 | Workforce cost grew $304.5M to $3,797.4M; the largest effect was more people (+$137.9M) | A fixed order would understate volume by $3.1M | More people · 45% · +1,368 people | +$246.1M without them |
+| 11 | Workforce cost grew $383.2M to $3,708.4M, and 53% of it was more people | A fixed order would understate volume by $5.2M | More people · 53% · +2,051 people | +$300.3M without them |
+| 12 | Workforce cost grew $415.8M to $3,723.9M, and 67% of it was more people | A fixed order would understate volume by $5.5M | More people · 67% · +2,820 people | +$379.7M without them |
+| 13 | Workforce cost grew $298.2M to $3,597.3M, and 88% of it was more people | A fixed order would overstate rates by $5.2M | More people · 88% · +2,657 people | +$366.0M without them |
+| 14 | Workforce cost grew $261.7M to $3,493.0M, and 94% of it was more people | A fixed order would overstate rates by $6.0M | More people · 94% · +2,498 people | +$353.4M without them |
+| 15 | Workforce cost grew $156.3M to $3,325.2M; the largest effect was more people (+$229.3M) | A fixed order would overstate currency by $10.0M | More people · +2,371 people | +$334.2M without them |
+| 16 | Workforce cost grew $171.1M to $3,308.1M; the largest effect was more people (+$220.3M) | A fixed order would overstate currency by $6.8M | More people · +2,269 people | +$310.0M without them |
 
 **Each group, FY26 vs FY25 (`p_Pair` 0):**
 
-| Group | Total cost | Change | Volume | Workforce mix | Location mix | Level mix | Rate | Currency | Axis floor | Bridge title |
+| Group | Total cost | Change | Volume | Workforce mix | Location mix | Level mix | Rate | Currency | Axis floor | Headline |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---:|---|
-| All of Arcadia | $4,648.1M | +$402.9M | +307.1 | −4.8 | −9.3 | +22.4 | +139.8 | −52.2 | $4.0B | Cost grew $403M, and 76% of it was more people |
-| Commercial | $988.4M | +$64.3M | +44.8 | +0.0 | −5.3 | +5.2 | +29.7 | −10.2 | $870M | Cost grew $64M, and 70% of it was more people |
-| Finance | $235.9M | +$24.9M | +18.9 | +1.9 | −1.8 | +1.7 | +6.3 | −2.1 | $200M | Cost grew $25M, and 76% of it was more people |
-| Legal & Compliance | $148.8M | +$16.8M | +11.4 | +0.4 | +1.3 | +0.9 | +4.0 | −1.3 | $120M | Cost grew $17M, and 68% of it was more people |
-| Marketing | $187.4M | +$16.5M | +13.6 | +0.8 | −3.0 | +0.5 | +6.4 | −1.7 | $160M | Cost grew $17M, and 82% of it was more people |
-| Operations | $512.2M | +$44.7M | +37.5 | −3.1 | −0.7 | +2.1 | +15.3 | −6.4 | $440M | Cost grew $45M, and 84% of it was more people |
-| People | $212.3M | +$27.4M | +18.6 | +0.6 | +0.5 | +1.5 | +8.1 | −1.9 | $170M | Cost grew $27M, and 68% of it was more people |
-| Product | $346.8M | +$31.7M | +26.7 | −0.7 | −2.0 | +0.6 | +10.3 | −3.1 | $290M | Cost grew $32M, and 84% of it was more people |
-| Technology | $2,016.3M | +$176.8M | +135.5 | +0.1 | +0.8 | +5.3 | +60.5 | −25.5 | $1.7B | Cost grew $177M, and 77% of it was more people |
+| All of Arcadia | $4,648.1M | +$402.9M | +307.1 | −4.8 | −9.3 | +22.4 | +139.8 | −52.2 | $4.0B | Workforce cost grew $402.9M to $4,648.1M, and 76% of it was more people |
+| Commercial | $988.4M | +$64.3M | +44.8 | +0.0 | −5.3 | +5.2 | +29.7 | −10.2 | $870M | Workforce cost grew $64.3M to $988.4M, and 70% of it was more people |
+| Finance | $235.9M | +$24.9M | +18.9 | +1.9 | −1.8 | +1.7 | +6.3 | −2.1 | $200M | Workforce cost grew $24.9M to $235.9M, and 76% of it was more people |
+| Legal & Compliance | $148.8M | +$16.8M | +11.4 | +0.4 | +1.3 | +0.9 | +4.0 | −1.3 | $120M | Workforce cost grew $16.8M to $148.8M, and 68% of it was more people |
+| Marketing | $187.4M | +$16.5M | +13.6 | +0.8 | −3.0 | +0.5 | +6.4 | −1.7 | $160M | Workforce cost grew $16.5M to $187.4M, and 82% of it was more people |
+| Operations | $512.2M | +$44.7M | +37.5 | −3.1 | −0.7 | +2.1 | +15.3 | −6.4 | $440M | Workforce cost grew $44.7M to $512.2M, and 84% of it was more people |
+| People | $212.3M | +$27.4M | +18.6 | +0.6 | +0.5 | +1.5 | +8.1 | −1.9 | $170M | Workforce cost grew $27.4M to $212.3M, and 68% of it was more people |
+| Product | $346.8M | +$31.7M | +26.7 | −0.7 | −2.0 | +0.6 | +10.3 | −3.1 | $290M | Workforce cost grew $31.7M to $346.8M, and 84% of it was more people |
+| Technology | $2,016.3M | +$176.8M | +135.5 | +0.1 | +0.8 | +5.3 | +60.5 | −25.5 | $1.7B | Workforce cost grew $176.8M to $2,016.3M, and 77% of it was more people |
 
 The eight functions add up to the company's opening and closing cost, but their effects do not add up to the company's: each function's mix is measured inside the function.
 
-**Technology, FY26 vs FY25:** KPIs "Total cost, FY26 · $2,016.3M · +$176.8M vs FY25 (+9.6%)" · "More people (volume) · +$135.5M · 77% of the change · headcount +1,301" · "Higher rates · +$60.5M" · "Mix of people · +$6.2M · level +5.3 · location +0.8 · workforce +0.1" · "Currency · −$25.5M · +$202.2M before exchange rates". Order card: Volume +135.5 / +134.0 / −1.5 · Workforce mix +0.1 / +0.0 / −0.1 · Location mix +0.8 / +1.0 / +0.2 · Level mix +5.3 / +5.6 / +0.3 · Rate +60.5 / +62.9 / **+2.4** · Currency −25.5 / −26.7 / −1.2; subtitle "A fixed order would move Rate by +$2.4M". Five-year table: FY22 +97.3 / −2.1 / +46.7 / −59.4 · FY23 +125.1 / −4.4 / +53.1 / +16.5 · FY24 +4.8 / −0.2 / +52.1 / −10.3 · FY25 +99.1 / +0.5 / +58.1 / +37.5 · FY26 +135.5 / +6.2 / +60.5 / −25.5.
+**The factor ribbon, all of Arcadia, FY26 vs FY25:**
 
-**FY24 vs FY23, all of Arcadia (`p_Pair` 8), the year the question matters:** headcount 37,160 to 37,118, yet cost +$93.5M. KPIs "Fewer people (volume) · −$4.3M · headcount −42" · "Higher rates · +$118.7M" · "Mix of people · +$5.8M · level +12.1 · location −9.1 · workforce +2.8" · "Currency · −$26.7M · +$120.2M before exchange rates". Order card: the only year the fixed order understates Rate (bias −0.4).
+Headline: Workforce cost grew $402.9M to $4,648.1M, and 76% of it was more people  
+Subtitle: Jun 30, 2025 to Jun 30, 2026 · +9.5% · all of Arcadia · 39,145 to 41,946 people · nominal USD
+
+| Cell | Name | Value | Note |
+|---:|---|---:|---|
+| 1 | More people | +$307.1M | 76% · +2,801 people |
+| 2 | Higher rates | +$139.8M | 35% · pay and bill rates |
+| 3 | Grade mix | +$22.4M | toward higher grades |
+| 4 | Country mix | −$9.3M | toward lower-cost countries |
+| 5 | Worker mix | −$4.8M | toward the less costly worker type |
+| 6 | Exchange rates | −$52.2M | +$455.2M without them |
+
+**Technology, p_Pair 0:** Workforce cost grew $176.8M to $2,016.3M, and 77% of it was more people · More people +$135.5M (77% · +1,301 people) · Higher rates +$60.5M (34% · pay and bill rates) · Grade mix +$5.3M (toward higher grades) · Country mix +$0.8M (toward higher-cost countries) · Worker mix +$0.1M (toward the costlier worker type) · Exchange rates −$25.5M (+$202.2M without them)
+
+**Arcadia Systems, p_Pair 8:** Workforce cost grew $93.5M to $3,817.4M; the largest effect was higher rates (+$118.7M) · Fewer people −$4.3M (−42 people) · Higher rates +$118.7M (pay and bill rates) · Grade mix +$12.1M (toward higher grades) · Country mix −$9.1M (toward lower-cost countries) · Worker mix +$2.8M (toward the costlier worker type) · Exchange rates −$26.7M (+$120.2M without them)
+
+**Technology, FY26 vs FY25:** order table Volume +135.5 / +134.0 / −1.5 · Workforce mix +0.1 / +0.0 / −0.1 · Location mix +0.8 / +1.0 / +0.2 · Level mix +5.3 / +5.6 / +0.3 · Rate +60.5 / +62.9 / **+2.4** · Currency −25.5 / −26.7 / −1.2; title "A fixed order would overstate rates by $2.4M". Five-year table FY22 +97.3 / −2.1 / +46.7 / −59.4 · FY23 +125.1 / −4.4 / +53.1 / +16.5 · FY24 +4.8 / −0.2 / +52.1 / −10.3 · FY25 +99.1 / +0.5 / +58.1 / +37.5 · FY26 +135.5 / +6.2 / +60.5 / −25.5; subtitle "In FY24 headcount changed by only +50, yet cost rose $46.4M".
 
 ### 13.3 Click tests (Presentation mode, then on Tableau Public)
 
@@ -1088,11 +1205,11 @@ The eight functions add up to the company's opening and closing cost, but their 
 | 1 | Nothing | The values of section 0 |
 | 2 | Click every control, title, card and list row | Nothing stays highlighted |
 | 3 | Open each popover in turn | One open at a time |
-| 4 | Period > FY24 vs FY23 | Popover closes; capsule "FY24 vs FY23"; title "Cost grew $94M; the largest effect was higher rates (+$118.7M)"; KPI 2 "Fewer people (volume) · −$4.3M · headcount −42"; axis starts at $3.5B; the five-year table unchanged |
-| 5 | Period > FY26 Q3 vs FY25 Q3 | KPI 1 "Total cost, FY26 Q3 · $4,517.4M · +$482.4M vs FY25 Q3 (+12.0%)"; Currency +$57.2M (teal); axis $3.8B |
-| 6 | Organization > Technology | Capsule "Technology" (white) "19,157 people on Jun 30, 2026"; title "Cost grew $177M, and 77% of it was more people"; axis $1.7B; the order card and the five-year table follow |
-| 7 | Organization > People | Axis starts at $170M; five-year table FY26 +18.6 / +2.6 / +8.1 / −1.9 |
-| 8 | Hover each KPI card | The sentences of 6.1 |
+| 4 | Period > FY24 vs FY23 | Popover closes; capsule "FY24 vs FY23 · year-end"; This Jun 30, 2024, Against Jun 30, 2023; headline "Workforce cost grew $93.5M to $3,817.4M; the largest effect was higher rates (+$118.7M)"; ribbon "Fewer people −$4.3M · −42 people"; axis starts at $3.5B; the five-year table unchanged |
+| 5 | Period > FY26 Q3 vs FY25 Q3 | Capsule "FY26 Q3 vs FY25 Q3 · quarter-end"; Span "12 months, quarter-end to quarter-end"; headline "… grew $482.4M to $4,517.4M, and 57% of it was more people"; Exchange rates +$57.2M in plum; axis $3.8B |
+| 6 | Organization > Technology | Capsule "Technology" (white) "19,157 people on Jun 30, 2026"; headline "Workforce cost grew $176.8M to $2,016.3M, and 77% of it was more people"; axis $1.7B; the order table and the five-year table follow |
+| 7 | Organization > People | Axis starts at $170M; five-year table FY26 +18.6 / +2.6 / +8.1 / −1.9; subtitle "In FY24 headcount changed by only +51, yet cost rose $10.4M" |
+| 8 | Hover each ribbon cell | The tooltips of 6.2, numbers in plum or sand |
 | 9 | Hover the Rate bar, the Volume bar, the Closing bar | 7.4 |
 | 10 | Info | The text of section 11; ✕ closes it |
 | 11 | Reset | FY26 vs FY25, all of Arcadia, popovers closed |
@@ -1114,4 +1231,23 @@ The eight functions add up to the company's opening and closing cost, but their 
 
 ## 15. As built
 
-Filled in after the build: where Tableau needed something different from this guide, and why. The numbers do not change.
+The workbook is written by `tableau/builder/d6/` from this guide's code blocks into the saved base workbook (2.2):
+
+```
+D4_TWB=".../4 Contingent Workforce Reconciliation/Arcadia CW Reconciliation.twb" \
+python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workforce Cost Bridge (build N).twb"
+```
+
+**Build 1 (2026-10-29), the first layout (five KPI cards, white cards).** Every number matched section 13 in Desktop, the waterfall closed and every period and function pick changed every card. What it taught, carried into this guide:
+
+| Seen in build 1 | Changed |
+|---|---|
+| The first impression did not tell the story: the title was a page name, the KPI cards were five equal boxes | Template B (C14): the headline is the answer, the six factors are the KPIs |
+| Text sheets showed ".." (page subtitle, KPI line 3, rail foot) | Every text sheet is sized for its lines plus padding (12.2) |
+| Value labels sat across the bar tops | `Label Y` lifts each label by 3.5% of the chart's height |
+| The Shapley and fixed-order bars could not show a $5M difference beside $300M | The order card is a table with a diverging bias bar (8) |
+| Popover ticks drew oversized and stacked | Ticks at shape size 1.8 |
+| Organization list rows overlapped | One row field, `Group Key` |
+| The period was only "FY26 vs FY25" | Dates spelled out (C16) |
+
+---

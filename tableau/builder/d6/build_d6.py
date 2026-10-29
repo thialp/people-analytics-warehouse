@@ -23,8 +23,9 @@ DASH = 'Dashboard'
 W, H = 1400, 850
 
 NAVY, SLATE, INK, WHITE = '#13233a', '#5a6170', '#1f2329', '#ffffff'
-PALE, MIST, AXIS, GRID = '#e4e9f0', '#b9c3d1', '#8c9bb0', '#ecedea'
-TEAL, SAND, SAND_D, LEVEL = '#0f6e56', '#b8a888', '#7d6a45', '#8c9bb0'
+PALE, MIST, AXIS, GRID = '#e4e9f0', '#b9c3d1', '#8c9bb0', '#e7e3dd'
+PLUM, SAND, SAND_D, LEVEL = '#5b3a63', '#c2a878', '#8a6a35', '#9aa5b4'
+PAPER, RULE, TRACK = '#f6f4f1', '#e0dcd6', '#ece8e2'
 PALE2, MUTED = '#e4e9f0', '#8fa0b8'
 
 SHEETS, ACTIONS = {}, {}
@@ -62,34 +63,56 @@ def no_field_labels(s, scope):
     s.styles.append(f"<style-rule element='worksheet'>\n  <format attr='display-field-labels' scope='{scope}' value='false' />\n</style-rule>")
 
 
-# ===================================================================================================== title, KPIs
+# ===================================================================================================== headline
 s = new('Page Title')
-s.pane('Text', enc=ZZ, valign='top', label=[[('Workforce Cost Bridge', 'bold', 20, NAVY)], [('{Page Subtitle}', 'book', 11, SLATE)]])
+s.pane('Text', enc=ZZ, valign='top', label=[
+    [('WORKFORCE COST BRIDGE', 'semi', 10, PLUM)],
+    [('{Head Verb}', 'bold', 22, INK), ('{S Change Abs Txt}', 'bold', 22, PLUM), (' to ', 'bold', 22, INK), ('{S Closing Txt}', 'bold', 22, PLUM),
+     ('{Head Mid}', 'bold', 22, INK), ('{Head Pct}', 'bold', 22, PLUM), ('{Head Of}', 'bold', 22, INK), ('{Head Driver}', 'bold', 22, PLUM)],
+    [('{From Date Text|attr}', 'semi', 11, NAVY), (' to ', 'book', 11, SLATE), ('{To Date Text|attr}', 'semi', 11, NAVY),
+     (' · {S Change Pct Str} · {Scope Words|attr} · {S HC Open Str} to {S HC Close Str} people · nominal USD', 'book', 11, SLATE)]])
 
-KPIS = [(1, 'K1 Title', 'S Closing Txt', 'K1 Line'), (2, 'K2 Title', 'S Volume Txt', 'K2 Line'),
-        (3, 'K3 Title', 'S Rate Txt', 'K3 Line'), (4, 'K4 Title', 'S Mix Txt', 'K4 Line'),
-        (5, 'K5 Title', 'S Currency Txt', 'K5 Line')]
-for k, t, big, line in KPIS:
-    s = new(f'KPI {k}')
-    s.pane('Text', enc=ZZ, valign='top', label=[[('{' + t + '}', 'book', 10, SLATE)], [('{' + big + '}', 'bold', 22, NAVY)],
-                                                [('{' + line + '}', 'book', 9, SLATE)]])
-for k in range(1, 6):
-    s = new(f'Hover K{k}')
-    hc = s.f('Hover Cell', 'dim')
-    s.rows = s.cols = hc
-    s.hide_labels.append(hc)
-    s.pane('Square', enc=ZZ + [('lod', 'Hover Cell', 'dim')], size='14.5', transparency='0', stroke='false',
-           tooltip=[[(tip_field(f'K{k} Tip 1'), 'book', 11, INK)], [(tip_field(f'K{k} Tip 2'), 'book', 10, SLATE)]])
+# ===================================================================================================== factor ribbon
+RIB_TIP = [[('{Rib Name}: ', 'semi', 11, NAVY), ('{Rib Val Adds}', 'bold', 11, PLUM), ('{Rib Val Takes}', 'bold', 11, SAND_D)],
+           [('{Rib Share Txt}', 'semi', 10, NAVY)], [('{factor_meaning|attr}', 'book', 10, INK)], [('{Rib Tip Extra}', 'book', 9, SLATE)]]
+
+
+def ribbon(name):
+    s = new(name)
+    s.filter_member('In Selection', 'true')
+    s.filter_member('Is Factor', 'true')
+    ro = s.f('Ribbon Order', 'ord')
+    s.cols = ro
+    s.hide_labels.append(ro)
+    return s, ro
+
+
+s, ro = ribbon('Ribbon Top')
+s.pane('Text', enc=ZZ + [('color', 'Cell Kind', 'agg')], valign='top', tooltip=RIB_TIP,
+       label=[[('{Rib Name}', 'book', 10, SLATE)], [('{Rib Value}', 'bold', 20, None)]])
+s, ro = ribbon('Ribbon Bars')
+z0 = s.f('Rib Zero', 'agg')
+s.cols = f'({ro} / {z0})'
+axis_rules = [f"<encoding attr='space' class='0' field='{z0}' field-type='quantitative' max='1' min='0' range-type='fixed' scope='cols' type='space' />",
+              f"<format attr='display' class='0' field='{z0}' scope='cols' value='false' />", "<format attr='tick-color' value='#00000000' />"]
+s.axis_rules += axis_rules
+s.pane('GanttBar', enc=ZZ + [('color', 'Rib Bar Kind', 'agg'), ('size', 'Rib Bar Size', 'agg')], size='1', transparency='255',
+       stroke='false', tooltip=RIB_TIP, refs=s.refband(0, z0, 0, 1, TRACK))
+s, ro = ribbon('Ribbon Note')
+s.pane('Text', enc=ZZ, valign='top', label=[[('{Rib Note}', 'book', 9, SLATE)]])
 
 # ===================================================================================================== bridge
 s = new('Bridge Title')
-s.pane('Text', enc=ZZ, valign='top', label=[[('{Bridge Title}', 'semi', 14, NAVY)], [('{Bridge Subtitle}', 'book', 10, SLATE)]])
+s.pane('Text', enc=ZZ, valign='top', label=[
+    [('From ', 'bold', 14, NAVY), ('{S Opening Txt}', 'bold', 14, SLATE), (' to ', 'bold', 14, NAVY), ('{S Closing Txt}', 'bold', 14, PLUM),
+     (', one factor at a time', 'bold', 14, NAVY)],
+    [("Each factor's average effect over every order of the six steps, $M; the axis starts at ", 'book', 10, SLATE),
+     ('{Floor Text|attr}', 'semi', 10, NAVY), (' so the factors are visible', 'book', 10, SLATE)]])
 
 s = new('Bridge', deselect=False)
 s.filter_member('In Selection', 'true')
 fo, fh, fs = s.f('factor_order', 'ord'), s.f('Factor Head', 'dim'), s.f('Factor Sub', 'dim')
 s.cols = f'({fo} / ({fh} / {fs}))'
-s.hide_labels.append(fo)
 top, ly = s.f('Bar Top', 'tc', ORDER), s.f('Label Y', 'tc', ORDER)
 s.rows = f'({top} + {ly})'
 s.axis_rules += [f"<encoding attr='space' class='0' domain-expand='false' field='{top}' field-type='quantitative' scope='rows' type='space' />",
@@ -101,66 +124,60 @@ s.styles.append(f"<style-rule element='label'>\n  <format attr='display' field='
                 f"  <format attr='font-size' field='{fh}' value='9' />\n  <format attr='color' field='{fh}' value='{INK}' />\n"
                 f"  <format attr='font-size' field='{fs}' value='8' />\n  <format attr='color' field='{fs}' value='{SLATE}' />\n"
                 f"  <format attr='font-size' field='{top}' value='8' />\n  <format attr='color' field='{top}' value='{AXIS}' />\n</style-rule>")
-s.hide_labels.clear()
 no_field_labels(s, 'cols')
 s.grid_rows = GRID
 floor = s.f('Floor Mark', 'agg')
-TIP = [[('{Tip Head} ', 'semi', 11, NAVY), ('{Tip Value Level}', 'bold', 11, NAVY), ('{Tip Value Adds}', 'bold', 11, TEAL),
+TIP = [[('{Tip Head} ', 'semi', 11, NAVY), ('{Tip Value Level}', 'bold', 11, NAVY), ('{Tip Value Adds}', 'bold', 11, PLUM),
         ('{Tip Value Takes}', 'bold', 11, SAND_D)],
-       [('{factor_meaning|attr}', 'book', 10, INK)], [('{Tip Share}', 'book', 10, SLATE)], [('{Tip Order}', 'book', 9, SLATE)]]
+       [('{factor_meaning|attr}', 'book', 10, INK)], [('{Tip Share}', 'semi', 10, NAVY)], [('{Tip Order}', 'book', 9, SLATE)]]
 s.pane('Automatic', pane_id=2, enc=[('lod', 'Floor Mark', 'agg')], refs=[s.refline(0, top, floor, '#d5dbe4', 1)])
 s.pane('GanttBar', pane_id=3, y_axis=top, order=ORDER, size='2.5', transparency='255', stroke='false', tooltip=TIP,
        enc=[('color', 'Bar Kind', 'agg'), ('size', 'Bar Size', 'tc', ORDER), ('lod', 'Floor Mark', 'agg')])
-s.pane('Text', pane_id=4, y_axis=ly, order=ORDER, align='center', valign='bottom', tooltip=TIP,
+s.pane('Text', pane_id=4, y_axis=ly, order=ORDER, align='center', valign='center', tooltip=TIP,
        enc=[('color', 'Label Kind', 'agg'), ('lod', 'Floor Mark', 'agg')],
-       label=[[('{Bar Label}', 'semi', 10, None)]])
-
-s = new('Bridge Note')
-s.pane('Text', enc=ZZ, valign='top', label=[[('Axis starts at {Floor Text|attr} so the factors are visible. ', 'book', 9, SLATE),
-                                             ('Teal adds cost, sand takes it away; the six effects add up to the change exactly.', 'book', 9, SLATE)]])
+       label=[[('{Bar Label}', 'bold', 10, None)]])
 
 # ===================================================================================================== order of the steps
 s = new('Bias Title')
 s.pane('Text', enc=ZZ, valign='top', label=[
-    [('The order of the steps changes the answer', 'semi', 14, NAVY)], [('{Bias Subtitle}', 'book', 10, SLATE)],
-    [('■', 'book', 10, NAVY), (' Shapley (every order)   ', 'book', 9, SLATE), ('■', 'book', 10, MIST),
-     (' One fixed order   ', 'book', 9, SLATE), ('Bias = fixed order − Shapley, $M', 'book', 9, SLATE)]])
+    [('{Bias Lead}', 'bold', 14, NAVY), ('{Bias Amount}', 'bold', 14, PLUM)],
+    [('Shapley averages every order of the six steps; one fixed order (volume first, currency last) shifts the credit, $M', 'book', 10, SLATE)]])
 
-s = new('Bias Bars', deselect=False)
-s.filter_member('In Selection', 'true')
-s.filter_member('Is Factor', 'true')
-fo, fh = s.f('factor_order', 'ord'), s.f('Factor Head', 'dim')
-sh, sq = s.f('Shapley', 'sum'), s.f('One fixed order', 'sum')
-MN, MV = f'[{DS}].[:Measure Names]', f'[{DS}].[Multiple Values]'
-s.filters.append(f"<filter class='categorical' column='{MN}'>\n  <groupfilter function='union' user:op='manual'>\n"
-                 f"    <groupfilter function='member' level='[:Measure Names]' member='&quot;{sh}&quot;' />\n"
-                 f"    <groupfilter function='member' level='[:Measure Names]' member='&quot;{sq}&quot;' />\n  </groupfilter>\n</filter>")
-s.slices.append(MN)
-s.rows = f'({fo} / ({fh} / {MN}))'
-s.cols = MV
-s.hide_labels += [fo, MN]
-label_style(s, fh, 10, INK)
-s.axis_rules += [f"<format attr='display' class='0' field='{MV}' scope='cols' value='false' />",
-                 "<format attr='tick-color' value='#00000000' />"]
-no_field_labels(s, 'rows')
+
+def bias_sheet(name, deselect=True):
+    s = new(name, deselect)
+    s.filter_member('In Selection', 'true')
+    s.filter_member('Is Factor', 'true')
+    fo = s.f('factor_order', 'ord')
+    s.rows = fo
+    s.hide_labels.append(fo)
+    s.row_dividers = GRID
+    return s
+
+
+bias_sheet('Bias Names').pane('Text', enc=ZZ, align='left', label=[[('{Factor Head}', 'book', 10, INK)]])
+bias_sheet('Bias Shapley').pane('Text', enc=ZZ, align='right', label=[[('{Bias Shap Txt}', 'semi', 10, NAVY)]])
+bias_sheet('Bias Seq').pane('Text', enc=ZZ, align='right', label=[[('{Bias Seq Txt}', 'book', 10, SLATE)]])
+s = bias_sheet('Bias Bars', deselect=False)
+bx = s.f('Bias M', 'sum')
+s.cols = bx
+s.axis_rules += [f"<format attr='display' class='0' field='{bx}' scope='cols' value='false' />", "<format attr='tick-color' value='#00000000' />"]
 s.zeroline = '#d5dbe4'
-s.pane('Bar', size='0.7', transparency='255', stroke='false', labels_show=True,
-       label=[[(f'<{MV}>', 'book', 8, SLATE)]],
-       tooltip=[[('{Factor Head}', 'semi', 10, NAVY)],
-                [('Shapley {Shapley|sum} · one fixed order {One fixed order|sum} · bias {Bias Text}', 'book', 10, SLATE)]])
-s.panes[-1] = s.panes[-1].replace("<encodings>", f"<encodings>\n    <color column='{MN}' />", 1)
-
-s = new('Bias Column')
-s.filter_member('In Selection', 'true')
-s.filter_member('Is Factor', 'true')
-fo = s.f('factor_order', 'ord')
-s.rows = fo
-s.hide_labels.append(fo)
-s.pane('Text', enc=ZZ + [('color', 'Bias Notable', 'agg')], align='right', label=[[('{Bias Text}', 'semi', 10, None)]])
+ap, an = s.f('Bias Axis', 'min'), s.f('Bias Axis Neg', 'min')
+refs = [s.refline(0, bx, ap, '#00000000', 0), s.refline(1, bx, an, '#00000000', 0)]
+s.pane('Bar', enc=[('color', 'Bias Kind', 'agg'), ('lod', 'Bias Axis', 'min'), ('lod', 'Bias Axis Neg', 'min')], refs=refs,
+       size='0.5', transparency='255', stroke='false', labels_show=True,
+       label=[[('{Bias Text}', 'semi', 9, SLATE)]],
+       tooltip=[[('{Factor Head|attr}', 'semi', 10, NAVY)],
+                [('Shapley ', 'book', 10, INK), ('{Bias Shap Txt}', 'semi', 10, NAVY), (' · one fixed order ', 'book', 10, INK),
+                 ('{Bias Seq Txt}', 'semi', 10, SLATE), (' · bias ', 'book', 10, INK), ('{Bias Text}', 'bold', 10, PLUM)]])
 
 # ===================================================================================================== five fiscal years
 s = new('Year Title')
-s.pane('Text', enc=ZZ, valign='top', label=[[('{Year Title|attr}', 'semi', 14, NAVY)], [('{Year Subtitle|attr}', 'book', 10, SLATE)]])
+s.pane('Text', enc=ZZ, valign='top', label=[
+    [('{Year Title|attr}', 'bold', 14, NAVY)],
+    [('In ', 'book', 10, SLATE), ('{Quiet FY|attr}', 'semi', 10, NAVY), (' headcount changed by only ', 'book', 10, SLATE),
+     ('{Quiet HC Txt|attr}', 'semi', 10, NAVY), ('{Quiet Verb|attr}', 'book', 10, SLATE), ('{Quiet Change Txt|attr}', 'bold', 10, PLUM)]])
 
 s = new('Year Table', deselect=False)
 s.filter_member('Year Row', 'true')
@@ -171,7 +188,9 @@ s.hide_labels += [fy, co]
 s.styles.append(f"<style-rule element='label'>\n  <format attr='font-size' field='{yl}' value='10' />\n  <format attr='color' field='{yl}' value='{NAVY}' />\n"
                 f"  <format attr='font-size' field='{cn}' value='9' />\n  <format attr='color' field='{cn}' value='{SLATE}' />\n</style-rule>")
 no_field_labels(s, 'rows'); no_field_labels(s, 'cols')
-s.pane('Text', enc=[('color', 'Cell Kind', 'agg')], align='left', label=[[('{Cell Text}', 'book', 10, None)]],
+s.row_dividers = GRID
+s.pane('Text', enc=[('color', 'Cell Kind', 'agg')], align='right',
+       label=[[('{Cell Text Hi}', 'bold', 10, None), ('{Cell Text Lo}', 'book', 10, None)]],
        tooltip=[[('{Year Row Label} · {Table Column}: ', 'book', 10, INK), ('{Cell Text}', 'semi', 10, NAVY)]])
 
 s = new('Year Note')
@@ -192,17 +211,18 @@ def control(name, shape=None, shape_field=None, lod=(), label=None, tip=None, si
 
 
 control('Period Field', shape='Arcadia D4/d4_field_capsule.png', lod=('Toggle Period Panel', 'Close Panel'),
-        label=[[('    {Pair Label}', 'semi', 9, NAVY)]], tip='Choose the two dates to compare')
-control('Period Sub', mark='Text', label=[[('{Span Text}', 'book', 8, '#8a97a8')]])
+        label=[[('    {Period Field Text}', 'semi', 9, NAVY)]], tip='Choose the two dates to compare')
+control('Period Dates', mark='Text', label=[[('{To Date Text|attr}', 'semi', 9, WHITE)], [('{From Date Text|attr}', 'semi', 9, WHITE)],
+                                            [('{Span Words|attr}', 'book', 9, MIST)]])
 control('Org Field', shape_field='Org Capsule Shape', lod=('Toggle Org Panel', 'Close Panel'),
         label=[[('    {Org Text Light}', 'semi', 9, NAVY), ('{Org Text Dark}', 'medium', 9, PALE2)]],
         tip='Choose all of Arcadia or one function')
-control('Org Sub', mark='Text', label=[[('{Org Sub Text}', 'book', 8, '#8a97a8')]])
+control('Org Sub', mark='Text', label=[[('{Org Sub Text}', 'book', 9, '#8a97a8')]])
 control('Reset', shape='Arcadia D4/d4_reset.png', lod=('Zero Pair', 'Default Group', 'Close Panel'), size='10',
         tip='Reset to default view', align='center')
 control('Info Button', shape_field='Info Shape', lod=('Toggle Info', 'Close Panel'), size='2', align='center',
         tip='How the bridge works')
-control('Rail As Of', mark='Text', label=[[('{Rail Line 1}', 'semi', 9, PALE2)], [('Nominal USD, ECB month-end rates', 'book', 9, MIST)],
+control('Rail As Of', mark='Text', label=[[('{Rail Line 1|attr}', 'semi', 9, PALE2)], [('Nominal USD at month-end ECB rates', 'book', 9, MIST)],
                                           [('Employees and contingent workers', 'book', 9, MIST)]])
 for p in ('Period', 'Org', 'Info'):
     control(f'{p} Close', mark='Text', lod=('Close Panel',), label=[[('{Close X}', 'book', 12, '#b8c0cc')]], tip='Close',
@@ -226,14 +246,14 @@ def lst(name, rows, flt, shape, label, lod):
     no_field_labels(s, 'rows')
     LISTS.append(name)
     s.pane('Shape', enc=ZZ + [('shape', shape, 'agg')] + [('lod', n, 'ord' if (n in m.raw_role or (n in m.calcs and m.role(n)[1] == 'ordinal')) else 'dim') for n in lod],
-           label=label, size='8', transparency='255', stroke='false', align='right',
+           label=label, size='1.8', transparency='255', stroke='false', align='right',
            extra_mark_fmt="<format attr='mark-labels-mode' value='all' />")
     return s
 
 
 lst('Pair List', ['Pair Offset'], 'Pair Option Row', 'Pair Shape',
     [[('  {Pair Option Name}', 'book', 10, PALE2), ('   {Pair Option Date}', 'book', 9, MUTED)]], ['Pair Offset', 'Close Panel'])
-lst('Group List', ['view_order', 'group_name'], 'Group Option Row', 'Group Shape',
+lst('Group List', ['Group Key'], 'Group Option Row', 'Group Shape',
     [[('  {Group Option Name}', 'book', 10, PALE2), ('   {Group Option People}', 'book', 9, MUTED)]], ['group_name', 'Close Panel'])
 
 
@@ -244,14 +264,13 @@ def bucket_map(field, kind, mapping):
 
 
 styled, enc_rules = [], []
-for n, cols in (('Bar Kind', [('level', LEVEL), ('adds', TEAL), ('takes away', SAND)]),
-                ('Label Kind', [('level', NAVY), ('adds', TEAL), ('takes away', SAND_D)]),
-                ('Cell Kind', [('adds', TEAL), ('takes away', SAND_D)]),
-                ('Bias Notable', [('notable', NAVY), ('small', AXIS)])):
+for n, cols in (('Bar Kind', [('level', LEVEL), ('adds', PLUM), ('takes away', SAND)]),
+                ('Label Kind', [('level', NAVY), ('adds', PLUM), ('takes away', SAND_D)]),
+                ('Bias Kind', [('adds', PLUM), ('takes away', SAND), ('small', '#d5dbe4')]),
+                ('Rib Bar Kind', [('adds', PLUM), ('takes away', SAND)])):
     enc_rules.append(bucket_map(m.inst(n, 'agg')[0], 'color', cols)); styled.append((n, 'agg'))
-enc_rules.append(f"<encoding attr='color' field='[:Measure Names]' type='palette'>\n"
-                 f"  <map to='{NAVY}'>\n    <bucket>&quot;[{DS}].{m.inst('Shapley', 'sum')[0]}&quot;</bucket>\n  </map>\n"
-                 f"  <map to='{MIST}'>\n    <bucket>&quot;[{DS}].{m.inst('One fixed order', 'sum')[0]}&quot;</bucket>\n  </map>\n</encoding>")
+# Cell Kind colors text (ribbon values, table) in dark sand; the ribbon bars use their own field so sand stays light there
+enc_rules.append(bucket_map(m.inst('Cell Kind', 'agg')[0], 'color', [('adds', PLUM), ('takes away', SAND_D)])); styled.append(('Cell Kind', 'agg'))
 TICK = [('d4_tick_on', 'Arcadia D4/d4_tick_on.png'), ('d4_tick_off', 'Arcadia D4/d4_tick_off.png')]
 for n in ('Pair Shape', 'Group Shape'):
     enc_rules.append(bucket_map(m.inst(n, 'agg')[0], 'shape', TICK)); styled.append((n, 'agg'))
@@ -363,33 +382,42 @@ def image_zone(path, px, py, pw, ph):
     return f"<zone {z(px, py, pw, ph)} id='{nid()}' is-centered='0' is-scaled='1' param='{xesc(path)}' type-v2='bitmap' />"
 
 
-zones = [sheet_zone('Page Title', 240, 16, 1136, 56)]
-KX = (240, 470, 700, 930, 1160)
-for k, x0 in enumerate(KX, 1):
-    zones.append(card(f'KPI {k}', x0, 86, 216, 86, [sheet_zone(f'KPI {k}', x0 + 14, 98, 188, 62)], pad=(12, 14, 12, 14)))
-for k, x0 in enumerate(KX, 1):
-    zones.append(sheet_zone(f'Hover K{k}', x0, 86, 216, 86))
-zones.append(card('Card: Bridge', 240, 186, 724, 626, [sheet_zone('Bridge Title', 254, 202, 696, 50, 50),
-                                                       sheet_zone('Bridge', 254, 252, 696, 512, 512),
-                                                       sheet_zone('Bridge Note', 254, 764, 696, 36, 36)]))
-bias_row = flow('Bias Row', 1002, 276, 360, 200, [sheet_zone('Bias Bars', 1002, 276, 304, 200, 304),
-                                                  sheet_zone('Bias Column', 1306, 276, 56, 200)], 'horz', fixed=200)
-zones.append(card('Card: Order', 988, 186, 388, 302, [sheet_zone('Bias Title', 1002, 202, 360, 74, 74), bias_row]))
-zones.append(card('Card: Years', 988, 502, 388, 310, [sheet_zone('Year Title', 1002, 518, 360, 58, 58),
-                                                      sheet_zone('Year Table', 1002, 576, 360, 204, 204),
-                                                      sheet_zone('Year Note', 1002, 780, 360, 20, 20)]))
+zones = [sheet_zone('Page Title', 240, 12, 1136, 112)]
+zones.append(rule_zone(240, 134, 1136, 2, PLUM))
+zones += [sheet_zone('Ribbon Top', 240, 142, 1136, 56), sheet_zone('Ribbon Bars', 240, 200, 1136, 14),
+          sheet_zone('Ribbon Note', 240, 216, 1136, 24)]
+zones.append(rule_zone(240, 246, 1136, 1, RULE))
+for k in range(1, 6):
+    zones.append(rule_zone(round(240 + k * 1136 / 6), 142, 1, 98, RULE))
+zones.append(rule_zone(240, 262, 708, 2, PLUM))
+zones += [sheet_zone('Bridge Title', 240, 272, 708, 52), sheet_zone('Bridge', 240, 328, 708, 456)]
+zones.append(text_zone(240, 790, 708, 18, [('Plum adds cost', PLUM, 9, 'Semibold'), (', ', SLATE, 9, 'Book'),
+                                            ('sand takes it away', SAND_D, 9, 'Semibold'),
+                                            ('; the six effects add up to the change exactly.', SLATE, 9, 'Book')]))
+zones.append(rule_zone(988, 262, 388, 2, PLUM))
+zones.append(sheet_zone('Bias Title', 988, 272, 388, 58))
+for (lbl, x0, w0, al) in (('Factor', 988, 104, 'left'), ('Shapley', 1092, 68, 'right'), ('Fixed order', 1160, 76, 'right'), ('Bias', 1236, 140, 'center')):
+    zones.append(text_zone(x0, 334, w0, 16, [(lbl, AXIS, 9, 'Book')])
+                 .replace("<run fontcolor", f"<run fontalignment='{ {'left': 0, 'center': 1, 'right': 2}[al] }' fontcolor", 1))
+for name, x0, w0 in (('Bias Names', 988, 104), ('Bias Shapley', 1092, 68), ('Bias Seq', 1160, 76), ('Bias Bars', 1236, 140)):
+    zones.append(sheet_zone(name, x0, 352, w0, 150))
+zones.append(rule_zone(988, 520, 388, 2, PLUM))
+zones += [sheet_zone('Year Title', 988, 530, 388, 62), sheet_zone('Year Table', 988, 594, 388, 194), sheet_zone('Year Note', 988, 790, 388, 20)]
 zones.append(text_zone(240, 826, 1136, 16, [(
     'Arcadia Systems is fictional; all data is synthetic. Executive officers excluded. Effects are Shapley values: each '
     "factor's average effect over every order of the six steps, so they add up to the change.", SLATE, 9, 'Book')]))
 zones.append(rule_zone(0, 0, 216, 850, NAVY))
 zones.append(image_zone(D4IMG + 'arcadia_logo_horizontal_reverse.png', 8, 24, 160, 40))
 zones.append(sheet_zone('Info Button', 180, 30, 28, 28))
-for lbl, y in (('PERIOD', 132), ('ORGANIZATION', 228)):
+for lbl, y in (('COMPARE', 92), ('ORGANIZATION', 212)):
     zones.append(text_zone(8, y, 200, 16, [(lbl, '#b8c4d6', 8, 'Semibold')], pad=(0, 0, 0, 4)))
-zones += [sheet_zone('Period Field', 8, 154, 200, 32), sheet_zone('Period Sub', 8, 186, 200, 18),
-          sheet_zone('Org Field', 8, 250, 200, 32), sheet_zone('Org Sub', 8, 282, 200, 18),
-          image_zone(D4IMG + 'arcadia_rail_divider.png', 8, 324, 200, 24), sheet_zone('Reset', 8, 348, 200, 32),
-          sheet_zone('Rail As Of', 8, 770, 200, 56)]
+zones += [sheet_zone('Period Field', 8, 110, 200, 32),
+          text_zone(8, 148, 56, 50, [('This', MUTED, 9, 'Book'), ('\n', None, None, None), ('Against', MUTED, 9, 'Book'),
+                                     ('\n', None, None, None), ('Span', MUTED, 9, 'Book')], pad=(3, 0, 0, 4)),
+          sheet_zone('Period Dates', 64, 148, 144, 50),
+          sheet_zone('Org Field', 8, 230, 200, 32), sheet_zone('Org Sub', 8, 262, 200, 20),
+          image_zone(D4IMG + 'arcadia_rail_divider.png', 8, 292, 200, 24), sheet_zone('Reset', 8, 322, 200, 32),
+          sheet_zone('Rail As Of', 8, 760, 200, 66)]
 
 VIS = {}
 
@@ -417,11 +445,11 @@ def popover(name, param, px, py, pw, ph, title, body, footer):
 
 zones.append(popover('Period', 'p_PeriodOpen', 216, 132, 360, 470, 'Compare', sheet_zone('Pair List', 228, 177, 348, 395),
                      'Each choice compares a quarter-end with the same date a year before.'))
-zones.append(popover('Org', 'p_OrgOpen', 216, 228, 360, 300, 'Organization', sheet_zone('Group List', 228, 273, 348, 225),
+zones.append(popover('Org', 'p_OrgOpen', 216, 252, 360, 300, 'Organization', sheet_zone('Group List', 228, 297, 348, 225),
                      'Each function is its own bridge: its effects add up to its own change.'))
 INFO = [('What is measured.', "Total workforce cost on a date: employees' loaded pay run-rate (base pay × FTE × (1 + the country's fringe rate)) plus contingent workers' annualized bill run-rate, converted to USD at the ECB rate on that date. It is a run-rate, not spend: what a year would cost at that day's workforce and pay."),
         ('The six factors.', 'Cost is people × the mix of people × what each costs × currency. Volume is the number of people; workforce mix the balance of employees and contingent workers; location mix the countries; level mix the grades (or contingent types); rate the cost per head at constant exchange rates; currency what exchange rates did to the reported cost.'),
-        ('Why Shapley.', 'Moving the factors one at a time explains the change exactly, but the answer depends on the order: the factor moved first is valued at the old levels of the others. Shapley gives each factor its average effect over all 720 orders, so none is favored, and the six effects still add up to the change exactly. The card on the right shows how far one fixed order would drift.'),
+        ('Why Shapley.', 'Moving the factors one at a time explains the change exactly, but the answer depends on the order: the factor moved first is valued at the old levels of the others. Shapley gives each factor its average effect over all 720 orders, so none is favored, and the six effects still add up to the change exactly. The table on the right shows how far one fixed order would drift.'),
         ('Limits.', 'Bonus, equity and allowances are not in the run-rate. A grade or country that appears on one date only counts as mix, never as rate.'),
         ('Data.', 'Arcadia Systems is fictional; all data is synthetic. Executive officers are excluded.')]
 runs = []
@@ -434,7 +462,7 @@ zones.append(popover('Info', 'p_InfoOpen', 216, 24, 591, 420, 'How the bridge wo
 
 DASH_UID = uid()
 dash = (f"  <dashboards>\n    <dashboard enable-sort-zone-taborder='true' name='{DASH}'>\n"
-        "      <style>\n        <style-rule element='table'>\n          <format attr='background-color' value='#f3f3ef' />\n        </style-rule>\n      </style>\n"
+        "      <style>\n        <style-rule element='table'>\n          <format attr='background-color' value='#f6f4f1' />\n        </style-rule>\n      </style>\n"
         f"      <size maxheight='{H}' maxwidth='{W}' minheight='{H}' minwidth='{W}' sizing-mode='fixed' />\n      <zones>\n"
         + indent('\n'.join(zones), 8) + f"\n      </zones>\n      <simple-id uuid='{DASH_UID}' />\n    </dashboard>\n  </dashboards>\n")
 

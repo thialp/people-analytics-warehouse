@@ -432,6 +432,7 @@ class Sheet:
         self.refband_styles = []
         self.grid_rows = None      # colour of the row grid lines (None: off)
         self.zeroline = None       # colour of the zero line (None: off)
+        self.row_dividers = None   # colour of the lines between rows (None: off)
 
     def f(self, name, how='auto', order=None):
         i, h = self.m.inst(name, how)
@@ -599,8 +600,12 @@ class Sheet:
              f"<style-rule element='zeroline'>\n  <format attr='stroke-size' value='1' />\n  <format attr='line-visibility' value='on' />\n"
              f"  <format attr='stroke-color' value='{self.zeroline}' />\n</style-rule>"),
             "<style-rule element='dropline'>\n  <format attr='stroke-size' value='0' />\n  <format attr='line-visibility' value='off' />\n</style-rule>",
-            "<style-rule element='table-div'>\n  <format attr='stroke-size' scope='rows' value='0' />\n  <format attr='line-visibility' scope='rows' value='off' />\n"
-            "  <format attr='stroke-size' scope='cols' value='0' />\n  <format attr='line-visibility' scope='cols' value='off' />\n</style-rule>",
+            ("<style-rule element='table-div'>\n  <format attr='stroke-size' scope='rows' value='0' />\n  <format attr='line-visibility' scope='rows' value='off' />\n"
+             "  <format attr='stroke-size' scope='cols' value='0' />\n  <format attr='line-visibility' scope='cols' value='off' />\n</style-rule>"
+             if not self.row_dividers else
+             "<style-rule element='table-div'>\n  <format attr='stroke-size' scope='rows' value='1' />\n  <format attr='line-visibility' scope='rows' value='on' />\n"
+             f"  <format attr='stroke-color' scope='rows' value='{self.row_dividers}' />\n  <format attr='div-level' scope='rows' value='1' />\n"
+             "  <format attr='stroke-size' scope='cols' value='0' />\n  <format attr='line-visibility' scope='cols' value='off' />\n</style-rule>"),
             "<style-rule element='header-div'>\n  <format attr='stroke-size' scope='rows' value='0' />\n  <format attr='line-visibility' scope='rows' value='off' />\n"
             "  <format attr='stroke-size' scope='cols' value='0' />\n  <format attr='line-visibility' scope='cols' value='off' />\n</style-rule>",
         ]

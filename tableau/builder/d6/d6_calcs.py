@@ -41,7 +41,7 @@ def all_calcs():
     snum = lambda x: f'{fill(P["Sign"], x)} + {fill(P["M1"], x)}'
     after('S Vol Share', [
         ('S Opening Txt', money('[S Opening]')), ('S Closing Txt', money('[S Closing]')),
-        ('S Change Txt', smoney('[S Change]')), ('S Volume Txt', smoney('[S Volume]')), ('S Rate Txt', smoney('[S Rate]')),
+        ('S Change Txt', smoney('[S Change]')), ('S Change Abs Txt', money('[S Change]')), ('S Volume Txt', smoney('[S Volume]')), ('S Rate Txt', smoney('[S Rate]')),
         ('S Mix Txt', smoney('[S Mix]')), ('S Currency Txt', smoney('[S Currency]')),
         ('S Constant Txt', smoney('[S Constant Change]')), ('S Currency Abs Txt', money('[S Currency]')),
         ('S Workforce Num', snum('[S Workforce]')), ('S Location Num', snum('[S Location]')), ('S Level Num', snum('[S Level]')),
@@ -52,18 +52,19 @@ def all_calcs():
     ])
     # helpers for the layout
     after('Bar Size', [('Floor Mark', 'MIN([Axis Floor])')])
-    after('Bias Notable', [('Shapley', '[Effect M]'), ('One fixed order', '[Seq M]')])
     after('Group Option People', [('Tick X', 'MIN(0.6)'), ('Close X', '"✕"')])
     return out
 
 
 M_FMT = '*+#,##0.0;"−"#,##0.0'
-FORMATS = {'Bar Top': '*$#,##0"M"', 'Label Y': '*$#,##0"M"', 'Shapley': M_FMT, 'One fixed order': M_FMT}
+FORMATS = {'Bar Top': '*$#,##0"M"', 'Label Y': '*$#,##0"M"'}
 DTYPES = {'Pair Offset': 'integer', 'Zero Pair': 'integer', 'Table Col Order': 'integer', 'Latest To': 'date',
           'Driver Order': 'integer', 'Step M': 'real', 'Effect M': 'real', 'Seq M': 'real', 'Bias M': 'real', 'Shapley': 'real',
           'One fixed order': 'real', 'Floor Raw': 'real', 'Floor Step': 'real', 'Axis Floor': 'real',
-          'Y Years': 'integer', 'Y Rate Up': 'integer'}
-ROLES = {'Pair Offset': ('dimension', 'ordinal'), 'Zero Pair': ('dimension', 'ordinal'),
+          'Y Years': 'integer', 'Y Rate Up': 'integer', 'Bias Axis': 'real', 'Bias Axis Neg': 'real',
+          'Rib Max': 'real', 'Row HC Change': 'integer', 'Quiet HC': 'integer', 'Quiet Flag': 'integer', 'Quiet Change': 'real',
+          'Y HC Min': 'integer', 'Ribbon Order': 'integer', 'Rib Zero': 'real'}
+ROLES = {'Ribbon Order': ('dimension', 'ordinal'), 'Pair Offset': ('dimension', 'ordinal'), 'Zero Pair': ('dimension', 'ordinal'),
          'Table Col Order': ('dimension', 'ordinal')}
 
 if __name__ == '__main__':
