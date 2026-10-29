@@ -238,6 +238,8 @@ control('Info Button', shape_field='Info Shape', lod=('Toggle Info', 'Close Pane
         tip='How the bridge works')
 control('Rail As Of', mark='Text', label=[[('{Rail Line 1|attr}', 'semi', 9, PALE2)], [('USD at month-end ECB rates', 'book', 8, MIST)],
                                           [('Employees and contingent workers', 'book', 8, MIST)]])
+control('Credit GitHub', shape='Arcadia How-To/icon_github.png', size='2.4', align='center', tip='Thiago Alpoin on GitHub')
+control('Credit LinkedIn', shape='Arcadia How-To/icon_linkedin.png', size='2.4', align='center', tip='Thiago Alpoin on LinkedIn')
 for p in ('Period', 'Org', 'Info'):
     control(f'{p} Close', mark='Text', lod=('Close Panel',), label=[[('{Close X}', 'book', 12, '#b8c0cc')]], tip='Close',
             align='center')
@@ -444,7 +446,9 @@ for key, sheet, y, h in (('This', 'Date This', 172, 22), ('Against', 'Date Again
     zones.append(sheet_zone(sheet, 76, y, 136, h))
 zones += [sheet_zone('Org Field', 14, 310, 188, 30), sheet_zone('Org Sub', 14, 346, 190, 52),
           image_zone(D4IMG + 'arcadia_rail_divider.png', 14, 412, 188, 24), sheet_zone('Reset', 14, 452, 188, 30),
-          sheet_zone('Rail As Of', 14, 762, 190, 60)]
+          sheet_zone('Rail As Of', 14, 690, 190, 60),
+          text_zone(14, 760, 190, 22, [('Built by Thiago Alpoin', PALE2, 9, 'Semibold')], pad=(0, 0, 0, 4)),
+          sheet_zone('Credit GitHub', 14, 786, 28, 28), sheet_zone('Credit LinkedIn', 46, 786, 28, 28)]
 
 VIS = {}
 
@@ -537,6 +541,11 @@ for cap, sheet, target, field in T:
               f"  <clear-option type='do-nothing' value='b:false' />\n  <params>\n"
               f"    <param name='source-field' value='{m.ref(field, how)}' />\n"
               f"    <param name='target-parameter' value='[Parameters].[{m.pid[target]}]' />\n  </params>\n</edit-parameter-action>")
+for cap, sheet, url in (('Open GitHub', 'Credit GitHub', 'https://github.com/thialp'),
+                        ('Open LinkedIn', 'Credit LinkedIn', 'https://www.linkedin.com/in/thiagoalpoin')):
+    acts.append(f"<action caption='{cap}' name='{action_id(cap)}'>\n  <activation type='on-select' />\n"
+                f"  <source dashboard='{DASH}' type='sheet' worksheet='{sheet}' />\n"
+                f"  <link caption='{cap}' expression='{url}' include-null='true' url-escape='true' />\n</action>")
 acts += PA          # every <action> before any <edit-parameter-action>
 out = out.replace("  <worksheets>\n", "  <actions>\n" + indent('\n'.join(acts), 4) + "\n  </actions>\n  <worksheets>\n", 1)
 for sh in SHEETS.values():         # a field on Rows or Columns is never repeated on the Tooltip shelf

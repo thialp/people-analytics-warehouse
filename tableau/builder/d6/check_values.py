@@ -148,10 +148,10 @@ def page(p, off):
     out['closes'] = abs(lvl - c) < 0.05  # each stored value is rounded to the cent
     b = p['bias']
     big = max(FACTORS, key=lambda f: abs(b[f]))
-    word = {'Volume': 'volume', 'Workforce mix': 'the worker mix', 'Location mix': 'the country mix', 'Level mix': 'the grade mix',
+    word = {'Volume': 'volume', 'Workforce mix': 'worker mix', 'Location mix': 'country mix', 'Level mix': 'grade mix',
             'Rate': 'rates', 'Currency': 'currency'}[big]
-    verb = 'overstate' if b[big] * s[big] >= 0 else 'understate'
-    out['bias_sub'] = f'A fixed order would {verb} {word} by {money(b[big])}'
+    verb = 'overstates' if b[big] * s[big] >= 0 else 'understates'
+    out['bias_sub'] = f'A fixed order {verb} {word} by {money(b[big])}'
     out['bias'] = [(f, snum(s[f]), snum(p['seq'][f]), snum(b[f])) for f in FACTORS]
     out['bars'] = [money(o)] + [snum(s[k]) for k in FACTORS] + [money(c)]
     return out

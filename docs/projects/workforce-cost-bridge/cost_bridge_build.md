@@ -61,7 +61,7 @@ y 0  ┌────────┬───────────────
      │        │ +$307.1M    │ +$139.8M     │ +$22.4M   │ −$9.3M      │ −$4.8M     │ −$52.2M│
      │        │ ▬▬▬▬▬▬▬▬    │ ▬▬▬▬         │ ▬         │ ▪           │ ▪          │ ▬▬    │
      │        │ 76% · +2,801│ 35% · pay …  │ toward …  │ toward …    │ toward …   │ +$455…│
- 262 │        │ ━━ From $4,245.2M to $4,648.1M ━━━━━━━━━━━━━   ━━ A fixed order would … ━━│
+ 262 │        │ ━━ From $4,245.2M to $4,648.1M ━━━━━━━━━━━━━   ━━ A fixed order … ━━│
      │        │ waterfall: Opening · six factors · Closing      Factor Shapley Fixed Bias │ 262–510
      │        │                                                 ━━ Rates rose every … ━━━│
      │        │                                                 FY × People Mix Rates Cur │ 520–812
@@ -75,7 +75,7 @@ y 0  ┌────────┬───────────────
 | Subtitle | Which dates, which scope? | "**Jun 30, 2025** to **Jun 30, 2026** · +9.5% · all of Arcadia · 39,145 to 41,946 people · nominal USD" |
 | Factor ribbon | How big is each factor? | More people **+$307.1M** (76% · +2,801 people) · Higher rates **+$139.8M** (35% · pay and bill rates) · Exchange rates **−$52.2M** (+$455.2M without them) · Grade mix **+$22.4M** · Country mix **−$9.3M** · Worker mix **−$4.8M** |
 | Bridge | How does it add up? | "From **$4,245.2M** to **$4,648.1M**, one factor at a time": 4,245.2 · +307.1 · −4.8 · −9.3 · +22.4 · +139.8 · −52.2 · 4,648.1 |
-| Order table | Why Shapley? | "A fixed order would overstate rates by **$5.5M**": Shapley, fixed order and bias per factor |
+| Order table | Why Shapley? | "A fixed order overstates rates by **$5.5M**": Shapley, fixed order and bias per factor |
 | Five fiscal years | Is this year different? | "Rates rose every year; currency swung both ways" · "In **FY24** headcount changed by only **−42**, yet cost rose **$93.5M**" |
 | Rail | Which dates exactly? | Capsule "FY26 vs FY25 · year-end"; This **Jun 30, 2026** · Against **Jun 30, 2025** · Span 12 months, year-end to year-end |
 
@@ -767,11 +767,11 @@ WHEN "Location mix" THEN [S Location] WHEN "Level mix" THEN [S Level]
 WHEN "Rate" THEN [S Rate] ELSE [S Currency] END
 
 // Bias Word
-CASE [Bias Driver] WHEN "Volume" THEN "volume" WHEN "Workforce mix" THEN "the worker mix" WHEN "Location mix" THEN "the country mix"
-WHEN "Level mix" THEN "the grade mix" WHEN "Rate" THEN "rates" ELSE "currency" END
+CASE [Bias Driver] WHEN "Volume" THEN "volume" WHEN "Workforce mix" THEN "worker mix" WHEN "Location mix" THEN "country mix"
+WHEN "Level mix" THEN "grade mix" WHEN "Rate" THEN "rates" ELSE "currency" END
 
 // Bias Lead
-"A fixed order would " + (IF [Bias Driver Value] * [Bias Driver Effect] >= 0 THEN "overstate " ELSE "understate " END) + [Bias Word] + " by "
+"A fixed order " + (IF [Bias Driver Value] * [Bias Driver Effect] >= 0 THEN "overstates " ELSE "understates " END) + [Bias Word] + " by "
 
 // Bias Amount
 "$" + <M1 on [Bias Driver Value]> + "M"
@@ -816,7 +816,7 @@ Four sheets side by side make the table; each: Filters `In Selection` = True and
 
 Column headers are four dashboard text objects above the table: `Factor` (left), `Shapley`, `Fixed order`, `Bias` (right aligned over the number column), Tableau Book 9 axis gray `#8C9BB0`.
 
-Expected, default: title "A fixed order would overstate rates by **$5.5M**".
+Expected, default: title "A fixed order overstates rates by **$5.5M**".
 
 | Factor | Shapley | Fixed order | Bias |
 |---|---:|---:|---:|
@@ -927,7 +927,7 @@ IF MIN([Sel Flag]) = 0 THEN [Cell Text] END
 { MIN(IF [Pair Offset] = 0 THEN LEFT(DATENAME('month', [to_month_end]), 3) + " " + STR(DAY([to_month_end])) END) }
 
 // Year Note
-"Mix = worker + country + grade · shaded: the fiscal year you compare"
+"Mix = worker + country + grade · shaded: year compared"
 ```
 
 The quiet year is the one whose headcount changed least: the year where volume explains least and the other factors carry the change. Its row is bold in the table and named in the subtitle.
@@ -1240,23 +1240,23 @@ Computed by `python3 tableau/builder/d6/check_values.py`; `--verify` also confir
 
 | p_Pair | Headline | Order-card title | People note | Exchange-rates note |
 |---:|---|---|---|---|
-| 0 | Workforce cost grew $402.9M to $4,648.1M, and 76% of it was more people | A fixed order would overstate rates by $5.5M | More people · 76% · +2,801 people | +$455.2M without them |
-| 1 | Workforce cost grew $482.4M to $4,517.4M, and 57% of it was more people | A fixed order would understate volume by $6.6M | More people · 57% · +2,561 people | +$425.2M without them |
-| 2 | Workforce cost grew $539.9M to $4,448.1M; the largest effect was more people (+$252.0M) | A fixed order would understate volume by $8.6M | More people · 47% · +2,356 people | +$399.2M without them |
-| 3 | Workforce cost grew $396.1M to $4,342.0M, and 60% of it was more people | A fixed order would understate volume by $4.5M | More people · 60% · +2,194 people | +$379.0M without them |
-| 4 | Workforce cost grew $427.8M to $4,245.2M, and 50% of it was more people | A fixed order would understate volume by $5.6M | More people · 50% · +2,027 people | +$341.4M without them |
-| 5 | Workforce cost grew $250.0M to $4,034.9M, and 62% of it was more people | A fixed order would overstate rates by $3.1M | More people · 62% · +1,480 people | +$276.3M without them |
-| 6 | Workforce cost grew $110.8M to $3,908.2M; the largest effect was higher rates (+$123.8M) | A fixed order would overstate currency by $3.6M | More people · 93% · +997 people | +$214.8M without them |
-| 7 | Workforce cost grew $237.6M to $3,946.0M, and 53% of it was higher rates | A fixed order would overstate currency by $1.7M | More people · 21% · +476 people | +$169.3M without them |
-| 8 | Workforce cost grew $93.5M to $3,817.4M; the largest effect was higher rates (+$118.7M) | A fixed order would overstate the grade mix by $1.2M | Fewer people · −42 people | +$120.2M without them |
-| 9 | Workforce cost grew $187.6M to $3,785.0M, and 60% of it was higher rates | A fixed order would understate volume by $1.1M | More people · 37% · +680 people | +$180.3M without them |
-| 10 | Workforce cost grew $304.5M to $3,797.4M; the largest effect was more people (+$137.9M) | A fixed order would understate volume by $3.1M | More people · 45% · +1,368 people | +$246.1M without them |
-| 11 | Workforce cost grew $383.2M to $3,708.4M, and 53% of it was more people | A fixed order would understate volume by $5.2M | More people · 53% · +2,051 people | +$300.3M without them |
-| 12 | Workforce cost grew $415.8M to $3,723.9M, and 67% of it was more people | A fixed order would understate volume by $5.5M | More people · 67% · +2,820 people | +$379.7M without them |
-| 13 | Workforce cost grew $298.2M to $3,597.3M, and 88% of it was more people | A fixed order would overstate rates by $5.2M | More people · 88% · +2,657 people | +$366.0M without them |
-| 14 | Workforce cost grew $261.7M to $3,493.0M, and 94% of it was more people | A fixed order would overstate rates by $6.0M | More people · 94% · +2,498 people | +$353.4M without them |
-| 15 | Workforce cost grew $156.3M to $3,325.2M; the largest effect was more people (+$229.3M) | A fixed order would overstate currency by $10.0M | More people · +2,371 people | +$334.2M without them |
-| 16 | Workforce cost grew $171.1M to $3,308.1M; the largest effect was more people (+$220.3M) | A fixed order would overstate currency by $6.8M | More people · +2,269 people | +$310.0M without them |
+| 0 | Workforce cost grew $402.9M to $4,648.1M, and 76% of it was more people | A fixed order overstates rates by $5.5M | More people · 76% · +2,801 people | +$455.2M without them |
+| 1 | Workforce cost grew $482.4M to $4,517.4M, and 57% of it was more people | A fixed order understates volume by $6.6M | More people · 57% · +2,561 people | +$425.2M without them |
+| 2 | Workforce cost grew $539.9M to $4,448.1M; the largest effect was more people (+$252.0M) | A fixed order understates volume by $8.6M | More people · 47% · +2,356 people | +$399.2M without them |
+| 3 | Workforce cost grew $396.1M to $4,342.0M, and 60% of it was more people | A fixed order understates volume by $4.5M | More people · 60% · +2,194 people | +$379.0M without them |
+| 4 | Workforce cost grew $427.8M to $4,245.2M, and 50% of it was more people | A fixed order understates volume by $5.6M | More people · 50% · +2,027 people | +$341.4M without them |
+| 5 | Workforce cost grew $250.0M to $4,034.9M, and 62% of it was more people | A fixed order overstates rates by $3.1M | More people · 62% · +1,480 people | +$276.3M without them |
+| 6 | Workforce cost grew $110.8M to $3,908.2M; the largest effect was higher rates (+$123.8M) | A fixed order overstates currency by $3.6M | More people · 93% · +997 people | +$214.8M without them |
+| 7 | Workforce cost grew $237.6M to $3,946.0M, and 53% of it was higher rates | A fixed order overstates currency by $1.7M | More people · 21% · +476 people | +$169.3M without them |
+| 8 | Workforce cost grew $93.5M to $3,817.4M; the largest effect was higher rates (+$118.7M) | A fixed order overstates the grade mix by $1.2M | Fewer people · −42 people | +$120.2M without them |
+| 9 | Workforce cost grew $187.6M to $3,785.0M, and 60% of it was higher rates | A fixed order understates volume by $1.1M | More people · 37% · +680 people | +$180.3M without them |
+| 10 | Workforce cost grew $304.5M to $3,797.4M; the largest effect was more people (+$137.9M) | A fixed order understates volume by $3.1M | More people · 45% · +1,368 people | +$246.1M without them |
+| 11 | Workforce cost grew $383.2M to $3,708.4M, and 53% of it was more people | A fixed order understates volume by $5.2M | More people · 53% · +2,051 people | +$300.3M without them |
+| 12 | Workforce cost grew $415.8M to $3,723.9M, and 67% of it was more people | A fixed order understates volume by $5.5M | More people · 67% · +2,820 people | +$379.7M without them |
+| 13 | Workforce cost grew $298.2M to $3,597.3M, and 88% of it was more people | A fixed order overstates rates by $5.2M | More people · 88% · +2,657 people | +$366.0M without them |
+| 14 | Workforce cost grew $261.7M to $3,493.0M, and 94% of it was more people | A fixed order overstates rates by $6.0M | More people · 94% · +2,498 people | +$353.4M without them |
+| 15 | Workforce cost grew $156.3M to $3,325.2M; the largest effect was more people (+$229.3M) | A fixed order overstates currency by $10.0M | More people · +2,371 people | +$334.2M without them |
+| 16 | Workforce cost grew $171.1M to $3,308.1M; the largest effect was more people (+$220.3M) | A fixed order overstates currency by $6.8M | More people · +2,269 people | +$310.0M without them |
 
 **Each group, FY26 vs FY25 (`p_Pair` 0):**
 
@@ -1292,7 +1292,7 @@ Subtitle: Jun 30, 2025 to Jun 30, 2026 · +9.5% · all of Arcadia · 39,145 to 4
 
 **Arcadia Systems, p_Pair 8:** Workforce cost grew $93.5M to $3,817.4M; the largest effect was higher rates (+$118.7M) · Fewer people −$4.3M (−42 people) · Higher rates +$118.7M (pay and bill rates) · Grade mix +$12.1M (toward higher grades) · Country mix −$9.1M (toward lower-cost countries) · Worker mix +$2.8M (toward costlier worker types) · Exchange rates −$26.7M (+$120.2M without them)
 
-**Technology, FY26 vs FY25:** order table Volume +135.5 / +134.0 / −1.5 · Workforce mix +0.1 / +0.0 / −0.1 · Location mix +0.8 / +1.0 / +0.2 · Level mix +5.3 / +5.6 / +0.3 · Rate +60.5 / +62.9 / **+2.4** · Currency −25.5 / −26.7 / −1.2; title "A fixed order would overstate rates by $2.4M". Five-year table FY22 +97.3 / −2.1 / +46.7 / −59.4 · FY23 +125.1 / −4.4 / +53.1 / +16.5 · FY24 +4.8 / −0.2 / +52.1 / −10.3 · FY25 +99.1 / +0.5 / +58.1 / +37.5 · FY26 +135.5 / +6.2 / +60.5 / −25.5; subtitle "In FY24 headcount changed by only +50, yet cost rose $46.4M".
+**Technology, FY26 vs FY25:** order table Volume +135.5 / +134.0 / −1.5 · Workforce mix +0.1 / +0.0 / −0.1 · Location mix +0.8 / +1.0 / +0.2 · Level mix +5.3 / +5.6 / +0.3 · Rate +60.5 / +62.9 / **+2.4** · Currency −25.5 / −26.7 / −1.2; title "A fixed order overstates rates by $2.4M". Five-year table FY22 +97.3 / −2.1 / +46.7 / −59.4 · FY23 +125.1 / −4.4 / +53.1 / +16.5 · FY24 +4.8 / −0.2 / +52.1 / −10.3 · FY25 +99.1 / +0.5 / +58.1 / +37.5 · FY26 +135.5 / +6.2 / +60.5 / −25.5; subtitle "In FY24 headcount changed by only +50, yet cost rose $46.4M".
 
 ### 13.3 Click tests (Presentation mode, then on Tableau Public)
 
@@ -1316,12 +1316,12 @@ Subtitle: Jun 30, 2025 to Jun 30, 2026 · +9.5% · all of Arcadia · 39,145 to 4
 
 1. Reset; close every popover.
 2. Hide all sheets; remove any stray legend or parameter control.
-3. Save a lighter copy, `Workforce Cost Bridge (hide fields).twb`: Hide All Unused Fields; delete working sheets (`CHK Rows`). Keep the full original.
+3. Save a lighter copy, `Workforce Cost Bridge (hide fields).twb`: Hide All Unused Fields; delete the empty `Sheet 1` from the base and any working sheets (`CHK Rows`). Keep the full original.
 4. Extract on; refresh.
 5. File > Save to Tableau Public As **Workforce Cost Bridge: Shapley Cost Decomposition | Arcadia Systems**. Description starting "Workforce cost analytics:"; tags workforce cost, Shapley decomposition, finance analytics, HR analytics, SQL. Show Viz on Profile on; Allow Workbook Download off; toolbar at the bottom.
 6. On the web: the click tests of 13.3; the first load and a click timed; the screenshot (1400 × 850) for the repo.
 
-**Assets to place before building:** the **Arcadia D4** shapes listed in section 10 (already in `My Tableau Repository/Shapes/Arcadia D4/` from Dashboards #4 and #5) and the images `arcadia_logo_horizontal_reverse.png`, `arcadia_rail_divider.png` and `d2_popover_line_wide.png` in the dashboard folder. No new shapes: the legends are text.
+**Assets to place before building:** the **Arcadia D4** shapes listed in section 10 (already in `My Tableau Repository/Shapes/Arcadia D4/` from Dashboards #4 and #5) and the images `arcadia_logo_horizontal_reverse.png`, `arcadia_rail_divider.png` and `d2_popover_line_wide.png` in the dashboard folder. No new shapes: the legends are text. The credit icons reuse `icon_github.png` and `icon_linkedin.png` from `My Tableau Repository/Shapes/Arcadia How-To/` (How-To #1 and #2).
 
 ---
 
@@ -1402,3 +1402,5 @@ python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workfor
 | The bridge subtitle truncated when the axis floor was in millions ("$290M") | Shorter line: "Each factor's average effect over every order of the steps, $M · the axis starts at $290M" |
 | The rail gave only total people under Organization | Three lines: people, employees (FTE), contingent workers at the later date. Needs release 6.1: `opening_employees`, `closing_employees`, `opening_contingent`, `closing_contingent` added to the mart, `dw.WorkforceCostGrowthMix` (now built alone by `sqlserver/03f_build_dw_cost_growth_mix.sql`), the view and the Custom SQL; three new checks in 12. Divider and Reset move down to make room |
 | "Cheaper" read as cheap, and the country note was crowded | Shorter notes without "shift to": "+6% · more senior grades", "−2% · lower-cost countries", "−1% · more contingent". The worker note now says which way the contingent share moved (from the new headcounts), not just whether cost rose |
+
+**Build 10 review (2026-10-29), carried into build 11.** No layout notes. Added, as in the How-To workbooks: a credit at the foot of the rail, "Built by Thiago Alpoin" (Tableau Semibold 9 `#E4E9F0`) over two icon sheets, `Credit GitHub` (URL action to github.com/thialp, the profile, until the repository's visibility is decided) and `Credit LinkedIn` (linkedin.com/in/thiagoalpoin); `Rail As Of` moves up to 690. Two truncations fixed: the order-table title on a mix factor ("A fixed order would overstate the country mix by $0.2M" wrapped and cut the subtitle; now "A fixed order overstates country mix by $0.2M") and the five-year note ("Mix = worker + country + grade · shaded: year compared").
