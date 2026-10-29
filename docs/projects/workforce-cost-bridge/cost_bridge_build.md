@@ -501,11 +501,11 @@ Expected: "Workforce cost grew **$402.9M** to **$4,648.1M**, and **76%** of it w
 
 ### 6.2 The factor ribbon
 
-Six cells, one per factor: people, rates and exchange rates first, then the three mix factors together (grades, countries, worker mix), which carry no note. Three sheets share the same six columns, stacked: **Ribbon Top** (name and value), **Ribbon Bars** (the bar), **Ribbon Note** (one line of context).
+Six cells, one per factor, in the same order as the bridge below (people, worker mix, country mix, grade mix, rates, exchange rates), so the eye can drop from a cell to its bar. Every cell has a note that changes with the selection; on the three mix cells it is the share of the change and the way the mix moved. Three sheets share the same six columns, stacked: **Ribbon Top** (name and value), **Ribbon Bars** (the bar), **Ribbon Note** (one line of context).
 
 ```
 // Ribbon Order
-CASE [factor_order] WHEN 1 THEN 1 WHEN 5 THEN 2 WHEN 6 THEN 3 WHEN 4 THEN 4 WHEN 3 THEN 5 WHEN 2 THEN 6 END
+[factor_order]
 
 // Rib Name
 CASE MIN([factor_order])
@@ -531,11 +531,25 @@ MIN([closing_headcount]) - MIN([opening_headcount])
 // Rib Without FX
 MIN([Sel Change LOD]) - SUM([Effect M])
 
+// Rib Mix Share
+IF ABS(SUM([Effect M]) / ABS(MIN([Sel Change LOD]))) < 0.005 THEN "<1%"
+ELSE (IF SUM([Effect M]) < 0 THEN "−" ELSE "+" END) + STR(INT(ROUND(ABS(SUM([Effect M]) / MIN([Sel Change LOD])) * 100, 0))) + "%" END
+
+// Rib Mix Dir
+IF ABS(SUM([Effect M])) < 0.05 THEN "no real shift"
+ELSEIF SUM([Effect M]) > 0 THEN
+  CASE MIN([factor_order]) WHEN 4 THEN "shift to higher grades" WHEN 3 THEN "shift to costlier countries" ELSE "shift to costlier workers" END
+ELSE
+  CASE MIN([factor_order]) WHEN 4 THEN "shift to lower grades" WHEN 3 THEN "shift to cheaper countries" ELSE "shift to cheaper workers" END
+END
+
 // Rib Note
 CASE MIN([factor_order])
 WHEN 1 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% · " ELSE "" END) + [Rib HC Txt]
 WHEN 5 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% · " ELSE "" END) + "pay and bill rates"
-WHEN 4 THEN "" WHEN 3 THEN "" WHEN 2 THEN ""
+WHEN 4 THEN [Rib Mix Share] + " · " + [Rib Mix Dir]
+WHEN 3 THEN [Rib Mix Share] + " · " + [Rib Mix Dir]
+WHEN 2 THEN [Rib Mix Share] + " · " + [Rib Mix Dir]
 ELSE <Sign on [Rib Without FX]> + "$" + <M1 on [Rib Without FX]> + "M without them" END
 
 // Rib Bar Kind
@@ -1353,3 +1367,12 @@ python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workfor
 | Reset too small | Back to its earlier size |
 | The span list's two-line labels were right-aligned and its ticks oversized | One line per span, 22 px rows, the same tick size as every list; the explanation moves to the footer; the popover is sized to its longest list |
 | The ribbon notes "toward higher grades" etc. read as jargon | The ribbon reads people, rates, exchange rates, then the three mix cells together; the mix cells carry no note |
+
+**Build 8 review (2026-10-29), carried into build 9.**
+
+| Seen in build 8 | Changed |
+|---|---|
+| The order table's numbers sat on top of the bars | The bar pane has no horizontal label alignment (Automatic), so each number sits past the bar end, left of a negative bar and right of a positive one |
+| The text in the Compare and Organization pills touched the pill's left curve | Eight leading spaces in both labels, so the text starts inside the pill |
+| Reset still too small | Shape size 11.5, the same as the two pills, in a 30 px zone |
+| The ribbon order did not match the bridge below it | The ribbon follows `factor_order`, the bridge's order: people, worker mix, country mix, grade mix, rates, exchange rates. The mix cells get a note that changes with the pick: the share of the change and the way the mix moved (`Rib Mix Share`, `Rib Mix Dir`), for example "+6% · shift to higher grades", or "no real shift" under $0.05M |

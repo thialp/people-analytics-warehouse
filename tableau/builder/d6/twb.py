@@ -511,7 +511,8 @@ class Sheet:
              "  <encodings>\n" + indent('\n'.join(encs), 4) + "\n  </encodings>\n"
              + (indent(rl, 2) + '\n' if rl else '') + indent(tip, 2) + '\n' + (indent(lab, 2) + '\n' if lab else '')
              + "  <style>\n    <style-rule element='cell'>\n"
-             f"      <format attr='text-align' value='{align}' />\n      <format attr='vertical-align' value='{valign}' />\n"
+             + (f"      <format attr='text-align' value='{align}' />\n" if align else '')
+             + f"      <format attr='vertical-align' value='{valign}' />\n"
              + (f"      {cell_fmt}\n" if cell_fmt else '') +
              "    </style-rule>\n    <style-rule element='mark'>\n" + indent('\n'.join(fm), 6) + "\n    </style-rule>\n  </style>\n</pane>")
         self.panes.append(re.sub(r'\n\s*\n', '\n', p))

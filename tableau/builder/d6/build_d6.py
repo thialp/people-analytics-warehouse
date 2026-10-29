@@ -166,7 +166,7 @@ s.zeroline = '#d5dbe4'
 ap, an = s.f('Bias Axis', 'min'), s.f('Bias Axis Neg', 'min')
 s.pane('Bar', enc=[('color', 'Bias Kind', 'agg'), ('lod', 'Bias Axis', 'min'), ('lod', 'Bias Axis Neg', 'min')],
        refs=[s.refline(0, bx, ap, '#00000000', 0), s.refline(1, bx, an, '#00000000', 0)],
-       size='0.55', transparency='255', stroke='false', labels_show=True,
+       size='0.55', transparency='255', stroke='false', labels_show=True, align=None,
        label=[[('{Bias Text}', 'semi', 9, SLATE)]],
        tooltip=[[('{Factor Head|attr}', 'semi', 10, NAVY)],
                 [('Shapley ', 'book', 10, INK), ('{Bias Shap Txt}', 'semi', 10, NAVY), (' · one fixed order ', 'book', 10, INK),
@@ -222,15 +222,15 @@ def control(name, shape=None, shape_field=None, lod=(), label=None, tip=None, si
 
 
 control('Period Field', shape='Arcadia D4/d4_field_capsule.png', lod=('Toggle Period Panel', 'Close Panel'), size='11.5',
-        label=[[('   {Period Field Text}', 'semi', 10, NAVY)]], tip='Choose the two dates to compare')
+        label=[[('        {Period Field Text}', 'semi', 10, NAVY)]], tip='Choose the two dates to compare')
 for nm, lab in (('Date This', [[('{To Date Text|attr}', 'semi', 9, WHITE)]]), ('Date Against', [[('{From Date Text|attr}', 'semi', 9, WHITE)]]),
                 ('Date Span', [[('{Span Line 1|attr}', 'book', 9, MIST)], [('{Span Line 2|attr}', 'book', 9, MIST)]])):
     new(nm).pane('Text', enc=ZZ, label=lab, valign='top')
 control('Org Field', shape_field='Org Capsule Shape', lod=('Toggle Org Panel', 'Close Panel'), size='11.5',
-        label=[[('   {Org Text Light}', 'semi', 10, NAVY), ('{Org Text Dark}', 'medium', 10, PALE2)]],
+        label=[[('        {Org Text Light}', 'semi', 10, NAVY), ('{Org Text Dark}', 'medium', 10, PALE2)]],
         tip='Choose all of Arcadia or one function')
 control('Org Sub', mark='Text', label=[[('{Org Sub Text}', 'book', 9, '#8a97a8')]])
-control('Reset', shape='Arcadia D4/d4_reset.png', lod=('Zero Pair', 'Default Group', 'Default Span', 'Close Panel'), size='10',
+control('Reset', shape='Arcadia D4/d4_reset.png', lod=('Zero Pair', 'Default Group', 'Default Span', 'Close Panel'), size='11.5',
         tip='Reset to default view', align='center')
 control('Info Button', shape_field='Info Shape', lod=('Toggle Info', 'Close Panel'), size='2', align='center',
         tip='How the bridge works')
@@ -441,7 +441,7 @@ for key, sheet, y, h in (('This', 'Date This', 172, 22), ('Against', 'Date Again
     zones.append(text_zone(14, y, 62, h, [(key, MUTED, 9, 'Book')], pad=(3, 0, 0, 4)))
     zones.append(sheet_zone(sheet, 76, y, 136, h))
 zones += [sheet_zone('Org Field', 14, 310, 188, 30), sheet_zone('Org Sub', 14, 348, 190, 18),
-          image_zone(D4IMG + 'arcadia_rail_divider.png', 14, 386, 188, 24), sheet_zone('Reset', 14, 424, 188, 28),
+          image_zone(D4IMG + 'arcadia_rail_divider.png', 14, 386, 188, 24), sheet_zone('Reset', 14, 422, 188, 30),
           sheet_zone('Rail As Of', 14, 762, 190, 60)]
 
 VIS = {}
