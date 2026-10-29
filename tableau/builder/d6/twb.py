@@ -469,7 +469,7 @@ class Sheet:
         self.slices.append(r)
 
     def pane(self, mark, enc=(), label=None, tooltip=None, size=None, transparency=None, labels_show=None,
-             align='left', valign='center', pane_id=None, y_axis=None, refs=(), extra_mark_fmt='', order=None,
+             align='left', valign='center', pane_id=None, y_axis=None, x_axis=None, refs=(), extra_mark_fmt='', order=None,
              color=None, stroke=None, cell_fmt=''):
         encs, have = [], set()
         for tag, name, *how in enc:
@@ -504,7 +504,7 @@ class Sheet:
         if extra_mark_fmt:
             fm.append(extra_mark_fmt)
         attrs = (f" id='{pane_id}'" if pane_id is not None else '') + " selection-relaxation-option='selection-relaxation-disallow'" \
-            + (f" y-axis-name='{y_axis}'" if y_axis else '')
+            + (f" y-axis-name='{y_axis}'" if y_axis else '') + (f" x-axis-name='{x_axis}'" if x_axis else '')
         sizing = "\n  <mark-sizing mark-sizing-setting='marks-scaling-off' />" if mark in ('Square', 'Shape', 'Circle', 'GanttBar') else ''
         rl = '\n'.join(refs)
         p = (f"<pane{attrs}>\n  <view>\n    <breakdown value='auto' />\n  </view>\n  <mark class='{mark}' />{sizing}\n"

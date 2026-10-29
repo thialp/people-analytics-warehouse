@@ -22,6 +22,7 @@ def ds_name(src):
 PARAMS = {
     'p_Pair': {'dtype': 'integer', 'value': 0, 'members': [str(i) for i in range(17)]},
     'p_Group': {'dtype': 'string', 'value': 'Arcadia Systems'},
+    'p_SpanView': {'dtype': 'string', 'value': 'year'},
     'p_PeriodOpen': {'dtype': 'boolean', 'value': False, 'members': ['true', 'false']},
     'p_OrgOpen': {'dtype': 'boolean', 'value': False, 'members': ['true', 'false']},
     'p_InfoOpen': {'dtype': 'boolean', 'value': False, 'members': ['true', 'false']},

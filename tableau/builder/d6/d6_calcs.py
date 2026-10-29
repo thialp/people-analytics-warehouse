@@ -63,8 +63,8 @@ DTYPES = {'Pair Offset': 'integer', 'Zero Pair': 'integer', 'Table Col Order': '
           'One fixed order': 'real', 'Floor Raw': 'real', 'Floor Step': 'real', 'Axis Floor': 'real',
           'Y Years': 'integer', 'Y Rate Up': 'integer', 'Bias Axis': 'real', 'Bias Axis Neg': 'real',
           'Rib Max': 'real', 'Row HC Change': 'integer', 'Quiet HC': 'integer', 'Quiet Flag': 'integer', 'Quiet Change': 'real',
-          'Y HC Min': 'integer', 'Ribbon Order': 'integer', 'Rib Zero': 'real'}
-ROLES = {'Ribbon Order': ('dimension', 'ordinal'), 'Pair Offset': ('dimension', 'ordinal'), 'Zero Pair': ('dimension', 'ordinal'),
+          'Y HC Min': 'integer', 'Ribbon Order': 'integer', 'Rib Zero': 'real', 'Span Key': 'integer', 'Band X': 'real', 'Band Size': 'real'}
+ROLES = {'Span Key': ('dimension', 'ordinal'), 'Ribbon Order': ('dimension', 'ordinal'), 'Pair Offset': ('dimension', 'ordinal'), 'Zero Pair': ('dimension', 'ordinal'),
          'Table Col Order': ('dimension', 'ordinal')}
 
 if __name__ == '__main__':

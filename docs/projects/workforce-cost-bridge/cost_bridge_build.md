@@ -148,6 +148,7 @@ None is shown on the dashboard: the rail and the popovers set them.
 |---|---|---|---|---|
 | `p_Pair` | Integer | Range 0 to 16, step 1 | **0** | Period list, Reset. 0 = the latest quarter-end against a year earlier, 1 = the quarter-end before, … 16 |
 | `p_Group` | String | All | **Arcadia Systems** | Organization list, Reset. The company or one function |
+| `p_SpanView` | String | List: year, quarter | **year** | Span list (browses only), Reset. Which comparisons the Period popover lists: fiscal years or quarters |
 | `p_PeriodOpen`, `p_OrgOpen`, `p_InfoOpen` | Boolean | True / False | False | The rail capsules, the ✕, Reset (one popover open at a time) |
 
 ---
@@ -767,10 +768,13 @@ IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELS
 <Sign on SUM([Seq M])> + <M1 on SUM([Seq M])>
 
 // Bias Axis
-{ MAX(IF [In Selection] AND [Is Factor] THEN ABS([Bias M]) END) } * 1.15
+{ MAX(IF [In Selection] AND [Is Factor] THEN ABS([Bias M]) END) } * 1.9
 
 // Bias Axis Neg
 -[Bias Axis]
+
+// Bias Label X
+SUM([Bias M]) + (IF SUM([Bias M]) >= 0 THEN 1 ELSE -1) * MIN([Bias Axis]) * 0.3
 ```
 
 "Overstate" when the fixed order moves the factor further in its own direction (a bias with the same sign as the effect), "understate" otherwise. `Bias Axis` keeps the diverging bars symmetric and leaves room for their labels.
@@ -871,6 +875,15 @@ IF [Quiet Change] >= 0 THEN ", yet cost rose " ELSE ", and cost fell " END
 
 // Quiet Change Txt
 "$" + <M1 on [Quiet Change]> + "M"
+
+// Band X
+MIN(0.0)
+
+// Band Size
+MIN(1.0)
+
+// Band Kind
+IF MIN([Quiet Flag]) = 1 THEN "quiet" ELSE "plain" END
 
 // Cell Text Hi
 IF MIN([Quiet Flag]) = 1 THEN [Cell Text] END
@@ -984,8 +997,32 @@ Each hangs from the rail's right edge (x 216): a navy `#13233A` vertical contain
 The list sheets: one row per option, Marks **Shape** with the tick files `d4_tick_on.png` (12) / `d4_tick_off.png` (11) from **Arcadia D4** (the files carry the state, so no color on the shape), the tick on a hidden axis at the left, **every tick at shape size 1.8 in every list** (a fixed size, never sized by the view, so ticks do not grow when a list is short; build 1's size 8 drew stacked, oversized ticks), rows 22 px, fit width; row banding none; tooltip off.
 
 ```
-// Pair Option Row
+// Span Key
+IF [Is Year Pair] THEN 1 ELSE 2 END
+
+// Span Value
+IF [Is Year Pair] THEN "year" ELSE "quarter" END
+
+// Span Name
+IF MIN([Span Key]) = 1 THEN "Fiscal year" ELSE "Quarter" END
+
+// Span Sub
+IF MIN([Span Key]) = 1 THEN "year-end vs year-end" ELSE "quarter-end vs a year before" END
+
+// Span Shape
+IF MIN([Span Value]) = [p_SpanView] THEN "d4_tick_on" ELSE "d4_tick_off" END
+
+// Span Match
+IF [p_SpanView] = "year" THEN [Is Year Pair] ELSE NOT [Is Year Pair] END
+
+// Default Span
+"year"
+
+// Span Option Row
 [In Group] AND [factor_order] = 0
+
+// Pair Option Row
+[In Group] AND [factor_order] = 0 AND [Span Match]
 
 // Pair Shape
 IF MIN([Pair Offset]) = [p_Pair] THEN "d4_tick_on" ELSE "d4_tick_off" END
@@ -1015,7 +1052,7 @@ IF MIN([view_name]) = "Company" THEN "All of Arcadia" ELSE MIN([group_name]) END
 
 | Popover | x, y, w × h | Body |
 |---|---|---|
-| **Period Popover** | 216, 132, 360 × 470 | Title "Compare". **Pair List**: Filter `Pair Option Row` = True (17 rows). Rows `Pair Offset` (header hidden, sorted ascending: the latest first). Shape `Pair Shape`; label `  <Pair Option Name>` Tableau Book 10 `#E4E9F0` then `   <Pair Option Date>` Tableau Book 9 `#8FA0B8`. Detail `Pair Offset`, `Close Panel`, `zzTrue`, `zzFalse`. Footer "Each choice compares a quarter-end with the same date a year before." |
+| **Period Popover** | 216, 150, 440 × 380 | Title "Compare". Two lists side by side, as How-To #2: **Span List** (150 wide): Filter `Span Option Row` = True; Rows `Span Key` (header hidden); Shape `Span Shape`; label `  <Span Name>` Tableau Book 10 `#E4E9F0` / `  <Span Sub>` Tableau Book 8 `#8FA0B8`; Detail `Span Value`. Clicking a span only browses: it sets `p_SpanView` and leaves the popover open. **Pair List** (278 wide): Filter `Pair Option Row` = True (5 fiscal years or 12 quarters). Rows `Pair Offset` (header hidden, sorted ascending: the latest first). Shape `Pair Shape`; label `  <Pair Option Name>` Tableau Book 10 `#E4E9F0` then `   <Pair Option Date>` Tableau Book 9 `#8FA0B8`. Detail `Pair Offset`, `Close Panel`, `zzTrue`, `zzFalse`. Footer "Pick a span, then the two dates to compare." |
 | **Org Popover** | 216, 228, 360 × 300 | Title "Organization". **Group List**: Filter `Group Option Row` = True (9 rows). Rows `Group Key` (header hidden; the company first, then the functions A to Z; one row field, because build 1's two row fields drew the rows on top of each other). Shape `Group Shape`; label `  <Group Option Name>` Tableau Book 10 `#E4E9F0` then `   <Group Option People>` Tableau Book 9 `#8FA0B8`. Detail `group_name`, `Close Panel`, `zzTrue`, `zzFalse`. Footer "Each function is its own bridge: its effects add up to its own change." |
 | **Info Popover** | 216, 24, 591 × 420 | Title "How the bridge works", then the text below |
 
@@ -1105,6 +1142,7 @@ Keys Tableau Book 9 `#8FA0B8`; `Date This` and `Date Against` Tableau Semibold 9
 |---|---|---|---|
 | Open period popover | Period Field | `p_PeriodOpen` | `Toggle Period Panel` |
 | Period closes others | Period Field | `p_OrgOpen`, `p_InfoOpen` (two actions) | `Close Panel` |
+| Browse span | Span List | `p_SpanView` | `Span Value` |
 | Set pair | Pair List | `p_Pair` | `Pair Offset` |
 | Close period popover on pick | Pair List | `p_PeriodOpen` | `Close Panel` |
 | Period popover on x | Period Close | `p_PeriodOpen` | `Close Panel` |
@@ -1115,12 +1153,13 @@ Keys Tableau Book 9 `#8FA0B8`; `Date This` and `Date Against` Tableau Semibold 9
 | Org popover on x | Org Close | `p_OrgOpen` | `Close Panel` |
 | Reset pair | Reset | `p_Pair` | `Zero Pair` |
 | Reset group | Reset | `p_Group` | `Default Group` |
+| Reset span | Reset | `p_SpanView` | `Default Span` |
 | Reset closes popovers | Reset | the three open flags (three actions) | `Close Panel` |
 | Open info | Info Button | `p_InfoOpen` | `Toggle Info` |
 | Info closes others | Info Button | `p_PeriodOpen`, `p_OrgOpen` (two actions) | `Close Panel` |
 | Info popover on x | Info Close | `p_InfoOpen` | `Close Panel` |
 
-21 in all.
+23 in all.
 
 **Deselect:** one Filter action per clickable sheet: source and target the same sheet, run on Select, clearing **Show all values**, `zzTrue` → `zzFalse`. Every sheet except `Bridge`, `Bias Bars` and `Year Table` (a selection there is useful).
 
@@ -1288,3 +1327,14 @@ python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workfor
 **Build 3 (2026-10-29).** Right, but the changes were too small to see; Span still truncated, the bias labels still sat on their bars. Build 4 takes the sizes from the prototype instead of nudging: rail capsules 11 pt and the date list 10 pt with a wider value column and Span as "12 months" / "year-end to year-end"; ribbon values Bold 24 in a taller band; the bias number in its own column beside a label-free bar; shorter notes ("toward cheaper worker types", the year note, the rail foot).
 
 **Build 4 and 5 (2026-10-29).** Build 4 enlarged the type (ribbon values 24, rail 11) and felt as crowded as build 2: the prototype is airy because its type is *smaller*. Build 5 takes the prototype's sizes (12.2) and closes the empty band under the headline; it matched the prototype. Build 6 gives the five-year title room for two lines with its subtitle and shortens the note.
+
+**Build 6 review (2026-10-29), carried into build 7.**
+
+| Seen in build 6 | Changed |
+|---|---|
+| Ribbon values too large beside the prototype; the ribbon bars thinner than they need to be | Values Bold 17; bars back to 6 px |
+| Waterfall bars too thick | Gantt width cut by a third (the prototype: bars two thirds of their column) |
+| The order table's bias numbers sat apart from their bars | Each number sits at its bar's end, on a dual axis (`Bias Label X`); the separate number column is gone |
+| The five-year subtitle crowded the title; the quiet year was bold only | A 4 pt spacer line under the title; the quiet year's row gets a plum tint band (`Year Band`, a sheet behind the table), as in the prototype |
+| The Period popover was one long list of 17 | Two lists, as How-To #2: the span (fiscal year or quarter, browse only) and its comparisons |
+| Rail capsules and Reset too big; rail blocks crowded | Smaller capsules and Reset; more space between the date rows and between blocks |
