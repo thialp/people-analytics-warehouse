@@ -41,7 +41,7 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 | 🪑 **3. [Workforce Planning](#case-study-3-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)** |
 | 🔍 **4. [Contingent Workforce](#case-study-4-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard)** |
 | 🔮 **5. [Seats to Fill](#case-study-5-seats-to-fill-hiring-forecast)** | *How many PIDs will we fill next year, how many will still be vacant, and can we trust it?* | A survival model of time to fill and 100 simulated futures, against the Budget, tested on eight past quarters | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard)** |
-| 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | *coming soon* |
+| 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard)** |
 | 🗺️ **7. [Global Workforce Footprint](#case-study-7-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
 
 ### How it works, in one picture
@@ -987,7 +987,24 @@ Three quarters of the $402.9M growth was **more people**; a third was **pricier 
 
 ### Tableau
 
-The marts connect directly from Tableau Public:
+**Published:** [Workforce Cost Bridge: Shapley Cost Decomposition on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard) (release 6.1 data, one Custom SQL extract of 1,224 rows).
+
+[![Workforce Cost Bridge on Tableau Public](docs/images/workforce_cost_bridge_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard)
+
+*FY26 against FY25, all of Arcadia. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard)**: compare any fiscal year or quarter-end with the same date a year earlier, for the company or one function; hover any factor for what it measures.*
+
+| Part | What it does |
+|---|---|
+| Headline | Writes itself from the selection: how much cost grew, to what, and how much of it one factor explains ("…and 76% of it was more people"), or names the largest effect when no factor explains most of it |
+| Rail and popovers | Compare (fiscal years or quarter-ends, each against a year earlier, with the two dates and the span spelled out), Organization (the company or one function, with people, employees and contingent workers on the date) and Reset |
+| Factor ribbon | The six Shapley effects in the bridge's order, each with its share of the change and a note that changes with the selection ("+6% · more senior grades", "−1% · more contingent") |
+| Bridge | Opening cost, the six effects, closing cost, on an axis that starts just below the smaller total so small factors stay visible |
+| Order table | Shapley against one fixed order (volume first, currency last), the bias per factor, and a title that names the largest distortion ("A fixed order overstates rates by $5.5M") |
+| Five fiscal years | People, mix, rates and currency for FY22 to FY26, the compared year shaded, the year headcount barely moved called out |
+
+23 parameter actions and 28 deselects drive the page from one data source. The workbook is written by [`tableau/builder/d6/`](tableau/builder/d6/) from the build guide's own formulas: [`cost_bridge_build.md`](docs/projects/workforce-cost-bridge/cost_bridge_build.md) (section 15 records each review round and what changed). [`check_values.py`](tableau/builder/d6/check_values.py) recomputes every number the page shows for all 153 selections and checks that each bridge closes.
+
+The marts also connect directly from Tableau Public:
 
 | Mart | Grain | Answers |
 |---|---|---|
@@ -1067,7 +1084,7 @@ The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau 
 
 - [`sqlserver/`](sqlserver/) holds T-SQL scripts that load the CSVs with `BULK INSERT` and build typed `dw` tables, the pay history in USD at its posting-date rate (`OUTER APPLY TOP 1` as the as-of join), an indexed worker month-end snapshot, a running pay ledger, a recursive reporting-chain table and the reporting views. The load script is generated from the CSV headers ([`make_load_raw.py`](sqlserver/make_load_raw.py)).
 - [`03b_build_dw_workforce_planning.sql`](sqlserver/03b_build_dw_workforce_planning.sql) builds the seat layer (positions, seat assignments, requisitions, the workforce plan, candidates, a seat month-end snapshot, seat fills with the pay walk, vacancy chains with a recursive CTE, plan vs actual) and four reporting views; [`08_validate_workforce_planning.sql`](sqlserver/08_validate_workforce_planning.sql) checks it.
-- [`03c_build_dw_contingent.sql`](sqlserver/03c_build_dw_contingent.sql) (release 3) brings in the contingent workforce: Bridgeway VMS and Keystone HR's contingent records, the contingent month-end snapshot, conversions and movement, and case study 4's identity resolution and discrepancy rules, where DuckDB's `ASOF JOIN` becomes a range join on each feed change and the date of the next one. [`04b`](sqlserver/04b_create_reporting_views_contingent.sql) adds six views (contingent spend, the Shapley growth mix in T-SQL, precomputed in `dw.WorkforceCostGrowthMix`, and the case study 4 marts), each with a matching Tableau Custom SQL file (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`); [`12_validate_contingent_workforce.sql`](sqlserver/12_validate_contingent_workforce.sql) checks them.
+- [`03c_build_dw_contingent.sql`](sqlserver/03c_build_dw_contingent.sql) (release 3) brings in the contingent workforce: Bridgeway VMS and Keystone HR's contingent records, the contingent month-end snapshot, conversions and movement, and case study 4's identity resolution and discrepancy rules, where DuckDB's `ASOF JOIN` becomes a range join on each feed change and the date of the next one. [`04b`](sqlserver/04b_create_reporting_views_contingent.sql) adds six views (contingent spend, the Shapley growth mix in T-SQL, precomputed in `dw.WorkforceCostGrowthMix` by [`03f`](sqlserver/03f_build_dw_cost_growth_mix.sql), and the case study 4 marts), each with a matching Tableau Custom SQL file (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`); [`12_validate_contingent_workforce.sql`](sqlserver/12_validate_contingent_workforce.sql) checks them.
 - [`03d_build_dw_cw_reconciliation.sql`](sqlserver/03d_build_dw_cw_reconciliation.sql) (release 4) adds case study 4's month-end close view: the load log and the close runs, the 12 flags with their routing, Keystone job data, the Helix ticket replay and the three Dashboard #4 marts; [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql) exposes them as views, [`tableau/custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql) unions them into the page's one data source, and [`15_validate_cw_reconciliation.sql`](sqlserver/15_validate_cw_reconciliation.sql) checks them.
 - [`tableau/custom_sql_workforce_cost_bridge.sql`](tableau/custom_sql_workforce_cost_bridge.sql) is the cost bridge as **Tableau Custom SQL**: one `SELECT` with no CTEs, using derived tables and `CROSS APPLY (VALUES …)` to unpivot each employee and contingent worker into walk lines.
 - [`tableau/custom_sql_headcount_fte_walk.sql`](tableau/custom_sql_headcount_fte_walk.sql) is the headcount & FTE walk for Dashboard #1: the walk rebuilt from the SQL Server snapshot with the five dimensions joined in, keeping every CSV column name so the workbook moves over with *Replace Data Source* ([field mapping](docs/projects/workforce-planning/release_2_replace_references.md)); [`10_validate_headcount_fte_walk.sql`](sqlserver/10_validate_headcount_fte_walk.sql) runs it and checks it.
@@ -1114,7 +1131,7 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 ├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, validation, and the DuckDB checker
 ├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
-├── tableau/              Tableau Custom SQL, connection settings and the Seats to Fill workbook builder
+├── tableau/              Tableau Custom SQL, connection settings and the workbook builders (Seats to Fill, Cost Bridge)
 └── docs/                 documentation, grouped by project (see docs/README.md)
     ├── company/          Arcadia profile, org chart, organization and pay model
     ├── warehouse/        data dictionary, source systems and lineage

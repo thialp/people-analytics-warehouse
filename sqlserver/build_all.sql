@@ -16,6 +16,7 @@
 :r /repo/sqlserver/03c_build_dw_contingent.sql
 :r /repo/sqlserver/03d_build_dw_cw_reconciliation.sql
 :r /repo/sqlserver/03e_build_dw_forecast.sql
+:r /repo/sqlserver/03f_build_dw_cost_growth_mix.sql
 :r /repo/sqlserver/04_create_reporting_views.sql
 :r /repo/sqlserver/04b_create_reporting_views_contingent.sql
 :r /repo/sqlserver/04c_create_reporting_views_reconciliation.sql

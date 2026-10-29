@@ -119,10 +119,23 @@ def page(p, off):
     drv = max(FACTORS, key=lambda f: abs(s[f]))
     dshare = s[drv] / chg if chg else None
     verb = 'grew' if chg >= 0 else 'fell'
+    head = f'Workforce cost {verb} {money(chg)} to {money(c)}'
     if dshare is not None and 0.5 <= dshare <= 1:
-        out['title'] = f'Cost {verb} {whole_m(chg)}, and {pct(dshare)} of it was {driver_words(drv, s[drv])}'
+        out['title'] = head + f', and {pct(dshare)} of it was {driver_words(drv, s[drv])}'
     else:
-        out['title'] = f'Cost {verb} {whole_m(chg)}; the largest effect was {driver_words(drv, s[drv])} ({smoney(s[drv])})'
+        out['title'] = head + f'; the largest effect was {driver_words(drv, s[drv])} ({smoney(s[drv])})'
+    out['sub'] = (f"{date_words(p['frm'])} to {date_words(p['to'])} · {spct(chg / o)} · {{scope}} · "
+                  f"{comma(p['hc0'])} to {comma(p['hc1'])} people · nominal USD")
+    share_ok = lambda v: chg and 0 <= v / chg <= 1
+    hcs = ('+' if hc >= 0 else MINUS) + comma(abs(hc)) + ' people'
+    rib = []
+    for f, name, note in (
+            ('Volume', 'More people' if vol >= 0 else 'Fewer people', (pct(vol / chg) + ' · ' if share_ok(vol) else '') + hcs),
+            ('Rate', 'Higher rates' if s['Rate'] >= 0 else 'Lower rates', (pct(s['Rate'] / chg) + ' · ' if share_ok(s['Rate']) else '') + 'pay and bill rates'),
+            ('Currency', 'Exchange rates', smoney(chg - s['Currency']) + ' without them'),
+            ('Level mix', 'Grade mix', ''), ('Location mix', 'Country mix', ''), ('Workforce mix', 'Worker mix', '')):
+        rib.append((name, smoney(s[f]), note))
+    out['ribbon'] = rib
     f = 0.95 * min(o, c) / 1e6
     step = 10 ** (math.floor(math.log10(f)) - 1)
     floor = math.floor(f / step) * step
@@ -135,7 +148,10 @@ def page(p, off):
     out['closes'] = abs(lvl - c) < 0.05  # each stored value is rounded to the cent
     b = p['bias']
     big = max(FACTORS, key=lambda f: abs(b[f]))
-    out['bias_sub'] = f'A fixed order would move {big} by {smoney(b[big])}'
+    word = {'Volume': 'volume', 'Workforce mix': 'worker mix', 'Location mix': 'country mix', 'Level mix': 'grade mix',
+            'Rate': 'rates', 'Currency': 'currency'}[big]
+    verb = 'overstates' if b[big] * s[big] >= 0 else 'understates'
+    out['bias_sub'] = f'A fixed order {verb} {word} by {money(b[big])}'
     out['bias'] = [(f, snum(s[f]), snum(p['seq'][f]), snum(b[f])) for f in FACTORS]
     out['bars'] = [money(o)] + [snum(s[k]) for k in FACTORS] + [money(c)]
     return out
@@ -158,7 +174,12 @@ def table(pairs, group):
     t1 = 'Rates rose every year' if n == len(rates) else 'Rates fell every year' if n == 0 else f'Rates rose in {n} of {len(rates)} years'
     t2 = ('currency swung both ways' if min(cur) < 0 < max(cur)
           else 'currency lowered cost every year' if max(cur) < 0 else 'currency raised cost every year')
-    return t1 + '; ' + t2, rows
+    quiet = min(yrs, key=lambda t: abs(t[1]['hc1'] - t[1]['hc0']))[1]
+    qhc = quiet['hc1'] - quiet['hc0']
+    qch = quiet['shap']['Closing cost'] - quiet['shap']['Opening cost']
+    sub = (f"In {fy(quiet['fy'])} headcount changed by only {('+' if qhc >= 0 else MINUS) + comma(abs(qhc))}"
+           + (', yet cost rose ' if qch >= 0 else ', and cost fell ') + money(qch))
+    return t1 + '; ' + t2, rows, sub
 
 
 def main():
@@ -185,11 +206,11 @@ def main():
         print(f"| {off} | {o['pair']} | {o['span']} | {o['k1'][1]} | {o['k1'][2].split(' vs ')[0]} ({o['k1'][2].split('(')[1]} | "
               + ' | '.join(o['bars'][1:7]) + f" | {floor_text(o['floor'])} |")
     print('\n### Page texts, company, every pair\n')
-    print('| p_Pair | Bridge title | KPI 2 line | KPI 5 line | Order-bias subtitle |')
+    print('| p_Pair | Headline | Order-card title | People note | Exchange-rates note |')
     print('|---:|---|---|---|---|')
     for off in range(17):
         o = page(pairs[(off, 'Arcadia Systems')], off)
-        print(f"| {off} | {o['title']} | {o['k2'][0]} · {o['k2'][2]} | {o['k5'][2]} | {o['bias_sub']} |")
+        print(f"| {off} | {o['title']} | {o['bias_sub']} | {o['ribbon'][0][0]} · {o['ribbon'][0][2]} | {o['ribbon'][5][2]} |")
     print('\n### Each group, the latest pair (p_Pair 0)\n')
     print('| Group | Total cost | Change | Volume | Workforce mix | Location mix | Level mix | Rate | Currency | Axis floor | Bridge title |')
     print('|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---|')
@@ -208,17 +229,23 @@ def main():
         print()
     print('### Five-year table\n')
     for g in ['Arcadia Systems', 'Technology', 'People']:
-        t, rows = table(pairs, g)
-        print(f'**{g}** · title "{t}"\n')
+        t, rows, sub = table(pairs, g)
+        print(f'**{g}** · title "{t}" · subtitle "{sub}"\n')
         print('| FY | Volume | Mix | Rate | Currency |')
         print('|---|---:|---:|---:|---:|')
         for r in rows:
             print('| ' + ' | '.join(r) + ' |')
         print()
     o = page(pairs[(0, 'Arcadia Systems')], 0)
-    print('### KPI band, company, latest pair\n')
-    for k in ['k1', 'k2', 'k3', 'k4', 'k5']:
-        print(f'- {o[k][0]} · **{o[k][1]}** · {o[k][2]}')
+    print('### The factor ribbon, company, latest pair\n')
+    print(f"Headline: {o['title']}  \nSubtitle: {o['sub'].format(scope='all of Arcadia')}\n")
+    print('| Cell | Name | Value | Note |')
+    print('|---:|---|---:|---|')
+    for i, (n, v, t) in enumerate(o['ribbon'], 1):
+        print(f'| {i} | {n} | {v} | {t} |')
+    for g, off in (('Technology', 0), ('Arcadia Systems', 8)):
+        o = page(pairs[(off, g)], off)
+        print(f"\n**{g}, p_Pair {off}:** {o['title']} · " + ' · '.join(f'{n} {v} ({t})' for n, v, t in o['ribbon']))
 
 
 if __name__ == '__main__':

@@ -45,7 +45,7 @@ from sqlglot import exp
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DB = ROOT / "warehouse" / "arcadia.duckdb"
 BUILD = ["03_build_dw.sql", "03b_build_dw_workforce_planning.sql", "03c_build_dw_contingent.sql",
-         "03d_build_dw_cw_reconciliation.sql", "03e_build_dw_forecast.sql",
+         "03d_build_dw_cw_reconciliation.sql", "03e_build_dw_forecast.sql", "03f_build_dw_cost_growth_mix.sql",
          "04_create_reporting_views.sql", "04b_create_reporting_views_contingent.sql",
          "04c_create_reporting_views_reconciliation.sql"]
 VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
@@ -168,8 +168,8 @@ def compare(con: duckdb.DuckDBPyConnection, mart: str, other: str, where: str = 
             return f"ROUND(CAST({q} AS DOUBLE) + 1e-6, 2)"   # off the half-cent boundary
         return f"CAST({q} AS {'DATE' if d == 'DATE' else 'VARCHAR'})"
 
-    other_cols = {r[0] for r in con.execute(f"DESCRIBE SELECT * FROM {other}").fetchall()}
-    missing = [c for c, _ in cols if c not in other_cols]
+    other_cols = {r[0].lower() for r in con.execute(f"DESCRIBE SELECT * FROM {other}").fetchall()}
+    missing = [c for c, _ in cols if c.lower() not in other_cols]      # T-SQL names are case-insensitive
     if missing:                                        # the mart moved ahead of the T-SQL: say what is missing
         print(f"   DIFF   {other:<34} lacks the mart's columns {', '.join(missing)} ({mart})")
         return False
