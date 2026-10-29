@@ -444,8 +444,8 @@ zones.append(sheet_zone('Period Field', 14, 124, 188, 30))
 for key, sheet, y, h in (('This', 'Date This', 172, 22), ('Against', 'Date Against', 198, 22), ('Span', 'Date Span', 224, 36)):
     zones.append(text_zone(14, y, 62, h, [(key, MUTED, 9, 'Book')], pad=(3, 0, 0, 4)))
     zones.append(sheet_zone(sheet, 76, y, 136, h))
-zones += [sheet_zone('Org Field', 14, 310, 188, 30), sheet_zone('Org Sub', 14, 346, 190, 52),
-          image_zone(D4IMG + 'arcadia_rail_divider.png', 14, 412, 188, 24), sheet_zone('Reset', 14, 452, 188, 30),
+zones += [sheet_zone('Org Field', 14, 310, 188, 30), sheet_zone('Org Sub', 14, 344, 190, 66),
+          image_zone(D4IMG + 'arcadia_rail_divider.png', 14, 418, 188, 24), sheet_zone('Reset', 14, 456, 188, 30),
           sheet_zone('Rail As Of', 14, 690, 190, 60),
           text_zone(14, 760, 190, 22, [('Built by Thiago Alpoin', PALE2, 9, 'Semibold')], pad=(0, 0, 0, 4)),
           sheet_zone('Credit GitHub', 14, 786, 28, 28), sheet_zone('Credit LinkedIn', 46, 786, 28, 28)]

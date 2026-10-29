@@ -41,7 +41,7 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 | 🪑 **3. [Workforce Planning](#case-study-3-workforce-planning)** | *Are we hiring into the PIDs we planned?* | Every position (PID), filled or vacant, for employees and contractors; every hire tied to the PID it filled and what that PID looked like before | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforcePlanningArcadiaSystems/Dashboard)** |
 | 🔍 **4. [Contingent Workforce](#case-study-4-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard)** |
 | 🔮 **5. [Seats to Fill](#case-study-5-seats-to-fill-hiring-forecast)** | *How many PIDs will we fill next year, how many will still be vacant, and can we trust it?* | A survival model of time to fill and 100 simulated futures, against the Budget, tested on eight past quarters | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard)** |
-| 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | *coming soon* |
+| 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard)** |
 | 🗺️ **7. [Global Workforce Footprint](#case-study-7-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
 
 ### How it works, in one picture
@@ -987,7 +987,24 @@ Three quarters of the $402.9M growth was **more people**; a third was **pricier 
 
 ### Tableau
 
-The marts connect directly from Tableau Public:
+**Published:** [Workforce Cost Bridge: Shapley Cost Decomposition on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard) (release 6.1 data, one Custom SQL extract of 1,224 rows).
+
+[![Workforce Cost Bridge on Tableau Public](docs/images/workforce_cost_bridge_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard)
+
+*FY26 against FY25, all of Arcadia. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard)**: compare any fiscal year or quarter-end with the same date a year earlier, for the company or one function; hover any factor for what it measures.*
+
+| Part | What it does |
+|---|---|
+| Headline | Writes itself from the selection: how much cost grew, to what, and how much of it one factor explains ("…and 76% of it was more people"), or names the largest effect when no factor explains most of it |
+| Rail and popovers | Compare (fiscal years or quarter-ends, each against a year earlier, with the two dates and the span spelled out), Organization (the company or one function, with people, employees and contingent workers on the date) and Reset |
+| Factor ribbon | The six Shapley effects in the bridge's order, each with its share of the change and a note that changes with the selection ("+6% · more senior grades", "−1% · more contingent") |
+| Bridge | Opening cost, the six effects, closing cost, on an axis that starts just below the smaller total so small factors stay visible |
+| Order table | Shapley against one fixed order (volume first, currency last), the bias per factor, and a title that names the largest distortion ("A fixed order overstates rates by $5.5M") |
+| Five fiscal years | People, mix, rates and currency for FY22 to FY26, the compared year shaded, the year headcount barely moved called out |
+
+23 parameter actions and 28 deselects drive the page from one data source. The workbook is written by [`tableau/builder/d6/`](tableau/builder/d6/) from the build guide's own formulas: [`cost_bridge_build.md`](docs/projects/workforce-cost-bridge/cost_bridge_build.md) (section 15 records each review round and what changed). [`check_values.py`](tableau/builder/d6/check_values.py) recomputes every number the page shows for all 153 selections and checks that each bridge closes.
+
+The marts also connect directly from Tableau Public:
 
 | Mart | Grain | Answers |
 |---|---|---|
@@ -1114,7 +1131,7 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 ├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, validation, and the DuckDB checker
 ├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
-├── tableau/              Tableau Custom SQL, connection settings and the Seats to Fill workbook builder
+├── tableau/              Tableau Custom SQL, connection settings and the workbook builders (Seats to Fill, Cost Bridge)
 └── docs/                 documentation, grouped by project (see docs/README.md)
     ├── company/          Arcadia profile, org chart, organization and pay model
     ├── warehouse/        data dictionary, source systems and lineage
