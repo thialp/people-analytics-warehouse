@@ -404,7 +404,7 @@ for (lbl, x0, w0, al) in (('Factor', 988, 104, 'left'), ('Shapley', 1092, 64, 'r
 for name, x0, w0 in (('Bias Names', 988, 104), ('Bias Shapley', 1092, 64), ('Bias Seq', 1156, 72), ('Bias Num', 1228, 48), ('Bias Bars', 1280, 96)):
     zones.append(sheet_zone(name, x0, 344, w0, 150))
 zones.append(rule_zone(988, 512, 388, 2, PLUM))
-zones += [sheet_zone('Year Title', 988, 522, 388, 52), sheet_zone('Year Table', 988, 576, 388, 210), sheet_zone('Year Note', 988, 792, 388, 18)]
+zones += [sheet_zone('Year Title', 988, 522, 388, 70), sheet_zone('Year Table', 988, 594, 388, 194), sheet_zone('Year Note', 988, 792, 388, 18)]
 zones.append(text_zone(240, 828, 1136, 16, [(
     'Arcadia Systems is fictional; all data is synthetic. Executive officers excluded. Effects are Shapley values: each '
     "factor's average effect over every order of the six steps, so they add up to the change.", SLATE, 9, 'Book')]))

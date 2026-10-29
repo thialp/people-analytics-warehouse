@@ -572,7 +572,7 @@ ELSE "" END
 
 All three sheets: Filters `In Selection` = True and `Is Factor` = True; Columns `Ribbon Order` (discrete, header hidden); Fit Entire View; shading None; every line None; Detail `zzTrue`, `zzFalse`.
 
-- **Ribbon Top**: Marks **Text**; Color `Cell Kind` (adds plum `#5B3A63`, takes away dark sand `#8A6A35`); left, top. Line 1 `  <Rib Name>` Tableau Book 10 slate `#5A6170`; line 2 `  <Rib Value>` Tableau Bold 24, no font color (the mark color carries plum or sand). The two leading spaces keep the text off the cell divider.
+- **Ribbon Top**: Marks **Text**; Color `Cell Kind` (adds plum `#5B3A63`, takes away dark sand `#8A6A35`); left, top. Line 1 `  <Rib Name>` Tableau Book 10 slate `#5A6170`; line 2 `  <Rib Value>` Tableau Bold 20, no font color (the mark color carries plum or sand). The two leading spaces keep the text off the cell divider.
 - **Ribbon Bars**: Columns `Ribbon Order` then `Rib Zero` (continuous, axis Fixed **−0.07 to 1.07**, hidden: the margin insets each bar and its track from the cell edges, so the six tracks read as six bars, not one strip). Marks **Gantt Bar** (size slider at its second step: a 5 px bar), Size `Rib Bar Size`, Color `Rib Bar Kind` (the same test as `Cell Kind`, its own field so its colors can differ: adds plum `#5B3A63`, takes away light sand `#C2A878`), size slider so the bar is 6 px tall. Analytics: **Reference Band**, per pane, constant 0 to 1, fill `#ECE8E2` (the track), no line.
 - **Ribbon Note**: Marks **Text**, `  <Rib Note>` Tableau Book 9 slate `#5A6170`, left, top.
 - **Tooltip** (Ribbon Top and Ribbon Bars, command buttons off): line 1 `<Rib Name>: ` Tableau Semibold 11 navy `#13233A`, `<Rib Val Adds>` Tableau Bold 11 plum `#5B3A63`, `<Rib Val Takes>` Tableau Bold 11 dark sand `#8A6A35`; line 2 `<Rib Share Txt>` Tableau Semibold 10 navy; line 3 `<ATTR(factor_meaning)>` Tableau Book 10 ink `#1F2329`; line 4 `<Rib Tip Extra>` Tableau Book 9 slate `#5A6170`.
@@ -589,7 +589,7 @@ Expected, default: More people **+$307.1M** · 76% · +2,801 people | Higher rat
 
 The headline (6.1) already states the answer, so the bridge's title says what the chart shows.
 
-Sheet **Bridge Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `From ` Tableau Bold 14 navy `#13233A` · `<S Opening Txt>` Bold 14 slate `#5A6170` · ` to ` Bold 14 navy · `<S Closing Txt>` Bold 14 plum `#5B3A63` · `, one factor at a time` Bold 14 navy. Line 2: `Each factor's average effect over every order of the six steps, $M; the axis starts at ` Tableau Book 10 slate `#5A6170` · `<ATTR(Floor Text)>` Semibold 10 navy · ` so the factors are visible` Book 10 slate.
+Sheet **Bridge Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `From ` Tableau Bold 13 navy `#13233A` · `<S Opening Txt>` Bold 13 slate `#5A6170` · ` to ` Bold 13 navy · `<S Closing Txt>` Bold 13 plum `#5B3A63` · `, one factor at a time` Bold 13 navy. Line 2: `Each factor's average effect over every order of the six steps, $M; the axis starts at ` Tableau Book 10 slate `#5A6170` · `<ATTR(Floor Text)>` Semibold 10 navy · ` so the factors are visible` Book 10 slate.
 
 Expected: "From **$4,245.2M** to **$4,648.1M**, one factor at a time" / "… the axis starts at **$4.0B** so the factors are visible".
 
@@ -775,7 +775,7 @@ IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELS
 
 "Overstate" when the fixed order moves the factor further in its own direction (a bias with the same sign as the effect), "understate" otherwise. `Bias Axis` keeps the diverging bars symmetric and leaves room for their labels.
 
-Sheet **Bias Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off; 80 px tall, so a title that wraps to two lines keeps its subtitle. Line 1: `<Bias Lead>` Tableau Bold 14 navy `#13233A` · `<Bias Amount>` Bold 14 plum `#5B3A63`. Line 2: `Shapley vs one fixed order (volume first, currency last), $M` Tableau Book 10 slate `#5A6170`.
+Sheet **Bias Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off; 80 px tall, so a title that wraps to two lines keeps its subtitle. Line 1: `<Bias Lead>` Tableau Bold 13 navy `#13233A` · `<Bias Amount>` Bold 13 plum `#5B3A63`. Line 2: `Shapley vs one fixed order (volume first, currency last), $M` Tableau Book 10 slate `#5A6170`.
 
 Four sheets side by side make the table; each: Filters `In Selection` = True and `Is Factor` = True; Rows `factor_order` (discrete, header hidden); Fit Entire View; shading None; row dividers solid 1 px `#E7E3DD`; Detail `zzTrue`, `zzFalse`; tooltip off unless stated. Same height and top, so the six rows line up.
 
@@ -885,12 +885,12 @@ IF MIN([Quiet Flag]) = 0 THEN [Cell Text] END
 { MIN(IF [Pair Offset] = 0 THEN LEFT(DATENAME('month', [to_month_end]), 3) + " " + STR(DAY([to_month_end])) END) }
 
 // Year Note
-"Mix = worker + country + grade · each " + [FY End Words] + " vs the one before · bold: quietest"
+"Mix = worker + country + grade · bold: the quietest year"
 ```
 
 The quiet year is the one whose headcount changed least: the year where volume explains least and the other factors carry the change. Its row is bold in the table and named in the subtitle.
 
-Sheet **Year Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `<ATTR(Year Title)>` Tableau Bold 14 navy `#13233A`. Line 2: `In ` Tableau Book 10 slate `#5A6170` · `<ATTR(Quiet FY)>` Semibold 10 navy · ` headcount changed by only ` Book 10 slate · `<ATTR(Quiet HC Txt)>` Semibold 10 navy · `<ATTR(Quiet Verb)>` Book 10 slate · `<ATTR(Quiet Change Txt)>` Bold 10 plum `#5B3A63`.
+Sheet **Year Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off. Line 1: `<ATTR(Year Title)>` Tableau Bold 13 navy `#13233A`. Line 2: `In ` Tableau Book 10 slate `#5A6170` · `<ATTR(Quiet FY)>` Semibold 10 navy · ` headcount changed by only ` Book 10 slate · `<ATTR(Quiet HC Txt)>` Semibold 10 navy · `<ATTR(Quiet Verb)>` Book 10 slate · `<ATTR(Quiet Change Txt)>` Bold 10 plum `#5B3A63`.
 
 Sheet **Year Table**:
 1. Filter `Year Row` = True.
@@ -1045,55 +1045,57 @@ New dashboard **Dashboard**, **Fixed 1400 × 850**, title off, shading **`#F6F4F
 
 | # | Item | x | y | w | h | Format |
 |---:|---|---:|---:|---:|---:|---|
-| 1 | `Page Title` | 240 | 12 | 1136 | 116 | |
-| 2 | Blank, plum `#5B3A63` | 240 | 136 | 1136 | 2 | the ribbon's top rule |
-| 3 | `Ribbon Top` | 240 | 146 | 1136 | 70 | |
-| 4 | `Ribbon Bars` | 240 | 222 | 1136 | 10 | |
-| 5 | `Ribbon Note` | 240 | 236 | 1136 | 22 | |
-| 6 | Blank `#E0DCD6` | 240 | 266 | 1136 | 1 | the ribbon's bottom rule |
-| 7–11 | Blanks `#E0DCD6`, the cell dividers | 429, 619, 808, 997, 1187 | 148 | 1 | 112 | |
-| 12 | Blank, plum | 240 | 280 | 708 | 2 | |
-| 13 | `Bridge Title` | 240 | 290 | 708 | 54 | |
-| 14 | `Bridge` | 240 | 348 | 708 | 438 | |
+| 1 | `Page Title` | 240 | 12 | 1136 | 94 | |
+| 2 | Blank, plum `#5B3A63` | 240 | 114 | 1136 | 2 | the ribbon's top rule |
+| 3 | `Ribbon Top` | 240 | 124 | 1136 | 64 | |
+| 4 | `Ribbon Bars` | 240 | 194 | 1136 | 10 | |
+| 5 | `Ribbon Note` | 240 | 208 | 1136 | 22 | |
+| 6 | Blank `#E0DCD6` | 240 | 240 | 1136 | 1 | the ribbon's bottom rule |
+| 7–11 | Blanks `#E0DCD6`, the cell dividers | 429, 619, 808, 997, 1187 | 126 | 1 | 108 | |
+| 12 | Blank, plum | 240 | 258 | 708 | 2 | |
+| 13 | `Bridge Title` | 240 | 268 | 708 | 52 | |
+| 14 | `Bridge` | 240 | 324 | 708 | 462 | |
 | 15 | Text: the bridge's note (7.5) | 240 | 792 | 708 | 18 | |
-| 16 | Blank, plum | 988 | 280 | 388 | 2 | |
-| 17 | `Bias Title` | 988 | 290 | 388 | 78 | |
-| 18 | Four text objects: the order table's headers | 988, 1092, 1156, 1228 | 372 | 104, 64, 72, 48 | 16 | Tableau Book 9 `#8C9BB0`; Factor left, the others right |
-| 19 | `Bias Names`, `Bias Shapley`, `Bias Seq`, `Bias Num`, `Bias Bars` | 988, 1092, 1156, 1228, 1280 | 390 | 104, 64, 72, 48, 96 | 144 | |
-| 20 | Blank, plum | 988 | 548 | 388 | 2 | |
-| 21 | `Year Title` | 988 | 558 | 388 | 74 | |
-| 22 | `Year Table` | 988 | 634 | 388 | 170 | |
-| 23 | `Year Note` | 988 | 806 | 388 | 16 | |
+| 16 | Blank, plum | 988 | 258 | 388 | 2 | |
+| 17 | `Bias Title` | 988 | 268 | 388 | 52 | |
+| 18 | Four text objects: the order table's headers | 988, 1092, 1156, 1228 | 326 | 104, 64, 72, 48 | 16 | Tableau Book 9 `#8C9BB0`; Factor left, the others right |
+| 19 | `Bias Names`, `Bias Shapley`, `Bias Seq`, `Bias Num`, `Bias Bars` | 988, 1092, 1156, 1228, 1280 | 344 | 104, 64, 72, 48, 96 | 150 | |
+| 20 | Blank, plum | 988 | 512 | 388 | 2 | |
+| 21 | `Year Title` | 988 | 522 | 388 | 70 | the title may wrap to two lines and keep its subtitle |
+| 22 | `Year Table` | 988 | 594 | 388 | 194 | |
+| 23 | `Year Note` | 988 | 792 | 388 | 18 | |
 | 24 | Footnote text | 240 | 828 | 1136 | 16 | "Arcadia Systems is fictional; all data is synthetic. Executive officers excluded. Effects are Shapley values: each factor's average effect over every order of the six steps, so they add up to the change." Tableau Book 9 slate `#5A6170` |
 | 25 | Blank, navy `#13233A` (the rail) | 0 | 0 | 216 | 850 | |
 | 26 | Rail items (12.3) | | | | | |
-| 27 | `Period Popover` | 216 | 152 | 360 | 470 | visibility `p_PeriodOpen` |
-| 28 | `Org Popover` | 216 | 318 | 360 | 300 | visibility `p_OrgOpen` |
+| 27 | `Period Popover` | 216 | 156 | 360 | 470 | visibility `p_PeriodOpen` |
+| 28 | `Org Popover` | 216 | 326 | 360 | 300 | visibility `p_OrgOpen` |
 | 29 | `Info Popover` | 216 | 24 | 591 | 420 | visibility `p_InfoOpen` |
 
 The ribbon's cells are 1136 ÷ 6 = 189.3 px; the dividers sit on their edges.
 
+**Type sizes, as the prototype's:** headline Bold 20; ribbon names Book 9, values Bold 20, notes Book 9; panel titles Bold 13, subtitles Book 10; table text 10; rail capsules Semibold 10, rail keys and dates 9, rail foot 8 to 9. Larger type made the page feel crowded (builds 3 and 4): the room comes from the sizes, not from extra height.
+
 ### 12.3 The rail (floating over the navy blank)
 
-Room to breathe, as on How-To #2: 12 px side margins, a clear gap between each block, larger rail text (capsules 11 pt, the date list 10 pt), the date list in two columns.
+Room to breathe, as on How-To #2: 12 px side margins, a clear gap between each block, the date list in two columns.
 
 | Item | x | y | w | h |
 |---|---:|---:|---:|---:|
 | Logo `arcadia_logo_horizontal_reverse.png` | 12 | 24 | 156 | 40 |
 | `Info Button` | 178 | 30 | 28 | 28 |
-| Text COMPARE (Tableau Semibold 9 `#B8C4D6`) | 12 | 96 | 192 | 16 |
-| `Period Field` (label Tableau Semibold 11) | 12 | 116 | 192 | 34 |
-| Key `This` · `Date This` | 12 · 66 | 164 | 52 · 146 | 20 |
-| Key `Against` · `Date Against` | 12 · 66 | 184 | 52 · 146 | 20 |
-| Key `Span` · `Date Span` | 12 · 66 | 204 | 52 · 146 | 34 |
-| Text ORGANIZATION | 12 | 262 | 192 | 16 |
-| `Org Field` (label Tableau Semibold or Medium 11) | 12 | 282 | 192 | 34 |
-| `Org Sub` | 12 | 322 | 192 | 18 |
-| Image `arcadia_rail_divider.png` | 12 | 356 | 192 | 24 |
-| `Reset` | 12 | 392 | 192 | 32 |
-| `Rail As Of` | 12 | 752 | 192 | 70 |
+| Text COMPARE (Tableau Semibold 8 `#B8C4D6`) | 12 | 100 | 192 | 16 |
+| `Period Field` (label Tableau Semibold 10 navy) | 12 | 120 | 192 | 34 |
+| Key `This` · `Date This` | 12 · 74 | 168 | 62 · 138 | 20 |
+| Key `Against` · `Date Against` | 12 · 74 | 188 | 62 · 138 | 20 |
+| Key `Span` · `Date Span` | 12 · 74 | 208 | 62 · 138 | 34 |
+| Text ORGANIZATION | 12 | 270 | 192 | 16 |
+| `Org Field` (label Tableau 10) | 12 | 290 | 192 | 34 |
+| `Org Sub` | 12 | 330 | 192 | 18 |
+| Image `arcadia_rail_divider.png` | 12 | 364 | 192 | 24 |
+| `Reset` | 12 | 392 + 8 | 192 | 32 |
+| `Rail As Of` | 12 | 762 | 192 | 60 |
 
-Keys Tableau Book 10 `#8FA0B8`; `Date This` and `Date Against` Tableau Semibold 10 white; `Date Span` Tableau Book 9 `#B9C3D1`. `Rail As Of`: `<Rail Line 1>` Semibold 9 `#E4E9F0` / `USD at month-end ECB rates` / `Employees and contingent workers` Book 9 `#B9C3D1` (each line fits 192 px, so nothing wraps). The popovers open just under their capsules: Period at y 152, Organization at y 318.
+Keys Tableau Book 9 `#8FA0B8`; `Date This` and `Date Against` Tableau Semibold 9 white, `Date Span` Book 9 `#B9C3D1`, all aligned top so each value sits level with its key. `Rail As Of`: `<Rail Line 1>` Semibold 9 `#E4E9F0` / `USD at month-end ECB rates` / `Employees and contingent workers` Book 8 `#B9C3D1`. The popovers open just under their capsules: Period at y 156, Organization at y 326.
 
 ### 12.4 Actions
 
@@ -1284,3 +1286,5 @@ python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workfor
 | "toward the less costly worker type" truncated | "toward cheaper worker types" |
 
 **Build 3 (2026-10-29).** Right, but the changes were too small to see; Span still truncated, the bias labels still sat on their bars. Build 4 takes the sizes from the prototype instead of nudging: rail capsules 11 pt and the date list 10 pt with a wider value column and Span as "12 months" / "year-end to year-end"; ribbon values Bold 24 in a taller band; the bias number in its own column beside a label-free bar; shorter notes ("toward cheaper worker types", the year note, the rail foot).
+
+**Build 4 and 5 (2026-10-29).** Build 4 enlarged the type (ribbon values 24, rail 11) and felt as crowded as build 2: the prototype is airy because its type is *smaller*. Build 5 takes the prototype's sizes (12.2) and closes the empty band under the headline; it matched the prototype. Build 6 gives the five-year title room for two lines with its subtitle and shortens the note.
