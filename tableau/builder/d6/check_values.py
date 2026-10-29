@@ -134,7 +134,7 @@ def page(p, off):
             ('Rate', 'Higher rates' if s['Rate'] >= 0 else 'Lower rates', (pct(s['Rate'] / chg) + ' · ' if share_ok(s['Rate']) else '') + 'pay and bill rates'),
             ('Level mix', 'Grade mix', 'toward higher grades' if s['Level mix'] >= 0 else 'toward lower grades'),
             ('Location mix', 'Country mix', 'toward higher-cost countries' if s['Location mix'] >= 0 else 'toward lower-cost countries'),
-            ('Workforce mix', 'Worker mix', 'toward costlier worker types' if s['Workforce mix'] >= 0 else 'toward less costly worker types'),
+            ('Workforce mix', 'Worker mix', 'toward costlier worker types' if s['Workforce mix'] >= 0 else 'toward cheaper worker types'),
             ('Currency', 'Exchange rates', smoney(chg - s['Currency']) + ' without them')):
         rib.append((name, smoney(s[f]), note))
     out['ribbon'] = rib

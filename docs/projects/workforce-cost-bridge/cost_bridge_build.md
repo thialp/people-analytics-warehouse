@@ -73,7 +73,7 @@ y 0  ┌────────┬───────────────
 |---|---|---|
 | Headline | What happened, in one sentence? | "Workforce cost grew **$402.9M** to **$4,648.1M**, and **76%** of it was **more people**" |
 | Subtitle | Which dates, which scope? | "**Jun 30, 2025** to **Jun 30, 2026** · +9.5% · all of Arcadia · 39,145 to 41,946 people · nominal USD" |
-| Factor ribbon | How big is each factor? | More people **+$307.1M** (76% · +2,801 people) · Higher rates **+$139.8M** (35% · pay and bill rates) · Grade mix **+$22.4M** (toward higher grades) · Country mix **−$9.3M** (toward lower-cost countries) · Worker mix **−$4.8M** (toward less costly worker types) · Exchange rates **−$52.2M** (+$455.2M without them) |
+| Factor ribbon | How big is each factor? | More people **+$307.1M** (76% · +2,801 people) · Higher rates **+$139.8M** (35% · pay and bill rates) · Grade mix **+$22.4M** (toward higher grades) · Country mix **−$9.3M** (toward lower-cost countries) · Worker mix **−$4.8M** (toward cheaper worker types) · Exchange rates **−$52.2M** (+$455.2M without them) |
 | Bridge | How does it add up? | "From **$4,245.2M** to **$4,648.1M**, one factor at a time": 4,245.2 · +307.1 · −4.8 · −9.3 · +22.4 · +139.8 · −52.2 · 4,648.1 |
 | Order table | Why Shapley? | "A fixed order would overstate rates by **$5.5M**": Shapley, fixed order and bias per factor |
 | Five fiscal years | Is this year different? | "Rates rose every year; currency swung both ways" · "In **FY24** headcount changed by only **−42**, yet cost rose **$93.5M**" |
@@ -278,13 +278,13 @@ IF [Pair Is Year] THEN " · year-end" ELSE " · quarter-end" END
 [Pair Label] + [Pair Kind]
 
 // Span Line 1
-IF [Pair Is Year] THEN "12 months, year-end to" ELSE "12 months, quarter-end to" END
+"12 months"
 
 // Span Line 2
-IF [Pair Is Year] THEN "year-end" ELSE "quarter-end" END
+IF [Pair Is Year] THEN "year-end to year-end" ELSE "quarter-end to quarter-end" END
 ```
 
-Expected with `p_Pair` 0: Pair Label "FY26 vs FY25", Period Field Text "FY26 vs FY25 · year-end", Span Text "Jun 30, 2025 to Jun 30, 2026", Span Line 1 and 2 "12 months, year-end to" / "year-end". With 1: "FY26 Q3 vs FY25 Q3 · quarter-end", "Mar 31, 2025 to Mar 31, 2026". With 8: "FY24 vs FY23". A pair ending on the fiscal year's last quarter reads as the fiscal year; any other reads with its quarter.
+Expected with `p_Pair` 0: Pair Label "FY26 vs FY25", Period Field Text "FY26 vs FY25 · year-end", Span Text "Jun 30, 2025 to Jun 30, 2026", Span Line 1 and 2 "12 months" / "year-end to year-end". With 1: "FY26 Q3 vs FY25 Q3 · quarter-end", "Mar 31, 2025 to Mar 31, 2026". With 8: "FY24 vs FY23". A pair ending on the fiscal year's last quarter reads as the fiscal year; any other reads with its quarter.
 
 ### 4.4 Numbers inside text
 
@@ -536,7 +536,7 @@ WHEN 1 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% �
 WHEN 5 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% · " ELSE "" END) + "pay and bill rates"
 WHEN 4 THEN (IF SUM([Effect M]) >= 0 THEN "toward higher grades" ELSE "toward lower grades" END)
 WHEN 3 THEN (IF SUM([Effect M]) >= 0 THEN "toward higher-cost countries" ELSE "toward lower-cost countries" END)
-WHEN 2 THEN (IF SUM([Effect M]) >= 0 THEN "toward costlier worker types" ELSE "toward less costly worker types" END)
+WHEN 2 THEN (IF SUM([Effect M]) >= 0 THEN "toward costlier worker types" ELSE "toward cheaper worker types" END)
 ELSE <Sign on [Rib Without FX]> + "$" + <M1 on [Rib Without FX]> + "M without them" END
 
 // Rib Bar Kind
@@ -572,14 +572,14 @@ ELSE "" END
 
 All three sheets: Filters `In Selection` = True and `Is Factor` = True; Columns `Ribbon Order` (discrete, header hidden); Fit Entire View; shading None; every line None; Detail `zzTrue`, `zzFalse`.
 
-- **Ribbon Top**: Marks **Text**; Color `Cell Kind` (adds plum `#5B3A63`, takes away dark sand `#8A6A35`); left, top. Line 1 `  <Rib Name>` Tableau Book 10 slate `#5A6170`; line 2 `  <Rib Value>` Tableau Bold 20, no font color (the mark color carries plum or sand). The two leading spaces keep the text off the cell divider.
+- **Ribbon Top**: Marks **Text**; Color `Cell Kind` (adds plum `#5B3A63`, takes away dark sand `#8A6A35`); left, top. Line 1 `  <Rib Name>` Tableau Book 10 slate `#5A6170`; line 2 `  <Rib Value>` Tableau Bold 24, no font color (the mark color carries plum or sand). The two leading spaces keep the text off the cell divider.
 - **Ribbon Bars**: Columns `Ribbon Order` then `Rib Zero` (continuous, axis Fixed **−0.07 to 1.07**, hidden: the margin insets each bar and its track from the cell edges, so the six tracks read as six bars, not one strip). Marks **Gantt Bar** (size slider at its second step: a 5 px bar), Size `Rib Bar Size`, Color `Rib Bar Kind` (the same test as `Cell Kind`, its own field so its colors can differ: adds plum `#5B3A63`, takes away light sand `#C2A878`), size slider so the bar is 6 px tall. Analytics: **Reference Band**, per pane, constant 0 to 1, fill `#ECE8E2` (the track), no line.
 - **Ribbon Note**: Marks **Text**, `  <Rib Note>` Tableau Book 9 slate `#5A6170`, left, top.
 - **Tooltip** (Ribbon Top and Ribbon Bars, command buttons off): line 1 `<Rib Name>: ` Tableau Semibold 11 navy `#13233A`, `<Rib Val Adds>` Tableau Bold 11 plum `#5B3A63`, `<Rib Val Takes>` Tableau Bold 11 dark sand `#8A6A35`; line 2 `<Rib Share Txt>` Tableau Semibold 10 navy; line 3 `<ATTR(factor_meaning)>` Tableau Book 10 ink `#1F2329`; line 4 `<Rib Tip Extra>` Tableau Book 9 slate `#5A6170`.
 
 Lines between the cells are five 1 px blanks `#E0DCD6` on the dashboard (12.2), at the cell edges, from the plum rule to the bottom rule.
 
-Expected, default: More people **+$307.1M** · 76% · +2,801 people | Higher rates **+$139.8M** · 35% · pay and bill rates | Grade mix **+$22.4M** · toward higher grades | Country mix **−$9.3M** · toward lower-cost countries | Worker mix **−$4.8M** · toward less costly worker types | Exchange rates **−$52.2M** · +$455.2M without them. Bars: 100%, 46%, 7%, 3%, 2%, 17% of a cell. Hover on More people: "More people: **+$307.1M**" / "**76% of the change**" / "More or fewer people" / "Headcount 39,145 to 41,946, with mix, rates and currency at their average over every order of the steps."
+Expected, default: More people **+$307.1M** · 76% · +2,801 people | Higher rates **+$139.8M** · 35% · pay and bill rates | Grade mix **+$22.4M** · toward higher grades | Country mix **−$9.3M** · toward lower-cost countries | Worker mix **−$4.8M** · toward cheaper worker types | Exchange rates **−$52.2M** · +$455.2M without them. Bars: 100%, 46%, 7%, 3%, 2%, 17% of a cell. Hover on More people: "More people: **+$307.1M**" / "**76% of the change**" / "More or fewer people" / "Headcount 39,145 to 41,946, with mix, rates and currency at their average over every order of the steps."
 
 ---
 
@@ -757,6 +757,9 @@ WHEN "Level mix" THEN "the grade mix" WHEN "Rate" THEN "rates" ELSE "currency" E
 // Bias Kind
 IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELSE "takes away" END
 
+// Bias Label Kind
+IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELSE "takes away" END
+
 // Bias Shap Txt
 <Sign on SUM([Effect M])> + <M1 on SUM([Effect M])>
 
@@ -772,18 +775,19 @@ IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELS
 
 "Overstate" when the fixed order moves the factor further in its own direction (a bias with the same sign as the effect), "understate" otherwise. `Bias Axis` keeps the diverging bars symmetric and leaves room for their labels.
 
-Sheet **Bias Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off; 80 px tall, so a title that wraps to two lines keeps its subtitle. Line 1: `<Bias Lead>` Tableau Bold 14 navy `#13233A` · `<Bias Amount>` Bold 14 plum `#5B3A63`. Line 2: `Shapley against one fixed order (volume first, currency last), $M` Tableau Book 10 slate `#5A6170`.
+Sheet **Bias Title**: Text, one mark; left, top; Detail `zzTrue`, `zzFalse`; tooltip off; 80 px tall, so a title that wraps to two lines keeps its subtitle. Line 1: `<Bias Lead>` Tableau Bold 14 navy `#13233A` · `<Bias Amount>` Bold 14 plum `#5B3A63`. Line 2: `Shapley vs one fixed order (volume first, currency last), $M` Tableau Book 10 slate `#5A6170`.
 
 Four sheets side by side make the table; each: Filters `In Selection` = True and `Is Factor` = True; Rows `factor_order` (discrete, header hidden); Fit Entire View; shading None; row dividers solid 1 px `#E7E3DD`; Detail `zzTrue`, `zzFalse`; tooltip off unless stated. Same height and top, so the six rows line up.
 
 | Sheet | Width | Mark | Content |
 |---|---:|---|---|
 | **Bias Names** | 104 | Text | `<Factor Head>` Tableau Book 10 ink `#1F2329`, left |
-| **Bias Shapley** | 68 | Text | `<Bias Shap Txt>` Tableau Semibold 10 navy `#13233A`, right |
-| **Bias Seq** | 76 | Text | `<Bias Seq Txt>` Tableau Book 10 slate `#5A6170`, right |
-| **Bias Bars** | 140 | Bar | Columns `SUM(Bias M)`, axis hidden; Color `Bias Kind`: adds plum `#5B3A63`, takes away sand `#C2A878`, small `#D5DBE4`; size 50%; Label `<Bias Text>` Tableau Semibold 9 slate `#5A6170` at the bar end; zero line solid 1 px `#D5DBE4`; two reference lines at `MIN(Bias Axis)` and `MIN(Bias Axis Neg)` with no line (they only hold the axis symmetric). Tooltip: `<Factor Head>` Semibold 10 navy / `Shapley ` Book 10 ink, `<Bias Shap Txt>` Semibold 10 navy, ` · one fixed order ` Book 10 ink, `<Bias Seq Txt>` Semibold 10 slate, ` · bias ` Book 10 ink, `<Bias Text>` Bold 10 plum |
+| **Bias Shapley** | 64 | Text | `<Bias Shap Txt>` Tableau Semibold 10 navy `#13233A`, right |
+| **Bias Seq** | 72 | Text | `<Bias Seq Txt>` Tableau Book 10 slate `#5A6170`, right |
+| **Bias Num** | 48 | Text | `<Bias Text>` Tableau Semibold 10, right; Color `Bias Kind` labels: adds plum `#5B3A63`, takes away dark sand `#8A6A35`, small axis gray `#8C9BB0` (the field **Bias Label Kind**, the same test as `Bias Kind`) |
+| **Bias Bars** | 96 | Bar | Columns `SUM(Bias M)`, axis hidden; Color `Bias Kind`: adds plum `#5B3A63`, takes away sand `#C2A878`, small `#D5DBE4`; size 50%; no label (the number sits in its own column, so a short bar never hides it); zero line solid 1 px `#D5DBE4`; two reference lines at `MIN(Bias Axis)` and `MIN(Bias Axis Neg)` with no line (they only hold the axis symmetric). Tooltip: `<Factor Head>` Semibold 10 navy / `Shapley ` Book 10 ink, `<Bias Shap Txt>` Semibold 10 navy, ` · one fixed order ` Book 10 ink, `<Bias Seq Txt>` Semibold 10 slate, ` · bias ` Book 10 ink, `<Bias Text>` Bold 10 plum |
 
-Column headers are four dashboard text objects above the table: `Factor` (left), `Shapley`, `Fixed order` (right aligned), `Bias` (centered), Tableau Book 9 axis gray `#8C9BB0`.
+Column headers are four dashboard text objects above the table: `Factor` (left), `Shapley`, `Fixed order`, `Bias` (right aligned over the number column), Tableau Book 9 axis gray `#8C9BB0`.
 
 Expected, default: title "A fixed order would overstate rates by **$5.5M**".
 
@@ -881,7 +885,7 @@ IF MIN([Quiet Flag]) = 0 THEN [Cell Text] END
 { MIN(IF [Pair Offset] = 0 THEN LEFT(DATENAME('month', [to_month_end]), 3) + " " + STR(DAY([to_month_end])) END) }
 
 // Year Note
-"Mix = worker + country + grade mix · each " + [FY End Words] + " against the one before · bold: the quietest year"
+"Mix = worker + country + grade · each " + [FY End Words] + " vs the one before · bold: quietest year"
 ```
 
 The quiet year is the one whose headcount changed least: the year where volume explains least and the other factors carry the change. Its row is bold in the table and named in the subtitle.
@@ -965,11 +969,11 @@ Each: Detail `zzTrue`, `zzFalse`; tooltip off.
 | **Org Sub** | none (Text) | `<Org Sub Text>` Tableau Book 8 `#8A97A8` | `zzTrue`, `zzFalse` | off |
 | **Reset** | `d4_reset.png` | none | `Zero Pair`, `Default Group`, `Close Panel`, `zzTrue`, `zzFalse` | "Reset to default view" |
 | **Info Button** | `Info Shape` | none | `Toggle Info`, `Close Panel`, `zzTrue`, `zzFalse` | "How the bridge works" |
-| **Rail As Of** | none (Text) | `<Rail Line 1>` Tableau Semibold 9 `#E4E9F0` / `Nominal USD at month-end ECB rates` Tableau Book 9 `#B9C3D1` / `Employees and contingent workers` Tableau Book 9 `#B9C3D1` | `zzTrue`, `zzFalse` | off |
+| **Rail As Of** | none (Text) | `<Rail Line 1>` Tableau Semibold 9 `#E4E9F0` / `USD at month-end ECB rates` Tableau Book 9 `#B9C3D1` / `Employees and contingent workers` Tableau Book 9 `#B9C3D1` | `zzTrue`, `zzFalse` | off |
 
 Capsules are drawn at shape size 12 (the whole pill shows), Reset at 10. The rail's first heading reads **COMPARE**.
 
-Expected: default Period "FY26 vs FY25 · year-end"; This Jun 30, 2026 · Against Jun 30, 2025 · Span 12 months, year-end to / year-end; Organization "All of Arcadia" (dark capsule) / "41,946 people on Jun 30, 2026"; Technology "Technology" (white capsule) / "19,157 people on Jun 30, 2026"; rail foot "Report date Jun 30, 2026".
+Expected: default Period "FY26 vs FY25 · year-end"; This Jun 30, 2026 · Against Jun 30, 2025 · Span 12 months / year-end to year-end; Organization "All of Arcadia" (dark capsule) / "41,946 people on Jun 30, 2026"; Technology "Technology" (white capsule) / "19,157 people on Jun 30, 2026"; rail foot "Report date Jun 30, 2026".
 
 ---
 
@@ -1043,53 +1047,53 @@ New dashboard **Dashboard**, **Fixed 1400 × 850**, title off, shading **`#F6F4F
 |---:|---|---:|---:|---:|---:|---|
 | 1 | `Page Title` | 240 | 12 | 1136 | 116 | |
 | 2 | Blank, plum `#5B3A63` | 240 | 136 | 1136 | 2 | the ribbon's top rule |
-| 3 | `Ribbon Top` | 240 | 144 | 1136 | 60 | |
-| 4 | `Ribbon Bars` | 240 | 208 | 1136 | 12 | |
-| 5 | `Ribbon Note` | 240 | 222 | 1136 | 22 | |
-| 6 | Blank `#E0DCD6` | 240 | 252 | 1136 | 1 | the ribbon's bottom rule |
-| 7–11 | Blanks `#E0DCD6`, the cell dividers | 429, 619, 808, 997, 1187 | 146 | 1 | 100 | |
-| 12 | Blank, plum | 240 | 266 | 708 | 2 | |
-| 13 | `Bridge Title` | 240 | 276 | 708 | 54 | |
-| 14 | `Bridge` | 240 | 334 | 708 | 452 | |
+| 3 | `Ribbon Top` | 240 | 146 | 1136 | 70 | |
+| 4 | `Ribbon Bars` | 240 | 222 | 1136 | 10 | |
+| 5 | `Ribbon Note` | 240 | 236 | 1136 | 22 | |
+| 6 | Blank `#E0DCD6` | 240 | 266 | 1136 | 1 | the ribbon's bottom rule |
+| 7–11 | Blanks `#E0DCD6`, the cell dividers | 429, 619, 808, 997, 1187 | 148 | 1 | 112 | |
+| 12 | Blank, plum | 240 | 280 | 708 | 2 | |
+| 13 | `Bridge Title` | 240 | 290 | 708 | 54 | |
+| 14 | `Bridge` | 240 | 348 | 708 | 438 | |
 | 15 | Text: the bridge's note (7.5) | 240 | 792 | 708 | 18 | |
-| 16 | Blank, plum | 988 | 266 | 388 | 2 | |
-| 17 | `Bias Title` | 988 | 276 | 388 | 80 | |
-| 18 | Four text objects: the order table's headers | 988, 1092, 1160, 1236 | 360 | 104, 68, 76, 140 | 16 | Tableau Book 9 `#8C9BB0`; Factor left, Shapley and Fixed order right, Bias centered |
-| 19 | `Bias Names`, `Bias Shapley`, `Bias Seq`, `Bias Bars` | 988, 1092, 1160, 1236 | 378 | 104, 68, 76, 140 | 144 | |
-| 20 | Blank, plum | 988 | 536 | 388 | 2 | |
-| 21 | `Year Title` | 988 | 546 | 388 | 76 | |
-| 22 | `Year Table` | 988 | 624 | 388 | 176 | |
-| 23 | `Year Note` | 988 | 802 | 388 | 18 | |
+| 16 | Blank, plum | 988 | 280 | 388 | 2 | |
+| 17 | `Bias Title` | 988 | 290 | 388 | 78 | |
+| 18 | Four text objects: the order table's headers | 988, 1092, 1156, 1228 | 372 | 104, 64, 72, 48 | 16 | Tableau Book 9 `#8C9BB0`; Factor left, the others right |
+| 19 | `Bias Names`, `Bias Shapley`, `Bias Seq`, `Bias Num`, `Bias Bars` | 988, 1092, 1156, 1228, 1280 | 390 | 104, 64, 72, 48, 96 | 144 | |
+| 20 | Blank, plum | 988 | 548 | 388 | 2 | |
+| 21 | `Year Title` | 988 | 558 | 388 | 74 | |
+| 22 | `Year Table` | 988 | 634 | 388 | 170 | |
+| 23 | `Year Note` | 988 | 806 | 388 | 16 | |
 | 24 | Footnote text | 240 | 828 | 1136 | 16 | "Arcadia Systems is fictional; all data is synthetic. Executive officers excluded. Effects are Shapley values: each factor's average effect over every order of the six steps, so they add up to the change." Tableau Book 9 slate `#5A6170` |
 | 25 | Blank, navy `#13233A` (the rail) | 0 | 0 | 216 | 850 | |
 | 26 | Rail items (12.3) | | | | | |
-| 27 | `Period Popover` | 216 | 150 | 360 | 470 | visibility `p_PeriodOpen` |
-| 28 | `Org Popover` | 216 | 302 | 360 | 300 | visibility `p_OrgOpen` |
+| 27 | `Period Popover` | 216 | 152 | 360 | 470 | visibility `p_PeriodOpen` |
+| 28 | `Org Popover` | 216 | 318 | 360 | 300 | visibility `p_OrgOpen` |
 | 29 | `Info Popover` | 216 | 24 | 591 | 420 | visibility `p_InfoOpen` |
 
 The ribbon's cells are 1136 ÷ 6 = 189.3 px; the dividers sit on their edges.
 
 ### 12.3 The rail (floating over the navy blank)
 
-Room to breathe, as on How-To #2: 12 px side margins, a clear gap between each block, the date list in two columns.
+Room to breathe, as on How-To #2: 12 px side margins, a clear gap between each block, larger rail text (capsules 11 pt, the date list 10 pt), the date list in two columns.
 
 | Item | x | y | w | h |
 |---|---:|---:|---:|---:|
 | Logo `arcadia_logo_horizontal_reverse.png` | 12 | 24 | 156 | 40 |
 | `Info Button` | 178 | 30 | 28 | 28 |
-| Text COMPARE (Tableau Semibold 8 `#B8C4D6`) | 12 | 96 | 192 | 16 |
-| `Period Field` | 12 | 116 | 192 | 32 |
-| Key `This` · `Date This` | 12 · 76 | 160 | 60 · 128 | 18 |
-| Key `Against` · `Date Against` | 12 · 76 | 178 | 60 · 128 | 18 |
-| Key `Span` · `Date Span` | 12 · 76 | 196 | 60 · 128 | 32 |
-| Text ORGANIZATION | 12 | 248 | 192 | 16 |
-| `Org Field` | 12 | 268 | 192 | 32 |
-| `Org Sub` | 12 | 304 | 192 | 18 |
-| Image `arcadia_rail_divider.png` | 12 | 338 | 192 | 24 |
-| `Reset` | 12 | 374 | 192 | 32 |
-| `Rail As Of` | 12 | 740 | 192 | 86 |
+| Text COMPARE (Tableau Semibold 9 `#B8C4D6`) | 12 | 96 | 192 | 16 |
+| `Period Field` (label Tableau Semibold 11) | 12 | 116 | 192 | 34 |
+| Key `This` · `Date This` | 12 · 66 | 164 | 52 · 146 | 20 |
+| Key `Against` · `Date Against` | 12 · 66 | 184 | 52 · 146 | 20 |
+| Key `Span` · `Date Span` | 12 · 66 | 204 | 52 · 146 | 34 |
+| Text ORGANIZATION | 12 | 262 | 192 | 16 |
+| `Org Field` (label Tableau Semibold or Medium 11) | 12 | 282 | 192 | 34 |
+| `Org Sub` | 12 | 322 | 192 | 18 |
+| Image `arcadia_rail_divider.png` | 12 | 356 | 192 | 24 |
+| `Reset` | 12 | 392 | 192 | 32 |
+| `Rail As Of` | 12 | 752 | 192 | 70 |
 
-The popovers open just under their capsules: Period at y 150, Organization at y 302.
+Keys Tableau Book 10 `#8FA0B8`; `Date This` and `Date Against` Tableau Semibold 10 white; `Date Span` Tableau Book 9 `#B9C3D1`. `Rail As Of`: `<Rail Line 1>` Semibold 9 `#E4E9F0` / `USD at month-end ECB rates` / `Employees and contingent workers` Book 9 `#B9C3D1` (each line fits 192 px, so nothing wraps). The popovers open just under their capsules: Period at y 152, Organization at y 318.
 
 ### 12.4 Actions
 
@@ -1205,7 +1209,7 @@ Subtitle: Jun 30, 2025 to Jun 30, 2026 · +9.5% · all of Arcadia · 39,145 to 4
 | 2 | Higher rates | +$139.8M | 35% · pay and bill rates |
 | 3 | Grade mix | +$22.4M | toward higher grades |
 | 4 | Country mix | −$9.3M | toward lower-cost countries |
-| 5 | Worker mix | −$4.8M | toward less costly worker types |
+| 5 | Worker mix | −$4.8M | toward cheaper worker types |
 | 6 | Exchange rates | −$52.2M | +$455.2M without them |
 
 **Technology, p_Pair 0:** Workforce cost grew $176.8M to $2,016.3M, and 77% of it was more people · More people +$135.5M (77% · +1,301 people) · Higher rates +$60.5M (34% · pay and bill rates) · Grade mix +$5.3M (toward higher grades) · Country mix +$0.8M (toward higher-cost countries) · Worker mix +$0.1M (toward costlier worker types) · Exchange rates −$25.5M (+$202.2M without them)
@@ -1277,4 +1281,6 @@ python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workfor
 | A two-line headline (FY24 vs FY23) pushed the subtitle out | Headline at Bold 20 |
 | The order table's title wrapped and lost its subtitle; the five-year title lost its subtitle; the note truncated | Taller title sheets (80 and 76), a shorter subtitle and note |
 | Bias bars too short for their labels | `Bias Axis` at 1.45× the largest bias |
-| "toward the less costly worker type" truncated | "toward less costly worker types" |
+| "toward the less costly worker type" truncated | "toward cheaper worker types" |
+
+**Build 3 (2026-10-29).** Right, but the changes were too small to see; Span still truncated, the bias labels still sat on their bars. Build 4 takes the sizes from the prototype instead of nudging: rail capsules 11 pt and the date list 10 pt with a wider value column and Span as "12 months" / "year-end to year-end"; ribbon values Bold 24 in a taller band; the bias number in its own column beside a label-free bar; shorter notes ("toward cheaper worker types", the year note, the rail foot).
