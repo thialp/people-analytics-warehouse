@@ -159,26 +159,23 @@ bias_sheet('Bias Names').pane('Text', enc=ZZ, align='left', label=[[('{Factor He
 bias_sheet('Bias Shapley').pane('Text', enc=ZZ, align='right', label=[[('{Bias Shap Txt}', 'semi', 10, NAVY)]])
 bias_sheet('Bias Seq').pane('Text', enc=ZZ, align='right', label=[[('{Bias Seq Txt}', 'book', 10, SLATE)]])
 s = bias_sheet('Bias Bars', deselect=False)
-bx, lx = s.f('Bias M', 'sum'), s.f('Bias Label X', 'agg')
-s.cols = f'({bx} + {lx})'
-ap, an = s.f('Bias Axis', 'min'), s.f('Bias Axis Neg', 'min')
-s.axis_rules += [f"<format attr='display' class='0' field='{bx}' scope='cols' value='false' />",
-                 f"<encoding attr='space' class='0' field='{lx}' field-type='quantitative' fold='true' scope='cols' synchronized='true' type='space' />",
-                 f"<format attr='display' class='0' field='{lx}' scope='cols' value='false' />", "<format attr='tick-color' value='#00000000' />"]
+bx = s.f('Bias M', 'sum')
+s.cols = bx
+s.axis_rules += [f"<format attr='display' class='0' field='{bx}' scope='cols' value='false' />", "<format attr='tick-color' value='#00000000' />"]
 s.zeroline = '#d5dbe4'
-BTIP = [[('{Factor Head|attr}', 'semi', 10, NAVY)],
-        [('Shapley ', 'book', 10, INK), ('{Bias Shap Txt}', 'semi', 10, NAVY), (' · one fixed order ', 'book', 10, INK),
-         ('{Bias Seq Txt}', 'semi', 10, SLATE), (' · bias ', 'book', 10, INK), ('{Bias Text}', 'bold', 10, PLUM)]]
-s.pane('Automatic', pane_id=2, enc=[('lod', 'Bias Axis', 'min'), ('lod', 'Bias Axis Neg', 'min')],
-       refs=[s.refline(0, bx, ap, '#00000000', 0), s.refline(1, bx, an, '#00000000', 0)])
-s.pane('Bar', pane_id=3, x_axis=bx, enc=[('color', 'Bias Kind', 'agg')], size='0.55', transparency='255', stroke='false', tooltip=BTIP)
-s.pane('Text', pane_id=4, x_axis=lx, enc=[('color', 'Bias Label Kind', 'agg')], align='center', tooltip=BTIP,
-       label=[[('{Bias Text}', 'semi', 9, None)]])
+ap, an = s.f('Bias Axis', 'min'), s.f('Bias Axis Neg', 'min')
+s.pane('Bar', enc=[('color', 'Bias Kind', 'agg'), ('lod', 'Bias Axis', 'min'), ('lod', 'Bias Axis Neg', 'min')],
+       refs=[s.refline(0, bx, ap, '#00000000', 0), s.refline(1, bx, an, '#00000000', 0)],
+       size='0.55', transparency='255', stroke='false', labels_show=True,
+       label=[[('{Bias Text}', 'semi', 9, SLATE)]],
+       tooltip=[[('{Factor Head|attr}', 'semi', 10, NAVY)],
+                [('Shapley ', 'book', 10, INK), ('{Bias Shap Txt}', 'semi', 10, NAVY), (' · one fixed order ', 'book', 10, INK),
+                 ('{Bias Seq Txt}', 'semi', 10, SLATE), (' · bias ', 'book', 10, INK), ('{Bias Text}', 'bold', 10, PLUM)]])
 
 # ===================================================================================================== five fiscal years
 s = new('Year Title')
 s.pane('Text', enc=ZZ, valign='top', label=[
-    [('{Year Title|attr}', 'bold', 13, NAVY)], [(' ', 'book', 4, SLATE)],
+    [('{Year Title|attr}', 'bold', 13, NAVY)],
     [('In ', 'book', 10, SLATE), ('{Quiet FY|attr}', 'semi', 10, NAVY), (' headcount changed by only ', 'book', 10, SLATE),
      ('{Quiet HC Txt|attr}', 'semi', 10, NAVY), ('{Quiet Verb|attr}', 'book', 10, SLATE), ('{Quiet Change Txt|attr}', 'bold', 10, PLUM)]])
 
@@ -224,16 +221,16 @@ def control(name, shape=None, shape_field=None, lod=(), label=None, tip=None, si
     return s
 
 
-control('Period Field', shape='Arcadia D4/d4_field_capsule.png', lod=('Toggle Period Panel', 'Close Panel'), size='10.5',
+control('Period Field', shape='Arcadia D4/d4_field_capsule.png', lod=('Toggle Period Panel', 'Close Panel'), size='11.5',
         label=[[('   {Period Field Text}', 'semi', 10, NAVY)]], tip='Choose the two dates to compare')
 for nm, lab in (('Date This', [[('{To Date Text|attr}', 'semi', 9, WHITE)]]), ('Date Against', [[('{From Date Text|attr}', 'semi', 9, WHITE)]]),
                 ('Date Span', [[('{Span Line 1|attr}', 'book', 9, MIST)], [('{Span Line 2|attr}', 'book', 9, MIST)]])):
     new(nm).pane('Text', enc=ZZ, label=lab, valign='top')
-control('Org Field', shape_field='Org Capsule Shape', lod=('Toggle Org Panel', 'Close Panel'), size='10.5',
+control('Org Field', shape_field='Org Capsule Shape', lod=('Toggle Org Panel', 'Close Panel'), size='11.5',
         label=[[('   {Org Text Light}', 'semi', 10, NAVY), ('{Org Text Dark}', 'medium', 10, PALE2)]],
         tip='Choose all of Arcadia or one function')
 control('Org Sub', mark='Text', label=[[('{Org Sub Text}', 'book', 9, '#8a97a8')]])
-control('Reset', shape='Arcadia D4/d4_reset.png', lod=('Zero Pair', 'Default Group', 'Default Span', 'Close Panel'), size='8.5',
+control('Reset', shape='Arcadia D4/d4_reset.png', lod=('Zero Pair', 'Default Group', 'Default Span', 'Close Panel'), size='10',
         tip='Reset to default view', align='center')
 control('Info Button', shape_field='Info Shape', lod=('Toggle Info', 'Close Panel'), size='2', align='center',
         tip='How the bridge works')
@@ -267,8 +264,7 @@ def lst(name, rows, flt, shape, label, lod):
 
 
 s = lst('Span List', ['Span Key'], 'Span Option Row', 'Span Shape',
-        [[('  {Span Name}', 'book', 10, PALE2)], [('  {Span Sub}', 'book', 8, MUTED)]], ['Span Value'])
-s.cell_size = (None, 40, s.f('Span Key', 'ord'))
+        [[('  {Span Name}', 'book', 10, PALE2)]], ['Span Value'])
 lst('Pair List', ['Pair Offset'], 'Pair Option Row', 'Pair Shape',
     [[('  {Pair Option Name}', 'book', 10, PALE2), ('   {Pair Option Date}', 'book', 9, MUTED)]], ['Pair Offset', 'Close Panel'])
 lst('Group List', ['Group Key'], 'Group Option Row', 'Group Shape',
@@ -287,7 +283,7 @@ for n, cols in (('Bar Kind', [('level', LEVEL), ('adds', PLUM), ('takes away', S
                 ('Bias Kind', [('adds', PLUM), ('takes away', SAND), ('small', '#d5dbe4')]),
                 ('Rib Bar Kind', [('adds', PLUM), ('takes away', SAND)]),
                 ('Bias Label Kind', [('adds', PLUM), ('takes away', SAND_D), ('small', AXIS)]),
-                ('Band Kind', [('quiet', '#efe9f1'), ('plain', PAPER)])):
+                ('Band Kind', [('selected', '#efe9f1'), ('plain', PAPER)])):
     enc_rules.append(bucket_map(m.inst(n, 'agg')[0], 'color', cols)); styled.append((n, 'agg'))
 # Cell Kind colors text (ribbon values, table) in dark sand; the ribbon bars use their own field so sand stays light there
 enc_rules.append(bucket_map(m.inst('Cell Kind', 'agg')[0], 'color', [('adds', PLUM), ('takes away', SAND_D)])); styled.append(('Cell Kind', 'agg'))
@@ -472,10 +468,10 @@ def popover(name, param, px, py, pw, ph, title, body, footer):
     return hide_all(x)
 
 
-per_body = flow('Period Body', 228, 195, 428, 305, [sheet_zone('Span List', 228, 195, 150, 305, 150),
-                                                      sheet_zone('Pair List', 378, 195, 278, 305)], 'horz')
-zones.append(popover('Period', 'p_PeriodOpen', 216, 150, 440, 380, 'Compare', per_body,
-                     'Pick a span, then the two dates to compare.'))
+per_body = flow('Period Body', 228, 195, 428, 275, [sheet_zone('Span List', 228, 195, 140, 275, 140),
+                                                      sheet_zone('Pair List', 368, 195, 288, 275)], 'horz')
+zones.append(popover('Period', 'p_PeriodOpen', 216, 150, 440, 350, 'Compare', per_body,
+                     'Fiscal year: year-end vs year-end · Quarter: quarter-end vs a year before'))
 zones.append(popover('Org', 'p_OrgOpen', 216, 340, 360, 300, 'Organization', sheet_zone('Group List', 228, 385, 348, 225),
                      'Each function is its own bridge: its effects add up to its own change.'))
 INFO = [('What is measured.', "Total workforce cost on a date: employees' loaded pay run-rate (base pay × FTE × (1 + the country's fringe rate)) plus contingent workers' annualized bill run-rate, converted to USD at the ECB rate on that date. It is a run-rate, not spend: what a year would cost at that day's workforce and pay."),

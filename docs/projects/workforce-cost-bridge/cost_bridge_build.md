@@ -73,7 +73,7 @@ y 0  ┌────────┬───────────────
 |---|---|---|
 | Headline | What happened, in one sentence? | "Workforce cost grew **$402.9M** to **$4,648.1M**, and **76%** of it was **more people**" |
 | Subtitle | Which dates, which scope? | "**Jun 30, 2025** to **Jun 30, 2026** · +9.5% · all of Arcadia · 39,145 to 41,946 people · nominal USD" |
-| Factor ribbon | How big is each factor? | More people **+$307.1M** (76% · +2,801 people) · Higher rates **+$139.8M** (35% · pay and bill rates) · Grade mix **+$22.4M** (toward higher grades) · Country mix **−$9.3M** (toward lower-cost countries) · Worker mix **−$4.8M** (toward cheaper worker types) · Exchange rates **−$52.2M** (+$455.2M without them) |
+| Factor ribbon | How big is each factor? | More people **+$307.1M** (76% · +2,801 people) · Higher rates **+$139.8M** (35% · pay and bill rates) · Exchange rates **−$52.2M** (+$455.2M without them) · Grade mix **+$22.4M** · Country mix **−$9.3M** · Worker mix **−$4.8M** |
 | Bridge | How does it add up? | "From **$4,245.2M** to **$4,648.1M**, one factor at a time": 4,245.2 · +307.1 · −4.8 · −9.3 · +22.4 · +139.8 · −52.2 · 4,648.1 |
 | Order table | Why Shapley? | "A fixed order would overstate rates by **$5.5M**": Shapley, fixed order and bias per factor |
 | Five fiscal years | Is this year different? | "Rates rose every year; currency swung both ways" · "In **FY24** headcount changed by only **−42**, yet cost rose **$93.5M**" |
@@ -276,7 +276,7 @@ IF [Is Company] THEN "all of Arcadia" ELSE [p_Group] END
 IF [Pair Is Year] THEN " · year-end" ELSE " · quarter-end" END
 
 // Period Field Text
-[Pair Label] + [Pair Kind]
+[Pair Label]
 
 // Span Line 1
 "12 months"
@@ -501,11 +501,11 @@ Expected: "Workforce cost grew **$402.9M** to **$4,648.1M**, and **76%** of it w
 
 ### 6.2 The factor ribbon
 
-Six cells, one per factor, in the order a reader weighs them: people, rates, grades, countries, worker mix, exchange rates. Three sheets share the same six columns, stacked: **Ribbon Top** (name and value), **Ribbon Bars** (the bar), **Ribbon Note** (one line of context).
+Six cells, one per factor: people, rates and exchange rates first, then the three mix factors together (grades, countries, worker mix), which carry no note. Three sheets share the same six columns, stacked: **Ribbon Top** (name and value), **Ribbon Bars** (the bar), **Ribbon Note** (one line of context).
 
 ```
 // Ribbon Order
-CASE [factor_order] WHEN 1 THEN 1 WHEN 5 THEN 2 WHEN 4 THEN 3 WHEN 3 THEN 4 WHEN 2 THEN 5 WHEN 6 THEN 6 END
+CASE [factor_order] WHEN 1 THEN 1 WHEN 5 THEN 2 WHEN 6 THEN 3 WHEN 4 THEN 4 WHEN 3 THEN 5 WHEN 2 THEN 6 END
 
 // Rib Name
 CASE MIN([factor_order])
@@ -535,9 +535,7 @@ MIN([Sel Change LOD]) - SUM([Effect M])
 CASE MIN([factor_order])
 WHEN 1 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% · " ELSE "" END) + [Rib HC Txt]
 WHEN 5 THEN (IF [Rib Share Ok] THEN STR(INT(ROUND([Rib Share] * 100, 0))) + "% · " ELSE "" END) + "pay and bill rates"
-WHEN 4 THEN (IF SUM([Effect M]) >= 0 THEN "toward higher grades" ELSE "toward lower grades" END)
-WHEN 3 THEN (IF SUM([Effect M]) >= 0 THEN "toward higher-cost countries" ELSE "toward lower-cost countries" END)
-WHEN 2 THEN (IF SUM([Effect M]) >= 0 THEN "toward costlier worker types" ELSE "toward cheaper worker types" END)
+WHEN 4 THEN "" WHEN 3 THEN "" WHEN 2 THEN ""
 ELSE <Sign on [Rib Without FX]> + "$" + <M1 on [Rib Without FX]> + "M without them" END
 
 // Rib Bar Kind
@@ -547,7 +545,7 @@ IF ROUND(SUM([Effect M]), 1) >= 0 THEN "adds" ELSE "takes away" END
 { MAX(IF [In Selection] AND [Is Factor] THEN ABS([Effect M]) END) }
 
 // Rib Bar Size
-ABS(SUM([Effect M])) / MIN([Rib Max])
+IF ABS(SUM([Effect M])) / ABS(MIN([Sel Change LOD])) > 1 THEN 1 ELSE ABS(SUM([Effect M])) / ABS(MIN([Sel Change LOD])) END
 
 // Rib Zero
 MIN(0.0)
@@ -580,7 +578,7 @@ All three sheets: Filters `In Selection` = True and `Is Factor` = True; Columns 
 
 Lines between the cells are five 1 px blanks `#E0DCD6` on the dashboard (12.2), at the cell edges, from the plum rule to the bottom rule.
 
-Expected, default: More people **+$307.1M** · 76% · +2,801 people | Higher rates **+$139.8M** · 35% · pay and bill rates | Grade mix **+$22.4M** · toward higher grades | Country mix **−$9.3M** · toward lower-cost countries | Worker mix **−$4.8M** · toward cheaper worker types | Exchange rates **−$52.2M** · +$455.2M without them. Bars: 100%, 46%, 7%, 3%, 2%, 17% of a cell. Hover on More people: "More people: **+$307.1M**" / "**76% of the change**" / "More or fewer people" / "Headcount 39,145 to 41,946, with mix, rates and currency at their average over every order of the steps."
+Expected, default: More people **+$307.1M** · 76% · +2,801 people | Higher rates **+$139.8M** · 35% · pay and bill rates | Grade mix **+$22.4M** · toward higher grades | Country mix **−$9.3M** · toward lower-cost countries | Worker mix **−$4.8M** · toward cheaper worker types | Exchange rates **−$52.2M** · +$455.2M without them. Bars, each factor's share of the change: 76%, 35%, 13%, 6%, 2%, 1% of a cell. Hover on More people: "More people: **+$307.1M**" / "**76% of the change**" / "More or fewer people" / "Headcount 39,145 to 41,946, with mix, rates and currency at their average over every order of the steps."
 
 ---
 
@@ -773,8 +771,7 @@ IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELS
 // Bias Axis Neg
 -[Bias Axis]
 
-// Bias Label X
-SUM([Bias M]) + (IF SUM([Bias M]) >= 0 THEN 1 ELSE -1) * MIN([Bias Axis]) * 0.3
+
 ```
 
 "Overstate" when the fixed order moves the factor further in its own direction (a bias with the same sign as the effect), "understate" otherwise. `Bias Axis` keeps the diverging bars symmetric and leaves room for their labels.
@@ -882,14 +879,20 @@ MIN(0.0)
 // Band Size
 MIN(1.0)
 
+// Sel FY
+{ MIN(IF [In Pair] THEN [fiscal_year] END) }
+
+// Sel Flag
+IF [fiscal_year] = [Sel FY] THEN 1 ELSE 0 END
+
 // Band Kind
-IF MIN([Quiet Flag]) = 1 THEN "quiet" ELSE "plain" END
+IF MIN([Sel Flag]) = 1 THEN "selected" ELSE "plain" END
 
 // Cell Text Hi
-IF MIN([Quiet Flag]) = 1 THEN [Cell Text] END
+IF MIN([Sel Flag]) = 1 THEN [Cell Text] END
 
 // Cell Text Lo
-IF MIN([Quiet Flag]) = 0 THEN [Cell Text] END
+IF MIN([Sel Flag]) = 0 THEN [Cell Text] END
 
 // Year Row Label
 [Row To Label]
@@ -898,7 +901,7 @@ IF MIN([Quiet Flag]) = 0 THEN [Cell Text] END
 { MIN(IF [Pair Offset] = 0 THEN LEFT(DATENAME('month', [to_month_end]), 3) + " " + STR(DAY([to_month_end])) END) }
 
 // Year Note
-"Mix = worker + country + grade · bold: the quietest year"
+"Mix = worker + country + grade · shaded: the fiscal year you compare"
 ```
 
 The quiet year is the one whose headcount changed least: the year where volume explains least and the other factors carry the change. Its row is bold in the table and named in the subtitle.
@@ -1334,7 +1337,19 @@ python3 tableau/builder/d6/build_d6.py "Workforce Cost Bridge base.twb" "Workfor
 |---|---|
 | Ribbon values too large beside the prototype; the ribbon bars thinner than they need to be | Values Bold 17; bars back to 6 px |
 | Waterfall bars too thick | Gantt width cut by a third (the prototype: bars two thirds of their column) |
-| The order table's bias numbers sat apart from their bars | Each number sits at its bar's end, on a dual axis (`Bias Label X`); the separate number column is gone |
+| The order table's bias numbers sat apart from their bars | Each number sits at its bar's end as the bar's own label; the separate number column is gone |
 | The five-year subtitle crowded the title; the quiet year was bold only | A 4 pt spacer line under the title; the quiet year's row gets a plum tint band (`Year Band`, a sheet behind the table), as in the prototype |
 | The Period popover was one long list of 17 | Two lists, as How-To #2: the span (fiscal year or quarter, browse only) and its comparisons |
 | Rail capsules and Reset too big; rail blocks crowded | Smaller capsules and Reset; more space between the date rows and between blocks |
+
+**Build 7 review (2026-10-29), carried into build 8.**
+
+| Seen in build 7 | Changed |
+|---|---|
+| The order table's bars did not draw: the second axis for the labels (`Bias Label X`) was invalid in Tableau | One bar mark per factor, its number as the bar's own label, outside the bar end |
+| Ribbon bars were sized to the largest factor, so the first cell always read 100% | Each bar is the factor's share of the change (76%, 35%, …), capped at 100% |
+| The five-year band and bold marked the quietest year, the same for every pick | They mark the fiscal year being compared (`Sel FY`); the subtitle still names the quietest year; the subtitle shows again (taller title box, no spacer) |
+| The Period capsule's label overflowed the pill | The capsule reads "FY26 vs FY25" (the list below it gives the dates and the span); pill and type sized together |
+| Reset too small | Back to its earlier size |
+| The span list's two-line labels were right-aligned and its ticks oversized | One line per span, 22 px rows, the same tick size as every list; the explanation moves to the footer; the popover is sized to its longest list |
+| The ribbon notes "toward higher grades" etc. read as jargon | The ribbon reads people, rates, exchange rates, then the three mix cells together; the mix cells carry no note |

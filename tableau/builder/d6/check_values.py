@@ -132,10 +132,8 @@ def page(p, off):
     for f, name, note in (
             ('Volume', 'More people' if vol >= 0 else 'Fewer people', (pct(vol / chg) + ' · ' if share_ok(vol) else '') + hcs),
             ('Rate', 'Higher rates' if s['Rate'] >= 0 else 'Lower rates', (pct(s['Rate'] / chg) + ' · ' if share_ok(s['Rate']) else '') + 'pay and bill rates'),
-            ('Level mix', 'Grade mix', 'toward higher grades' if s['Level mix'] >= 0 else 'toward lower grades'),
-            ('Location mix', 'Country mix', 'toward higher-cost countries' if s['Location mix'] >= 0 else 'toward lower-cost countries'),
-            ('Workforce mix', 'Worker mix', 'toward costlier worker types' if s['Workforce mix'] >= 0 else 'toward cheaper worker types'),
-            ('Currency', 'Exchange rates', smoney(chg - s['Currency']) + ' without them')):
+            ('Currency', 'Exchange rates', smoney(chg - s['Currency']) + ' without them'),
+            ('Level mix', 'Grade mix', ''), ('Location mix', 'Country mix', ''), ('Workforce mix', 'Worker mix', '')):
         rib.append((name, smoney(s[f]), note))
     out['ribbon'] = rib
     f = 0.95 * min(o, c) / 1e6
