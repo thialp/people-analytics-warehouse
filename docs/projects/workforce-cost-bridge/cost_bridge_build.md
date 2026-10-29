@@ -767,7 +767,7 @@ IF ABS(SUM([Bias M])) < 1 THEN "small" ELSEIF SUM([Bias M]) >= 0 THEN "adds" ELS
 <Sign on SUM([Seq M])> + <M1 on SUM([Seq M])>
 
 // Bias Axis
-{ MAX(IF [In Selection] AND [Is Factor] THEN ABS([Bias M]) END) } * 1.45
+{ MAX(IF [In Selection] AND [Is Factor] THEN ABS([Bias M]) END) } * 1.15
 
 // Bias Axis Neg
 -[Bias Axis]
@@ -885,7 +885,7 @@ IF MIN([Quiet Flag]) = 0 THEN [Cell Text] END
 { MIN(IF [Pair Offset] = 0 THEN LEFT(DATENAME('month', [to_month_end]), 3) + " " + STR(DAY([to_month_end])) END) }
 
 // Year Note
-"Mix = worker + country + grade · each " + [FY End Words] + " vs the one before · bold: quietest year"
+"Mix = worker + country + grade · each " + [FY End Words] + " vs the one before · bold: quietest"
 ```
 
 The quiet year is the one whose headcount changed least: the year where volume explains least and the other factors carry the change. Its row is bold in the table and named in the subtitle.
