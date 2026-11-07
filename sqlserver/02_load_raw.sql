@@ -115,6 +115,27 @@ DECLARE @n_bw_supplier INT = (SELECT COUNT(*) FROM raw.bw_supplier);
 PRINT CONCAT('raw.bw_supplier', '                     ', @n_bw_supplier, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.bw_time_off;
+CREATE TABLE raw.bw_time_off (
+    [booking_id]       NVARCHAR(400) NULL,
+    [bw_worker_id]     NVARCHAR(400) NULL,
+    [service_order_id] NVARCHAR(400) NULL,
+    [booking_type]     NVARCHAR(400) NULL,
+    [first_day]        NVARCHAR(400) NULL,
+    [last_day]         NVARCHAR(400) NULL,
+    [working_days]     NVARCHAR(400) NULL,
+    [hours]            NVARCHAR(400) NULL,
+    [status]           NVARCHAR(400) NULL,
+    [submitted_at]     NVARCHAR(400) NULL,
+    [approved_at]      NVARCHAR(400) NULL
+);
+BULK INSERT raw.bw_time_off
+FROM '/repo/data/raw/bw_time_off.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_bw_time_off INT = (SELECT COUNT(*) FROM raw.bw_time_off);
+PRINT CONCAT('raw.bw_time_off', '                     ', @n_bw_time_off, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.bw_timesheet_month;
 CREATE TABLE raw.bw_timesheet_month (
     [timesheet_id]        NVARCHAR(400) NULL,
@@ -579,6 +600,28 @@ DECLARE @n_gen_cw_job_defect INT = (SELECT COUNT(*) FROM raw.gen_cw_job_defect);
 PRINT CONCAT('raw.gen_cw_job_defect', '               ', @n_gen_cw_job_defect, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.gen_org_drift_truth;
+CREATE TABLE raw.gen_org_drift_truth (
+    [drift_id]        NVARCHAR(400) NULL,
+    [signal_code]     NVARCHAR(400) NULL,
+    [cause]           NVARCHAR(400) NULL,
+    [person_id]       NVARCHAR(400) NULL,
+    [matrix_org_id]   NVARCHAR(400) NULL,
+    [assignment_id]   NVARCHAR(400) NULL,
+    [job_record_ids]  NVARCHAR(400) NULL,
+    [original_values] NVARCHAR(400) NULL,
+    [seeded_value]    NVARCHAR(400) NULL,
+    [start_date]      NVARCHAR(400) NULL,
+    [end_date]        NVARCHAR(400) NULL,
+    [detail]          NVARCHAR(400) NULL
+);
+BULK INSERT raw.gen_org_drift_truth
+FROM '/repo/data/sqlserver/gen_org_drift_truth.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_gen_org_drift_truth INT = (SELECT COUNT(*) FROM raw.gen_org_drift_truth);
+PRINT CONCAT('raw.gen_org_drift_truth', '             ', @n_gen_org_drift_truth, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.itsm_ticket;
 CREATE TABLE raw.itsm_ticket (
     [ticket_number]     NVARCHAR(400) NULL,
@@ -693,6 +736,115 @@ DECLARE @n_ks_cw_job INT = (SELECT COUNT(*) FROM raw.ks_cw_job);
 PRINT CONCAT('raw.ks_cw_job', '                       ', @n_ks_cw_job, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.ks_leave_of_absence;
+CREATE TABLE raw.ks_leave_of_absence (
+    [leave_id]                    NVARCHAR(400) NULL,
+    [worker_id]                   NVARCHAR(400) NULL,
+    [leave_type]                  NVARCHAR(400) NULL,
+    [status]                      NVARCHAR(400) NULL,
+    [initiated_date]              NVARCHAR(400) NULL,
+    [approved_date]               NVARCHAR(400) NULL,
+    [last_day_of_work]            NVARCHAR(400) NULL,
+    [first_day_of_leave]          NVARCHAR(400) NULL,
+    [estimated_last_day_of_leave] NVARCHAR(400) NULL,
+    [actual_last_day_of_leave]    NVARCHAR(400) NULL,
+    [first_day_back_at_work]      NVARCHAR(400) NULL,
+    [total_days_on_leave]         NVARCHAR(400) NULL,
+    [is_estimated]                NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_leave_of_absence
+FROM '/repo/data/raw/ks_leave_of_absence.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_leave_of_absence INT = (SELECT COUNT(*) FROM raw.ks_leave_of_absence);
+PRINT CONCAT('raw.ks_leave_of_absence', '             ', @n_ks_leave_of_absence, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ks_matrix_membership;
+CREATE TABLE raw.ks_matrix_membership (
+    [membership_id]        NVARCHAR(400) NULL,
+    [person_id]            NVARCHAR(400) NULL,
+    [person_type]          NVARCHAR(400) NULL,
+    [matrix_org_id]        NVARCHAR(400) NULL,
+    [effective_start_date] NVARCHAR(400) NULL,
+    [effective_end_date]   NVARCHAR(400) NULL,
+    [assigned_reason]      NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_matrix_membership
+FROM '/repo/data/raw/ks_matrix_membership.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_matrix_membership INT = (SELECT COUNT(*) FROM raw.ks_matrix_membership);
+PRINT CONCAT('raw.ks_matrix_membership', '            ', @n_ks_matrix_membership, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ks_matrix_org;
+CREATE TABLE raw.ks_matrix_org (
+    [matrix_record_id]     NVARCHAR(400) NULL,
+    [matrix_org_id]        NVARCHAR(400) NULL,
+    [matrix_org_name]      NVARCHAR(400) NULL,
+    [matrix_type]          NVARCHAR(400) NULL,
+    [region]               NVARCHAR(400) NULL,
+    [parent_matrix_org_id] NVARCHAR(400) NULL,
+    [covers_country_codes] NVARCHAR(400) NULL,
+    [effective_start_date] NVARCHAR(400) NULL,
+    [effective_end_date]   NVARCHAR(400) NULL,
+    [manager_worker_id]    NVARCHAR(400) NULL,
+    [status]               NVARCHAR(400) NULL,
+    [inactive_date]        NVARCHAR(400) NULL,
+    [created_date]         NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_matrix_org
+FROM '/repo/data/raw/ks_matrix_org.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_matrix_org INT = (SELECT COUNT(*) FROM raw.ks_matrix_org);
+PRINT CONCAT('raw.ks_matrix_org', '                   ', @n_ks_matrix_org, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ks_role_assignment;
+CREATE TABLE raw.ks_role_assignment (
+    [assignment_id]              NVARCHAR(400) NULL,
+    [role_name]                  NVARCHAR(400) NULL,
+    [assignee_worker_id]         NVARCHAR(400) NULL,
+    [target_org_unit_id]         NVARCHAR(400) NULL,
+    [target_org_name]            NVARCHAR(400) NULL,
+    [named_leader_worker_id]     NVARCHAR(400) NULL,
+    [assigned_via]               NVARCHAR(400) NULL,
+    [inherited_from_org_unit_id] NVARCHAR(400) NULL,
+    [effective_start_date]       NVARCHAR(400) NULL,
+    [effective_end_date]         NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_role_assignment
+FROM '/repo/data/raw/ks_role_assignment.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_role_assignment INT = (SELECT COUNT(*) FROM raw.ks_role_assignment);
+PRINT CONCAT('raw.ks_role_assignment', '              ', @n_ks_role_assignment, ' rows');
+GO
+
+DROP TABLE IF EXISTS raw.ks_time_off_request;
+CREATE TABLE raw.ks_time_off_request (
+    [time_off_request_id] NVARCHAR(400) NULL,
+    [person_id]           NVARCHAR(400) NULL,
+    [person_type]         NVARCHAR(400) NULL,
+    [source_system]       NVARCHAR(400) NULL,
+    [bw_booking_id]       NVARCHAR(400) NULL,
+    [time_off_type]       NVARCHAR(400) NULL,
+    [request_type]        NVARCHAR(400) NULL,
+    [first_day]           NVARCHAR(400) NULL,
+    [last_day]            NVARCHAR(400) NULL,
+    [units]               NVARCHAR(400) NULL,
+    [unit_of_time]        NVARCHAR(400) NULL,
+    [days_requested]      NVARCHAR(400) NULL,
+    [corrects_request_id] NVARCHAR(400) NULL,
+    [status]              NVARCHAR(400) NULL,
+    [created_at]          NVARCHAR(400) NULL,
+    [approved_at]         NVARCHAR(400) NULL
+);
+BULK INSERT raw.ks_time_off_request
+FROM '/repo/data/raw/ks_time_off_request.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ks_time_off_request INT = (SELECT COUNT(*) FROM raw.ks_time_off_request);
+PRINT CONCAT('raw.ks_time_off_request', '             ', @n_ks_time_off_request, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.ref_cw_discrepancy_type;
 CREATE TABLE raw.ref_cw_discrepancy_type (
     [discrepancy_code]    NVARCHAR(400) NULL,
@@ -788,6 +940,19 @@ DECLARE @n_ref_fx_rate_monthly INT = (SELECT COUNT(*) FROM raw.ref_fx_rate_month
 PRINT CONCAT('raw.ref_fx_rate_monthly', '             ', @n_ref_fx_rate_monthly, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.ref_job_family_home;
+CREATE TABLE raw.ref_job_family_home (
+    [job_family_code] NVARCHAR(400) NULL,
+    [home_function]   NVARCHAR(400) NULL,
+    [is_shared]       NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_job_family_home
+FROM '/repo/data/raw/ref_job_family_home.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_job_family_home INT = (SELECT COUNT(*) FROM raw.ref_job_family_home);
+PRINT CONCAT('raw.ref_job_family_home', '             ', @n_ref_job_family_home, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.ref_job_level_base_salary;
 CREATE TABLE raw.ref_job_level_base_salary (
     [job_level]                    NVARCHAR(400) NULL,
@@ -817,6 +982,20 @@ DECLARE @n_ref_performance_bonus INT = (SELECT COUNT(*) FROM raw.ref_performance
 PRINT CONCAT('raw.ref_performance_bonus', '           ', @n_ref_performance_bonus, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.ref_public_holiday;
+CREATE TABLE raw.ref_public_holiday (
+    [country_code] NVARCHAR(400) NULL,
+    [holiday_date] NVARCHAR(400) NULL,
+    [holiday_name] NVARCHAR(400) NULL,
+    [source]       NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_public_holiday
+FROM '/repo/data/sqlserver/ref_public_holiday.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_public_holiday INT = (SELECT COUNT(*) FROM raw.ref_public_holiday);
+PRINT CONCAT('raw.ref_public_holiday', '              ', @n_ref_public_holiday, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.ref_raw_column;
 CREATE TABLE raw.ref_raw_column (
     [table_name]   NVARCHAR(400) NULL,
@@ -842,8 +1021,8 @@ CREATE TABLE raw.ref_raw_table_lineage (
     [added_in_release] NVARCHAR(400) NULL
 );
 BULK INSERT raw.ref_raw_table_lineage
-FROM '/repo/data/raw/ref_raw_table_lineage.csv'
-WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+FROM '/repo/data/sqlserver/ref_raw_table_lineage.psv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = '|', ROWTERMINATOR = '0x0a', TABLOCK);
 DECLARE @n_ref_raw_table_lineage INT = (SELECT COUNT(*) FROM raw.ref_raw_table_lineage);
 PRINT CONCAT('raw.ref_raw_table_lineage', '           ', @n_ref_raw_table_lineage, ' rows');
 GO

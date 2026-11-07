@@ -5,6 +5,8 @@
   Release 6: workers, jobs and pay run to the data-through date (Jul 5, 2026), so their
   row counts include the 79 hires and the job and pay records of Jul 1-5, 2026.
 */
+/* Release 7 moved dw.WorkerReportingChain from 1,048,170 to 1,048,292 rows: 631 job records keep the
+   manager they had before a reorganization or transfer (borrowed reporting lines, case study 7). */
 SET NOCOUNT ON;
 USE ArcadiaHR;
 GO
@@ -22,7 +24,7 @@ FROM (
     UNION ALL SELECT 'dw.MonthEndCalendar rows',                          (SELECT COUNT(*) FROM dw.MonthEndCalendar),                  61
     UNION ALL SELECT 'dw.WorkerMonthEndSnapshot rows',                    (SELECT COUNT(*) FROM dw.WorkerMonthEndSnapshot),            1639687
     UNION ALL SELECT 'dw.WorkerPayLedger rows',                           (SELECT COUNT(*) FROM dw.WorkerPayLedger),                   1639687
-    UNION ALL SELECT 'dw.WorkerReportingChain rows',                      (SELECT COUNT(*) FROM dw.WorkerReportingChain),              1048170
+    UNION ALL SELECT 'dw.WorkerReportingChain rows',                      (SELECT COUNT(*) FROM dw.WorkerReportingChain),              1048292
     UNION ALL SELECT 'org leaders at 2026-06-30',                         (SELECT COUNT(*) FROM rpt.vw_org_leader_summary WHERE month_end_date = '2026-06-30'), 44
 ) AS c;
 GO

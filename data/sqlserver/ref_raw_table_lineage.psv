@@ -1,0 +1,61 @@
+table_name|system_code|module|grain|history_type|added_in_release
+dim_worker|KS|Core HR|worker|Type 1|2
+fact_job_history|KS|Core HR|worker x effective-dated job record|SCD Type 2|2
+fact_compensation_history|KS|Compensation|worker x effective-dated pay record|SCD Type 2|2
+fact_performance_review|KS|Performance|worker x fiscal year|Transaction|2
+fact_bonus_payout|KS|Compensation|worker x fiscal year|Transaction|2
+dim_org_unit|KS|Organization|org unit|Type 1|2
+dim_department|KS|Organization|department|Type 1|2
+dim_cost_center|KS|Organization|department x country|Type 1|2
+dim_location|KS|Organization|office|Type 1|2
+dim_country|KS|Organization|country|Type 1|2
+dim_job_level|KS|Compensation|job level|Type 1|2
+dim_job_profile|KS|Compensation|job family x level|Type 1|2
+ref_job_level_base_salary|KS|Compensation|job level x country|Type 1|2
+ref_salary_range|KS|Compensation|fiscal year x job level x country|Dated|2
+ref_tenure_increase|KS|Compensation|completed years of service|Type 1|2
+ref_performance_bonus|KS|Performance|rating|Type 1|2
+dim_position|KS|Position management|seat x effective-dated record|SCD Type 2|2
+fact_position_assignment|KS|Position management|seat x worker x dates|Effective-dated|2
+fact_requisition|KS|Recruiting|requisition|Accumulating snapshot|2
+dim_candidate|KS|Recruiting|applicant x requisition|Type 1|2
+fact_candidate_stage_event|KS|Recruiting|applicant x stage|Transaction|2
+fact_workforce_plan|KS|Workforce planning|plan version x cost center x fiscal quarter|Versioned|2
+ks_contingent_worker|KS|Contingent worker profile|person x effective-dated version|SCD Type 2|3
+bw_supplier|BW|Suppliers|supplier|Type 1|3
+bw_rate_card|BW|Rate cards|fiscal year x country x CW type x role family x seniority|Dated|3
+bw_contingent_worker|BW|Workers|worker in Bridgeway|Type 1|3
+bw_service_order|BW|Service orders|service order|Accumulating snapshot|3
+bw_service_order_revision|BW|Service orders|service order x revision|SCD Type 2|3
+bw_timesheet_month|BW|Timesheets|worker x service order x month x rate|Transaction|3
+feed_bridgeway_keystone_event|INT|Integration log|change sent from Bridgeway|Transaction|3
+ref_fx_rate_daily|PUB|FX|currency x ECB publication day|Transaction|1
+ref_fx_rate_monthly|PUB|FX|currency x month-end|Transaction|1
+ref_fx_rate_constant|PUB|FX|rate set x currency|Type 1|1
+ref_fringe_rate|PUB|Fringe research|country x calendar year|Dated|1
+ref_fringe_source|PUB|Fringe research|country x year x component x source|Type 1|1
+ref_source_system|WH|Warehouse metadata|source system|Type 1|3
+ref_raw_table_lineage|WH|Warehouse metadata|raw table|Type 1|3
+ref_raw_column|WH|Warehouse metadata|release 3 raw table x column|Type 1|3
+ref_cw_discrepancy_type|WH|Warehouse metadata|discrepancy type|Type 1|3
+gen_cw_discrepancy_truth|GEN|Answer key|seeded discrepancy x continuous period|Effective-dated|3
+feed_event_delivery|INT|Integration log|change sent from Bridgeway|Transaction|4
+ks_contingent_worker_audit|KS|Contingent worker profile|contingent version|Transaction|4
+ks_cw_job|KS|Contingent worker job data|person x job record x effective-dated version|SCD Type 2|4
+gen_cw_job_defect|GEN|Answer key|job data defect x continuous period|Effective-dated|4
+etl_load_run|ETL|Load log|source x scheduled run|Transaction|4
+itsm_ticket|HLX|Tickets|ticket|Accumulating snapshot|4
+itsm_ticket_event|HLX|Tickets|ticket x state change|Transaction|4
+itsm_ticket_link|HLX|Tickets|ticket x subject|Type 1|4
+ref_ticket_category|HLX|Tickets|ticket category|Type 1|4
+ref_report_calendar|WH|Report calendar|report (one row)|Type 1|5
+ref_report_quarter|WH|Report calendar|fiscal quarter in the report window|Type 1|5
+ks_matrix_org|KS|Matrix organization|matrix org x effective-dated record|SCD Type 2|7
+ks_matrix_membership|KS|Matrix organization|person x matrix org x dates|Effective-dated|7
+ks_role_assignment|KS|Role assignments|role x assignee x target org unit x dates|Effective-dated|7
+ks_time_off_request|KS|Absence|time off request (employees, and contingent workers as fed)|Transaction|7
+ks_leave_of_absence|KS|Absence|leave of absence|Accumulating snapshot|7
+bw_time_off|BW|Time off|time off booking|Transaction|7
+ref_job_family_home|WH|Org design|job family|Type 1|7
+ref_public_holiday|PUB|Public holidays|country x national holiday|Transaction|7
+gen_org_drift_truth|GEN|Answer key|seeded org design gap x continuous period|Effective-dated|7

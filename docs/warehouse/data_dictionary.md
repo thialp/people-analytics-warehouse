@@ -798,6 +798,7 @@ Written by [`forecast/run_forecast.py`](../../forecast/run_forecast.py) into the
 | `mart_leader_availability` | leader × worker type × day (report date + 30 days) | People in the team that day, at work (weekdays), off by reason (time off, leave, public holiday), people whose assignment or employment has ended. Test 99 checks at work + off = people |
 | `mart_alignment_detail` | person × signal, report date | The roster behind every gap, with the person's manager and the L0, L1 and L2 leaders above them |
 | `mart_org_entitlement` | leader × person they may see, report date | Row-level security for Tableau Cloud: `viewer_email` (the leader's work email) and every person in their branch |
+| `mart_org_tree_layout` | tree mode × focus leader × circle or link point, report date | Where the Canopy tree's circles (`mark_type` Node) and link curves (`mark_type` Link, 17 points each) sit for every leader as the focus, Dynamic and Static: x 0 to 1, y 0 to 3 (reverse the axis). Sizes and colors come from `mart_org_node` (`node_id` = `leader_id`) |
 
 Executive officers lead but stay out of every count. Contingent workers count from Bridgeway (11,941 on Jun 30, 2026); their manager comes from Keystone, or from the Bridgeway hiring manager when Keystone has no record.
 
