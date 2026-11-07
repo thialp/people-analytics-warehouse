@@ -1,0 +1,38 @@
+matrix_record_id,matrix_org_id,matrix_org_name,matrix_type,region,parent_matrix_org_id,covers_country_codes,effective_start_date,effective_end_date,manager_worker_id,status,inactive_date,created_date
+MR00021,MX-AE,Country Leader · United Arab Emirates,Country,Middle East & Africa,MX-R-MEA,AE,2023-07-01,,W133025,Active,,2023-07-01
+MR00024,MX-ANZ,Country Leader · Australia,Country,Asia Pacific,MX-R-AP,AU,2023-07-01,2025-12-02,W115386,Active,,2023-07-01
+MR00025,MX-ANZ,Country Leader · Australia,Country,Asia Pacific,MX-R-AP,AU,2025-12-03,,,Active,,2023-07-01
+MR00017,MX-BNN,Cluster Leader · Benelux & Nordics,Country,Europe,MX-R-EU,NL;SE,2023-07-01,2025-12-31,W127023,Active,,2023-07-01
+MR00018,MX-BNN,Cluster Leader · Benelux & Nordics,Country,Europe,MX-R-EU,NL;SE,2026-01-01,2026-02-11,,Active,,2023-07-01
+MR00019,MX-BNN,Cluster Leader · Benelux & Nordics,Country,Europe,MX-R-EU,NL;SE,2026-02-12,,W114820,Active,,2023-07-01
+MR00004,MX-BR,Country Leader · Brazil,Country,Latin America,MX-R-LA,BR,2023-07-01,,W104003,Active,,2023-07-01
+MR00002,MX-CA,Country Leader · Canada,Country,North America,MX-R-NA,CA,2023-07-01,,W110290,Active,,2023-07-01
+MR00006,MX-DACH,Cluster Leader · DACH,Country,Europe,MX-R-EU,DE;CH,2023-07-01,2025-04-09,W112515,Active,,2023-07-01
+MR00007,MX-DACH,Cluster Leader · DACH,Country,Europe,MX-R-EU,DE;CH,2025-04-10,2025-08-24,,Active,,2023-07-01
+MR00008,MX-DACH,Cluster Leader · DACH,Country,Europe,MX-R-EU,DE;CH,2025-08-25,,W111918,Active,,2023-07-01
+MR00016,MX-FR,Country Leader · France,Country,Europe,MX-R-EU,FR,2025-11-01,,W102216,Active,,2025-11-01
+MR00013,MX-IBE,Cluster Leader · Iberia,Country,Europe,MX-R-EU,ES;PT,2025-11-01,2026-06-24,W111627,Active,,2025-11-01
+MR00014,MX-IBE,Cluster Leader · Iberia,Country,Europe,MX-R-EU,ES;PT,2026-06-25,2026-06-26,,Active,,2025-11-01
+MR00015,MX-IBE,Cluster Leader · Iberia,Country,Europe,MX-R-EU,ES;PT,2026-06-27,,W117185,Active,,2025-11-01
+MR00023,MX-IN,Country Leader · India,Country,Asia Pacific,MX-R-AP,IN,2023-07-01,,W115611,Active,,2023-07-01
+MR00026,MX-JP,Country Leader · Japan,Country,Asia Pacific,MX-R-AP,JP,2023-07-01,,W113797,Active,,2023-07-01
+MR00027,MX-KR,Country Leader · Korea,Country,Asia Pacific,MX-R-AP,KR,2023-07-01,,,Active,,2023-07-01
+MR00003,MX-MX,Country Leader · Mexico,Country,Latin America,MX-R-LA,MX,2023-07-01,,W120138,Active,,2023-07-01
+MR00020,MX-PL,Country Leader · Poland,Country,Europe,MX-R-EU,PL,2023-07-01,,W115609,Active,,2023-07-01
+MR00035,MX-R-AP,Region President · Asia Pacific,Region,Asia Pacific,,,2023-07-01,2025-09-16,W115613,Active,,2023-07-01
+MR00036,MX-R-AP,Region President · Asia Pacific,Region,Asia Pacific,,,2025-09-17,2025-09-30,,Active,,2023-07-01
+MR00037,MX-R-AP,Region President · Asia Pacific,Region,Asia Pacific,,,2025-10-01,,W112586,Active,,2023-07-01
+MR00031,MX-R-EU,Region President · Europe,Region,Europe,,,2023-07-01,,W116228,Active,,2023-07-01
+MR00030,MX-R-LA,Region President · Latin America,Region,Latin America,,,2023-07-01,,W122066,Active,,2023-07-01
+MR00032,MX-R-MEA,Region President · Middle East & Africa,Region,Middle East & Africa,,,2023-07-01,2023-10-05,W125327,Active,,2023-07-01
+MR00033,MX-R-MEA,Region President · Middle East & Africa,Region,Middle East & Africa,,,2023-10-06,2023-11-05,,Active,,2023-07-01
+MR00034,MX-R-MEA,Region President · Middle East & Africa,Region,Middle East & Africa,,,2023-11-06,,W115628,Active,,2023-07-01
+MR00029,MX-R-NA,Region President · North America,Region,North America,,,2023-07-01,,W100011,Active,,2023-07-01
+MR00028,MX-SEA,Cluster Leader · Southeast Asia,Country,Asia Pacific,MX-R-AP,SG;PH,2023-07-01,,W104008,Active,,2023-07-01
+MR00009,MX-SEU,Cluster Leader · Southern Europe,Country,Europe,MX-R-EU,ES;PT;FR,2023-07-01,2024-02-15,W115016,Active,,2023-07-01
+MR00010,MX-SEU,Cluster Leader · Southern Europe,Country,Europe,MX-R-EU,ES;PT;FR,2024-02-16,2024-06-04,,Active,,2023-07-01
+MR00011,MX-SEU,Cluster Leader · Southern Europe,Country,Europe,MX-R-EU,ES;PT;FR,2024-06-05,2025-10-31,W114112,Active,,2023-07-01
+MR00012,MX-SEU,Cluster Leader · Southern Europe,Country,Europe,MX-R-EU,ES;PT;FR,2025-11-01,,,Inactive,2025-11-01,2023-07-01
+MR00005,MX-UKI,Cluster Leader · UK & Ireland,Country,Europe,MX-R-EU,GB;IE,2023-07-01,,W114163,Active,,2023-07-01
+MR00001,MX-US,Country Leader · United States,Country,North America,MX-R-NA,US,2023-07-01,,W110289,Active,,2023-07-01
+MR00022,MX-ZA,Country Leader · South Africa,Country,Middle East & Africa,MX-R-MEA,ZA,2023-07-01,,W120133,Active,,2023-07-01

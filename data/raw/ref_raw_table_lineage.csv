@@ -50,3 +50,12 @@ itsm_ticket_link,HLX,Tickets,ticket x subject,Type 1,4
 ref_ticket_category,HLX,Tickets,ticket category,Type 1,4
 ref_report_calendar,WH,Report calendar,report (one row),Type 1,5
 ref_report_quarter,WH,Report calendar,fiscal quarter in the report window,Type 1,5
+ks_matrix_org,KS,Matrix organization,matrix org x effective-dated record,SCD Type 2,7
+ks_matrix_membership,KS,Matrix organization,person x matrix org x dates,Effective-dated,7
+ks_role_assignment,KS,Role assignments,role x assignee x target org unit x dates,Effective-dated,7
+ks_time_off_request,KS,Absence,"time off request (employees, and contingent workers as fed)",Transaction,7
+ks_leave_of_absence,KS,Absence,leave of absence,Accumulating snapshot,7
+bw_time_off,BW,Time off,time off booking,Transaction,7
+ref_job_family_home,WH,Org design,job family,Type 1,7
+ref_public_holiday,PUB,Public holidays,country x national holiday,Transaction,7
+gen_org_drift_truth,GEN,Answer key,seeded org design gap x continuous period,Effective-dated,7

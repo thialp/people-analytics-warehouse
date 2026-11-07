@@ -29,6 +29,9 @@ jobs:
       - name: Extend Core HR to the data-through date (release 6)
         run: python generator/core_hr_extract.py
 
+      - name: Add org design and time off (release 7)
+        run: python generator/leadership_scope.py
+
       - name: Check raw data is reproducible from the generator
         run: git diff --stat --exit-code data/raw
 

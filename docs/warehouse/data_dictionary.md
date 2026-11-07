@@ -570,6 +570,24 @@ Helix ticket categories: one per reconciliation flag (F01 to F09) and two for th
 | `priority` | VARCHAR | Default priority |
 | `title_template` | VARCHAR | Ticket title before the subject |
 
+### Org design and time off (release 7)
+
+Case study 7, Who Leads Where. Written by [`generator/leadership_scope.py`](../../generator/leadership_scope.py) after the Core HR extract ([`org_design.py`](../../generator/org_design.py), [`time_off.py`](../../generator/time_off.py)); every column is in the registry (`ref_raw_column`, test 61). Plan: [release 7](../projects/leadership-scope/release_7_plan.md).
+
+| Table | System | Grain | What it holds |
+|---|---|---|---|
+| `ks_matrix_org` | Keystone | matrix org × effective-dated record | 5 region matrices and the country or cluster matrices under them (`covers_country_codes`); the leader (`manager_worker_id`, empty while the seat is open); an ended matrix keeps an open `Inactive` record. The Southern Europe cluster splits into Iberia and France on Nov 1, 2025 |
+| `ks_matrix_membership` | Keystone | person × matrix org × dates | The country matrix each employee and contingent worker belongs to, from the matrix go-live (Jul 1, 2023) |
+| `ks_role_assignment` | Keystone | role × assignee × target org unit × dates | HR Partner and Finance Partner on every function and every unit an L1 leads, `Direct` or `Inherited`; `target_org_name` carries the leader the row was issued for (`named_leader_worker_id`) |
+| `ks_time_off_request` | Keystone | request | Employees' requests (plan by country, hours in the US and Canada, half days, sick days, corrections with negative units) and contingent workers' bookings as Bridgeway sent them (`source_system` BW) |
+| `ks_leave_of_absence` | Keystone | leave | Parental, medical, family care, personal and military leaves, with estimated and actual return |
+| `bw_time_off` | Bridgeway | booking | Contingent workers book time off in the vendor system; the source of truth for their days off |
+| `ref_job_family_home` | Warehouse | job family | The function that usually hires each family; Data and Operations are shared |
+| `ref_public_holiday` | Public | country × holiday | National holidays (python-holidays 0.108), FY26 to 60 days past the report date |
+| `gen_org_drift_truth` | Generator | seeded gap | The answer key: S1 borrowed reporting lines (with the job records and original managers), M1/M2/M3 matrix gaps, R1 assignments naming a former leader |
+
+`fact_job_history` changes only in `manager_worker_id`, on the job records the answer key lists (631): people who kept their old manager after the FY25 reorganization or a department transfer. Test 93 checks it.
+
 ## Marts (`data/marts/`)
 
 Pay measures in the two cost marts are **annualized run-rates at the month-end**, in USD. Executive officers are excluded.
@@ -771,6 +789,18 @@ Grain: **fiscal year × period × plan version × view × group** (10,080 rows =
 
 Written by [`forecast/run_forecast.py`](../../forecast/run_forecast.py) into the warehouse's `forecast` schema and `data/marts/`: `mart_pid_fill_quarter`, `mart_fill_survival`, `mart_pid_forecast_draws`, `mart_pid_forecast_backtest`, `mart_pid_forecast_accuracy`, `mart_pid_forecast_model`, `mart_pid_forecast_run`, `mart_cw_budget_function`. Grain, columns and method: [Seats to Fill: the forecast method](../projects/workforce-planning/seats_to_fill_method.md#6-tables-forecast-schema-in-the-warehouse-and-datamarts). Tests f01 to f06 in `tests/forecast/`.
 
+### Who Leads Where marts (release 7, case study 7)
+
+| Mart | Grain | What it holds |
+|---|---|---|
+| `mart_org_node` | leader × worker type (All, Employees, Contingent), report date | Every node of the org tree: `leader_level` (L0 Executive Leadership, L1, L2, Manager), `is_selectable` (L0–L2), `parent_leader_id`, `path` (the chain from the top for the drill-down technique), `child_leaders`; people, directs, indirects, layers below, countries, median span, managers with 15+ or one direct; `gap_people` and each signal (`s1_budgeted_elsewhere`, `s2_role_other_function`, `m1_country_leader_other_country`, `m2_not_one_country_matrix`, `m3_matrix_inactive_or_leaderless`), `assignments_naming_former_leader`; at work and off on the report date |
+| `mart_leader_org` | L0–L2 leader × worker type × month-end (13 month-ends) | The same measures over time, plus `gap_rate`: the trend and the Tableau Cloud Pulse metrics |
+| `mart_leader_availability` | leader × worker type × day (report date + 30 days) | People in the team that day, at work (weekdays), off by reason (time off, leave, public holiday), people whose assignment or employment has ended. Test 99 checks at work + off = people |
+| `mart_alignment_detail` | person × signal, report date | The roster behind every gap, with the person's manager and the L0, L1 and L2 leaders above them |
+| `mart_org_entitlement` | leader × person they may see, report date | Row-level security for Tableau Cloud: `viewer_email` (the leader's work email) and every person in their branch |
+
+Executive officers lead but stay out of every count. Contingent workers count from Bridgeway (11,941 on Jun 30, 2026); their manager comes from Keystone, or from the Bridgeway hiring manager when Keystone has no record.
+
 ## Intermediate models
 
 ### int_cw_supplier_alias
@@ -853,3 +883,21 @@ For each fill: `parent_fill_id` (the internal move that emptied its seat), `chai
 
 ### int_worker_reporting_line
 One row per active worker per month-end: direct manager, skip-level manager, department head, function head, layers below the CEO, direct and total reports.
+
+### int_person_month_end
+One row per person (employee or contingent worker) per month-end for the 13 month-ends ending on the report date: department (Keystone's, for contingent workers when Keystone holds them), office, country, job family, manager and where the manager comes from (`manager_source`).
+
+### int_org_closure
+Month-end × ancestor × descendant × depth (and each person with themselves at depth 0), built with a recursive CTE: "who is in my organization" becomes one join. Test 97.
+
+### int_org_leader
+Every leader per month-end with `leader_level`, `depth_from_top` and `path`.
+
+### int_alignment_signal / int_assignment_signal
+One row per person × signal × month-end (S1, S2, M1, M2, M3), and per role assignment still naming a former leader (R1). Test 94 checks every seeded gap is found and nothing unseeded is (S1 employees, M1, M2); test 96 the same for R1.
+
+### int_leader_org
+Leader × month-end × worker type: size, shape (layers, spans) and alignment of everyone below. Feeds `mart_org_node` and `mart_leader_org`.
+
+### int_time_off_day / int_person_availability_day
+Every weekday a person is off (time off or leave; corrections taken back; half days count as at work), and every person's status on each of the 31 days from the report date.
