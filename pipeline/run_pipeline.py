@@ -74,6 +74,12 @@ EXPORTS = [
     "mart_cw_gap_rate_close",
     "mart_itsm_ticket_close",
     "mart_cw_reconciliation_dashboard",
+    # release 7 (case study 7): Who Leads Where
+    "mart_org_node",
+    "mart_leader_org",
+    "mart_leader_availability",
+    "mart_alignment_detail",
+    "mart_org_entitlement",
 ]
 
 

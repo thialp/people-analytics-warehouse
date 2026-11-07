@@ -1,0 +1,116 @@
+assignment_id,role_name,assignee_worker_id,target_org_unit_id,target_org_name,named_leader_worker_id,assigned_via,inherited_from_org_unit_id,effective_start_date,effective_end_date
+RA000001,HR Partner,W131084,D-201,Product Management (Leah Shelton),W108838,Direct,,2023-07-01,
+RA000002,HR Partner,W118915,D-202,Design & Research (Owen Foster),W109805,Direct,,2023-07-01,
+RA000003,HR Partner,W132577,D-401,Brand & Communications (Riley Sullivan),W116818,Direct,,2023-07-01,
+RA000004,HR Partner,W128520,D-402,Growth Marketing (Leah Osborne),W117181,Direct,,2023-07-01,
+RA000005,HR Partner,W119245,D-501,FP&A (Hannah Quinlan),W117665,Direct,,2023-07-01,
+RA000006,HR Partner,W126095,D-502,Accounting & Controllership (Isaac Norris),W118028,Direct,,2023-07-01,2024-07-18
+RA000007,HR Partner,W131684,D-502,Accounting & Controllership (Isaac Norris),W118028,Direct,,2024-08-15,2025-04-04
+RA000008,HR Partner,W119047,D-502,Accounting & Controllership (Isaac Norris),W118028,Direct,,2025-04-15,
+RA000009,HR Partner,W118808,D-503,Treasury & Tax (Avery Yates),W118512,Direct,,2023-07-01,2025-08-30
+RA000010,HR Partner,W119388,D-503,Treasury & Tax (Avery Yates),W118512,Direct,,2025-09-29,
+RA000011,HR Partner,W128520,D-601,HR Business Partners (Zoe Carter),W118705,Direct,,2023-07-01,
+RA000012,HR Partner,W119222,D-602,Talent Acquisition (Brandon Ramsey),W118995,Direct,,2023-07-01,
+RA000013,HR Partner,W119143,D-603,Total Rewards (Trevor Norris),W119285,Direct,,2023-07-01,
+RA000014,HR Partner,W119448,D-604,People Analytics (Chloe Osborne),W119430,Direct,,2023-07-01,
+RA000015,HR Partner,W119282,D-701,Legal (Ava Baxter),W119527,Direct,,2023-07-01,
+RA000016,HR Partner,W119200,D-702,Compliance & Risk (Zoe Parker),W119769,Direct,,2023-07-01,
+RA000017,HR Partner,W128860,D-801,Customer Operations (Tyler Garrett),W120132,Direct,,2023-07-01,
+RA000018,HR Partner,W127309,D-802,Trust & Safety Operations (Tatiana Guerra),W122066,Direct,,2023-07-01,
+RA000019,HR Partner,W128520,D-803,Workplace & Procurement (Kayla Lowell),W123154,Direct,,2023-07-01,2026-04-16
+RA000020,HR Partner,W128520,D-803,Workplace & Procurement (Isha Ng),W123158,Direct,,2026-04-17,
+RA000021,HR Partner,W100709,ORG-COM,Commercial (Isaac Porter),W100004,Direct,,2023-07-01,
+RA000022,HR Partner,W121458,ORG-COM-CLS,Client Services (Noah Bennett),W100013,Direct,,2023-07-01,
+RA000023,HR Partner,W121458,D-305,Client Success (Wesley Hughes) (Inherited),W114158,Inherited,ORG-COM-CLS,2023-07-01,
+RA000024,HR Partner,W121458,D-306,Technical Support (Amelie Gallagher) (Inherited),W115609,Inherited,ORG-COM-CLS,2023-07-01,
+RA000025,HR Partner,W118814,ORG-COM-SAL,Sales (James Jennings),W110289,Direct,,2023-07-01,
+RA000026,HR Partner,W118814,D-301,Enterprise Sales - Americas (Eduardo Vidal) (Inherited),W128277,Inherited,ORG-COM-SAL,2023-07-01,
+RA000027,HR Partner,W118814,D-302,Enterprise Sales - EMEA (Ursula Rossi) (Inherited),W111619,Inherited,ORG-COM-SAL,2023-07-01,
+RA000028,HR Partner,W118814,D-303,Enterprise Sales - APAC (Seo-yeon Agarwal) (Inherited),W112586,Inherited,ORG-COM-SAL,2023-07-01,
+RA000029,HR Partner,W118814,D-304,Sales Operations (Leah Foster) (Inherited),W113311,Inherited,ORG-COM-SAL,2023-07-01,
+RA000030,HR Partner,W118814,D-307,Partnerships (Marcus Caldwell) (Inherited),W113795,Inherited,ORG-COM-SAL,2023-07-01,2024-01-18
+RA000031,HR Partner,W118814,D-307,Partnerships (Divya Lim) (Inherited),W113797,Inherited,ORG-COM-SAL,2024-01-19,
+RA000032,HR Partner,W126095,ORG-FIN,Finance (Jordan Reed),W100006,Direct,,2023-07-01,2024-07-18
+RA000033,HR Partner,W118710,ORG-FIN,Finance (Jordan Reed),W100006,Direct,,2024-08-25,
+RA000034,HR Partner,W119338,ORG-LGL,Legal & Compliance (Grace Warren),W100009,Direct,,2023-07-01,
+RA000035,HR Partner,W118863,ORG-MKT,Marketing (Isaac Barnes),W100007,Direct,,2023-07-01,
+RA000036,HR Partner,W119365,ORG-OPS,Operations (Tyler Mercer),W100005,Direct,,2023-07-01,2023-09-13
+RA000037,HR Partner,W118814,ORG-OPS,Operations (Tyler Mercer),W100005,Direct,,2023-10-23,
+RA000038,HR Partner,W100709,ORG-PPL,People (Grace Ellis),W100008,Direct,,2023-07-01,
+RA000039,HR Partner,W100709,ORG-PRD,Product (Ava Carter),W100003,Direct,,2023-07-01,
+RA000040,HR Partner,W119121,ORG-TEC,Technology (Marcus Carter),W100002,Direct,,2023-07-01,
+RA000041,HR Partner,W118710,ORG-TEC-ENG,Engineering (Isaac Holland),W100010,Direct,,2023-07-01,
+RA000042,HR Partner,W118710,D-101,Core Platform Engineering (Hannah Caldwell) (Inherited),W100014,Inherited,ORG-TEC-ENG,2023-07-01,
+RA000043,HR Partner,W118710,D-102,Product Engineering (Nathan Quinlan) (Inherited),W102190,Inherited,ORG-TEC-ENG,2023-07-01,
+RA000044,HR Partner,W118710,D-103,Mobile & Web Engineering (Daniela Guerra) (Inherited),W104003,Inherited,ORG-TEC-ENG,2023-07-01,
+RA000045,HR Partner,W118710,D-104,Analytics Engineering (Chen Kobayashi) (Inherited),W105454,Inherited,ORG-TEC-ENG,2023-07-01,
+RA000046,HR Partner,W118710,D-108,Data & AI Platform (no leader) (Inherited),,Inherited,ORG-TEC-ENG,2023-07-01,2024-10-31
+RA000047,HR Partner,W118710,D-108,Data & AI Platform (Liam Emerson) (Inherited),W103156,Inherited,ORG-TEC-ENG,2024-11-01,
+RA000048,HR Partner,W119196,ORG-TEC-INF,Infrastructure (Maria Barnes),W100011,Direct,,2023-07-01,
+RA000049,HR Partner,W119196,D-105,Site Reliability (Chloe Hughes) (Inherited),W106179,Inherited,ORG-TEC-INF,2023-07-01,
+RA000050,HR Partner,W119196,D-106,Information Security (Jordan Abbott) (Inherited),W107146,Inherited,ORG-TEC-INF,2023-07-01,2024-04-04
+RA000051,HR Partner,W119196,D-106,Information Security (Diego Pacheco) (Inherited),W107444,Inherited,ORG-TEC-INF,2024-04-05,
+RA000052,HR Partner,W119196,D-107,Enterprise IT (Brandon Porter) (Inherited),W107992,Inherited,ORG-TEC-INF,2023-07-01,
+RA000053,Finance Partner,W117683,D-201,Product Management (Leah Shelton),W108838,Direct,,2023-07-01,2024-10-19
+RA000054,Finance Partner,W118034,D-201,Product Management (Leah Shelton),W108838,Direct,,2024-11-19,2025-05-07
+RA000055,Finance Partner,W118535,D-201,Product Management (Leah Shelton),W108838,Direct,,2025-05-30,
+RA000056,Finance Partner,W132332,D-202,Design & Research (Owen Foster),W109805,Direct,,2023-07-01,
+RA000057,Finance Partner,W118343,D-401,Brand & Communications (Riley Sullivan),W116818,Direct,,2023-07-01,
+RA000058,Finance Partner,W128821,D-402,Growth Marketing (Leah Osborne),W117181,Direct,,2023-07-01,
+RA000059,Finance Partner,W118305,D-501,FP&A (Hannah Quinlan),W117665,Direct,,2023-07-01,
+RA000060,Finance Partner,W118225,D-502,Accounting & Controllership (Isaac Norris),W118028,Direct,,2023-07-01,
+RA000061,Finance Partner,W118393,D-503,Treasury & Tax (Avery Yates),W118512,Direct,,2023-07-01,
+RA000062,Finance Partner,W118687,D-601,HR Business Partners (Zoe Carter),W118705,Direct,,2023-07-01,
+RA000063,Finance Partner,W131276,D-602,Talent Acquisition (Brandon Ramsey),W118995,Direct,,2023-07-01,
+RA000064,Finance Partner,W118680,D-603,Total Rewards (Trevor Norris),W119285,Direct,,2023-07-01,
+RA000065,Finance Partner,W126416,D-604,People Analytics (Chloe Osborne),W119430,Direct,,2023-07-01,
+RA000066,Finance Partner,W118244,D-701,Legal (Ava Baxter),W119527,Direct,,2023-07-01,2024-06-29
+RA000067,Finance Partner,W117911,D-701,Legal (Ava Baxter),W119527,Direct,,2024-07-08,2025-09-08
+RA000068,Finance Partner,W117911,D-701,Legal (Zoe Lowell),W119694,Direct,,2025-09-09,
+RA000069,Finance Partner,W118305,D-702,Compliance & Risk (Zoe Parker),W119769,Direct,,2023-07-01,
+RA000070,Finance Partner,W118381,D-801,Customer Operations (Tyler Garrett),W120132,Direct,,2023-07-01,2025-06-01
+RA000071,Finance Partner,W118592,D-801,Customer Operations (Tyler Garrett),W120132,Direct,,2025-06-23,
+RA000072,Finance Partner,W118687,D-802,Trust & Safety Operations (Tatiana Guerra),W122066,Direct,,2023-07-01,
+RA000073,Finance Partner,W118184,D-803,Workplace & Procurement (Kayla Lowell),W123154,Direct,,2023-07-01,2026-04-16
+RA000074,Finance Partner,W118184,D-803,Workplace & Procurement (Isha Ng),W123158,Direct,,2026-04-17,
+RA000075,Finance Partner,W126416,ORG-COM,Commercial (Isaac Porter),W100004,Direct,,2023-07-01,
+RA000076,Finance Partner,W126416,ORG-COM-CLS,Client Services (Noah Bennett),W100013,Direct,,2023-07-01,
+RA000077,Finance Partner,W126416,D-305,Client Success (Wesley Hughes) (Inherited),W114158,Inherited,ORG-COM-CLS,2023-07-01,
+RA000078,Finance Partner,W126416,D-306,Technical Support (Amelie Gallagher) (Inherited),W115609,Inherited,ORG-COM-CLS,2023-07-01,
+RA000079,Finance Partner,W118351,ORG-COM-SAL,Sales (James Jennings),W110289,Direct,,2023-07-01,2024-11-10
+RA000080,Finance Partner,W118351,D-301,Enterprise Sales - Americas (Eduardo Vidal) (Inherited),W128277,Inherited,ORG-COM-SAL,2023-07-01,2024-11-10
+RA000081,Finance Partner,W118351,D-302,Enterprise Sales - EMEA (Ursula Rossi) (Inherited),W111619,Inherited,ORG-COM-SAL,2023-07-01,2024-11-10
+RA000082,Finance Partner,W118351,D-303,Enterprise Sales - APAC (Seo-yeon Agarwal) (Inherited),W112586,Inherited,ORG-COM-SAL,2023-07-01,2024-11-10
+RA000083,Finance Partner,W118351,D-304,Sales Operations (Leah Foster) (Inherited),W113311,Inherited,ORG-COM-SAL,2023-07-01,2024-11-10
+RA000084,Finance Partner,W118351,D-307,Partnerships (Marcus Caldwell) (Inherited),W113795,Inherited,ORG-COM-SAL,2023-07-01,2024-01-18
+RA000085,Finance Partner,W118351,D-307,Partnerships (Divya Lim) (Inherited),W113797,Inherited,ORG-COM-SAL,2024-01-19,2024-11-10
+RA000086,Finance Partner,W117858,ORG-COM-SAL,Sales (James Jennings),W110289,Direct,,2024-11-24,
+RA000087,Finance Partner,W117858,D-301,Enterprise Sales - Americas (Eduardo Vidal) (Inherited),W128277,Inherited,ORG-COM-SAL,2024-11-24,
+RA000088,Finance Partner,W117858,D-302,Enterprise Sales - EMEA (Ursula Rossi) (Inherited),W111619,Inherited,ORG-COM-SAL,2024-11-24,
+RA000089,Finance Partner,W117858,D-303,Enterprise Sales - APAC (Seo-yeon Agarwal) (Inherited),W112586,Inherited,ORG-COM-SAL,2024-11-24,
+RA000090,Finance Partner,W117858,D-304,Sales Operations (Leah Foster) (Inherited),W113311,Inherited,ORG-COM-SAL,2024-11-24,
+RA000091,Finance Partner,W117858,D-307,Partnerships (Divya Lim) (Inherited),W113797,Inherited,ORG-COM-SAL,2024-11-24,
+RA000092,Finance Partner,W118228,ORG-FIN,Finance (Jordan Reed),W100006,Direct,,2023-07-01,
+RA000093,Finance Partner,W104516,ORG-LGL,Legal & Compliance (Grace Warren),W100009,Direct,,2023-07-01,
+RA000094,Finance Partner,W118114,ORG-MKT,Marketing (Isaac Barnes),W100007,Direct,,2023-07-01,
+RA000095,Finance Partner,W118680,ORG-OPS,Operations (Tyler Mercer),W100005,Direct,,2023-07-01,
+RA000096,Finance Partner,W124570,ORG-PPL,People (Grace Ellis),W100008,Direct,,2023-07-01,
+RA000097,Finance Partner,W117974,ORG-PRD,Product (Ava Carter),W100003,Direct,,2023-07-01,
+RA000098,Finance Partner,W117669,ORG-TEC,Technology (Marcus Carter),W100002,Direct,,2023-07-01,
+RA000099,Finance Partner,W125029,ORG-TEC-ENG,Engineering (Isaac Holland),W100010,Direct,,2023-07-01,2024-12-11
+RA000100,Finance Partner,W125029,D-101,Core Platform Engineering (Hannah Caldwell) (Inherited),W100014,Inherited,ORG-TEC-ENG,2023-07-01,2024-12-11
+RA000101,Finance Partner,W125029,D-102,Product Engineering (Nathan Quinlan) (Inherited),W102190,Inherited,ORG-TEC-ENG,2023-07-01,2024-12-11
+RA000102,Finance Partner,W125029,D-103,Mobile & Web Engineering (Daniela Guerra) (Inherited),W104003,Inherited,ORG-TEC-ENG,2023-07-01,2024-12-11
+RA000103,Finance Partner,W125029,D-104,Analytics Engineering (Chen Kobayashi) (Inherited),W105454,Inherited,ORG-TEC-ENG,2023-07-01,2024-12-11
+RA000104,Finance Partner,W125029,D-108,Data & AI Platform (no leader) (Inherited),,Inherited,ORG-TEC-ENG,2023-07-01,2024-10-31
+RA000105,Finance Partner,W125029,D-108,Data & AI Platform (Liam Emerson) (Inherited),W103156,Inherited,ORG-TEC-ENG,2024-11-01,2024-12-11
+RA000106,Finance Partner,W117955,ORG-TEC-ENG,Engineering (Isaac Holland),W100010,Direct,,2025-01-04,
+RA000107,Finance Partner,W117955,D-101,Core Platform Engineering (Hannah Caldwell) (Inherited),W100014,Inherited,ORG-TEC-ENG,2025-01-04,
+RA000108,Finance Partner,W117955,D-102,Product Engineering (Nathan Quinlan) (Inherited),W102190,Inherited,ORG-TEC-ENG,2025-01-04,
+RA000109,Finance Partner,W117955,D-103,Mobile & Web Engineering (Daniela Guerra) (Inherited),W104003,Inherited,ORG-TEC-ENG,2025-01-04,
+RA000110,Finance Partner,W117955,D-104,Analytics Engineering (Chen Kobayashi) (Inherited),W105454,Inherited,ORG-TEC-ENG,2025-01-04,
+RA000111,Finance Partner,W117955,D-108,Data & AI Platform (Liam Emerson) (Inherited),W103156,Inherited,ORG-TEC-ENG,2025-01-04,
+RA000112,Finance Partner,W133575,ORG-TEC-INF,Infrastructure (Maria Barnes),W100011,Direct,,2023-07-01,
+RA000113,Finance Partner,W133575,D-105,Site Reliability (Chloe Hughes) (Inherited),W106179,Inherited,ORG-TEC-INF,2023-07-01,
+RA000114,Finance Partner,W133575,D-106,Information Security (Jordan Abbott) (Inherited),W107146,Inherited,ORG-TEC-INF,2023-07-01,
+RA000115,Finance Partner,W133575,D-107,Enterprise IT (Brandon Porter) (Inherited),W107992,Inherited,ORG-TEC-INF,2023-07-01,

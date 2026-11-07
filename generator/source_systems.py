@@ -131,6 +131,16 @@ RAW_TABLE_LINEAGE = [
     # Report calendar (release 5, Dashboard #5): every date label, from one as-of date
     ("ref_report_calendar", _WH, "Report calendar", "report (one row)", "Type 1", 5),
     ("ref_report_quarter", _WH, "Report calendar", "fiscal quarter in the report window", "Type 1", 5),
+    # Org design and time off (release 7, case study 7): generator/org_design.py, generator/time_off.py
+    ("ks_matrix_org", _KS, "Matrix organization", "matrix org x effective-dated record", "SCD Type 2", 7),
+    ("ks_matrix_membership", _KS, "Matrix organization", "person x matrix org x dates", "Effective-dated", 7),
+    ("ks_role_assignment", _KS, "Role assignments", "role x assignee x target org unit x dates", "Effective-dated", 7),
+    ("ks_time_off_request", _KS, "Absence", "time off request (employees, and contingent workers as fed)", "Transaction", 7),
+    ("ks_leave_of_absence", _KS, "Absence", "leave of absence", "Accumulating snapshot", 7),
+    ("bw_time_off", _BW, "Time off", "time off booking", "Transaction", 7),
+    ("ref_job_family_home", _WH, "Org design", "job family", "Type 1", 7),
+    ("ref_public_holiday", _PUB, "Public holidays", "country x national holiday", "Transaction", 7),
+    ("gen_org_drift_truth", _GEN, "Answer key", "seeded org design gap x continuous period", "Effective-dated", 7),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -388,6 +398,117 @@ RAW_COLUMNS["gen_cw_discrepancy_truth"] = [
     ("resolution", "VARCHAR", "How it ended, or Open at extract"),
     ("detail", "VARCHAR", "The facts behind it, in a sentence"),
 ]
+# Release 7 (case study 7): org design and time off
+RAW_COLUMNS.update({
+    "ks_matrix_org": [
+        ("matrix_record_id", "VARCHAR", "Record key"),
+        ("matrix_org_id", "VARCHAR", "Matrix org: MX-R-.. for a region, MX-.. for a country or cluster"),
+        ("matrix_org_name", "VARCHAR", "Name, e.g. Cluster Leader · DACH"),
+        ("matrix_type", "VARCHAR", "Region or Country"),
+        ("region", "VARCHAR", "Region it belongs to"),
+        ("parent_matrix_org_id", "VARCHAR", "The region matrix above a country matrix; empty for a region"),
+        ("covers_country_codes", "VARCHAR", "Countries a country matrix covers, semicolon separated; empty for a region"),
+        ("effective_start_date", "DATE", "First day of this record"),
+        ("effective_end_date", "DATE", "Last day; empty if current"),
+        ("manager_worker_id", "VARCHAR", "The matrix leader (-> dim_worker); empty while the seat is open"),
+        ("status", "VARCHAR", "Active or Inactive"),
+        ("inactive_date", "DATE", "Day the matrix ended, on its Inactive record"),
+        ("created_date", "DATE", "Day the matrix was created"),
+    ],
+    "ks_matrix_membership": [
+        ("membership_id", "VARCHAR", "Record key"),
+        ("person_id", "VARCHAR", "Keystone person: an employee (W1..) or a contingent worker (W5..)"),
+        ("person_type", "VARCHAR", "Employee or Contingent"),
+        ("matrix_org_id", "VARCHAR", "-> ks_matrix_org (a country or cluster matrix)"),
+        ("effective_start_date", "DATE", "First day in the matrix"),
+        ("effective_end_date", "DATE", "Last day; empty if current"),
+        ("assigned_reason", "VARCHAR", "Matrix go-live, Hire, Location change or Matrix reorganization"),
+    ],
+    "ks_role_assignment": [
+        ("assignment_id", "VARCHAR", "Record key"),
+        ("role_name", "VARCHAR", "HR Partner or Finance Partner"),
+        ("assignee_worker_id", "VARCHAR", "The person holding the role (-> dim_worker)"),
+        ("target_org_unit_id", "VARCHAR", "The org unit or department the role covers"),
+        ("target_org_name", "VARCHAR", "The target as Keystone shows it: unit (leader when issued), (Inherited) when inherited"),
+        ("named_leader_worker_id", "VARCHAR", "The leader the name carries (-> dim_worker)"),
+        ("assigned_via", "VARCHAR", "Direct or Inherited"),
+        ("inherited_from_org_unit_id", "VARCHAR", "Where an inherited row comes from"),
+        ("effective_start_date", "DATE", "First day"),
+        ("effective_end_date", "DATE", "Last day; empty if current"),
+    ],
+    "ks_time_off_request": [
+        ("time_off_request_id", "VARCHAR", "Record key"),
+        ("person_id", "VARCHAR", "Keystone person (employee or contingent worker)"),
+        ("person_type", "VARCHAR", "Employee or Contingent"),
+        ("source_system", "VARCHAR", "KS when requested in Keystone; BW when Bridgeway sent it"),
+        ("bw_booking_id", "VARCHAR", "-> bw_time_off, for a contingent worker's booking"),
+        ("time_off_type", "VARCHAR", "Plan, by country (e.g. United States · Paid Time Off (PTO))"),
+        ("request_type", "VARCHAR", "Absence Request, or Absence Correction (negative units, taking days back)"),
+        ("first_day", "DATE", "First day off"),
+        ("last_day", "DATE", "Last day off"),
+        ("units", "DOUBLE", "Units in the plan's unit; negative for a correction"),
+        ("unit_of_time", "VARCHAR", "Hours (US, Canada) or Days"),
+        ("days_requested", "DOUBLE", "Working days, 0.5 for a half day; negative for a correction"),
+        ("corrects_request_id", "VARCHAR", "The request a correction reduces"),
+        ("status", "VARCHAR", "Approved"),
+        ("created_at", "TIMESTAMP", "When it was requested (or received from Bridgeway)"),
+        ("approved_at", "TIMESTAMP", "When it was approved"),
+    ],
+    "ks_leave_of_absence": [
+        ("leave_id", "VARCHAR", "Record key"),
+        ("worker_id", "VARCHAR", "-> dim_worker"),
+        ("leave_type", "VARCHAR", "Parental, Medical, Family Care, Personal (unpaid) or Military Leave"),
+        ("status", "VARCHAR", "Approved"),
+        ("initiated_date", "DATE", "Day the leave was requested"),
+        ("approved_date", "DATE", "Day it was approved"),
+        ("last_day_of_work", "DATE", "Last day worked before the leave"),
+        ("first_day_of_leave", "DATE", "First day of leave"),
+        ("estimated_last_day_of_leave", "DATE", "Planned last day"),
+        ("actual_last_day_of_leave", "DATE", "Actual last day, once known"),
+        ("first_day_back_at_work", "DATE", "First day back, once known"),
+        ("total_days_on_leave", "INTEGER", "Calendar days, actual or estimated"),
+        ("is_estimated", "BOOLEAN", "True while the return is still an estimate"),
+    ],
+    "bw_time_off": [
+        ("booking_id", "VARCHAR", "Record key"),
+        ("bw_worker_id", "VARCHAR", "-> bw_contingent_worker"),
+        ("service_order_id", "VARCHAR", "-> bw_service_order"),
+        ("booking_type", "VARCHAR", "Planned time off or Sick"),
+        ("first_day", "DATE", "First day off"),
+        ("last_day", "DATE", "Last day off"),
+        ("working_days", "INTEGER", "Working days off"),
+        ("hours", "DOUBLE", "Hours not billed"),
+        ("status", "VARCHAR", "Approved"),
+        ("submitted_at", "TIMESTAMP", "When the worker booked it"),
+        ("approved_at", "TIMESTAMP", "When the manager approved it in Bridgeway"),
+    ],
+    "ref_job_family_home": [
+        ("job_family_code", "VARCHAR", "-> dim_job_profile"),
+        ("home_function", "VARCHAR", "The function that usually hires the family; empty for a shared family"),
+        ("is_shared", "BOOLEAN", "True for families every function hires (Data, Operations)"),
+    ],
+    "ref_public_holiday": [
+        ("country_code", "VARCHAR", "-> dim_country"),
+        ("holiday_date", "DATE", "The holiday (including observed days)"),
+        ("holiday_name", "VARCHAR", "Name"),
+        ("source", "VARCHAR", "Where it comes from"),
+    ],
+    "gen_org_drift_truth": [
+        ("drift_id", "VARCHAR", "Record key"),
+        ("signal_code", "VARCHAR", "S1 borrowed reporting line, M1 matrix for another country, M2 two matrices, M3 ended or leaderless matrix, R1 assignment naming a former leader"),
+        ("cause", "VARCHAR", "What happened"),
+        ("person_id", "VARCHAR", "The person it is about, when it is about a person"),
+        ("matrix_org_id", "VARCHAR", "The matrix involved"),
+        ("assignment_id", "VARCHAR", "The role assignment involved (R1)"),
+        ("job_record_ids", "VARCHAR", "S1: the job records whose manager was replaced, semicolon separated"),
+        ("original_values", "VARCHAR", "S1: the managers the simulation gave those records; R1: the leader the row still names"),
+        ("seeded_value", "VARCHAR", "S1: the manager kept; M1/M2/M3: the matrix it should be; R1: the leader it should name"),
+        ("start_date", "DATE", "First day it is true"),
+        ("end_date", "DATE", "Last day it is true; empty if still open on the extract date"),
+        ("detail", "VARCHAR", "The facts behind it, in a sentence"),
+    ],
+})
+
 RAW_COLUMNS["ref_source_system"] = [
     ("system_code", "VARCHAR", "KS, BW, INT, PUB, WH, GEN, HLX or ETL"),
     ("system_name", "VARCHAR", "System name"),
@@ -429,6 +550,7 @@ def columns(table: str) -> list[str]:
 
 
 RELEASE_4_TABLES = [t for t, _, _, _, _, r in RAW_TABLE_LINEAGE if r == 4]
+RELEASE_7_TABLES = [t for t, _, _, _, _, r in RAW_TABLE_LINEAGE if r == 7]
 
 # Release 3 operational tables and the answer key (not the registry): written from the
 # Bridgeway and Keystone simulations.

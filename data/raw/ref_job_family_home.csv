@@ -1,0 +1,15 @@
+job_family_code,home_function,is_shared
+SWE,Technology,False
+ITS,Technology,False
+SEC,Technology,False
+PRD,Product,False
+DSN,Product,False
+SAL,Commercial,False
+CSM,Commercial,False
+MKT,Marketing,False
+FIN,Finance,False
+HRM,People,False
+LGL,Legal & Compliance,False
+EXE,Executive,False
+DAT,,True
+OPS,,True

@@ -1067,7 +1067,8 @@ pip install -r requirements.txt
 
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
 python generator/core_hr_extract.py    # then extend Core HR to the data-through date (release 6)
-python pipeline/run_pipeline.py        # build the warehouse, run the 88 tests, export the marts,
+python generator/leadership_scope.py   # then add org design and time off (release 7)
+python pipeline/run_pipeline.py        # build the warehouse, run the 100 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 1)
