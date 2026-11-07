@@ -26,4 +26,5 @@ JOIN rc ON s.month_end_date = rc.report_as_of_date
 JOIN intermediate.int_person_month_end AS p ON p.month_end_date = s.month_end_date AND p.person_id = s.person_id
 JOIN staging.stg_location AS loc ON loc.location_id = p.location_id
 LEFT JOIN intermediate.int_person_month_end AS m ON m.month_end_date = p.month_end_date AND m.person_id = p.manager_worker_id
-LEFT JOIN above AS a ON a.person_id = s.person_id;
+LEFT JOIN above AS a ON a.person_id = s.person_id
+ORDER BY ALL;

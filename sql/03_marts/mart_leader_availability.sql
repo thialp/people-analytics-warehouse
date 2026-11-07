@@ -31,4 +31,5 @@ FROM below AS b
 JOIN wt ON wt.worker_type = 'All'
         OR (wt.worker_type = 'Employees' AND b.worker_type = 'Employee')
         OR (wt.worker_type = 'Contingent' AND b.worker_type = 'Contingent')
-GROUP BY 1, 2, 3, 4, 5;
+GROUP BY 1, 2, 3, 4, 5
+ORDER BY ALL;

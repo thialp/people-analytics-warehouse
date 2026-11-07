@@ -37,4 +37,5 @@ JOIN staging.stg_location AS loc ON loc.location_id = l.location_id
 LEFT JOIN intermediate.int_org_leader AS pl ON pl.month_end_date = l.month_end_date AND pl.leader_id = l.parent_leader_id
 LEFT JOIN kids AS k ON k.month_end_date = l.month_end_date AND k.leader_id = l.leader_id
 LEFT JOIN staging.stg_org_unit AS ou ON ou.org_unit_id = l.leads_org_unit_id
-LEFT JOIN today AS t ON t.leader_id = l.leader_id AND t.worker_type = o.worker_type;
+LEFT JOIN today AS t ON t.leader_id = l.leader_id AND t.worker_type = o.worker_type
+ORDER BY ALL;

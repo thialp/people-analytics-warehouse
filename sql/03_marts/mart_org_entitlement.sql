@@ -13,4 +13,5 @@ SELECT c.ancestor_id AS viewer_leader_id, w.work_email AS viewer_email, l.leader
 FROM intermediate.int_org_closure AS c
 JOIN rc ON c.month_end_date = rc.report_as_of_date
 JOIN intermediate.int_org_leader AS l ON l.month_end_date = c.month_end_date AND l.leader_id = c.ancestor_id
-JOIN staging.stg_worker AS w ON w.worker_id = c.ancestor_id;
+JOIN staging.stg_worker AS w ON w.worker_id = c.ancestor_id
+ORDER BY ALL;

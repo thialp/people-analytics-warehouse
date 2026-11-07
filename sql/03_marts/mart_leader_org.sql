@@ -14,4 +14,5 @@ SELECT o.month_end_date, cal.fiscal_year, cal.fiscal_quarter_label,
 FROM intermediate.int_leader_org AS o
 JOIN intermediate.int_org_leader AS l ON l.month_end_date = o.month_end_date AND l.leader_id = o.leader_id
 JOIN intermediate.int_month_end_calendar AS cal ON cal.month_end_date = o.month_end_date
-WHERE l.leader_level IN ('L0', 'L1', 'L2');
+WHERE l.leader_level IN ('L0', 'L1', 'L2')
+ORDER BY ALL;
