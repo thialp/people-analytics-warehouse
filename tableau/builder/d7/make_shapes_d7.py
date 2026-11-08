@@ -2,7 +2,7 @@
 
     python3 make_shapes_d7.py OUT_DIR [GITHUB_PNG]
 
-OUT_DIR is ~/Documents/My Tableau Repository/Shapes/Arcadia D7. Every file is drawn at 4x its size on the
+OUT_DIR is ~/Documents/My Tableau Repository/Shapes/Arcadia D7 (shapes/ in this folder holds the same 52 files, ready to copy). Every file is drawn at 4x its size on the
 page. Names end in _l (light) or _d (dark); the workbook picks one with the theme parameter.
 Colors are the approved Canopy palette (docs/projects/leadership-scope, design round 2).
 """
@@ -18,9 +18,10 @@ THEME = {
     'd': dict(chip='#202A28', accent='#7FD1B9', on='#0F1413', muted='#9AA9A4', ink='#E9EFEC', line='#2A3532',
               surface='#1A2120', soft='#1E3A33'),
 }
-FONT = '/usr/share/fonts/opentype/inter/Inter-SemiBold.otf'
-FONT_B = '/usr/share/fonts/opentype/inter/Inter-Bold.otf'
-FONT_M = '/usr/share/fonts/opentype/inter/Inter-Medium.otf'
+FONTS = os.environ.get('D7_FONTS', '/usr/share/fonts/opentype/inter')     # the folder holding Inter (on a Mac, ~/Library/Fonts)
+FONT = os.path.join(FONTS, 'Inter-SemiBold.otf')
+FONT_B = os.path.join(FONTS, 'Inter-Bold.otf')
+FONT_M = os.path.join(FONTS, 'Inter-Medium.otf')
 
 
 def rgb(h, a=255):

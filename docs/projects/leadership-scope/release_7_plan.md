@@ -9,6 +9,7 @@ This page tracks the release from the data the generator writes to the published
 | 1 | 2026-11-07 | Plan written: decisions, data model, how gaps are seeded, alignment signals, time off, tests, phases |
 | 2 | 2026-11-07 | **Phases 1 and 2 done.** Generator (`org_design.py`, `time_off.py`, driver `leadership_scope.py`), 9 staging models, 8 intermediate models, 5 marts, tests 93 to 100; 100 of 100 tests pass. Results in section 12. Public holidays added (`ref_public_holiday`), so a US holiday reads as a holiday, not as a working day |
 | 3 | 2026-11-07 | **Phase 3 (SQL Server) and the Custom SQL done in the repository.** `03g` builds the release 7 tables (the closure one level at a time, 12 levels; the tree layout for every focus leader), `04d` the views, `18_validate` 35 checks; `check_tsql_in_duckdb.py` matches every view and the page's Custom SQL row for row. New mart `mart_org_tree_layout` (test 101). One Custom SQL for the page, `tableau/custom_sql_who_leads_where.sql`, row types Node, Tree, Day, Signal, R1 (646,673 rows). Run guide: `sql_server_release_7_run.md`. `05_validate` now expects 1,048,292 reporting-chain rows (borrowed reporting lines) |
+| 4 | 2026-11-07 | **Phase 7: the workbook.** `tableau/builder/d7` writes it from a base workbook (connection only): 196 calculations, 80 sheets, light and dark, 168 actions. One context filter per sheet (Leaders, Days, Tree) keeps every FIXED read to the rows that sheet needs: a click went from 20 to 30 seconds to a few. Names centered under each circle (the gap slice split around 12 o'clock). Numbers checked in Tableau Desktop against `check_values.py`. Guide: `who_leads_where_build.md` |
 
 ## Contents
 
@@ -33,11 +34,11 @@ This page tracks the release from the data the generator writes to the published
 |---:|---|---|---|---|
 | 1 | Data creation: matrix orgs, matrix membership, role assignments, borrowed reporting lines, time off, answer key | Claude | **Done** 2026-11-07 | Every pre-release-7 raw table identical by hash except the documented `fact_job_history` manager splits; generator deterministic |
 | 2 | Warehouse (DuckDB): staging, org closure, alignment signals, daily availability, marts, tests | Claude | **Done** 2026-11-07 | All tests pass; every mart of Dashboards #1 to #6 unchanged by hash; only the reporting-line marts move, as documented |
-| 3 | SQL Server twin: `03g`, `04d`, `18_validate`, `build_all` | Claude, then Thiago on the Mac | Done in the repository; Mac run to do | `check_tsql_in_duckdb.py` matches; `18_validate` passes on the Mac |
+| 3 | SQL Server twin: `03g`, `04d`, `18_validate`, `build_all` | Claude, then Thiago on the Mac | **Done** 2026-11-07: every `18_validate` check passes on the Mac | `check_tsql_in_duckdb.py` matches; `18_validate` passes on the Mac |
 | 4 | Custom SQL and tree coordinates | Claude | **Done** 2026-11-07, in SQL (no Python needed): `mart_org_tree_layout` and `dw.OrgTreeLayout`, every leader as the focus; x runs 0 to 1, so the normal and expanded cards use the same rows | Dynamic and static layouts for every leader, at normal and expanded widths |
 | 5 | Check tables with real numbers; refresh the design canvas | Claude, reviewed by Thiago | To do | Canvas shows generated values |
 | 6 | Figma spec | Thiago, with Claude | To do | Spec matches the approved canvas |
-| 7 | Build guide and workbook, light and dark | Claude, then Thiago | To do | Check tables and click tests pass on Tableau Public |
+| 7 | Build guide and workbook, light and dark | Claude, then Thiago | Workbook built by `tableau/builder/d7` and checked in Tableau Desktop 2026.2; guide `who_leads_where_build.md`. Publish to do | Check tables and click tests pass on Tableau Public |
 | 8 | Publish; Tableau Cloud with row-level security and Pulse | Both | To do | Live link; Pulse metrics followed per L1 |
 
 ---

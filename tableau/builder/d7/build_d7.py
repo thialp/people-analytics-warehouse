@@ -24,7 +24,7 @@ src = open(BASE, encoding='utf-8').read()
 W, H = 1400, 850
 DASH = 'Who Leads Where'
 SHAPES = 'Arcadia D7'
-BRAND = '/Users/thiagoalpoin/Documents/Claude/Professional Portfolio/tableau/Shared/Brand/'
+BRAND = os.environ.get('D7_BRAND', '/Users/thiagoalpoin/Documents/Claude/Professional Portfolio/tableau/Shared/Brand/')   # the Arcadia logos
 
 PAL = {
     'l': dict(bg='#F4F7F6', rail='#FFFFFF', surface='#FFFFFF', pop='#FFFFFF', line='#DFE6E3', ink='#15201D', muted='#56635F',
