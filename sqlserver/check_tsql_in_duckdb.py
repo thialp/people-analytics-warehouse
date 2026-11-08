@@ -324,7 +324,30 @@ def static_checks() -> bool:
             if depth != 0:
                 ok = False
                 print(f"   FAIL  {path.name}: unbalanced block comment")
-    print("   primary keys, text lengths, PRINT, STRING_AGG orderings and comments: "
+    # a reserved word as a column or alias must be in brackets (Msg 156): DuckDB accepts OFF, SQL Server does not
+    reserved = set("""ADD ALL ALTER AND ANY AS ASC AUTHORIZATION BACKUP BEGIN BETWEEN BREAK BROWSE BULK BY CASCADE CASE CHECK
+        CHECKPOINT CLOSE CLUSTERED COALESCE COLLATE COLUMN COMMIT COMPUTE CONSTRAINT CONTAINS CONTAINSTABLE CONTINUE CONVERT
+        CREATE CROSS CURRENT CURRENT_DATE CURRENT_TIME CURRENT_TIMESTAMP CURRENT_USER CURSOR DATABASE DBCC DEALLOCATE DECLARE
+        DEFAULT DELETE DENY DESC DISK DISTINCT DISTRIBUTED DOUBLE DROP DUMP ELSE END ERRLVL ESCAPE EXCEPT EXEC EXECUTE EXISTS
+        EXIT EXTERNAL FETCH FILE FILLFACTOR FOR FOREIGN FREETEXT FREETEXTTABLE FROM FULL FUNCTION GOTO GRANT GROUP HAVING
+        HOLDLOCK IDENTITY IDENTITY_INSERT IDENTITYCOL IF IN INDEX INNER INSERT INTERSECT INTO IS JOIN KEY KILL LEFT LIKE LINENO
+        LOAD MERGE NATIONAL NOCHECK NONCLUSTERED NOT NULL NULLIF OF OFF OFFSETS ON OPEN OPENDATASOURCE OPENQUERY OPENROWSET
+        OPENXML OPTION OR ORDER OUTER OVER PERCENT PIVOT PLAN PRECISION PRIMARY PRINT PROC PROCEDURE PUBLIC RAISERROR READ
+        READTEXT RECONFIGURE REFERENCES REPLICATION RESTORE RESTRICT RETURN REVERT REVOKE RIGHT ROLLBACK ROWCOUNT ROWGUIDCOL
+        RULE SAVE SCHEMA SELECT SESSION_USER SET SETUSER SHUTDOWN SOME STATISTICS SYSTEM_USER TABLE TABLESAMPLE TEXTSIZE THEN
+        TO TOP TRAN TRANSACTION TRIGGER TRUNCATE TRY_CONVERT TSEQUAL UNION UNIQUE UNPIVOT UPDATE UPDATETEXT USE USER VALUES
+        VARYING VIEW WAITFOR WHEN WHERE WHILE WITH WRITETEXT""".split())
+    sources = sorted((ROOT / "sqlserver").glob("*.sql")) + sorted((ROOT / "tableau").glob("custom_sql_*.sql"))
+    for path in sources:
+        text = re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
+        text = re.sub(r"--[^\n]*", "", text)
+        text = re.sub(r"N?'(?:[^']|'')*'", "''", text)        # string literals
+        for m in re.finditer(r"(?:\bAS\s+|\.)([A-Za-z_]\w*)\b(?!\s*\()", text, flags=re.I):
+            if m.group(1).upper() in reserved and not re.match(r"\s*\(", text[m.end():]):
+                if m.group(0).startswith(".") or m.group(1).upper() not in ("SELECT", "WITH", "BEGIN"):
+                    ok = False
+                    print(f"   FAIL  {path.name}: reserved word {m.group(1)} used as a name; put it in brackets, [{m.group(1)}]")
+    print("   primary keys, text lengths, PRINT, STRING_AGG orderings, comments and reserved words: "
           + ("all fit SQL Server's rules" if ok else "see above"))
     return ok
 
