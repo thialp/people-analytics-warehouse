@@ -198,9 +198,9 @@ def page(th):
               'Count employees, contingent workers, or both')
     seg_sheet('Count Toggle', 'Seg Row', 'Seg Key', 'Count Shape', ['Count Option'], SIZE['seg'],
               'Everyone in the organization, or only those at work on the chosen day')
-    seg_sheet('Tree Toggle', 'Seg Row', 'Seg Key', 'Tree Shape', ['tree_mode'], SIZE['segs'],
+    seg_sheet('Tree Toggle', 'Seg Row', 'Seg Key', 'Tree Shape', ['Seg Mode'], SIZE['segs'],
               'Dynamic: one level at a time · Static: three levels at once')
-    seg_sheet('Tree Toggle Wide', 'Seg Row', 'Seg Key', 'Tree Shape', ['tree_mode'], SIZE['segs'],
+    seg_sheet('Tree Toggle Wide', 'Seg Row', 'Seg Key', 'Tree Shape', ['Seg Mode'], SIZE['segs'],
               'Dynamic: one level at a time · Static: three levels at once')
     seg_sheet('Theme Toggle', 'Seg Row', 'Seg Key', 'Theme Shape', ['Theme Is Dark', 'Close Panel'], SIZE['segs'], 'Light or dark page')
 
@@ -320,6 +320,13 @@ def page(th):
 
 
 L, D = page('l'), page('d')
+
+# every sheet gets a context filter, so its FIXED reads scan only the rows it needs (see Ctx Leaders in d7_calcs.py)
+CTX = {'KPI 2': 'Ctx Days', 'Cal Field': 'Ctx Days', 'Calendar': 'Ctx Days', 'Cal Summary': 'Ctx Days',
+       'Tree': 'Ctx Tree', 'Tree Wide': 'Ctx Tree'}
+for name, sh_ in SHEETS.items():
+    sh_.filter_member(CTX.get(name.replace(' (dark)', ''), 'Ctx Leaders'), 'true')
+    sh_.filters.insert(0, sh_.filters.pop().replace("'>\n", "' context='true'>\n", 1))
 
 # ===================================================================================================== datasource styles
 def bucket_map(field, kind, mapping):
@@ -568,7 +575,7 @@ for S in (L, D):
     for p in ('p_PickOpen', 'p_CalOpen', 'p_RulesOpen'):
         T.append((f'Theme closes {p}{sfx}', S['Theme Toggle'], p, 'Close Panel'))
     for nm in ('Tree Toggle', 'Tree Toggle Wide'):
-        T.append((f'{nm}{sfx}', S[nm], 'p_Tree', 'tree_mode'))
+        T.append((f'{nm}{sfx}', S[nm], 'p_Tree', 'Seg Mode'))
     for nm in ('Expand', 'Expand Wide'):
         T.append((f'{nm}{sfx}', S[nm], 'p_Zoom', 'Toggle Zoom'))
     T += [(f'Open picker{sfx}', S['Org Field'], 'p_PickOpen', 'Toggle Pick'),

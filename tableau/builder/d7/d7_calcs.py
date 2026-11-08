@@ -180,14 +180,17 @@ def all_calcs():
     a('Tip At Work', 'IF [Day Weekend] = 1 THEN [Day Text] + " is a weekend" ELSE ' + comma('[N At Work]').replace('IF ISNULL', '(IF ISNULL', 1)
       + ') + " at work on " + [Day Text] END')
     # ------------------------------------------------------------------ toggles
-    a('Seg Row', '[row_type] = "Tree" AND [focus_leader_id] = [p_Focus] AND [tier] = 0 AND [mark_type] = "Node"')
-    a('Seg Key', 'IF [tree_mode] = "Dynamic" THEN 1 ELSE 2 END')
-    a('Count Option', 'IF [tree_mode] = "Dynamic" THEN "Everyone" ELSE "At work" END')
-    a('Count Shape', '"d7_count_" + (IF [tree_mode] = "Dynamic" THEN "everyone" ELSE "atwork" END) + "_" '
+    # the Count, Tree and Theme toggles draw two segments from the focus leader's All and Employees rows (Node rows sit in
+    # every sheet's context), so Seg Mode stands in for a two-value field
+    a('Seg Row', '[row_type] = "Node" AND [leader_id] = [p_Focus] AND ([worker_type] = "All" OR [worker_type] = "Employees")')
+    a('Seg Mode', 'IF [worker_type] = "All" THEN "Dynamic" ELSE "Static" END')
+    a('Seg Key', 'IF [Seg Mode] = "Dynamic" THEN 1 ELSE 2 END')
+    a('Count Option', 'IF [Seg Mode] = "Dynamic" THEN "Everyone" ELSE "At work" END')
+    a('Count Shape', '"d7_count_" + (IF [Seg Mode] = "Dynamic" THEN "everyone" ELSE "atwork" END) + "_" '
       '+ (IF [Count Option] = [p_Count] THEN "on" ELSE "off" END) + [Theme Key]')
-    a('Tree Shape', '"d7_tree_" + LOWER([tree_mode]) + "_" + (IF [tree_mode] = [p_Tree] THEN "on" ELSE "off" END) + [Theme Key]')
-    a('Theme Is Dark', '[tree_mode] = "Static"')
-    a('Theme Shape', '"d7_theme_" + (IF [tree_mode] = "Dynamic" THEN "light" ELSE "dark" END) + "_" '
+    a('Tree Shape', '"d7_tree_" + LOWER([Seg Mode]) + "_" + (IF [Seg Mode] = [p_Tree] THEN "on" ELSE "off" END) + [Theme Key]')
+    a('Theme Is Dark', '[Seg Mode] = "Static"')
+    a('Theme Shape', '"d7_theme_" + (IF [Seg Mode] = "Dynamic" THEN "light" ELSE "dark" END) + "_" '
       '+ (IF [Theme Is Dark] = [p_Dark] THEN "on" ELSE "off" END) + [Theme Key]')
     a('Worker Row', '[row_type] = "Node" AND [leader_id] = [p_Focus]')
     a('Worker Key', 'CASE [worker_type] WHEN "All" THEN 1 WHEN "Employees" THEN 2 ELSE 3 END')
@@ -254,6 +257,14 @@ def all_calcs():
     a('Solid Total', comma('[F Solid Gaps]') + ' + " PEOPLE"')
     a('Matrix Total', comma('[F Matrix Gaps]') + ' + " PEOPLE"')
     a('Role Total', 'STR([F R1]) + IF [F R1] = 1 THEN " ASSIGNMENT" ELSE " ASSIGNMENTS" END')
+    # ------------------------------------------------------------------ context: each sheet reads only the rows it needs
+    # A context filter runs before every FIXED expression, so the page's many FIXED reads scan a small slice of the
+    # 646,673 rows instead of all of them.
+    a('Ctx Leaders', '[row_type] = "Node" OR [row_type] = "Signal" OR [row_type] = "R1"')
+    a('Ctx Days', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
+    a('Ctx Tree', '([row_type] = "Tree" AND [focus_leader_id] = [p_Focus] AND [tree_mode] = [p_Tree]) '
+      'OR ([row_type] = "Node" AND ([worker_type] = [p_Worker] OR [worker_type] = "All")) '
+      'OR ([row_type] = "Day" AND [worker_type] = [p_Worker] AND [day_offset] = [p_Day])')
     a('Rail As Of', '"Synthetic data as of " + [Report Label]')
     return c
 
@@ -264,6 +275,6 @@ DTYPES = {'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Wo
           'Report Date': 'date', 'Pie Angle': 'integer', 'Pie Size': 'real',
           # IFNULL() takes the type of its arguments; the writer cannot infer it, so these are named here
           'Org L0 Text': 'string', 'Org L1 Text': 'string', 'Org L2 Text': 'string', 'Pick B0 Default': 'string',
-          'Pick B1 Default': 'string', 'Open Node': 'string', 'Focus Target': 'string'}
+          'Pick B1 Default': 'string', 'Open Node': 'string', 'Focus Target': 'string', 'Seg Mode': 'string'}
 ROLES = {'Cal DOW': ('dimension', 'ordinal'), 'Cal Week': ('dimension', 'ordinal'), 'Seg Key': ('dimension', 'ordinal'),
          'Worker Key': ('dimension', 'ordinal'), 'Sig Order': ('dimension', 'ordinal'), 'Pick Rank': ('dimension', 'ordinal')}
