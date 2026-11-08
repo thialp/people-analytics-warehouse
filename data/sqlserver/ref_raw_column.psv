@@ -198,6 +198,95 @@ gen_cw_discrepancy_truth|10|start_date|DATE|First day it is true
 gen_cw_discrepancy_truth|11|end_date|DATE|Last day it is true; empty if still open on the extract date
 gen_cw_discrepancy_truth|12|resolution|VARCHAR|How it ended, or Open at extract
 gen_cw_discrepancy_truth|13|detail|VARCHAR|The facts behind it, in a sentence
+ks_matrix_org|1|matrix_record_id|VARCHAR|Record key
+ks_matrix_org|2|matrix_org_id|VARCHAR|Matrix org: MX-R-.. for a region, MX-.. for a country or cluster
+ks_matrix_org|3|matrix_org_name|VARCHAR|Name, e.g. Cluster Leader · DACH
+ks_matrix_org|4|matrix_type|VARCHAR|Region or Country
+ks_matrix_org|5|region|VARCHAR|Region it belongs to
+ks_matrix_org|6|parent_matrix_org_id|VARCHAR|The region matrix above a country matrix; empty for a region
+ks_matrix_org|7|covers_country_codes|VARCHAR|Countries a country matrix covers, semicolon separated; empty for a region
+ks_matrix_org|8|effective_start_date|DATE|First day of this record
+ks_matrix_org|9|effective_end_date|DATE|Last day; empty if current
+ks_matrix_org|10|manager_worker_id|VARCHAR|The matrix leader (-> dim_worker); empty while the seat is open
+ks_matrix_org|11|status|VARCHAR|Active or Inactive
+ks_matrix_org|12|inactive_date|DATE|Day the matrix ended, on its Inactive record
+ks_matrix_org|13|created_date|DATE|Day the matrix was created
+ks_matrix_membership|1|membership_id|VARCHAR|Record key
+ks_matrix_membership|2|person_id|VARCHAR|Keystone person: an employee (W1..) or a contingent worker (W5..)
+ks_matrix_membership|3|person_type|VARCHAR|Employee or Contingent
+ks_matrix_membership|4|matrix_org_id|VARCHAR|-> ks_matrix_org (a country or cluster matrix)
+ks_matrix_membership|5|effective_start_date|DATE|First day in the matrix
+ks_matrix_membership|6|effective_end_date|DATE|Last day; empty if current
+ks_matrix_membership|7|assigned_reason|VARCHAR|Matrix go-live, Hire, Location change or Matrix reorganization
+ks_role_assignment|1|assignment_id|VARCHAR|Record key
+ks_role_assignment|2|role_name|VARCHAR|HR Partner or Finance Partner
+ks_role_assignment|3|assignee_worker_id|VARCHAR|The person holding the role (-> dim_worker)
+ks_role_assignment|4|target_org_unit_id|VARCHAR|The org unit or department the role covers
+ks_role_assignment|5|target_org_name|VARCHAR|The target as Keystone shows it: unit (leader when issued), (Inherited) when inherited
+ks_role_assignment|6|named_leader_worker_id|VARCHAR|The leader the name carries (-> dim_worker)
+ks_role_assignment|7|assigned_via|VARCHAR|Direct or Inherited
+ks_role_assignment|8|inherited_from_org_unit_id|VARCHAR|Where an inherited row comes from
+ks_role_assignment|9|effective_start_date|DATE|First day
+ks_role_assignment|10|effective_end_date|DATE|Last day; empty if current
+ks_time_off_request|1|time_off_request_id|VARCHAR|Record key
+ks_time_off_request|2|person_id|VARCHAR|Keystone person (employee or contingent worker)
+ks_time_off_request|3|person_type|VARCHAR|Employee or Contingent
+ks_time_off_request|4|source_system|VARCHAR|KS when requested in Keystone; BW when Bridgeway sent it
+ks_time_off_request|5|bw_booking_id|VARCHAR|-> bw_time_off, for a contingent worker's booking
+ks_time_off_request|6|time_off_type|VARCHAR|Plan, by country (e.g. United States · Paid Time Off (PTO))
+ks_time_off_request|7|request_type|VARCHAR|Absence Request, or Absence Correction (negative units, taking days back)
+ks_time_off_request|8|first_day|DATE|First day off
+ks_time_off_request|9|last_day|DATE|Last day off
+ks_time_off_request|10|units|DOUBLE|Units in the plan's unit; negative for a correction
+ks_time_off_request|11|unit_of_time|VARCHAR|Hours (US, Canada) or Days
+ks_time_off_request|12|days_requested|DOUBLE|Working days, 0.5 for a half day; negative for a correction
+ks_time_off_request|13|corrects_request_id|VARCHAR|The request a correction reduces
+ks_time_off_request|14|status|VARCHAR|Approved
+ks_time_off_request|15|created_at|TIMESTAMP|When it was requested (or received from Bridgeway)
+ks_time_off_request|16|approved_at|TIMESTAMP|When it was approved
+ks_leave_of_absence|1|leave_id|VARCHAR|Record key
+ks_leave_of_absence|2|worker_id|VARCHAR|-> dim_worker
+ks_leave_of_absence|3|leave_type|VARCHAR|Parental, Medical, Family Care, Personal (unpaid) or Military Leave
+ks_leave_of_absence|4|status|VARCHAR|Approved
+ks_leave_of_absence|5|initiated_date|DATE|Day the leave was requested
+ks_leave_of_absence|6|approved_date|DATE|Day it was approved
+ks_leave_of_absence|7|last_day_of_work|DATE|Last day worked before the leave
+ks_leave_of_absence|8|first_day_of_leave|DATE|First day of leave
+ks_leave_of_absence|9|estimated_last_day_of_leave|DATE|Planned last day
+ks_leave_of_absence|10|actual_last_day_of_leave|DATE|Actual last day, once known
+ks_leave_of_absence|11|first_day_back_at_work|DATE|First day back, once known
+ks_leave_of_absence|12|total_days_on_leave|INTEGER|Calendar days, actual or estimated
+ks_leave_of_absence|13|is_estimated|BOOLEAN|True while the return is still an estimate
+bw_time_off|1|booking_id|VARCHAR|Record key
+bw_time_off|2|bw_worker_id|VARCHAR|-> bw_contingent_worker
+bw_time_off|3|service_order_id|VARCHAR|-> bw_service_order
+bw_time_off|4|booking_type|VARCHAR|Planned time off or Sick
+bw_time_off|5|first_day|DATE|First day off
+bw_time_off|6|last_day|DATE|Last day off
+bw_time_off|7|working_days|INTEGER|Working days off
+bw_time_off|8|hours|DOUBLE|Hours not billed
+bw_time_off|9|status|VARCHAR|Approved
+bw_time_off|10|submitted_at|TIMESTAMP|When the worker booked it
+bw_time_off|11|approved_at|TIMESTAMP|When the manager approved it in Bridgeway
+ref_job_family_home|1|job_family_code|VARCHAR|-> dim_job_profile
+ref_job_family_home|2|home_function|VARCHAR|The function that usually hires the family; empty for a shared family
+ref_job_family_home|3|is_shared|BOOLEAN|True for families every function hires (Data, Operations)
+ref_public_holiday|1|country_code|VARCHAR|-> dim_country
+ref_public_holiday|2|holiday_date|DATE|The holiday (including observed days)
+ref_public_holiday|3|holiday_name|VARCHAR|Name
+ref_public_holiday|4|source|VARCHAR|Where it comes from
+gen_org_drift_truth|1|drift_id|VARCHAR|Record key
+gen_org_drift_truth|2|signal_code|VARCHAR|S1 borrowed reporting line, M1 matrix for another country, M2 two matrices, M3 ended or leaderless matrix, R1 assignment naming a former leader
+gen_org_drift_truth|3|cause|VARCHAR|What happened
+gen_org_drift_truth|4|person_id|VARCHAR|The person it is about, when it is about a person
+gen_org_drift_truth|5|matrix_org_id|VARCHAR|The matrix involved
+gen_org_drift_truth|6|assignment_id|VARCHAR|The role assignment involved (R1)
+gen_org_drift_truth|7|job_record_ids|VARCHAR|S1: the job records whose manager was replaced, semicolon separated
+gen_org_drift_truth|8|original_values|VARCHAR|S1: the managers the simulation gave those records; R1: the leader the row still names
+gen_org_drift_truth|9|seeded_value|VARCHAR|S1: the manager kept; M1/M2/M3: the matrix it should be; R1: the leader it should name
+gen_org_drift_truth|10|start_date|DATE|First day it is true
+gen_org_drift_truth|11|end_date|DATE|Last day it is true; empty if still open on the extract date
+gen_org_drift_truth|12|detail|VARCHAR|The facts behind it, in a sentence
 ref_source_system|1|system_code|VARCHAR|KS, BW, INT, PUB, WH, GEN, HLX or ETL
 ref_source_system|2|system_name|VARCHAR|System name
 ref_source_system|3|system_type|VARCHAR|What kind of system it is

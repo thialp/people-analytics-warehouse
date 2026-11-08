@@ -17,12 +17,15 @@
 :r /repo/sqlserver/03d_build_dw_cw_reconciliation.sql
 :r /repo/sqlserver/03e_build_dw_forecast.sql
 :r /repo/sqlserver/03f_build_dw_cost_growth_mix.sql
+:r /repo/sqlserver/03g_build_dw_leadership_scope.sql
 :r /repo/sqlserver/04_create_reporting_views.sql
 :r /repo/sqlserver/04b_create_reporting_views_contingent.sql
 :r /repo/sqlserver/04c_create_reporting_views_reconciliation.sql
+:r /repo/sqlserver/04d_create_reporting_views_leadership.sql
 :r /repo/sqlserver/05_validate.sql
 :r /repo/sqlserver/08_validate_workforce_planning.sql
 :r /repo/sqlserver/12_validate_contingent_workforce.sql
 :r /repo/sqlserver/15_validate_cw_reconciliation.sql
 :r /repo/sqlserver/16_validate_report_calendar.sql
 :r /repo/sqlserver/17_validate_seats_to_fill.sql
+:r /repo/sqlserver/18_validate_leadership_scope.sql

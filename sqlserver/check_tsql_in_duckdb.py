@@ -18,7 +18,7 @@ What it runs
      compensation walk for the pairs that end in FY26 (the full walk needs more memory
      than a laptop-sized DuckDB run allows)
   4. the PASS/FAIL tables of 05, 08, 10, 12 (the contingent workforce), 14 (Dashboard #3) and
-     15 (Dashboard #4, the reconciliation)
+     15 (Dashboard #4, the reconciliation), 17 (Dashboard #5) and 18 (case study 7, Who Leads Where)
   and, before all that, SQL Server rules DuckDB does not enforce: primary-key columns must be
   made NOT NULL first, text must fit its declared VARCHAR length, PRINT takes no subquery, and
   ordered STRING_AGGs in one SELECT must share one ordering (Msg 8711).
@@ -46,8 +46,9 @@ ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DB = ROOT / "warehouse" / "arcadia.duckdb"
 BUILD = ["03_build_dw.sql", "03b_build_dw_workforce_planning.sql", "03c_build_dw_contingent.sql",
          "03d_build_dw_cw_reconciliation.sql", "03e_build_dw_forecast.sql", "03f_build_dw_cost_growth_mix.sql",
+         "03g_build_dw_leadership_scope.sql",
          "04_create_reporting_views.sql", "04b_create_reporting_views_contingent.sql",
-         "04c_create_reporting_views_reconciliation.sql"]
+         "04c_create_reporting_views_reconciliation.sql", "04d_create_reporting_views_leadership.sql"]
 VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_org_leader_summary", "rpt.vw_org_leader_summary"),
          ("mart_fringe_rate", "rpt.vw_fringe_rate"),
@@ -65,7 +66,13 @@ VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_cw_pid_fill", "rpt.vw_cw_pid_fill"),
          ("mart_cw_gap_close", "rpt.vw_cw_gap_close"),
          ("mart_cw_gap_rate_close", "rpt.vw_cw_gap_rate_close"),
-         ("mart_itsm_ticket_close", "rpt.vw_itsm_ticket_close")]
+         ("mart_itsm_ticket_close", "rpt.vw_itsm_ticket_close"),
+         ("mart_org_node", "rpt.vw_org_node"),                      # release 7: Who Leads Where
+         ("mart_leader_org", "rpt.vw_leader_org"),
+         ("mart_leader_availability", "rpt.vw_leader_availability"),
+         ("mart_alignment_detail", "rpt.vw_alignment_detail"),
+         ("mart_org_entitlement", "rpt.vw_org_entitlement"),
+         ("mart_org_tree_layout", "rpt.vw_org_tree_layout")]
 FORECAST = ["mart_pid_fill_quarter", "mart_fill_survival", "mart_pid_forecast_draws", "mart_pid_forecast_backtest",
             "mart_pid_forecast_accuracy", "mart_pid_forecast_model", "mart_pid_forecast_run", "mart_cw_budget_function"]
 SKIP = re.compile(r"^\s*(CREATE\s+(CLUSTERED\s+|UNIQUE\s+)?INDEX|ALTER\s+TABLE|SET\s+NOCOUNT|USE\s|PRINT\s|DECLARE\s"
@@ -384,6 +391,14 @@ def main() -> int:
         ok &= seats_to_fill(con)
         con.execute("CREATE OR REPLACE TABLE tmp_s5 AS SELECT * FROM cs.seats_to_fill")   # #s5 in 17_validate
         con.execute("CREATE OR REPLACE VIEW s5 AS SELECT * FROM tmp_s5")
+        custom_sql(con, "custom_sql_who_leads_where.sql", "who_leads_where")   # case study 7: row types against their marts
+        for row_type, mart in (("Node", "mart_org_node"), ("Day", "mart_leader_availability")):
+            con.execute(f"CREATE OR REPLACE VIEW cs.w7_{row_type} AS SELECT * FROM cs.who_leads_where WHERE row_type = '{row_type}'")
+            ok &= compare(con, mart, f"cs.w7_{row_type}")
+        con.execute("CREATE OR REPLACE VIEW cs.w7_Tree AS SELECT * FROM cs.who_leads_where WHERE row_type = 'Tree'")
+        ok &= compare(con, "mart_org_tree_layout", "cs.w7_Tree")
+        con.execute("CREATE OR REPLACE TABLE tmp_w7 AS SELECT * FROM cs.who_leads_where")   # #w7 in 18_validate
+        con.execute("CREATE OR REPLACE VIEW w7 AS SELECT * FROM tmp_w7")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
         ok &= compare(con, "mart_compensation_walk", "cs.walk_fy26", "WHERE to_month_end >= DATE '2025-06-30'")
         print("\n4. Validation scripts")
@@ -395,6 +410,7 @@ def main() -> int:
         ok &= validation(con, "15_validate_cw_reconciliation.sql")
         ok &= validation(con, "16_validate_report_calendar.sql")
         ok &= validation(con, "17_validate_seats_to_fill.sql")
+        ok &= validation(con, "18_validate_leadership_scope.sql")
         con.close()
     ok &= static
     print("\nAll checks match." if ok else "\nDifferences found.")
