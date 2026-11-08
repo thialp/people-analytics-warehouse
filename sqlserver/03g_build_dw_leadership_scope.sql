@@ -639,7 +639,7 @@ SELECT b.LeaderID, wt.WorkerType, b.Day, b.DayOffset,
        SUM(CASE WHEN b.DayStatus <> 'Not in the team' THEN 1 ELSE 0 END)               AS People,
        CASE WHEN DATEDIFF(DAY, '1900-01-01', b.Day) % 7 < 5
             THEN SUM(CASE WHEN b.DayStatus = 'At work' THEN 1 ELSE 0 END) END         AS AtWork,
-       SUM(CASE WHEN b.DayStatus IN ('Time off', 'Leave', 'Public holiday') THEN 1 ELSE 0 END) AS Off,
+       SUM(CASE WHEN b.DayStatus IN ('Time off', 'Leave', 'Public holiday') THEN 1 ELSE 0 END) AS [Off],
        SUM(CASE WHEN b.DayStatus = 'Time off' THEN 1 ELSE 0 END)                       AS OffTimeOff,
        SUM(CASE WHEN b.DayStatus = 'Leave' THEN 1 ELSE 0 END)                          AS OffLeave,
        SUM(CASE WHEN b.DayStatus = 'Public holiday' THEN 1 ELSE 0 END)                 AS OffPublicHoliday,
@@ -675,7 +675,7 @@ SELECT l.MonthEndDate AS AsOfDate, l.LeaderID, l.LeaderName, l.JobTitle, l.Grade
        o.GapPeople, o.SolidLineGapPeople, o.MatrixGapPeople,
        o.S1BudgetedElsewhere, o.S2RoleOtherFunction, o.M1CountryLeaderOtherCountry,
        o.M2NotOneCountryMatrix, o.M3MatrixInactiveOrLeaderless, o.AssignmentsNamingFormerLeader,
-       t.AtWork AS AtWorkToday, t.Off AS OffToday
+       t.AtWork AS AtWorkToday, t.[Off] AS OffToday
 INTO dw.OrgNode
 FROM dw.OrgLeader AS l
 JOIN fc.report_calendar AS rc ON l.MonthEndDate = rc.report_as_of_date

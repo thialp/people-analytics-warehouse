@@ -112,7 +112,7 @@ SELECT
     IsWeekend            AS is_weekend,
     People               AS people,
     AtWork               AS at_work,
-    Off                  AS off,
+    [Off]                AS [off],
     OffTimeOff           AS off_time_off,
     OffLeave             AS off_leave,
     OffPublicHoliday     AS off_public_holiday,

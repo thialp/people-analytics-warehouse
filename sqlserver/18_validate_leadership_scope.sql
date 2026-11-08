@@ -134,6 +134,6 @@ FROM (
     UNION ALL SELECT 'circles off the canvas (x outside 0 to 1)',
                      (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree' AND (x < 0 OR x > 1)), 0
     UNION ALL SELECT 'weekdays where at work + off <> people',
-                     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Day' AND is_weekend = 0 AND at_work + off <> people), 0
+                     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Day' AND is_weekend = 0 AND at_work + [off] <> people), 0
 ) AS c;
 GO
