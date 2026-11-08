@@ -139,7 +139,7 @@ def all_calcs():
     a('Crumb Chain', 'IFNULL([Crumb L0] + " (L0)", "") + IF ISNULL([Crumb L1]) THEN "" ELSE " › " + [Crumb L1] + " (L1)" END '
       '+ IF ISNULL([Crumb L2]) THEN "" ELSE " › " + [Crumb L2] + " (L2)" END + IF [F Level] = "Manager" THEN " › " + [F Name] ELSE "" END')
     a('Tree Hint', 'IF [p_Tree] = "Dynamic" THEN "Dynamic · " + [Crumb Chain] + " · click a leader to show their team, again to open it; '
-      'the top circle goes back up" ELSE "Static · every leader three levels below " + [F Name] + " · click a circle to open it" END')
+      'the top circle goes back up" ELSE "Static · three levels of leaders below " + [F Name] + " at once · click a circle to open it" END')
     # ------------------------------------------------------------------ the tree
     a('Open Pick', '{FIXED : MAX(IF [row_type] = "Tree" AND [tree_mode] = "Dynamic" AND [focus_leader_id] = [p_Focus] AND [tier] = 1 '
       'AND [mark_type] = "Node" AND [node_id] = [p_Open] THEN [node_id] END)}')
@@ -156,11 +156,13 @@ def all_calcs():
     a('N At Work', '{FIXED [leader_id] : MAX(IF [row_type] = "Day" AND [worker_type] = [p_Worker] AND [day_offset] = [p_Day] THEN [at_work] END)}')
     a('N Shown', 'IF [p_Count] = "At work" AND [Day Weekend] = 0 THEN [N At Work] ELSE [N People] END')
     a('N Shown Txt', comma('[N Shown]') + ' + IF [p_Count] = "At work" AND [Day Weekend] = 0 THEN " at work" ELSE "" END')
-    a('Y Link', 'IF [mark_type] = "Link" THEN [y] END')
-    a('Y Node', 'IF [mark_type] = "Node" OR [point_index] = 16 THEN [y] END')
-    a('Pie Angle', 'IF [mark_type] = "Node" THEN [N People] - [N Gaps] ELSE [N Gaps] END')
-    a('Pie Size', '[N People]')
-    a('Pie Color', '(IF [mark_type] <> "Node" THEN "gap" ELSEIF [tier] = 0 THEN "focus" '
+    a('Y Link', 'IF [mark_type] = "Link" THEN -[y] END')
+    a('Y Node', 'IF [mark_type] = "Node" OR [point_index] = 16 THEN -[y] END')
+    a('Pie Angle', 'IF [mark_type] = "Node" THEN [N People] - [N Gaps] ELSEIF [point_index] = 16 THEN [N Gaps] END')
+    a('Pie Size', 'IF [tree_mode] = "Static" AND [tier] = 3 THEN 1 ELSEIF [tree_mode] = "Static" AND [tier] = 2 THEN [N People] * 0.35 '
+      'ELSE [N People] END')
+    a('Row Count', 'IIF(ISNULL([row_type]), 1, 1)')
+    a('Pie Color', '(IF [mark_type] <> "Node" AND [point_index] <> 16 THEN "none" ELSEIF [mark_type] <> "Node" THEN "gap" ELSEIF [tier] = 0 THEN "focus" '
       'ELSEIF [tree_mode] = "Dynamic" AND [node_id] = [Open Node] THEN "open" ELSE "node" END) + [Theme Key]')
     a('Link Kind', '(IF [tree_mode] = "Dynamic" AND ([node_id] = [Open Node] OR [tier] = 2) THEN "sel" ELSE "link" END) + [Theme Key]')
     a('Node Label Name', 'IF [mark_type] <> "Node" OR ([tree_mode] = "Static" AND [tier] >= 2) THEN "" '
@@ -203,7 +205,9 @@ def all_calcs():
     a('Pick Row L2', '[Pick Base] AND [leader_level] = "L2" AND [parent_leader_id] = [p_B1]')
     a('Pick Rank', '1000000 - [people]')
     a('Pick Shape', '(IF CONTAINS([F Path], "|" + [leader_id] + "|") THEN "d7_dot_on" ELSE "d7_dot_off" END) + [Theme Key]')
-    a('Pick Sub', '(IF [leader_level] = "L0" AND NOT ISNULL([parent_leader_id]) THEN [function_name] ELSE [job_title] END) + " · " + ' + comma('[people]'))
+    a('Pick Sub', '[job_title] + " · " + ' + comma('[people]'))
+    a('Tick X', 'MIN(0.5)')
+    a('Pick People', comma('[people]'))
     a('B0 Name', '{FIXED : MAX(IF [Pick Base] AND [leader_id] = [p_B0] THEN [leader_name] END)}')
     a('B1 Name', '{FIXED : MAX(IF [Pick Base] AND [leader_id] = [p_B1] THEN [leader_name] END)}')
     a('Pick Head L1', 'IF ISNULL([B0 Name]) THEN "L1" ELSE "L1 · UNDER " + UPPER([B0 Name]) END')
@@ -257,6 +261,9 @@ def all_calcs():
 DTYPES = {'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Worker Key': 'integer', 'Sig Order': 'integer',
           'Pick Rank': 'integer', 'Day Weekend': 'integer', 'Sig Bar Len': 'integer', 'Cal Pos': 'integer', 'F Depth': 'integer',
           'F Child Leaders': 'integer', 'F R1': 'integer', 'Report Monday': 'date', 'Quiet Date': 'date', 'Day Date': 'date',
-          'Report Date': 'date', 'Pie Angle': 'integer', 'Pie Size': 'integer'}
+          'Report Date': 'date', 'Pie Angle': 'integer', 'Pie Size': 'real',
+          # IFNULL() takes the type of its arguments; the writer cannot infer it, so these are named here
+          'Org L0 Text': 'string', 'Org L1 Text': 'string', 'Org L2 Text': 'string', 'Pick B0 Default': 'string',
+          'Pick B1 Default': 'string', 'Open Node': 'string', 'Focus Target': 'string'}
 ROLES = {'Cal DOW': ('dimension', 'ordinal'), 'Cal Week': ('dimension', 'ordinal'), 'Seg Key': ('dimension', 'ordinal'),
          'Worker Key': ('dimension', 'ordinal'), 'Sig Order': ('dimension', 'ordinal'), 'Pick Rank': ('dimension', 'ordinal')}

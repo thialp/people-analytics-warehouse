@@ -66,7 +66,7 @@ for k, v in all_calcs():
     m.add(k, v, dtype=DTYPES.get(k), role=ROLES.get(k))
 
 SHEETS, ACTIONS = {}, {}
-SIZE = {'seg': '4.4', 'seg3': '3.4', 'button': '2', 'dot': '1.3', 'brand': '2.2', 'pie': '6'}
+SIZE = {'seg': '6.2', 'segs': '5.3', 'seg3': '4.5', 'button': '2', 'dot': '1.3', 'brand': '2.2', 'pie': '6'}
 
 
 def action_id(caption):
@@ -108,7 +108,21 @@ def no_field_labels(s, scope):
 
 
 def tip(n):
-    return '{' + n + ('' if m.level(n) in ('agg', 'tc') else '|attr') + '}'
+    return '{' + n + ('' if n in m.calcs and m.level(n) in ('agg', 'tc') else '|attr') + '}'
+
+
+_pane = Sheet.pane
+
+
+def _pane_attr_tips(self, mark, tooltip=None, **kw):
+    """a row-level field only on the Tooltip shelf must be an aggregate: {Field} becomes {Field|attr}"""
+    if tooltip:
+        fix = lambda t: re.sub(r'\{([^{}|]+)\}', lambda mm: tip(mm.group(1)), t)
+        tooltip = [[(fix(t), f, z, c) for t, f, z, c in line] for line in tooltip]
+    return _pane(self, mark, tooltip=tooltip, **kw)
+
+
+Sheet.pane = _pane_attr_tips
 
 
 # ===================================================================================================== sheets, per theme
@@ -184,11 +198,11 @@ def page(th):
               'Count employees, contingent workers, or both')
     seg_sheet('Count Toggle', 'Seg Row', 'Seg Key', 'Count Shape', ['Count Option'], SIZE['seg'],
               'Everyone in the organization, or only those at work on the chosen day')
-    seg_sheet('Tree Toggle', 'Seg Row', 'Seg Key', 'Tree Shape', ['tree_mode'], SIZE['seg'],
+    seg_sheet('Tree Toggle', 'Seg Row', 'Seg Key', 'Tree Shape', ['tree_mode'], SIZE['segs'],
               'Dynamic: one level at a time · Static: three levels at once')
-    seg_sheet('Tree Toggle Wide', 'Seg Row', 'Seg Key', 'Tree Shape', ['tree_mode'], SIZE['seg'],
+    seg_sheet('Tree Toggle Wide', 'Seg Row', 'Seg Key', 'Tree Shape', ['tree_mode'], SIZE['segs'],
               'Dynamic: one level at a time · Static: three levels at once')
-    seg_sheet('Theme Toggle', 'Seg Row', 'Seg Key', 'Theme Shape', ['Theme Is Dark', 'Close Panel'], SIZE['seg'], 'Light or dark page')
+    seg_sheet('Theme Toggle', 'Seg Row', 'Seg Key', 'Theme Shape', ['Theme Is Dark', 'Close Panel'], SIZE['segs'], 'Light or dark page')
 
     s = sh('Cal Field')
     s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ('Toggle Cal', 'Close Panel')], valign='top',
@@ -236,7 +250,7 @@ def page(th):
                          "<format attr='tick-color' value='#00000000' />"]
         s.pane('Automatic', pane_id=2, enc=[])
         s.pane('Line', pane_id=3, y_axis=yl, size='0.6', transparency='255',
-               enc=ZZ + [('path', 'point_index', 'ord'), ('lod', 'node_id', 'dim'), ('color', 'Link Kind', 'dim')]
+               enc=ZZ + [('path', 'point_index', 'ord'), ('lod', 'node_id', 'dim'), ('lod', 'mark_type', 'dim'), ('color', 'Link Kind', 'dim')]
                + [('lod', n, 'dim') for n in ACT], tooltip=TIP)
         s.pane('Pie', pane_id=4, y_axis=yn, size=SIZE['pie'], transparency='255', stroke='false', align='center', valign='bottom',
                enc=ZZ + [('lod', 'node_id', 'dim'), ('color', 'Pie Color', 'dim'), ('size', 'Pie Size', 'min'), ('wedge-size', 'Pie Angle', 'sum')]
@@ -257,7 +271,7 @@ def page(th):
         no_field_labels(s, 'rows')
         s.cell_size = (None, 46, o)
         s.pane('Text', enc=ZZ + [('lod', 'signal_code', 'dim')], valign='center', align='left',
-               label=[[('{signal_name}', 'book', 9.5, ink), ('   ', 'book', 9.5, ink), ('{Sig Count Txt}', 'bold', 9.5, ink)],
+               label=[[('{Sig Count Txt}', 'bold', 9.5, ink), ('   {signal_name}', 'book', 9.5, ink)],
                       [('{Sig Bar}', 'book', 7, gp), ('{Sig Track}', 'book', 7, P['chip'])]],
                tooltip=[[('{signal_name}', 'bold', 10, ink), ('  ·  {Sig Count Txt} {Worker Words}', 'book', 10, gp)],
                         [('{Sig Rule}', 'book', 9, ink)], [('Good partner to ask: ', 'book', 9, mu), ('{Sig Partner}', 'semi', 9, ink)]])
@@ -270,12 +284,15 @@ def page(th):
         s.rows = f'({rk} / {li})'
         s.hide_labels += [rk, li]
         no_field_labels(s, 'rows')
-        s.cell_size = (None, 38, li)
+        s.cell_size = (None, 30, li)
+        tx = s.f('Tick X', 'agg')
+        s.cols = tx
+        hide_axis(s, tx, 0, 10)
         acts = {'Pick L0': ['leader_id', 'Empty Text'], 'Pick L1': ['leader_id', 'Empty Text'], 'Pick L2': ['leader_id', 'Empty Text', 'Close Panel']}[col]
         s.pane('Shape', enc=ZZ + [('shape', 'Pick Shape', 'dim')] + [('lod', n, how(n)) for n in acts], size=SIZE['dot'],
-               transparency='255', stroke='false', align='left',
-               label=[[('{leader_name}', 'semi', 9.5, ink)], [('{Pick Sub}', 'book', 8, mu)]],
-               tooltip=[[('{leader_name}', 'bold', 10, ink), ('  {leader_level}', 'semi', 9, ac)], [('{job_title}', 'book', 9, mu)],
+               transparency='255', stroke='false', align='right',
+               label=[[('{leader_name}', 'semi', 9.5, ink), ('   {Pick People}', 'book', 8.5, mu)]],
+               tooltip=[[('{leader_name}', 'bold', 10, ink), ('  {leader_level}', 'semi', 9, ac)], [('{Pick Sub}', 'book', 9, mu)],
                         [('Click to open their organization' + ('' if col == 'Pick L2' else ' and see the leaders below'), 'semi', 9, ac)]],
                extra_mark_fmt="<format attr='mark-labels-mode' value='all' />")
     text_sheet('Pick Head L1', [[('{Pick Head L1}', 'semi', 7.5, mu)]])
@@ -283,7 +300,7 @@ def page(th):
 
     # ---------------------------------------------------------------- the calendar
     text_sheet('Cal Title', [[('{Cal Title}', 'semi', 12, ink)],
-                             [('People at work each day after approved time off, leave and public holidays · pick a day', 'book', 8.5, mu)]])
+                             [('At work each day after time off, leave and public holidays · click a day', 'book', 8.5, mu)]])
     s = sh('Calendar')
     s.filter_member('Cal Row', 'true')
     wk, dw = s.f('Cal Week', 'ord'), s.f('Cal DOW', 'ord')
@@ -291,7 +308,7 @@ def page(th):
     s.hide_labels += [wk, dw]
     no_field_labels(s, 'rows'); no_field_labels(s, 'cols')
     s.pane('Square', enc=ZZ + [('color', 'Cal Kind', 'dim'), ('lod', 'day_offset', 'ord'), ('lod', 'Close Panel', 'dim')],
-           size='3', transparency='255', stroke='false', align='center', valign='center',
+           size='4.2', transparency='255', stroke='false', align='center', valign='center',
            label=[[('{Cal Day Label}', 'book', 7.5, mu)], [('{Cal Value}', 'bold', 9.5, ink)], [('{Cal Off}', 'book', 7.5, mu)]],
            tooltip=[[('{Cal Tip}', 'bold', 10, ink)], [('{Cal Value}', 'semi', 9, ac), (' at work of ', 'book', 9, ink), ('{people|sum}', 'semi', 9, ink)],
                     [('Off: ', 'book', 9, mu), ('{off_time_off|sum}', 'semi', 9, ink), (' time off · ', 'book', 9, mu), ('{off_leave|sum}', 'semi', 9, ink),
@@ -311,8 +328,8 @@ def bucket_map(field, kind, mapping):
 
 
 enc_rules, styled = [], []
-for n, keys in (('Pie Color', ('gap', 'focus', 'open', 'node')), ('Link Kind', ('sel', 'link')), ('Cal Kind', ('we', 'sel', 'high', 'low'))):
-    colours = {'gap': 'gap', 'focus': 'focus', 'open': 'open', 'node': 'node', 'sel': 'linksel', 'link': 'link',
+for n, keys in (('Pie Color', ('gap', 'focus', 'open', 'node', 'none')), ('Link Kind', ('sel', 'link')), ('Cal Kind', ('we', 'sel', 'high', 'low'))):
+    colours = {'none': 'surface', 'gap': 'gap', 'focus': 'focus', 'open': 'open', 'node': 'node', 'sel': 'linksel', 'link': 'link',
                'we': 'calwe', 'high': 'calhigh', 'low': 'callow'}
     mp = []
     for th in ('l', 'd'):
@@ -425,9 +442,9 @@ def layout(th, S):
     pg.image(BRAND + P['logo'], 16, 20, 150, 41)
     pg.box(14, 76, 188, 1, P['line'])
     pg.text(14, 86, 196, 48, [('Who Leads Where', ink, 15, 'Bold'), ('\n', 0, 0, 0), ('Leadership scope & org design', mu, 9, 'Book')])
-    pg.box(14, 140, 188, 46, P['soft'], radius=9)
-    pg.text(22, 145, 176, 38, [('People Analytics · full company', ac, 8.5, 'Semibold'), ('\n', 0, 0, 0),
-                               ('Leaders see only their own organization', mu, 8, 'Book')])
+    pg.box(14, 138, 188, 52, P['soft'], radius=9)
+    pg.text(20, 142, 180, 46, [('People Analytics · full company', ac, 8, 'Semibold'), ('\n', 0, 0, 0),
+                               ('Leaders see only their own branch', mu, 8, 'Book')])
     for lab, y in (('ORGANIZATION', 200), ('COUNT', 312), ('SHOW', 372), ('AT WORK ON', 432)):
         pg.text(14, y, 190, 16, [(lab, mu, 7.5, 'Semibold')])
     pg.box(14, 218, 188, 80, P['surface'], P['line'], 10)
