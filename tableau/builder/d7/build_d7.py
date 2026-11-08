@@ -253,7 +253,7 @@ def page(th):
                enc=ZZ + [('path', 'point_index', 'ord'), ('lod', 'node_id', 'dim'), ('lod', 'mark_type', 'dim'), ('color', 'Link Kind', 'dim')]
                + [('lod', n, 'dim') for n in ACT], tooltip=TIP)
         s.pane('Pie', pane_id=4, y_axis=yn, size=SIZE['pie'], transparency='255', stroke='false', align='center', valign='bottom',
-               enc=ZZ + [('lod', 'node_id', 'dim'), ('color', 'Pie Color', 'dim'), ('size', 'Pie Size', 'min'), ('wedge-size', 'Pie Angle', 'sum')]
+               enc=ZZ + [('lod', 'Wedge Order', 'ord'), ('lod', 'node_id', 'dim'), ('color', 'Pie Color', 'dim'), ('size', 'Pie Size', 'min'), ('wedge-size', 'Pie Angle', 'sum')]
                + [('lod', n, 'dim') for n in ACT],
                label=[[('{Node Label Name}', 'semi', 8.5, ink)], [('{Node Label Count}', 'book', 8, mu)]], tooltip=TIP,
                extra_mark_fmt="<format attr='mark-labels-mode' value='all' />")

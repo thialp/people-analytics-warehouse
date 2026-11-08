@@ -157,12 +157,17 @@ def all_calcs():
     a('N Shown', 'IF [p_Count] = "At work" AND [Day Weekend] = 0 THEN [N At Work] ELSE [N People] END')
     a('N Shown Txt', comma('[N Shown]') + ' + IF [p_Count] = "At work" AND [Day Weekend] = 0 THEN " at work" ELSE "" END')
     a('Y Link', 'IF [mark_type] = "Link" THEN -[y] END')
-    a('Y Node', 'IF [mark_type] = "Node" OR [point_index] = 16 THEN -[y] END')
-    a('Pie Angle', 'IF [mark_type] = "Node" THEN [N People] - [N Gaps] ELSEIF [point_index] = 16 THEN [N Gaps] END')
+    # Each pie is three wedges: half the gap slice (a link's point 15), the people without a gap (the Node row), and the
+    # other half (point 16). Tableau labels a wedge at its middle angle, so splitting the gap around 12 o'clock centers
+    # the big wedge, and its name label, on 6 o'clock: straight below the circle.
+    a('Node Y', '{FIXED [tree_mode], [focus_leader_id], [node_id] : MIN(IF [mark_type] = "Node" THEN [y] END)}')
+    a('Y Node', 'IF [mark_type] = "Node" OR [point_index] = 16 THEN -[y] ELSEIF [point_index] = 15 THEN -[Node Y] END')
+    a('Wedge Order', 'IF [mark_type] = "Node" THEN 2 ELSEIF [point_index] = 15 THEN 1 ELSE 3 END')
+    a('Pie Angle', 'IF [mark_type] = "Node" THEN [N People] - [N Gaps] ELSEIF [point_index] >= 15 THEN [N Gaps] / 2 END')
     a('Pie Size', 'IF [tree_mode] = "Static" AND [tier] = 3 THEN 1 ELSEIF [tree_mode] = "Static" AND [tier] = 2 THEN [N People] * 0.35 '
       'ELSE [N People] END')
     a('Row Count', 'IIF(ISNULL([row_type]), 1, 1)')
-    a('Pie Color', '(IF [mark_type] <> "Node" AND [point_index] <> 16 THEN "none" ELSEIF [mark_type] <> "Node" THEN "gap" ELSEIF [tier] = 0 THEN "focus" '
+    a('Pie Color', '(IF [mark_type] <> "Node" AND [point_index] < 15 THEN "none" ELSEIF [mark_type] <> "Node" THEN "gap" ELSEIF [tier] = 0 THEN "focus" '
       'ELSEIF [tree_mode] = "Dynamic" AND [node_id] = [Open Node] THEN "open" ELSE "node" END) + [Theme Key]')
     a('Link Kind', '(IF [tree_mode] = "Dynamic" AND ([node_id] = [Open Node] OR [tier] = 2) THEN "sel" ELSE "link" END) + [Theme Key]')
     a('Node Label Name', 'IF [mark_type] <> "Node" OR ([tree_mode] = "Static" AND [tier] >= 2) THEN "" '
@@ -272,9 +277,9 @@ def all_calcs():
 DTYPES = {'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Worker Key': 'integer', 'Sig Order': 'integer',
           'Pick Rank': 'integer', 'Day Weekend': 'integer', 'Sig Bar Len': 'integer', 'Cal Pos': 'integer', 'F Depth': 'integer',
           'F Child Leaders': 'integer', 'F R1': 'integer', 'Report Monday': 'date', 'Quiet Date': 'date', 'Day Date': 'date',
-          'Report Date': 'date', 'Pie Angle': 'integer', 'Pie Size': 'real',
+          'Report Date': 'date', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Pie Size': 'real',
           # IFNULL() takes the type of its arguments; the writer cannot infer it, so these are named here
           'Org L0 Text': 'string', 'Org L1 Text': 'string', 'Org L2 Text': 'string', 'Pick B0 Default': 'string',
           'Pick B1 Default': 'string', 'Open Node': 'string', 'Focus Target': 'string', 'Seg Mode': 'string'}
 ROLES = {'Cal DOW': ('dimension', 'ordinal'), 'Cal Week': ('dimension', 'ordinal'), 'Seg Key': ('dimension', 'ordinal'),
-         'Worker Key': ('dimension', 'ordinal'), 'Sig Order': ('dimension', 'ordinal'), 'Pick Rank': ('dimension', 'ordinal')}
+         'Worker Key': ('dimension', 'ordinal'), 'Sig Order': ('dimension', 'ordinal'), 'Pick Rank': ('dimension', 'ordinal'), 'Wedge Order': ('dimension', 'ordinal')}
