@@ -17,11 +17,11 @@ def pct1(num, den):
 
 
 def focus(field, wt='[p_Worker]', agg='MAX'):
-    return f'{{FIXED : {agg}(IF [row_type] = "Node" AND [leader_id] = [p_Focus] AND [worker_type] = {wt} THEN [{field}] END)}}'
+    return f'{{FIXED : {agg}(IF [row_type] = "Node" AND [leader_id] = [Focus ID] AND [worker_type] = {wt} THEN [{field}] END)}}'
 
 
 def focus_day(field):
-    return (f'{{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] '
+    return (f'{{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] '
             f'AND [day_offset] = [p_Day] THEN [{field}] END)}}')
 
 
@@ -65,6 +65,9 @@ def all_calcs():
     a('Empty Text', '""')
     a('Dynamic Text', '"Dynamic"')
     a('Theme Key', 'IF [p_Dark] THEN "_d" ELSE "_l" END')
+    # the leader on the page is the last id on p_Path, so a click sets ONE parameter: Tableau refreshes every sheet once
+    # per parameter that changes, so a second parameter (the old p_Focus) doubled the time of every click
+    a('Focus ID', 'REGEXP_EXTRACT([p_Path], "([^|]+)[|]$")')
     a('Show Light', 'NOT [p_Dark]')
     a('Show Dark', '[p_Dark]')
     for th, cond in (('Light', 'NOT [p_Dark]'), ('Dark', '[p_Dark]')):
@@ -140,12 +143,12 @@ def all_calcs():
     # the rail's organization box: one row per level from the CEO down to the focus, the focus highlighted
     a('Lvl', 'CASE [depth_from_top] WHEN 0 THEN "CEO" WHEN 1 THEN "EXEC" ELSE "L" + STR([depth_from_top] - 1) END')
     a('Path Row', '[row_type] = "Node" AND [worker_type] = "All" AND CONTAINS([p_Path], "|" + [leader_id] + "|")')
-    a('Is Focus Row', '[leader_id] = [p_Focus]')
+    a('Is Focus Row', '[leader_id] = [Focus ID]')
     a('Name Focus', 'IF [Is Focus Row] THEN [leader_name] ELSE "" END')
     a('Name Other', 'IF [Is Focus Row] THEN "" ELSE [leader_name] END')
     # the rail's organization box: the CEO down to the focus by name, then every level below the focus with its number of leaders
     a('Org Row', '[row_type] = "Node" AND [worker_type] = "All" AND (CONTAINS([p_Path], "|" + [leader_id] + "|") '
-      'OR CONTAINS([path], "|" + [p_Focus] + "|"))')
+      'OR CONTAINS([path], "|" + [Focus ID] + "|"))')
     a('Org Row Focus', 'IF MIN([depth_from_top]) = MIN([F Depth]) THEN "   " + MAX([leader_name]) ELSE "" END')
     a('Org Row Count', 'COUNTD([leader_id])')
     a('Org Sub', comma('[F Directs Shown]') + ' + IIF([F Directs Shown] = 1, " direct", " directs") + " · click to open any leader"')
@@ -173,16 +176,16 @@ def all_calcs():
     # the top, every level's leaders, and the focus's own team. Nothing in the layout moves, so Tableau animates a click.
     # Four rows at most: two levels above the focus, the focus's row and their team; a link shows only when its upper
     # circle is on the page too, except its points 15 and 16 (the gap halves of the circle's pie, under the circle).
-    # p_Path holds the focus's path and is set by the same click as p_Focus, so these are plain row tests: inside the
+    # p_Path holds the focus's path (Focus ID is its last id), so these are plain row tests: inside the
     # context filter, a FIXED lookup of the path would run again inside every FIXED read of the tree
     a('On Path', 'CONTAINS([p_Path], "|" + [node_id] + "|")')
     a('Parent On Path', 'ISNULL([parent_node_id]) OR CONTAINS([p_Path], "|" + [parent_node_id] + "|")')
     # the path a tree click sets: the clicked leader's, or in Static, the focus circle's manager's (it goes up one)
     a('Path Target', 'IF [tree_mode] = "Static" AND [tier] = 0 AND NOT ISNULL([N Parent]) '
       'THEN LEFT([path], LEN([path]) - LEN([node_id]) - 1) ELSE [path] END')
-    a('In Team', 'IFNULL([parent_node_id] = [p_Focus], FALSE)')
+    a('In Team', 'IFNULL([parent_node_id] = [Focus ID], FALSE)')
     a('In Tree View', '[row_type] = "Tree" AND [tree_mode] = [p_Tree] AND ('
-      '([tree_mode] = "Static" AND [focus_leader_id] = [p_Focus]) '
+      '([tree_mode] = "Static" AND [focus_leader_id] = [Focus ID]) '
       'OR ([tree_mode] = "Dynamic" AND [Parent On Path] AND [tier] >= [F Depth] - 2 + IIF([mark_type] = "Link" AND [point_index] < 15, 1, 0)))')
     for n, f in (('N People', 'people'), ('N Gaps', 'gap_people'), ('N Directs', 'directs'), ('N Indirects', 'indirects'),
                  ('N Countries', 'countries')):
@@ -208,18 +211,18 @@ def all_calcs():
       'ELSEIF [tree_mode] = "Dynamic" AND NOT [On Path] AND NOT [In Team] THEN [N People] * 0.35 ELSE [N People] END')
     a('Row Count', 'IIF(ISNULL([row_type]), 1, 1)')
     a('Pie Color', '(IF [mark_type] <> "Node" AND [point_index] < 15 THEN "none" ELSEIF [mark_type] <> "Node" THEN "gap" '
-      'ELSEIF [node_id] = [p_Focus] THEN "focus" ELSEIF [tree_mode] = "Dynamic" AND [On Path] THEN "open" ELSE "node" END) + [Theme Key]')
+      'ELSEIF [node_id] = [Focus ID] THEN "focus" ELSEIF [tree_mode] = "Dynamic" AND [On Path] THEN "open" ELSE "node" END) + [Theme Key]')
     a('Link Kind', '(IF [tree_mode] = "Dynamic" AND ([On Path] OR [In Team]) THEN "sel" ELSE "link" END) + [Theme Key]')
     # labels: the path and the focus's team in Dynamic (the other leaders of each level stay small and quiet: hover names
     # them); tiers 0 and 1 in Static
     a('Show Label', '[mark_type] = "Node" AND IIF([tree_mode] = "Static", [tier] < 2, [On Path] OR [In Team])')
     # a team of more than four is one unit apart: every other label drops two lines, so neighbors never collide
     a('Label Drop', 'IF [tree_mode] = "Dynamic" AND [In Team] AND [slots] > 4 AND [slot] % 2 = 1 THEN CHAR(10) + CHAR(10) ELSE "" END')
-    a('Node Label Name', 'IF NOT [Show Label] THEN "" ELSEIF [node_id] = [p_Focus] THEN [leader_name] '
+    a('Node Label Name', 'IF NOT [Show Label] THEN "" ELSEIF [node_id] = [Focus ID] THEN [leader_name] '
       'ELSE [Label Drop] + SPLIT([leader_name], " ", -1) END')
     a('Node Label Count', 'IF NOT [Show Label] THEN "" ELSE [N Shown Txt] END')
     a('Focus Target', 'IF [tree_mode] = "Static" AND [tier] = 0 THEN IFNULL([N Parent], [node_id]) ELSE [node_id] END')
-    a('Tip Action', 'IF [node_id] = [p_Focus] THEN (IF ISNULL([N Parent]) THEN "The top of Arcadia" '
+    a('Tip Action', 'IF [node_id] = [Focus ID] THEN (IF ISNULL([N Parent]) THEN "The top of Arcadia" '
       'ELSEIF [tree_mode] = "Static" THEN "Click to go up to " + [N Parent Name] ELSE "Open now: click anyone above to go back up" END) '
       'ELSEIF [tree_mode] = "Dynamic" AND [On Path] THEN "Click to go back up to " + [leader_name] '
       'ELSE "Click to open their organization" END')
@@ -233,7 +236,7 @@ def all_calcs():
     # ------------------------------------------------------------------ toggles
     # the Count, Tree and Theme toggles draw two segments from the focus leader's All and Employees rows (Node rows sit in
     # every sheet's context), so Seg Mode stands in for a two-value field
-    a('Seg Row', '[row_type] = "Node" AND [leader_id] = [p_Focus] AND ([worker_type] = "All" OR [worker_type] = "Employees")')
+    a('Seg Row', '[row_type] = "Node" AND [leader_id] = [Focus ID] AND ([worker_type] = "All" OR [worker_type] = "Employees")')
     a('Seg Mode', 'IF [worker_type] = "All" THEN "Dynamic" ELSE "Static" END')
     a('Seg Key', 'IF [Seg Mode] = "Dynamic" THEN 1 ELSE 2 END')
     a('Count Option', 'IF [Seg Mode] = "Dynamic" THEN "Everyone" ELSE "At work" END')
@@ -243,10 +246,10 @@ def all_calcs():
     a('Theme Is Dark', '[Seg Mode] = "Static"')
     a('Theme Shape', '"d7_theme_" + (IF [Seg Mode] = "Dynamic" THEN "light" ELSE "dark" END) + "_" '
       '+ (IF [Theme Is Dark] = [p_Dark] THEN "on" ELSE "off" END) + [Theme Key]')
-    a('Worker Row', '[row_type] = "Node" AND [leader_id] = [p_Focus]')
+    a('Worker Row', '[row_type] = "Node" AND [leader_id] = [Focus ID]')
     a('Worker Key', 'CASE [worker_type] WHEN "All" THEN 1 WHEN "Employees" THEN 2 ELSE 3 END')
     a('Worker Shape', '"d7_worker_" + LOWER([worker_type]) + "_" + (IF [worker_type] = [p_Worker] THEN "on" ELSE "off" END) + [Theme Key]')
-    a('Focus Row', '[row_type] = "Node" AND [leader_id] = [p_Focus] AND [worker_type] = "All"')
+    a('Focus Row', '[row_type] = "Node" AND [leader_id] = [Focus ID] AND [worker_type] = "All"')
     a('Zoom Shape', '(IF [p_Zoom] THEN "d7_collapse" ELSE "d7_expand" END) + [Theme Key]')
     a('Info Shape', '"d7_info" + [Theme Key]')
     a('Close Shape', '"d7_close" + [Theme Key]')
@@ -274,7 +277,7 @@ def all_calcs():
     a('Tick X', 'MIN(0.5)')
     a('Pick People', comma('[people]'))
     # ------------------------------------------------------------------ the calendar
-    a('Cal Row', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
+    a('Cal Row', '[row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker]')
     a('Report Monday', 'DATEADD("day", 1 - DATEPART("iso-weekday", [Report Date]), [Report Date])')
     a('Cal DOW', 'DATEPART("iso-weekday", [day])')
     a('Cal Week', 'DIV(DATEDIFF("day", [Report Monday], [day]), 7)')
@@ -285,8 +288,8 @@ def all_calcs():
     a('Cal Value', 'IF [is_weekend] THEN "Weekend" ELSE ' + comma('[at_work]').replace('IF ISNULL', '(IF ISNULL', 1) + ') END')
     a('Cal Off', 'IF [is_weekend] THEN "" ELSE ' + comma('[off]').replace('IF ISNULL', '(IF ISNULL', 1) + ') + " off" END')
     a('Cal Tip', 'LEFT(DATENAME("weekday", [day]), 3) + ", " + LEFT(DATENAME("month", [day]), 3) + " " + STR(DAY([day]))')
-    a('Quiet At Work', '{FIXED : MIN(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND NOT [is_weekend] THEN [at_work] END)}')
-    a('Quiet Date', '{FIXED : MIN(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND NOT [is_weekend] '
+    a('Quiet At Work', '{FIXED : MIN(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND NOT [is_weekend] THEN [at_work] END)}')
+    a('Quiet Date', '{FIXED : MIN(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND NOT [is_weekend] '
       'AND [at_work] = [Quiet At Work] THEN [day] END)}')
     a('Quiet Text', '"The quietest weekday is " + LEFT(DATENAME("weekday", [Quiet Date]), 3) + ", " + LEFT(DATENAME("month", [Quiet Date]), 3) '
       '+ " " + STR(DAY([Quiet Date])) + ": " + ' + comma('[Quiet At Work]') + ' + " at work."')
@@ -298,7 +301,7 @@ def all_calcs():
     # ------------------------------------------------------------------ the alignment panel
     a('Sig Scaffold', '([row_type] = "Signal" OR [row_type] = "R1") AND [leader_id] = [CEO ID]')
     a('Sig Order', 'CASE [signal_code] ' + ' '.join(f'WHEN "{s[0]}" THEN {i}' for i, s in enumerate(SIGNALS, 1)) + ' END')
-    a('Sig Count', '{FIXED [signal_code] : COUNTD(IF ([row_type] = "Signal" OR [row_type] = "R1") AND [leader_id] = [p_Focus] '
+    a('Sig Count', '{FIXED [signal_code] : COUNTD(IF ([row_type] = "Signal" OR [row_type] = "R1") AND [leader_id] = [Focus ID] '
       'AND [WT Match] THEN [person_id] END)}')
     a('Sig Max', '{FIXED : MAX([Sig Count])}')
     a('Sig Bar Len', 'IF [Sig Max] > 0 AND [Sig Count] > 0 THEN MAX(1, INT(ROUND(30 * [Sig Count] / [Sig Max], 0))) ELSE 0 END')
@@ -317,9 +320,9 @@ def all_calcs():
     # A context filter runs before every FIXED expression, so the page's many FIXED reads scan a small slice of the
     # 580,222 rows instead of all of them.
     a('Ctx Leaders', '[row_type] = "Node" OR [row_type] = "Signal" OR [row_type] = "R1"')
-    a('Ctx Days', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
+    a('Ctx Days', '[row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker]')
     # the company tree enters the context only where its manager is on the focus's path: a few hundred rows of 63,091
-    a('Ctx Tree', '([row_type] = "Tree" AND [tree_mode] = [p_Tree] AND IIF([tree_mode] = "Dynamic", [Parent On Path], [focus_leader_id] = [p_Focus])) '
+    a('Ctx Tree', '([row_type] = "Tree" AND [tree_mode] = [p_Tree] AND IIF([tree_mode] = "Dynamic", [Parent On Path], [focus_leader_id] = [Focus ID])) '
       'OR ([row_type] = "Node" AND ([worker_type] = [p_Worker] OR [worker_type] = "All")) '
       'OR ([row_type] = "Day" AND [worker_type] = [p_Worker] AND [day_offset] = [p_Day])')
     # ------------------------------------------------------------------ the Team pulse card (Pulse rows; the coverage floor)
@@ -327,7 +330,7 @@ def all_calcs():
     a('Floor', '0.85')
     a('Floor Txt', '"85%"')
     def pm(field, n, wt='[p_Worker]'):
-        return (f'{{FIXED : MAX(IF [row_type] = "Pulse" AND [leader_id] = [p_Focus] AND [worker_type] = {wt} '
+        return (f'{{FIXED : MAX(IF [row_type] = "Pulse" AND [leader_id] = [Focus ID] AND [worker_type] = {wt} '
                 f'AND [month_index] = {n} THEN [{field}] END)}}')
     for nm, f in (('P People', 'people'), ('P Gaps', 'gap_people'), ('P Hub', 'hub_people')):
         a(nm + ' Now', pm(f, 12)); a(nm + ' Ago', pm(f, 0))
@@ -345,8 +348,8 @@ def all_calcs():
         a(name + ' Bad', f'IF ISNULL({val}) THEN "" ELSEIF {good} THEN "" ELSE {txt} END')
     sign = lambda x: f'(IF {x} > 0 THEN "+" ELSEIF {x} < 0 THEN "−" ELSE "" END)'
     # the hero: coverage today against the floor, the week ahead, the day to plan for
-    a('Cov Today At Work', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 0 THEN [at_work] END)}')
-    a('Cov Today People', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 0 THEN [people] END)}')
+    a('Cov Today At Work', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND [day_offset] = 0 THEN [at_work] END)}')
+    a('Cov Today People', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND [day_offset] = 0 THEN [people] END)}')
     a('Cov Today', 'IF [Cov Today People] > 0 THEN [Cov Today At Work] / [Cov Today People] END')
     a('Cov Today Txt', 'IF ISNULL([Cov Today]) THEN "–" ELSE STR(ROUND(100 * [Cov Today], 0)) + "%" END')
     a('Cov State Good', 'IF [Cov Today] >= [Floor] THEN "Above the " + [Floor Txt] + " floor" ELSE "" END')
@@ -354,7 +357,7 @@ def all_calcs():
     a('Cov Value Good', 'IF [Cov Today] >= [Floor] THEN [Cov Today Txt] ELSE "" END')
     a('Cov Value Bad', 'IF [Cov Today] < [Floor] THEN [Cov Today Txt] ELSE "" END')
     a('Cov Sub', '"    " + ' + comma('[Cov Today At Work]') + ' + " of " + ' + comma('[Cov Today People]') + ' + " at work"')
-    a('Week Row', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] <= 6 AND NOT [is_weekend] AND [people] > 0')
+    a('Week Row', '[row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND [day_offset] <= 6 AND NOT [is_weekend] AND [people] > 0')
     a('Cov Day', '[at_work] / [people]')
     a('Cov Kind', '(IF [at_work] < [Floor] * [people] THEN "low" ELSEIF [day_offset] = 0 THEN "today" ELSE "ok" END) + [Theme Key]')
     a('Cov Day Label', 'LEFT(DATENAME("weekday", [day]), 3)')
@@ -375,12 +378,12 @@ def all_calcs():
     a('Growth Pct', 'IF [P People Ago] > 0 THEN [Growth] / [P People Ago] END')
     a('Growth Txt', sign('[Growth]') + ' + ' + comma('ABS([Growth])'))
     chip('Growth Chip', '[Growth]', sign('[Growth]') + ' + STR(ROUND(ABS(100 * [Growth Pct]), 1)) + "%"')
-    a('Renew 30', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 30 THEN [left_team] END)}')
-    a('Renew 7', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 7 THEN [left_team] END)}')
+    a('Renew 30', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND [day_offset] = 30 THEN [left_team] END)}')
+    a('Renew 7', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND [day_offset] = 7 THEN [left_team] END)}')
     a('Renew Txt', comma('[Renew 30]'))
     a('Renew Chip', '""')
     a('Renew Note', '(IF [p_Worker] = "Employees" THEN "departures · " ELSE "contingent · " END) + ' + comma('[Renew 7]') + ' + " this week"')
-    a('Renew Row', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
+    a('Renew Row', '[row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker]')
     a('Mix Now', 'IF [P All Now] > 0 THEN [P CW Now] / [P All Now] END')
     a('Mix Ago', 'IF [P All Ago] > 0 THEN [P CW Ago] / [P All Ago] END')
     a('Mix Txt', 'STR(ROUND(100 * [Mix Now], 0)) + "%"')
@@ -404,15 +407,15 @@ def all_calcs():
     a('Hub Delta', 'ROUND(100 * ([Hub Now] - [Hub Ago]), 1)')
     chip('Hub Chip', '[Hub Delta]', sign('[Hub Delta]') + ' + STR(ABS([Hub Delta])) + " pts"')
     a('Hub Note', 'IF [F Function] = "Executive" THEN "in their function\'s hubs" ELSE "in a " + [F Function] + " hub" END')
-    a('Pulse Row', '[row_type] = "Pulse" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
+    a('Pulse Row', '[row_type] = "Pulse" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker]')
     a('Pulse Sub', '[F Name] + "\'s organization · " + [Report Short]')
     a('Bar Track', 'MIN(1.0)')
     a('Bar Zero', 'MIN(0.0)')
     a('Mix Bar', 'MIN([Mix Now])')
     a('Coach Bar', 'MIN([Coach Share])')
     a('Hub Bar', 'MIN([Hub Now])')
-    a('Ctx Pulse', '([row_type] = "Node" AND [leader_id] = [p_Focus]) OR ([row_type] = "Day" AND [leader_id] = [p_Focus] '
-      'AND [worker_type] = [p_Worker]) OR ([row_type] = "Pulse" AND [leader_id] = [p_Focus])')
+    a('Ctx Pulse', '([row_type] = "Node" AND [leader_id] = [Focus ID]) OR ([row_type] = "Day" AND [leader_id] = [Focus ID] '
+      'AND [worker_type] = [p_Worker]) OR ([row_type] = "Pulse" AND [leader_id] = [Focus ID])')
     a('Rail As Of', '"Synthetic data as of " + [Report Label]')
     for n, wt in (('Foot All', 'All'), ('Foot Employees', 'Employees'), ('Foot Contingent', 'Contingent')):
         a(n, '{FIXED : MAX(IF [row_type] = "Node" AND [depth_from_top] = 0 AND [worker_type] = "' + wt + '" THEN [people] END)}')
@@ -421,7 +424,7 @@ def all_calcs():
     return c
 
 
-DTYPES = {'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Worker Key': 'integer', 'Sig Order': 'integer',
+DTYPES = {'Focus ID': 'string', 'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Worker Key': 'integer', 'Sig Order': 'integer',
           'Pick Rank': 'integer', 'Day Weekend': 'integer', 'Sig Bar Len': 'integer', 'Cal Pos': 'integer', 'F Depth': 'integer',
           'F Child Leaders': 'integer', 'F R1': 'integer', 'Report Monday': 'date', 'Quiet Date': 'date', 'Day Date': 'date',
           'Report Date': 'date', 'N Depth': 'integer', 'Floor': 'real', 'P Dip Day': 'date', 'Cov Day': 'real', 'Growth': 'integer', 'Gap Change': 'integer', 'Hub Delta': 'real', 'Renew 30': 'integer', 'Renew 7': 'integer', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Node X': 'real', 'X Plot': 'real', 'Pie Size': 'real',

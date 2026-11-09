@@ -45,7 +45,6 @@ for r in re.findall(r"<metadata-record class='column'>(.*?)</metadata-record>", 
 DS = re.search(r"<datasource caption='[^']*' inline='true' name='(federated\.[a-z0-9]+)'", src).group(1)
 
 PARAMS = {
-    'p_Focus': {'dtype': 'string', 'value': 'W100001'},          # Grace Ramsey, the CEO: the page opens on the whole company
     'p_Path': {'dtype': 'string', 'value': '|W100001|'},
     'p_Tree': {'dtype': 'string', 'value': 'Dynamic'},
     'p_Worker': {'dtype': 'string', 'value': 'All'},
@@ -738,10 +737,10 @@ for S in (L, D):
           (f'Pick day{sfx}', S['Calendar'], 'p_Day', 'day_offset'),
           (f'Pick day closes{sfx}', S['Calendar'], 'p_CalOpen', 'Close Panel')]
     for k in range(7):
-        T += [(f'Pick L{k} focus{sfx}', S[f'Pick L{k}'], 'p_Focus', 'leader_id'), (f'Pick L{k} path{sfx}', S[f'Pick L{k}'], 'p_Path', 'path'),
+        T += [(f'Pick L{k} path{sfx}', S[f'Pick L{k}'], 'p_Path', 'path'),
               (f'Pick L{k} open{sfx}', S[f'Pick L{k}'], 'p_PickOpen', 'Pick Keep Open')]
     for nm in ('Tree', 'Tree Wide'):
-        T += [(f'{nm} focus{sfx}', S[nm], 'p_Focus', 'Focus Target'), (f'{nm} path{sfx}', S[nm], 'p_Path', 'Path Target'),
+        T += [(f'{nm} path{sfx}', S[nm], 'p_Path', 'Path Target'),
               (f'{nm} mode{sfx}', S[nm], 'p_Tree', 'Dynamic Text')]
     for cap, sheet, url in (('GitHub', S['Credit GitHub'], 'https://github.com/thialp'),
                             ('LinkedIn', S['Credit LinkedIn'], 'https://www.linkedin.com/in/thiagoalpoin')):
