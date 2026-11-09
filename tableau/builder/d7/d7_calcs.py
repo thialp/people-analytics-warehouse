@@ -302,6 +302,97 @@ def all_calcs():
     a('Ctx Tree', '([row_type] = "Tree" AND [tree_mode] = [p_Tree] AND IIF([tree_mode] = "Dynamic", [Parent On Path], [focus_leader_id] = [p_Focus])) '
       'OR ([row_type] = "Node" AND ([worker_type] = [p_Worker] OR [worker_type] = "All")) '
       'OR ([row_type] = "Day" AND [worker_type] = [p_Worker] AND [day_offset] = [p_Day])')
+    # ------------------------------------------------------------------ the Team pulse card (Pulse rows; the coverage floor)
+    # Each tile reads like a Tableau Pulse metric: a value, its change (teal when it is good news, gold when not), a note.
+    a('Floor', '0.85')
+    a('Floor Txt', '"85%"')
+    def pm(field, n, wt='[p_Worker]'):
+        return (f'{{FIXED : MAX(IF [row_type] = "Pulse" AND [leader_id] = [p_Focus] AND [worker_type] = {wt} '
+                f'AND [month_index] = {n} THEN [{field}] END)}}')
+    for nm, f in (('P People', 'people'), ('P Gaps', 'gap_people'), ('P Hub', 'hub_people')):
+        a(nm + ' Now', pm(f, 12)); a(nm + ' Ago', pm(f, 0))
+    a('P CW Now', pm('people', 12, '"Contingent"')); a('P All Now', pm('people', 12, '"All"'))
+    a('P CW Ago', pm('people', 0, '"Contingent"')); a('P All Ago', pm('people', 0, '"All"'))
+    for nm, f in (('P Dip Offset', 'dip_day_offset'), ('P Dip Day', 'dip_day'), ('P Dip People', 'dip_people'),
+                  ('P Dip At Work', 'dip_at_work'), ('P Dip Holiday', 'dip_holiday_name'), ('P Dip Country', 'dip_holiday_country_code'),
+                  ('P Light Name', 'lightest_team_leader_name'), ('P Light People', 'lightest_team_people'),
+                  ('P Light At Work', 'lightest_team_at_work')):
+        a(nm, pm(f, 12))
+    a('Ago Label', '"vs " + LEFT(DATENAME("month", DATEADD("year", -1, [Report Date])), 3) + " " + STR(YEAR([Report Date]) - 1)')
+    def chip(name, val, txt, good_if_up=True):
+        good = f'{val} >= 0' if good_if_up else f'{val} <= 0'
+        a(name + ' Good', f'IF ISNULL({val}) THEN "" ELSEIF {good} THEN {txt} ELSE "" END')
+        a(name + ' Bad', f'IF ISNULL({val}) THEN "" ELSEIF {good} THEN "" ELSE {txt} END')
+    sign = lambda x: f'(IF {x} > 0 THEN "+" ELSEIF {x} < 0 THEN "−" ELSE "" END)'
+    # the hero: coverage today against the floor, the week ahead, the day to plan for
+    a('Cov Today At Work', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 0 THEN [at_work] END)}')
+    a('Cov Today People', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 0 THEN [people] END)}')
+    a('Cov Today', 'IF [Cov Today People] > 0 THEN [Cov Today At Work] / [Cov Today People] END')
+    a('Cov Today Txt', 'IF ISNULL([Cov Today]) THEN "–" ELSE STR(ROUND(100 * [Cov Today], 0)) + "%" END')
+    a('Cov State Good', 'IF [Cov Today] >= [Floor] THEN "Above the " + [Floor Txt] + " floor" ELSE "" END')
+    a('Cov State Bad', 'IF [Cov Today] < [Floor] THEN "Below the " + [Floor Txt] + " floor" ELSE "" END')
+    a('Cov Value Good', 'IF [Cov Today] >= [Floor] THEN [Cov Today Txt] ELSE "" END')
+    a('Cov Value Bad', 'IF [Cov Today] < [Floor] THEN [Cov Today Txt] ELSE "" END')
+    a('Cov Sub', comma('[Cov Today At Work]') + ' + " of " + ' + comma('[Cov Today People]') + ' + " at work"')
+    a('Week Row', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] <= 6 AND NOT [is_weekend] AND [people] > 0')
+    a('Cov Day', '[at_work] / [people]')
+    a('Cov Kind', '(IF [at_work] < [Floor] * [people] THEN "low" ELSEIF [day_offset] = 0 THEN "today" ELSE "ok" END) + [Theme Key]')
+    a('Cov Day Label', 'LEFT(DATENAME("weekday", [day]), 3)')
+    a('Cov Day Pct', 'STR(ROUND(100 * [at_work] / [people], 0)) + "%"')
+    a('Floor Mark', 'MIN([Floor])')
+    a('Dip Pct', 'IF [P Dip People] > 0 THEN [P Dip At Work] / [P Dip People] END')
+    a('Dip Day Name', 'DATENAME("weekday", [P Dip Day])')
+    a('Light Pct', 'IF [P Light People] > 0 THEN [P Light At Work] / [P Light People] END')
+    a('Light Surname', 'SPLIT([P Light Name], " ", -1)')
+    a('Insight Lead', 'IF ISNULL([Dip Pct]) THEN "" ELSEIF [Dip Pct] < [Floor] THEN "Plan for " + [Dip Day Name] + ": " ELSE "The week ahead: " END')
+    a('Insight Body', 'IF ISNULL([Dip Pct]) THEN "Nobody is scheduled in the next seven days." '
+      'ELSEIF [Dip Pct] < [Floor] THEN "coverage dips to " + STR(ROUND(100 * [Dip Pct], 0)) + "%" '
+      '+ IIF(ISNULL([P Dip Holiday]), "", " for " + [P Dip Holiday] + ", " + [P Dip Country]) + "." '
+      'ELSE "every day stays above the floor; the lightest is " + [Dip Day Name] + " at " + STR(ROUND(100 * [Dip Pct], 0)) + "%." END '
+      '+ IIF(ISNULL([Light Pct]), "", " " + [Light Surname] + "\'s team is lightest, at " + STR(ROUND(100 * [Light Pct], 0)) + "%.")')
+    # the tiles
+    a('Growth', '[P People Now] - [P People Ago]')
+    a('Growth Pct', 'IF [P People Ago] > 0 THEN [Growth] / [P People Ago] END')
+    a('Growth Txt', sign('[Growth]') + ' + ' + comma('ABS([Growth])'))
+    chip('Growth Chip', '[Growth]', sign('[Growth]') + ' + STR(ROUND(ABS(100 * [Growth Pct]), 1)) + "%"')
+    a('Renew 30', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 30 THEN [left_team] END)}')
+    a('Renew 7', '{FIXED : MAX(IF [row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker] AND [day_offset] = 7 THEN [left_team] END)}')
+    a('Renew Txt', comma('[Renew 30]'))
+    a('Renew Chip', '""')
+    a('Renew Note', '(IF [p_Worker] = "Employees" THEN "departures · " ELSE "contingent · " END) + ' + comma('[Renew 7]') + ' + " this week"')
+    a('Renew Row', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
+    a('Mix Now', 'IF [P All Now] > 0 THEN [P CW Now] / [P All Now] END')
+    a('Mix Ago', 'IF [P All Ago] > 0 THEN [P CW Ago] / [P All Ago] END')
+    a('Mix Txt', 'STR(ROUND(100 * [Mix Now], 0)) + "%"')
+    a('Mix Chip', 'IF ISNULL([Mix Ago]) THEN "" ELSE ' + sign('ROUND(100 * ([Mix Now] - [Mix Ago]), 1)')
+      + ' + STR(ROUND(ABS(100 * ([Mix Now] - [Mix Ago])), 1)) + " pts" END')
+    a('Mix Note', comma('[P CW Now]') + ' + " of " + ' + comma('[P All Now]') + ' + " people"')
+    a('Gap Change', '[P Gaps Now] - [P Gaps Ago]')
+    a('Gap Change Pct', 'IF [P Gaps Ago] > 0 THEN [Gap Change] / [P Gaps Ago] END')
+    a('Gap Txt', sign('[Gap Change]') + ' + ' + comma('ABS([Gap Change])'))
+    chip('Gap Chip', '[Gap Change]', sign('[Gap Change]') + ' + STR(ROUND(ABS(100 * [Gap Change Pct]), 0)) + "%"', good_if_up=False)
+    a('Gap Trend Kind', '(IF [Gap Change] <= 0 THEN "good" ELSE "bad" END) + [Theme Key]')
+    a('F Mgr 15 All', focus('managers_15_plus', '"All"'))
+    a('F Mgr One All', focus('managers_one_direct', '"All"'))
+    a('F Managers All', focus('managers_below', '"All"'))
+    a('Coach Share', 'IF [F Managers All] > 0 THEN ([F Managers All] - [F Mgr 15 All] - [F Mgr One All]) / [F Managers All] END')
+    a('Coach Txt', 'IF ISNULL([Coach Share]) THEN "–" ELSE STR(ROUND(100 * [Coach Share], 0)) + "%" END')
+    a('Coach Note', '"managers leading 2 to 14 people"')
+    a('Hub Now', 'IF [P People Now] > 0 THEN [P Hub Now] / [P People Now] END')
+    a('Hub Ago', 'IF [P People Ago] > 0 THEN [P Hub Ago] / [P People Ago] END')
+    a('Hub Txt', 'IF ISNULL([Hub Now]) THEN "–" ELSE STR(ROUND(100 * [Hub Now], 0)) + "%" END')
+    a('Hub Delta', 'ROUND(100 * ([Hub Now] - [Hub Ago]), 1)')
+    chip('Hub Chip', '[Hub Delta]', sign('[Hub Delta]') + ' + STR(ABS([Hub Delta])) + " pts"')
+    a('Hub Note', 'IF [F Function] = "Executive" THEN "in their function\'s hubs" ELSE "in a " + [F Function] + " hub" END')
+    a('Pulse Row', '[row_type] = "Pulse" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
+    a('Pulse Sub', '[F Name] + "\'s organization · " + [Report Short]')
+    a('Bar Track', 'MIN(1.0)')
+    a('Bar Zero', 'MIN(0.0)')
+    a('Mix Bar', 'MIN([Mix Now])')
+    a('Coach Bar', 'MIN([Coach Share])')
+    a('Hub Bar', 'MIN([Hub Now])')
+    a('Ctx Pulse', '([row_type] = "Node" AND [leader_id] = [p_Focus]) OR ([row_type] = "Day" AND [leader_id] = [p_Focus] '
+      'AND [worker_type] = [p_Worker]) OR ([row_type] = "Pulse" AND [leader_id] = [p_Focus])')
     a('Rail As Of', '"Synthetic data as of " + [Report Label]')
     return c
 
@@ -309,7 +400,7 @@ def all_calcs():
 DTYPES = {'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Worker Key': 'integer', 'Sig Order': 'integer',
           'Pick Rank': 'integer', 'Day Weekend': 'integer', 'Sig Bar Len': 'integer', 'Cal Pos': 'integer', 'F Depth': 'integer',
           'F Child Leaders': 'integer', 'F R1': 'integer', 'Report Monday': 'date', 'Quiet Date': 'date', 'Day Date': 'date',
-          'Report Date': 'date', 'N Depth': 'integer', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Node X': 'real', 'X Plot': 'real', 'Pie Size': 'real',
+          'Report Date': 'date', 'N Depth': 'integer', 'Floor': 'real', 'P Dip Day': 'date', 'Cov Day': 'real', 'Growth': 'integer', 'Gap Change': 'integer', 'Hub Delta': 'real', 'Renew 30': 'integer', 'Renew 7': 'integer', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Node X': 'real', 'X Plot': 'real', 'Pie Size': 'real',
           # IFNULL() takes the type of its arguments; the writer cannot infer it, so these are named here
           'Org L0 Text': 'string', 'Org L1 Text': 'string', 'Org L2 Text': 'string', 'Pick B0 Default': 'string',
           'Pick B1 Default': 'string', 'Focus Target': 'string', 'Path Target': 'string', 'Seg Mode': 'string'}

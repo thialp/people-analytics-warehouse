@@ -29,11 +29,11 @@ BRAND = os.environ.get('D7_BRAND', '/Users/thiagoalpoin/Documents/Claude/Profess
 PAL = {
     'l': dict(bg='#F4F7F6', rail='#FFFFFF', surface='#FFFFFF', pop='#FFFFFF', line='#DFE6E3', ink='#15201D', muted='#56635F',
               accent='#1F7560', soft='#E1F2EB', gap='#A3611A', chip='#EDF2F0', node='#D3E3DD', open='#A9D3C3', focus='#7DBCA5',
-              link='#C7D3CF', linksel='#1F7560', callow='#EEF6F2', calhigh='#9ACFBC', calsel='#F6DFC0', calwe='#F4F7F6',
+              link='#C7D3CF', linksel='#1F7560', callow='#EEF6F2', calhigh='#9ACFBC', calsel='#F6DFC0', calwe='#F4F7F6', goldsoft='#E6C48E',
               logo='arcadia_logo_horizontal.png', name=''),
     'd': dict(bg='#141A19', rail='#0F1413', surface='#1A2120', pop='#1E2725', line='#2A3532', ink='#E9EFEC', muted='#9AA9A4',
               accent='#7FD1B9', soft='#1E3A33', gap='#E3B65C', chip='#202A28', node='#2C3D39', open='#36665A', focus='#4E9C86',
-              link='#33413D', linksel='#7FD1B9', callow='#1D2A27', calhigh='#2F6A5B', calsel='#5A4826', calwe='#161D1C',
+              link='#33413D', linksel='#7FD1B9', callow='#1D2A27', calhigh='#2F6A5B', calsel='#5A4826', calwe='#161D1C', goldsoft='#8C6A34',
               logo='arcadia_logo_horizontal_reverse.png', name=' (dark)'),
 }
 
@@ -269,23 +269,61 @@ def page(th):
                label=[[('{Node Label Name}', 'semi', 8.5, ink)], [('{Node Label Count}', 'book', 8, mu)]], tooltip=TIP,
                extra_mark_fmt="<format attr='mark-labels-mode' value='all' />")
 
-    # ---------------------------------------------------------------- the alignment panel
-    for key, flt, total in (('Solid', 'Is Solid', 'Solid Total'), ('Matrix', 'Is Matrix', 'Matrix Total'), ('Role', 'Is Role', 'Role Total')):
-        line = {'Solid': 'SOLID LINE', 'Matrix': 'MATRIX LINE', 'Role': 'ROLE ASSIGNMENTS'}[key]
-        text_sheet(f'Align Head {key}', [[(line, 'semi', 7.5, mu), ('   ·   ', 'book', 7.5, mu), ('{' + total + '}', 'semi', 7.5, ink)]])
-        s = sh(f'Align {key}')
-        s.filter_member('Sig Scaffold', 'true')
-        s.filter_member(flt, 'true')
-        o = s.f('Sig Order', 'ord')
-        s.rows = o
-        s.hide_labels.append(o)
-        no_field_labels(s, 'rows')
-        s.cell_size = (None, 46, o)
-        s.pane('Text', enc=ZZ + [('lod', 'signal_code', 'dim')], valign='center', align='left',
-               label=[[('{Sig Count Txt}', 'bold', 9.5, ink), ('   {signal_name}', 'book', 9.5, ink)],
-                      [('{Sig Bar}', 'book', 7, gp), ('{Sig Track}', 'book', 7, P['chip'])]],
-               tooltip=[[('{signal_name}', 'bold', 10, ink), ('  ·  {Sig Count Txt} {Worker Words}', 'book', 10, gp)],
-                        [('{Sig Rule}', 'book', 9, ink)], [('Good partner to ask: ', 'book', 9, mu), ('{Sig Partner}', 'semi', 9, ink)]])
+    # ---------------------------------------------------------------- the Team pulse card
+    good, bad, neutral = ac, gp, mu
+    text_sheet('Pulse Sub', [[('{Pulse Sub}', 'book', 8.5, mu)]])
+    text_sheet('Pulse Hero', [
+        [('TEAM COVERAGE · TODAY      ', 'semi', 7.5, mu), ('{Cov State Good}', 'semi', 8, good), ('{Cov State Bad}', 'semi', 8, bad)],
+        [('{Cov Value Good}', 'bold', 22, good), ('{Cov Value Bad}', 'bold', 22, bad), ('   ', 'book', 9, mu), ('{Cov Sub}', 'book', 9, mu)]],
+        tooltip=[[('Share of the team at work today, after time off, leave and public holidays', 'semi', 9, ink)],
+                 [('The floor (', 'book', 9, mu), ('{Floor Txt}', 'semi', 9, ink), (') is the coverage a leader plans to keep; a Tableau Pulse threshold on Tableau Cloud', 'book', 9, mu)]])
+    s = sh('Pulse Week')
+    s.filter_member('Week Row', 'true')
+    do = s.f('day_offset', 'ord')
+    s.cols = do
+    s.hide_labels.append(do)
+    no_field_labels(s, 'cols')
+    cv = s.f('Cov Day', 'sum')
+    s.rows = cv
+    hide_axis(s, cv, 0.5, 1.06, scope='rows')
+    fl = s.f('Floor Mark', 'agg')
+    s.pane('Bar', enc=ZZ + [('color', 'Cov Kind', 'dim'), ('lod', 'Floor Mark', 'agg')], size='0.55', transparency='255', stroke='false',
+           align='center', valign='top', refs=[s.refline(0, cv, fl, mu, 1, 'dashed')],
+           label=[[('{Cov Day Label}', 'semi', 8, ink)], [('{Cov Day Pct}', 'book', 8, mu)]],
+           tooltip=[[('{Cov Day Label}', 'bold', 10, ink), ('  {Cov Day Pct} at work', 'book', 10, ink)],
+                    [('{at_work|sum}', 'semi', 9, ink), (' of ', 'book', 9, mu), ('{people|sum}', 'semi', 9, ink), (' · floor ', 'book', 9, mu), ('{Floor Txt}', 'semi', 9, ink)]])
+    text_sheet('Pulse Insight', [[('{Insight Lead}', 'bold', 9, ink), ('{Insight Body}', 'book', 9, ink)]])
+    TILES = [('Growth', 'TEAM GROWTH', '{Growth Txt}', [('  {Growth Chip Good}', 'semi', 8.5, good), ('{Growth Chip Bad}', 'semi', 8.5, bad)], '{Ago Label}'),
+             ('Renew', 'RENEWALS AHEAD', '{Renew Txt}', [('  {Renew Chip}', 'semi', 8.5, neutral)], '{Renew Note}'),
+             ('Mix', 'CONTINGENT MIX', '{Mix Txt}', [('  {Mix Chip}', 'semi', 8.5, neutral)], '{Mix Note}'),
+             ('Gap', 'ALIGNMENT TREND', '{Gap Txt}', [('  {Gap Chip Good}', 'semi', 8.5, good), ('{Gap Chip Bad}', 'semi', 8.5, bad)], 'people with a gap, {Ago Label}'),
+             ('Coach', 'COACHING CAPACITY', '{Coach Txt}', [], '{Coach Note}'),
+             ('Hub', 'IN THE HUB', '{Hub Txt}', [('  {Hub Chip Good}', 'semi', 8.5, good), ('{Hub Chip Bad}', 'semi', 8.5, bad)], '{Hub Note}')]
+    for key, lab, val, chips, note in TILES:
+        text_sheet(f'Tile {key}', [[(lab, 'semi', 7.5, mu)], [(val, 'bold', 15, ink)] + chips, [(note, 'book', 7.5, mu)]])
+    for key, row, xf, yf, kind in (('Growth', 'Pulse Row', 'month_index', 'people', None), ('Gap', 'Pulse Row', 'month_index', 'gap_people', 'Gap Trend Kind'),
+                                   ('Renew', 'Renew Row', 'day_offset', 'left_team', None)):
+        s = sh(f'Spark {key}')
+        s.filter_member(row, 'true')
+        x, y = s.f(xf, 'min'), s.f(yf, 'sum')
+        s.cols, s.rows = x, y
+        s.axis_rules += [f"<encoding attr='space' class='0' domain-expand='false' field='{x}' field-type='quantitative' scope='cols' type='space' />",
+                         f"<format attr='display' class='0' field='{x}' scope='cols' value='false' />",
+                         f"<encoding attr='space' class='0' domain-expand='false' field='{y}' field-type='quantitative' scope='rows' type='space' />",
+                         f"<format attr='display' class='0' field='{y}' scope='rows' value='false' />",
+                         "<format attr='tick-color' value='#00000000' />"]
+        enc = ZZ + [('path', xf, 'ord'), ('lod', xf, 'ord')] + ([('color', kind, 'dim')] if kind else [])
+        s.pane('Line', enc=enc, size='0.8', transparency='255', color=None if kind else (good if key == 'Growth' else mu))
+        s.tooltip_off = True
+    for key, bar in (('Mix', 'Mix Bar'), ('Coach', 'Coach Bar'), ('Hub', 'Hub Bar')):
+        s = sh(f'Bar {key}')
+        s.filter_member('Focus Row', 'true')
+        z0 = s.f('Bar Zero', 'agg')
+        s.cols = z0
+        hide_axis(s, z0, 0, 1)
+        s.pane('GanttBar', enc=ZZ + [('size', bar, 'agg')], size='1.6', transparency='255', stroke='false', color=good,
+               refs=s.refband(0, z0, 0, 1, P['chip']))
+        s.tooltip_off = True
 
     # ---------------------------------------------------------------- the leader picker
     for col, flt in (('Pick L0', 'Pick Row L0'), ('Pick L1', 'Pick Row L1'), ('Pick L2', 'Pick Row L2')):
@@ -335,6 +373,8 @@ L, D = page('l'), page('d')
 # every sheet gets a context filter, so its FIXED reads scan only the rows it needs (see Ctx Leaders in d7_calcs.py)
 CTX = {'KPI 2': 'Ctx Days', 'Cal Field': 'Ctx Days', 'Calendar': 'Ctx Days', 'Cal Summary': 'Ctx Days',
        'Tree': 'Ctx Tree', 'Tree Wide': 'Ctx Tree'}
+CTX.update({n: 'Ctx Pulse' for n in ('Pulse Sub', 'Pulse Hero', 'Pulse Week', 'Pulse Insight', 'Tile Growth', 'Tile Renew', 'Tile Mix',
+                                     'Tile Gap', 'Tile Coach', 'Tile Hub', 'Spark Growth', 'Spark Gap', 'Spark Renew', 'Bar Mix', 'Bar Coach', 'Bar Hub')})
 for name, sh_ in SHEETS.items():
     sh_.filter_member(CTX.get(name.replace(' (dark)', ''), 'Ctx Leaders'), 'true')
     sh_.filters.insert(0, sh_.filters.pop().replace("'>\n", "' context='true'>\n", 1))
@@ -346,13 +386,14 @@ def bucket_map(field, kind, mapping):
 
 
 enc_rules, styled = [], []
-for n, keys in (('Pie Color', ('gap', 'focus', 'open', 'node', 'none')), ('Link Kind', ('sel', 'link')), ('Cal Kind', ('we', 'sel', 'high', 'low'))):
+for n, keys in (('Pie Color', ('gap', 'focus', 'open', 'node', 'none')), ('Link Kind', ('sel', 'link')), ('Cal Kind', ('we', 'sel', 'high', 'low')),
+                ('Cov Kind', ('today', 'ok', 'low')), ('Gap Trend Kind', ('good', 'bad'))):
     colours = {'none': 'surface', 'gap': 'gap', 'focus': 'focus', 'open': 'open', 'node': 'node', 'sel': 'linksel', 'link': 'link',
-               'we': 'calwe', 'high': 'calhigh', 'low': 'callow'}
+               'we': 'calwe', 'high': 'calhigh', 'low': 'callow', 'today': 'accent', 'ok': 'calhigh', 'good': 'accent', 'bad': 'gap'}
     mp = []
     for th in ('l', 'd'):
         for k in keys:
-            c = PAL[th]['calsel'] if (n == 'Cal Kind' and k == 'sel') else PAL[th][colours[k]]
+            c = PAL[th]['calsel'] if (n == 'Cal Kind' and k == 'sel') else PAL[th]['goldsoft'] if (n == 'Cov Kind' and k == 'low') else PAL[th][colours[k]]
             mp.append((f'{k}_{th}', c))
     enc_rules.append(bucket_map(m.inst(n, 'dim')[0], 'color', mp)); styled.append((n, 'dim'))
 shape_files = sorted(f[:-4] for f in os.listdir(os.environ.get('D7_SHAPES', os.path.join(HERE, 'shapes'))) if f.endswith('.png'))
@@ -501,18 +542,29 @@ def layout(th, S):
         pg.text(256, CY + CH - 26, wcard - 32, 18, [('Circle size = people led  ·  ', mu, 8, 'Book'), ('amber slice', P['gap'], 8, 'Semibold'),
                                                    (' = share with an alignment gap  ·  click a leader to open their team, anyone above to go back up', mu, 8, 'Book')],
                 show=show)
-    # alignment panel (narrow only)
+    # the Team pulse card (narrow only): the coverage hero, then six tiles in two columns
     show = f'Show {T} Narrow'
-    pg.box(1060, CY, 316, CH, P['surface'], P['line'], 14, show=show)
-    pg.text(1076, CY + 10, 250, 24, [('Org design alignment', ink, 11.5, 'Semibold')], show=show)
-    pg.sheet(S['Info'], 1338, CY + 9, 26, 26, show=show)
-    pg.text(1076, CY + 36, 290, 18, [('Where records differ from the org design', mu, 8.5, 'Book')], show=show)
-    y = CY + 64
-    for key, n in (('Solid', 2), ('Matrix', 3), ('Role', 1)):
-        pg.sheet(S[f'Align Head {key}'], 1076, y, 286, 18, show=show)
-        pg.box(1076, y + 19, 286, 1, P['line'], show=show)
-        pg.sheet(S[f'Align {key}'], 1072, y + 22, 292, 46 * n, show=show)
-        y += 22 + 46 * n + 14
+    X0, PW = 1060, 316
+    pg.box(X0, CY, PW, CH, P['surface'], P['line'], 14, show=show)
+    pg.text(X0 + 16, CY + 10, 250, 24, [('Team pulse', ink, 11.5, 'Semibold')], show=show)
+    pg.sheet(S['Info'], X0 + PW - 38, CY + 9, 26, 26, show=show)
+    pg.sheet(S['Pulse Sub'], X0 + 14, CY + 34, PW - 28, 18, show=show)
+    hy = CY + 58
+    pg.box(X0 + 12, hy, PW - 24, 254, P['bg'], radius=12, show=show)
+    pg.sheet(S['Pulse Hero'], X0 + 20, hy + 6, PW - 40, 70, show=show)
+    pg.sheet(S['Pulse Week'], X0 + 18, hy + 76, PW - 36, 114, show=show)
+    pg.sheet(S['Pulse Insight'], X0 + 20, hy + 192, PW - 40, 58, show=show)
+    tw, th_, gx, gy = (PW - 24 - 8) // 2, 108, 8, 8
+    ty0 = hy + 254 + 10
+    for i, key in enumerate(('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')):
+        x0 = X0 + 12 + (i % 2) * (tw + gx)
+        y0 = ty0 + (i // 2) * (th_ + gy)
+        pg.box(x0, y0, tw, th_, P['bg'], radius=10, show=show)
+        pg.sheet(S[f'Tile {key}'], x0 + 6, y0 + 4, tw - 10, 66, show=show)
+        if key in ('Growth', 'Gap', 'Renew'):
+            pg.sheet(S[f'Spark {key}'], x0 + 6, y0 + 70, tw - 12, 34, show=show)
+        else:
+            pg.sheet(S[f'Bar {key}'], x0 + 4, y0 + 72, tw - 8, 26, show=show)
     # popovers
     show = f'Show {T} Pick'
     pg.box(224, 96, 780, 590, P['pop'], P['line'], 16, show=show)
