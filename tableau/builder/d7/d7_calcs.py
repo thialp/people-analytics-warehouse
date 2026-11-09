@@ -148,6 +148,7 @@ def all_calcs():
       'OR CONTAINS([path], "|" + [p_Focus] + "|"))')
     a('Org Row Focus', 'IF MIN([depth_from_top]) = MIN([F Depth]) THEN "   " + MAX([leader_name]) ELSE "" END')
     a('Org Row Count', 'COUNTD([leader_id])')
+    a('Org Sub', comma('[F Directs Shown]') + ' + IIF([F Directs Shown] = 1, " direct", " directs") + " · click to open any leader"')
     a('Org Row Other', 'IF MIN([depth_from_top]) < MIN([F Depth]) THEN "   " + MAX([leader_name]) '
       'ELSEIF MIN([depth_from_top]) > MIN([F Depth]) THEN "   " + STR([Org Row Count]) + " " + '
       'IIF(MIN([depth_from_top]) = 1, IIF([Org Row Count] = 1, "executive", "executives"), IIF([Org Row Count] = 1, "leader", "leaders")) '
@@ -253,18 +254,25 @@ def all_calcs():
     a('LinkedIn Shape', '"d7_linkedin" + [Theme Key]')
     # ------------------------------------------------------------------ the leader picker
     a('Pick Base', '[row_type] = "Node" AND [worker_type] = "All"')
-    a('Pick Row L0', '[Pick Base] AND [leader_level] = "L0"')
-    a('Pick Row L1', '[Pick Base] AND [leader_level] = "L1" AND [parent_leader_id] = [p_B0]')
-    a('Pick Row L2', '[Pick Base] AND [leader_level] = "L2" AND [parent_leader_id] = [p_B1]')
+    # the picker: CEO and executives, then one column per level down to L6; each column lists the leaders under the
+    # one picked in the column before (the path), so every click opens that leader and shows their leaders next
+    a('Pick Row L0', '[Pick Base] AND [depth_from_top] <= 1')
+    for k in range(1, 7):
+        a(f'Pick Row L{k}', f'[Pick Base] AND [depth_from_top] = {k + 1} AND CONTAINS([p_Path], "|" + [parent_leader_id] + "|")')
+    for d in range(1, 7):
+        a(f'Path Name D{d}', '{FIXED : MAX(IF [Pick Base] AND [depth_from_top] = ' + str(d)
+          + ' AND CONTAINS([p_Path], "|" + [leader_id] + "|") THEN [leader_name] END)}')
+    for k in range(1, 7):
+        before = '"PICK AN EXECUTIVE"' if k == 1 else f'"PICK AN L{k - 1} LEADER"'
+        have_before = 'TRUE' if k == 1 else f'NOT ISNULL([Path Name D{k - 1}])'
+        a(f'Pick Head L{k}', f'IF NOT ISNULL([Path Name D{k}]) THEN "L{k} · UNDER " + UPPER([Path Name D{k}]) '
+          f'ELSEIF {have_before} THEN "L{k} · " + {before} ELSE "L{k}" END')
+    a('Pick Keep Open', '[child_leaders] > 0')
     a('Pick Rank', '1000000 - [people]')
     a('Pick Shape', '(IF CONTAINS([F Path], "|" + [leader_id] + "|") THEN "d7_dot_on" ELSE "d7_dot_off" END) + [Theme Key]')
     a('Pick Sub', '[job_title] + " · " + ' + comma('[people]'))
     a('Tick X', 'MIN(0.5)')
     a('Pick People', comma('[people]'))
-    a('B0 Name', '{FIXED : MAX(IF [Pick Base] AND [leader_id] = [p_B0] THEN [leader_name] END)}')
-    a('B1 Name', '{FIXED : MAX(IF [Pick Base] AND [leader_id] = [p_B1] THEN [leader_name] END)}')
-    a('Pick Head L1', 'IF ISNULL([B0 Name]) THEN "L1" ELSE "L1 · UNDER " + UPPER([B0 Name]) END')
-    a('Pick Head L2', 'IF ISNULL([B1 Name]) THEN "L2 · PICK AN L1 LEADER" ELSE "L2 · UNDER " + UPPER([B1 Name]) END')
     # ------------------------------------------------------------------ the calendar
     a('Cal Row', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
     a('Report Monday', 'DATEADD("day", 1 - DATEPART("iso-weekday", [Report Date]), [Report Date])')

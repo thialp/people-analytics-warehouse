@@ -175,7 +175,7 @@ def page(th):
         text_sheet(f'KPI {i}', [[(lab, 'semi', 7.5, mu)], [('{' + v + '}', 'semi', 18, col)], [('{' + note + '}', 'book', 8, mu)]], tooltip=tp)
 
     # ---------------------------------------------------------------- rail
-    ORG_ACT = ('Toggle Pick', 'Pick B0 Default', 'Pick B1 Default', 'Close Panel')
+    ORG_ACT = ('Toggle Pick', 'Close Panel')
     s = sh('Org Field')
     s.filter_member('Org Row', 'true')
     dp = s.f('depth_from_top', 'ord')
@@ -227,6 +227,7 @@ def page(th):
     button_sheet('Credit GitHub', 'GitHub Shape', [], SIZE['brand'], 'Thiago Alpoin on GitHub')
     button_sheet('Credit LinkedIn', 'LinkedIn Shape', [], SIZE['brand'], 'Thiago Alpoin on LinkedIn')
     text_sheet('Rail As Of', [[('{Rail As Of}', 'book', 8, mu)]])
+    text_sheet('Org Sub', [[('{Org Sub}', 'book', 7.5, mu)]])
     text_sheet('Footnote', [[('{Footnote}', 'book', 9, mu)]], valign='center')
 
     # ---------------------------------------------------------------- the tree
@@ -331,9 +332,10 @@ def page(th):
         s.tooltip_off = True
 
     # ---------------------------------------------------------------- the leader picker
-    for col, flt in (('Pick L0', 'Pick Row L0'), ('Pick L1', 'Pick Row L1'), ('Pick L2', 'Pick Row L2')):
+    for k in range(7):
+        col = f'Pick L{k}'
         s = sh(col)
-        s.filter_member(flt, 'true')
+        s.filter_member(f'Pick Row L{k}', 'true')
         rk, li = s.f('Pick Rank', 'ord'), s.f('leader_id', 'dim')
         s.rows = f'({rk} / {li})'
         s.hide_labels += [rk, li]
@@ -342,15 +344,15 @@ def page(th):
         tx = s.f('Tick X', 'agg')
         s.cols = tx
         hide_axis(s, tx, 0, 10)
-        acts = {'Pick L0': ['leader_id', 'path', 'Empty Text'], 'Pick L1': ['leader_id', 'path', 'Empty Text'], 'Pick L2': ['leader_id', 'path', 'Empty Text', 'Close Panel']}[col]
-        s.pane('Shape', enc=ZZ + [('shape', 'Pick Shape', 'dim')] + [('lod', n, how(n)) for n in acts], size=SIZE['dot'],
-               transparency='255', stroke='false', align='right',
-               label=[[('{leader_name}', 'semi', 9.5, ink), ('   {Pick People}', 'book', 8.5, mu)]],
+        s.pane('Shape', enc=ZZ + [('shape', 'Pick Shape', 'dim')] + [('lod', n, how(n)) for n in ('leader_id', 'path', 'Pick Keep Open')],
+               size=SIZE['dot'], transparency='255', stroke='false', align='right',
+               label=[[('{leader_name}', 'semi', 9, ink), ('  {Pick People}', 'book', 8, mu)]],
                tooltip=[[('{leader_name}', 'bold', 10, ink), ('  {Lvl}', 'semi', 9, ac)], [('{Pick Sub}', 'book', 9, mu)],
-                        [('Click to open their organization' + ('' if col == 'Pick L2' else ' and see the leaders below'), 'semi', 9, ac)]],
+                        [('{people}', 'semi', 9, ink), (' people led, directly and indirectly', 'book', 9, mu)],
+                        [('Click to open their organization' + ('' if k == 6 else ' and see the leaders below'), 'semi', 9, ac)]],
                extra_mark_fmt="<format attr='mark-labels-mode' value='all' />")
-    text_sheet('Pick Head L1', [[('{Pick Head L1}', 'semi', 7.5, mu)]])
-    text_sheet('Pick Head L2', [[('{Pick Head L2}', 'semi', 7.5, mu)]])
+        if k:
+            text_sheet(f'Pick Head L{k}', [[(f'{{Pick Head L{k}}}', 'semi', 7.5, mu)]])
 
     # ---------------------------------------------------------------- the calendar
     text_sheet('Cal Title', [[('{Cal Title}', 'semi', 12, ink)],
@@ -590,10 +592,10 @@ def layout(th, S):
         Hz([Img(BRAND + P['logo'], 150), Gap()], 41),
         Gap(15), Gap(1, P['line']), Gap(10),
         Tx([('Who Leads Where', ink, 15, 'Bold'), ('\n', 0, 0, 0), ('Leadership scope & org design', mu, 9, 'Book')], 46),
-        Gap(18), lab('ORGANIZATION'), Gap(4),
-        V([Sh(S['Org Field'])], 196, bg=P['surface'], border=P['line'], radius=10, pad=(8, 8, 8, 8)),
-        Gap(24), lab('WORKFORCE'), Gap(2), Sh(S['Worker Toggle'], 30),
-        Gap(22), lab('TREE COUNTS'), Gap(2), Sh(S['Count Toggle'], 30),
+        Gap(18), lab('ORGANIZATION'), Sh(S['Org Sub'], 16), Gap(4),
+        V([Sh(S['Org Field'])], 182, bg=P['surface'], border=P['line'], radius=10, pad=(8, 8, 8, 8)),
+        Gap(24), lab('WORKFORCE'), Gap(2), Hz([Sh(S['Worker Toggle'])], 30, bg=P['chip'], radius=15, pad=(1, 2, 1, 2)),
+        Gap(22), lab('TREE COUNTS'), Gap(2), Hz([Sh(S['Count Toggle'])], 30, bg=P['chip'], radius=15, pad=(1, 2, 1, 2)),
         Gap(22), Tx([('CALENDAR', mu, 7.5, 'Semibold'), ('\n', 0, 0, 0), ('Click the card to pick a day', mu, 7.5, 'Book')], 30), Gap(4),
         V([Sh(S['Cal Field'])], 50, bg=P['surface'], border=P['line'], radius=10, pad=(5, 8, 3, 8)),
         Gap(),
@@ -650,14 +652,15 @@ def layout(th, S):
     # ---- popovers
     pick = V([
         Hz([Tx([("Open any leader's organization", ink, 12, 'Semibold')]), Sh(S['Pick Close'], 28)], 28),
-        Tx([('Click a name to open it and see the leaders below; the tree, KPIs and panel follow your pick', mu, 8.5, 'Book')], 22),
+        Tx([('Click a name to open it and see the leaders below; the tree, KPIs and panel follow your pick. ', mu, 8.5, 'Book'),
+            ('The number beside each name is everyone they lead, directly and indirectly.', mu, 8.5, 'Book')], 22),
         Gap(8),
-        Hz([Tx([('CEO AND EXECUTIVES', mu, 7.5, 'Semibold')], 250), Sh(S['Pick Head L1'], 250), Sh(S['Pick Head L2'])], 18),
-        Hz([Sh(S['Pick L0'], 250), Sh(S['Pick L1'], 250), Sh(S['Pick L2'])], 460),
+        Hz([Tx([('CEO AND EXECUTIVES', mu, 7.5, 'Semibold')], 160)] + [Sh(S[f'Pick Head L{k}'], 160 if k < 6 else None) for k in range(1, 7)], 18),
+        Hz([Sh(S[f'Pick L{k}'], 160 if k < 6 else None) for k in range(7)], 460),
         Tx([('On Tableau Cloud a leader sees only their own branch (row-level security on their work email); '
              'People Analytics sees every branch.', mu, 8, 'Book')], pad=(8, 0, 0, 0)),
-    ], fname=f'Popover Pick {T}', bg=P['pop'], border=P['line'], radius=16, pad=(10, 12, 8, 16))
-    pg.root(pick, 224, 96, 780, 590, show=f'Show {T} Pick')
+    ], fname=f'Popover Pick {T}', bg=P['pop'], border=P['line'], radius=16, pad=(10, 12, 8, 14))
+    pg.root(pick, 224, 96, 1156, 590, show=f'Show {T} Pick')
     cal = V([
         Hz([Sh(S['Cal Title']), V([Sh(S['Cal Close'], 28), Gap()], 28)], 44),
         Hz([Tx([(d, mu, 8, 'Book')], 73, align='center') for d in ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat')]
@@ -721,8 +724,6 @@ for S in (L, D):
     for nm in ('Expand', 'Expand Wide'):
         T.append((f'{nm}{sfx}', S[nm], 'p_Zoom', 'Toggle Zoom'))
     T += [(f'Open picker{sfx}', S['Org Field'], 'p_PickOpen', 'Toggle Pick'),
-          (f'Picker L0 default{sfx}', S['Org Field'], 'p_B0', 'Pick B0 Default'),
-          (f'Picker L1 default{sfx}', S['Org Field'], 'p_B1', 'Pick B1 Default'),
           (f'Picker closes cal{sfx}', S['Org Field'], 'p_CalOpen', 'Close Panel'),
           (f'Picker closes rules{sfx}', S['Org Field'], 'p_RulesOpen', 'Close Panel'),
           (f'Open calendar{sfx}', S['Cal Field'], 'p_CalOpen', 'Toggle Cal'),
@@ -734,18 +735,11 @@ for S in (L, D):
           (f'Close picker{sfx}', S['Pick Close'], 'p_PickOpen', 'Close Panel'),
           (f'Close calendar{sfx}', S['Cal Close'], 'p_CalOpen', 'Close Panel'),
           (f'Close rules{sfx}', S['Rules Close'], 'p_RulesOpen', 'Close Panel'),
-          (f'Pick L0 browse{sfx}', S['Pick L0'], 'p_B0', 'leader_id'),
-          (f'Pick L0 focus{sfx}', S['Pick L0'], 'p_Focus', 'leader_id'),
-          (f'Pick L0 path{sfx}', S['Pick L0'], 'p_Path', 'path'),
-          (f'Pick L0 clears L1{sfx}', S['Pick L0'], 'p_B1', 'Empty Text'),
-          (f'Pick L1 browse{sfx}', S['Pick L1'], 'p_B1', 'leader_id'),
-          (f'Pick L1 focus{sfx}', S['Pick L1'], 'p_Focus', 'leader_id'),
-          (f'Pick L1 path{sfx}', S['Pick L1'], 'p_Path', 'path'),
-          (f'Pick L2 focus{sfx}', S['Pick L2'], 'p_Focus', 'leader_id'),
-          (f'Pick L2 path{sfx}', S['Pick L2'], 'p_Path', 'path'),
-          (f'Pick L2 closes{sfx}', S['Pick L2'], 'p_PickOpen', 'Close Panel'),
           (f'Pick day{sfx}', S['Calendar'], 'p_Day', 'day_offset'),
           (f'Pick day closes{sfx}', S['Calendar'], 'p_CalOpen', 'Close Panel')]
+    for k in range(7):
+        T += [(f'Pick L{k} focus{sfx}', S[f'Pick L{k}'], 'p_Focus', 'leader_id'), (f'Pick L{k} path{sfx}', S[f'Pick L{k}'], 'p_Path', 'path'),
+              (f'Pick L{k} open{sfx}', S[f'Pick L{k}'], 'p_PickOpen', 'Pick Keep Open')]
     for nm in ('Tree', 'Tree Wide'):
         T += [(f'{nm} focus{sfx}', S[nm], 'p_Focus', 'Focus Target'), (f'{nm} path{sfx}', S[nm], 'p_Path', 'Path Target'),
               (f'{nm} mode{sfx}', S[nm], 'p_Tree', 'Dynamic Text')]
@@ -784,7 +778,7 @@ def ws_window(name):
 
 
 names = list(SHEETS)
-LISTS = [n for n in names if n.startswith(('Pick L0', 'Pick L1', 'Pick L2', 'Align Solid', 'Align Matrix', 'Align Role', 'Org Field'))]
+LISTS = [n for n in names if n.startswith(('Pick L', 'Align Solid', 'Align Matrix', 'Align Role', 'Org Field'))]
 vps = '\n'.join(f"    <viewpoint name='{xesc(n)}'>\n      <zoom type='{'fit-width' if n in LISTS else 'entire-view'}' />\n    </viewpoint>" for n in sorted(names))
 dwin = (f"<window class='dashboard' maximized='true' name='{DASH}'>\n  <viewpoints>\n{vps}\n  </viewpoints>\n"
         f"  <active id='-1' />\n  <simple-id uuid='{uid()}' />\n</window>")

@@ -29,16 +29,18 @@ def rgb(h, a=255):
     return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4)) + (a,)
 
 
-def seg(label, w, h, pos, on, t, size=11):
-    """one segment of a pill toggle: pos is 'left', 'mid', 'right' or 'only'"""
+def seg(label, w, h, pos, on, t, size=11, track=True):
+    """one segment of a pill toggle: pos is 'left', 'mid', 'right' or 'only'. track=False leaves the track out
+    (the dashboard container draws it, so the segments never show a seam)"""
     W, H = w * S, h * S
     im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     r = H // 2
-    d.rounded_rectangle([0, 0, W - 1, H - 1], r, fill=rgb(t['chip']))
-    if pos in ('mid', 'right'):          # square off the inside edges so segments join into one pill
+    if track:
+        d.rounded_rectangle([0, 0, W - 1, H - 1], r, fill=rgb(t['chip']))
+    if track and pos in ('mid', 'right'):          # square off the inside edges so segments join into one pill
         d.rectangle([0, 0, r, H - 1], fill=rgb(t['chip']))
-    if pos in ('mid', 'left'):
+    if track and pos in ('mid', 'left'):
         d.rectangle([W - 1 - r, 0, W - 1, H - 1], fill=rgb(t['chip']))
     if on:
         p = 3 * S
@@ -128,7 +130,7 @@ def main(out, gh=None):
             for i, (key, label) in enumerate(opts):
                 pos = 'left' if i == 0 else ('right' if i == len(opts) - 1 else 'mid')
                 for on in (True, False):
-                    seg(label, w, h, pos, on, t, fs).save(os.path.join(out, f'd7_{name}_{key}_{"on" if on else "off"}_{k}.png'))
+                    seg(label, w, h, pos, on, t, fs, track=name not in ('worker', 'count')).save(os.path.join(out, f'd7_{name}_{key}_{"on" if on else "off"}_{k}.png'))
                     n += 1
         for on in (True, False):
             dot(on, t).save(os.path.join(out, f'd7_dot_{"on" if on else "off"}_{k}.png')); n += 1
