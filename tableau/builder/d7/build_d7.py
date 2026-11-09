@@ -24,6 +24,7 @@ src = open(BASE, encoding='utf-8').read()
 W, H = 1400, 850
 DASH = 'Who Leads Where'
 SHAPES = 'Arcadia D7'
+IMG = os.environ.get('D7_IMAGES', '/Users/thiagoalpoin/Documents/Claude/Professional Portfolio/tableau/7 Who Leads Where/Images/')
 BRAND = os.environ.get('D7_BRAND', '/Users/thiagoalpoin/Documents/Claude/Professional Portfolio/tableau/Shared/Brand/')   # the Arcadia logos
 
 PAL = {
@@ -65,6 +66,7 @@ for k, v in all_calcs():
     m.add(k, v, dtype=DTYPES.get(k), role=ROLES.get(k))
 
 SHEETS, ACTIONS = {}, {}
+HOVER_SIZE, HOVER_ALPHA, SPARK_SIZE, BAR_SIZE = '4.6', '1', '0.8', '3.4'
 SIZE = {'seg': '6.2', 'segs': '5.3', 'seg3': '4.5', 'button': '2', 'dot': '1.3', 'brand': '2.2', 'pie': '6'}
 
 
@@ -124,6 +126,149 @@ def _pane_attr_tips(self, mark, tooltip=None, **kw):
 Sheet.pane = _pane_attr_tips
 
 
+# ===================================================================================================== map-layer cards
+# The KPI cards and the Team pulse tiles are each ONE worksheet: text drawn as map labels. A map puts a point exactly
+# where its latitude and longitude say, so every label lands on its card to the pixel; the cards themselves are a PNG
+# under the sheet. One sheet instead of 5 (KPIs) or 18 (tiles) matters because Tableau refreshes every sheet on every
+# click. Geometry: lon = (x - W/2) * SCALE * FIT_X, lat = -(y - H/2) * SCALE * FIT_Y; two corner points (no fit) pin the
+# map's extent to the sheet; FIT stretches for the padding Tableau adds around a fitted map.
+SCALE = 0.01
+GAP_X = 3                                                        # a label's gap right of its point (lines have none)
+FIT_X, FIT_Y = 1.1, 1.1
+KW = [218, 217, 218, 217, 218]                                   # the five KPI cards, 12 apart: 1,136 px
+KX = [sum(KW[:i]) + 12 * i for i in range(5)]
+KPI_W, KPI_H = 1136, 76                                          # the cards' area
+KOX = 60                       # the KPI map sheet starts 60 px left of the first card: a fitted map keeps a margin of
+KPI_SW = KPI_W + KOX + 24      # about 48 px inside each edge where no text can sit, so the cards stay clear of it
+TOX = 20                                                         # the tiles' map sheet reaches 20 px past each side
+
+TW, TH, TGX, TGY = [207, 208], 96, 8, 8                          # the six pulse tiles, two columns, three rows
+TILES_W, TILES_H = sum(TW) + TGX, 3 * TH + 2 * TGY
+TILES_SW = TILES_W + 2 * TOX
+TX = [0, TW[0] + TGX]
+TY = [0, TH + TGY, 2 * (TH + TGY)]
+
+
+# measured on the dashboard (Nov 8): where a label lands = a + b x where it was aimed, per sheet and axis (the label
+# gap right of its point and the map's fit padding); every position is aimed at (x - a) / b so it lands on x
+CAL = {('KPI', 'x'): (2.5, 1.0), ('KPI', 'y'): (0.0, 1.0), ('Tiles', 'x'): (0.0, 1.0), ('Tiles', 'y'): (0.0, 1.0)}
+OFF = {'KPI': KOX, 'Tiles': TOX}                                 # card x = sheet x - OFF
+_W = {'KPI': (KPI_SW, KPI_H), 'Tiles': (TILES_SW, TILES_H)}
+
+
+def _lon(x, sheet, label=True):
+    a, b = CAL[(sheet, 'x')] if label else (CAL[(sheet, 'x')][0] - GAP_X, CAL[(sheet, 'x')][1])
+    return ((x + OFF[sheet] - a) / b - _W[sheet][0] / 2) * SCALE * FIT_X
+
+
+def _lat(y, sheet):
+    a, b = CAL[(sheet, 'y')]
+    return -((y - a) / b - _W[sheet][1] / 2) * SCALE * FIT_Y
+
+
+def pt(x, y, sheet, label=True):
+    return f'MAKEPOINT({_lat(y, sheet):.6f}, {_lon(x, sheet, label):.6f})'
+
+
+GEO = {}
+
+
+def geo(name, formula):
+    m.add(name, formula, dtype='spatial', role=('measure', 'nominal'))
+    GEO[name] = True
+    return name
+
+
+for nm, w, h in (('KPI', KPI_SW, KPI_H), ('Tiles', TILES_SW, TILES_H)):
+    geo(f'{nm} Corner TL', f'MAKEPOINT({h / 2 * SCALE:.6f}, {-w / 2 * SCALE:.6f})')
+    geo(f'{nm} Corner BR', f'MAKEPOINT({-h / 2 * SCALE:.6f}, {w / 2 * SCALE:.6f})')
+for k in range(5):
+    for row, y in (('Title', 15), ('Value', 38), ('Note', 61)):
+        geo(f'KPI pt {row} {k + 1}', pt(KX[k] + 12, y, 'KPI'))
+    for j, f in enumerate((1 / 6, 1 / 2, 5 / 6)):
+        geo(f'KPI pt Hover {k + 1}{"abc"[j]}', pt(KX[k] + KW[k] * f, 38, 'KPI', False))
+TILE_KEYS = ('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')
+for i, key in enumerate(TILE_KEYS):
+    x0, y0, w0 = TX[i % 2], TY[i // 2], TW[i % 2]
+    for row, y in (('Label', 13), ('Value', 33), ('Note', TH - 13)):
+        geo(f'Tiles pt {row} {key}', pt(x0 + 12, y0 + y, 'Tiles'))
+    a_x, b_x = x0 + 12, w0 - 24                                  # sparks and bars run from x0 + 12 across w0 - 24 px
+    bx = CAL[('Tiles', 'x')][1]
+    ay, by = CAL[('Tiles', 'y')]
+    lon0, per_px_x = _lon(a_x, 'Tiles', False), SCALE * FIT_X / bx
+    if key in ('Growth', 'Gap', 'Renew'):
+        row, xf, yf, n = {'Growth': ('Pulse Row', 'month_index', 'people', 12), 'Gap': ('Pulse Row', 'month_index', 'gap_people', 12),
+                          'Renew': ('Renew Row', 'day_offset', 'left_team', 30)}[key]
+        lo = f'{{FIXED : MIN(IF [{row}] THEN [{yf}] END)}}'
+        hi = f'{{FIXED : MAX(IF [{row}] THEN [{yf}] END)}}'
+        top, ht = y0 + 46, 24
+        lon = f'{lon0:.6f} + {b_x * per_px_x / n:.6f} * [{xf}]'
+        frac = f'IIF({hi} > {lo}, ([{yf}] - {lo}) / ({hi} - {lo}), 0.5)'
+        lat = f'{_lat(top + ht, "Tiles"):.6f} + {ht * SCALE * FIT_Y / by:.6f} * {frac}'
+        geo(f'Tiles pt Spark {key}', f'IF [{row}] THEN MAKEPOINT({lat}, {lon}) END')
+    else:
+        # a bar is a thick line through all 13 month rows (a point on every row keeps the line unbroken)
+        share = {'Mix': 'Mix Now', 'Coach': 'Coach Share', 'Hub': 'Hub Now'}[key]
+        lat = f'{_lat(y0 + 62, "Tiles"):.6f}'
+        geo(f'Tiles pt Track {key}', f'IF [Pulse Row] THEN MAKEPOINT({lat}, {lon0:.6f} + {b_x * per_px_x / 12:.6f} * [month_index]) END')
+        geo(f'Tiles pt Fill {key}', f'IF [Pulse Row] THEN MAKEPOINT({lat}, {lon0:.6f} + {b_x * per_px_x / 12:.6f} * [month_index] * IFNULL([{share}], 0)) END')
+
+_inst, _inst_decl = Model.inst, Model.inst_decl
+
+
+def _inst_geo(self, name, how='auto'):
+    if name in GEO and how in ('auto', 'clct'):
+        return f'[clct:{self.cid[name]}:nk]', 'clct'
+    return _inst(self, name, how)
+
+
+def _inst_decl_geo(self, name, how='auto', order=None):
+    if name in GEO and how in ('auto', 'clct'):
+        c = self.cid[name]
+        return f"<column-instance column='[{c}]' derivation='Collect' name='[clct:{c}:nk]' pivot='key' type='nominal' />"
+    return _inst_decl(self, name, how, order)
+
+
+Model.inst, Model.inst_decl = _inst_geo, _inst_decl_geo
+LATLON = (f'[{DS}].[Latitude (generated)]', f'[{DS}].[Longitude (generated)]')
+
+
+def map_sheet(s, nm):
+    """turn a Sheet into a borderless map; layers are added with map_layer"""
+    s.rows, s.cols = LATLON
+    s.axis_rules += [f"<format attr='display' class='0' field='{LATLON[0]}' scope='rows' value='false' />",
+                     f"<format attr='display' class='0' field='{LATLON[1]}' scope='cols' value='false' />",
+                     "<format attr='tick-color' value='#00000000' />"]
+    s.styles.append("<style-rule element='map'>\n  <format attr='washout' value='0' />\n</style-rule>")
+    s.is_map = True
+    s.pane('Circle', pane_id=1)
+    for c in ('TL', 'BR'):
+        map_layer(s, f'{nm} Corner {c}', 'Circle')
+
+
+def map_layer(s, point, mark='Circle', label=None, enc=(), size='0.01', color=None, align='right', valign='center', tooltip=None,
+              transparency='0'):
+    pid = len(s.panes) + 1
+    s.pane(mark, pane_id=pid, enc=list(enc) + [('lod', point, 'clct')], label=label, tooltip=tooltip, size=size,
+           transparency=transparency, color=color, align=align, valign=valign, stroke='false' if mark != 'Line' else None)
+    inert = '' if tooltip else " inert='true'"
+    s.panes[-1] = s.panes[-1].replace(f"<pane id='{pid}' ", f"<pane generated-title='{xesc(point)}' id='{pid}'{inert} ", 1)
+
+
+_xml = Sheet.xml
+
+
+def _xml_map(self):
+    x = _xml(self)
+    if getattr(self, 'is_map', False):
+        x = x.replace("\n    <panes>\n", "\n    <panes customization-axis='layer'>\n", 1)
+        x = re.sub(r"(      </datasources>\n)", r"\1      <mapsources>\n        <mapsource name='' />\n      </mapsources>\n", x, count=1)
+    return x
+
+
+Sheet.xml = _xml_map
+
+
 # ===================================================================================================== sheets, per theme
 def page(th):
     P = PAL[th]
@@ -170,8 +315,15 @@ def page(th):
             [[('{K5 Value}', 'bold', 10, gp), (' {Worker Words} with at least one alignment signal', 'book', 10, ink)],
              [('Solid line: ', 'book', 9, mu), ('{F Solid Gaps}', 'semi', 9, ink), (' · Matrix line: ', 'book', 9, mu), ('{F Matrix Gaps}', 'semi', 9, ink)],
              [('Flags, not errors: see Org design alignment on the right.', 'book', 9, mu)]])]
+    # the five KPI cards: one map sheet (title, value and note per card; three invisible hover marks per card carry its tooltip)
+    s = sh('KPI Map', deselect=False)
+    map_sheet(s, 'KPI')
     for i, (lab, v, note, col, tp) in enumerate(KPI, 1):
-        text_sheet(f'KPI {i}', [[(lab, 'semi', 7.5, mu)], [('{' + v + '}', 'semi', 18, col)], [('{' + note + '}', 'book', 8, mu)]], tooltip=tp)
+        map_layer(s, f'KPI pt Title {i}', label=[[(lab, 'semi', 7.5, mu)]])
+        map_layer(s, f'KPI pt Value {i}', label=[[('{' + v + '}', 'semi', 18, col)]])
+        map_layer(s, f'KPI pt Note {i}', label=[[('{' + note + '}', 'book', 8, mu)]])
+        for j in 'abc':
+            map_layer(s, f'KPI pt Hover {i}{j}', 'Square', size=HOVER_SIZE, tooltip=tp, transparency=HOVER_ALPHA, color=ink)
 
     # ---------------------------------------------------------------- rail
     ORG_ACT = ('Toggle Pick', 'Close Panel')
@@ -303,32 +455,21 @@ def page(th):
              ('Gap', 'ALIGNMENT TREND', '{Gap Txt}', [('  {Gap Chip Good}', 'semi', 8.5, good), ('{Gap Chip Bad}', 'semi', 8.5, bad)], 'people with a gap, {Ago Label}'),
              ('Coach', 'COACHING CAPACITY', '{Coach Txt}', [], '{Coach Note}'),
              ('Hub', 'IN THE HUB', '{Hub Txt}', [('  {Hub Chip Good}', 'semi', 8.5, good), ('{Hub Chip Bad}', 'semi', 8.5, bad)], '{Hub Note}')]
+    # the six tiles: one map sheet (label, value and chips, note; sparks and bars as line layers)
+    s = sh('Tiles Map', deselect=False)
+    map_sheet(s, 'Tiles')
     for key, lab, val, chips, note in TILES:
-        text_sheet(f'Tile {key}', [[(lab, 'semi', 7.5, mu)], [(val, 'bold', 16, ink)] + chips])
-        text_sheet(f'Tile {key} Note', [[(note, 'book', 8, mu)]], valign='bottom')
-    for key, row, xf, yf, kind in (('Growth', 'Pulse Row', 'month_index', 'people', None), ('Gap', 'Pulse Row', 'month_index', 'gap_people', 'Gap Trend Kind'),
-                                   ('Renew', 'Renew Row', 'day_offset', 'left_team', None)):
-        s = sh(f'Spark {key}')
-        s.filter_member(row, 'true')
-        x, y = s.f(xf, 'min'), s.f(yf, 'sum')
-        s.cols, s.rows = x, y
-        s.axis_rules += [f"<encoding attr='space' class='0' domain-expand='false' field='{x}' field-type='quantitative' scope='cols' type='space' />",
-                         f"<format attr='display' class='0' field='{x}' scope='cols' value='false' />",
-                         f"<encoding attr='space' class='0' domain-expand='false' field='{y}' field-type='quantitative' scope='rows' type='space' />",
-                         f"<format attr='display' class='0' field='{y}' scope='rows' value='false' />",
-                         "<format attr='tick-color' value='#00000000' />"]
-        enc = ZZ + [('path', xf, 'ord'), ('lod', xf, 'ord')] + ([('color', kind, 'dim')] if kind else [])
-        s.pane('Line', enc=enc, size='0.8', transparency='255', color=None if kind else (good if key == 'Growth' else mu))
-        s.tooltip_off = True
-    for key, bar in (('Mix', 'Mix Bar'), ('Coach', 'Coach Bar'), ('Hub', 'Hub Bar')):
-        s = sh(f'Bar {key}')
-        s.filter_member('Focus Row', 'true')
-        z0 = s.f('Bar Zero', 'agg')
-        s.cols = z0
-        hide_axis(s, z0, 0, 1)
-        s.pane('GanttBar', enc=ZZ + [('size', bar, 'agg')], size='0.9', transparency='255', stroke='false', color=good,
-               refs=s.refband(0, z0, 0, 1, P['chip']))
-        s.tooltip_off = True
+        map_layer(s, f'Tiles pt Label {key}', label=[[(lab, 'semi', 7.5, mu)]])
+        map_layer(s, f'Tiles pt Value {key}', label=[[(val, 'bold', 16, ink)] + chips])
+        map_layer(s, f'Tiles pt Note {key}', label=[[(note, 'book', 8, mu)]])
+        if key in ('Growth', 'Gap', 'Renew'):
+            xf = 'day_offset' if key == 'Renew' else 'month_index'
+            enc = [('path', xf, 'ord')] + ([('color', 'Gap Trend Kind', 'dim')] if key == 'Gap' else [])
+            map_layer(s, f'Tiles pt Spark {key}', 'Line', enc=enc, size=SPARK_SIZE, transparency='255',
+                      color=None if key == 'Gap' else (good if key == 'Growth' else mu))
+        else:
+            map_layer(s, f'Tiles pt Track {key}', 'Line', enc=[('path', 'month_index', 'ord')], size=BAR_SIZE, transparency='255', color=P['chip'])
+            map_layer(s, f'Tiles pt Fill {key}', 'Line', enc=[('path', 'month_index', 'ord')], size=BAR_SIZE, transparency='255', color=good)
 
     # ---------------------------------------------------------------- the leader picker
     for k in range(7):
@@ -377,13 +518,38 @@ def page(th):
 L, D = page('l'), page('d')
 
 # every sheet gets a context filter, so its FIXED reads scan only the rows it needs (see Ctx Leaders in d7_calcs.py)
-CTX = {'KPI 2': 'Ctx Days', 'Cal Field': 'Ctx Days', 'Calendar': 'Ctx Days', 'Cal Summary': 'Ctx Days',
+CTX = {'KPI Map': 'Ctx Pulse', 'Tiles Map': 'Ctx Pulse', 'Cal Field': 'Ctx Days', 'Calendar': 'Ctx Days', 'Cal Summary': 'Ctx Days',
        'Tree': 'Ctx Tree', 'Tree Wide': 'Ctx Tree'}
-CTX.update({n: 'Ctx Pulse' for n in ('Pulse Sub', 'Pulse State', 'Pulse Hero', 'Pulse Week', 'Pulse Days', 'Pulse Insight',
-                                     'Spark Growth', 'Spark Gap', 'Spark Renew', 'Bar Mix', 'Bar Coach', 'Bar Hub')})
-CTX.update({f'Tile {k}{n}': 'Ctx Pulse' for k in ('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub') for n in ('', ' Note')})
+CTX.update({n: 'Ctx Pulse' for n in ('Pulse Sub', 'Pulse State', 'Pulse Hero', 'Pulse Week', 'Pulse Days', 'Pulse Insight')})
+# ... and the context also says when the sheet can be seen: its theme, its popover, the narrow or the wide tree. Tableau
+# refreshes every sheet on every click, hidden ones included; a hidden sheet's context is then FALSE (a parameter-only
+# test, folded before the query), so it compiles and returns nothing instead of running its full query
+NARROW = {'Tree', 'Tree Hint', 'Tree Toggle', 'Expand', 'Info', 'Pulse Sub', 'Pulse State', 'Pulse Hero', 'Pulse Week', 'Pulse Days',
+          'Pulse Insight', 'Tiles Map'}
+POPOVER = {'Cal Title': 'p_CalOpen', 'Calendar': 'p_CalOpen', 'Cal Summary': 'p_CalOpen', 'Cal Close': 'p_CalOpen', 'Rules Close': 'p_RulesOpen'}
+
+
+def seen(base, dark):
+    conds = [('Dark', '[p_Dark]') if dark else ('Light', 'NOT [p_Dark]')]
+    if base.startswith('Pick '):
+        conds.append(('Pick', '[p_PickOpen]'))
+    elif base in POPOVER:
+        conds.append((POPOVER[base][2:-4], f'[{POPOVER[base]}]'))
+    elif base.endswith('Wide'):
+        conds.append(('Wide', '[p_Zoom]'))
+    elif base in NARROW:
+        conds.append(('Narrow', 'NOT [p_Zoom]'))
+    return conds
+
+
 for name, sh_ in SHEETS.items():
-    sh_.filter_member(CTX.get(name.replace(' (dark)', ''), 'Ctx Leaders'), 'true')
+    base = name.replace(' (dark)', '')
+    ctx = CTX.get(base, 'Ctx Leaders')
+    conds = seen(base, name != base)
+    key = ctx + ' · ' + ' '.join(c[0] for c in conds)
+    if key not in m.calcs:
+        m.add(key, f'[{ctx}] AND ' + ' AND '.join(c[1] for c in conds))
+    sh_.filter_member(key, 'true')
     sh_.filters.insert(0, sh_.filters.pop().replace("'>\n", "' context='true'>\n", 1))
 
 # ===================================================================================================== datasource styles
@@ -572,7 +738,6 @@ class Page:
         VIS[str(start)] = show
 
 
-KW = [218, 217, 218, 217, 218]                                   # the five KPI cards, 12 apart: 1,136 px
 X0 = 240 + sum(KW[:3]) + 3 * 12                                  # the Team pulse card lines up with the fourth KPI card
 PW = 240 + 1136 - X0
 CY, CH = 160, 662
@@ -586,6 +751,10 @@ def layout(th, S):
     lab = lambda t: Tx([(t, mu, 7.5, 'Semibold')], 18)
     if th == 'd':
         pg.root(Gap(bg=P['bg']), 0, 0, W, H)                         # the dark page covers the light dashboard background
+    # ---- the five KPI cards: the card picture, and the KPI map sheet on top of it; both go before the rail, which
+    # covers the map sheet's empty left edge (the sheet starts KOX px left of the cards)
+    pg.root(Img(IMG + f'd7_kpi_cards_{th}.png'), 240, 72, KPI_W, KPI_H)
+    pg.root(Sh(S['KPI Map']), 240 - KOX, 72, KPI_SW, KPI_H)
     # ---- the rail
     rail = V([
         Hz([Img(BRAND + P['logo'], 150), Gap()], 41),
@@ -606,10 +775,6 @@ def layout(th, S):
     pg.root(Gap(bg=P['line']), 216, 0, 1, H)
     # ---- the headline on one line, the theme toggle at its right end; the five KPI cards
     pg.root(Hz([Sh(S['Headline']), V([Sh(S['Theme Toggle'], 26), Gap()], 136)], fname=f'Header {T}'), 240, 6, 1136, 58)
-    kpis = []
-    for k in range(5):
-        kpis += ([Gap(12)] if k else []) + [V([Sh(S[f'KPI {k + 1}'])], KW[k], bg=P['surface'], border=P['line'], radius=12, pad=(4, 6, 4, 12))]
-    pg.root(Hz(kpis, fname=f'KPIs {T}'), 240, 72, 1136, 76)
     # ---- the tree card, narrow (beside the Team pulse) and wide
     for show, wcard in ((f'Show {T} Narrow', X0 - 12 - 240), (f'Show {T} Wide', 1136)):
         wide = 'Wide' in show
@@ -622,16 +787,7 @@ def layout(th, S):
         ], fname=f'Card Tree{w_} {T}', bg=P['surface'], border=P['line'], radius=14, pad=(8, 8, 8, 8))
         pg.root(card, 240, CY, wcard, CH, show=show)
     # ---- the Team pulse card: the coverage hero, then six tiles in two columns
-    tiles = []
-    for r in range(3):
-        row = []
-        for c in range(2):
-            key = ('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')[2 * r + c]
-            viz = (Hz([Sh(S[f'Spark {key}'])], 28, pad=(0, 4, 0, 4)) if key in ('Growth', 'Gap', 'Renew')
-                   else V([Sh(S[f'Bar {key}'])], 28, pad=(10, 4, 9, 4)))
-            row += ([Gap(8)] if c else []) + [V([Sh(S[f'Tile {key}'], 44), viz, Sh(S[f'Tile {key} Note'])],
-                                                bg=P['bg'], radius=10, pad=(4, 6, 2, 6))]
-        tiles += ([Gap(8)] if r else []) + [Hz(row)]
+    tiles = Gap(TILES_H)          # room for the six tiles: their picture and the Tiles map sheet float here at full size
     hero = V([
         Hz([Tx([('TEAM COVERAGE · TODAY', mu, 7.5, 'Semibold')], pad=(3, 0, 0, 0)), V([Sh(S['Pulse State'])], 150, bg=P['soft'], radius=11, pad=(1, 2, 1, 2))], 22),
         Sh(S['Pulse Hero'], 44),
@@ -643,9 +799,12 @@ def layout(th, S):
         Hz([Tx([('Team pulse', ink, 11.5, 'Semibold')], pad=(2, 0, 0, 4)), Sh(S['Info'], 26)], 26),
         Sh(S['Pulse Sub'], 20), Gap(6),
         hero, Gap(10),
-        V(tiles),
+        tiles, Gap(),
     ], fname=f'Card Team pulse {T}', bg=P['surface'], border=P['line'], radius=14, pad=(10, 12, 12, 12))
     pg.root(pulse, X0, CY, PW, CH, show=f'Show {T} Narrow')
+    tx, ty, tw_, th_ = tiles.rect
+    pg.root(Img(IMG + f'd7_pulse_tiles_{th}.png'), tx, ty, TILES_W, TILES_H, show=f'Show {T} Narrow')
+    pg.root(Sh(S['Tiles Map']), tx - TOX, ty, TILES_SW, TILES_H, show=f'Show {T} Narrow')
     # ---- the footnote
     pg.root(Sh(S['Footnote']), 240, CY + CH + 4, 1136, 18)
     # ---- popovers
