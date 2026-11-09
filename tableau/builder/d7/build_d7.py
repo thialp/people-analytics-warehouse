@@ -45,8 +45,8 @@ for r in re.findall(r"<metadata-record class='column'>(.*?)</metadata-record>", 
 DS = re.search(r"<datasource caption='[^']*' inline='true' name='(federated\.[a-z0-9]+)'", src).group(1)
 
 PARAMS = {
-    'p_Focus': {'dtype': 'string', 'value': 'W100010'},          # Isaac Holland, L1, Software Engineering
-    'p_Path': {'dtype': 'string', 'value': '|W100001|W100002|W100010|'},   # his path: the CEO, his L0, him
+    'p_Focus': {'dtype': 'string', 'value': 'W100001'},          # Grace Ramsey, the CEO: the page opens on the whole company
+    'p_Path': {'dtype': 'string', 'value': '|W100001|'},
     'p_Tree': {'dtype': 'string', 'value': 'Dynamic'},
     'p_Worker': {'dtype': 'string', 'value': 'All'},
     'p_Count': {'dtype': 'string', 'value': 'Everyone'},
@@ -145,8 +145,8 @@ def page(th):
     # ---------------------------------------------------------------- headline and KPIs
     text_sheet('Headline', [
         [('{Head Eyebrow}', 'semi', 8, mu)],
-        [('{Head Leads}', 'semi', 18, ink), ('{Head People}', 'semi', 18, ac), ('{Head In}', 'semi', 18, ink),
-         ('{Head Gaps}', 'semi', 18, gp), ('{Head Tail}', 'semi', 18, ink)]],
+        [('{Head Leads}', 'semi', 16, ink), ('{Head People}', 'semi', 16, ac), ('{Head In}', 'semi', 16, ink),
+         ('{Head Gaps}', 'semi', 16, gp), ('{Head Tail}', 'semi', 16, ink)]],
         tooltip=[[('{F Name}', 'bold', 10, ink), (' · ', 'book', 10, mu), ('{F Title}', 'book', 10, ink)],
                  [('{F Office}', 'book', 9, mu), (', ', 'book', 9, mu), ('{F Country}', 'book', 9, mu)],
                  [('Alignment gaps are flags, not errors: many have a good business reason.', 'book', 9, mu)]])
@@ -175,13 +175,22 @@ def page(th):
         text_sheet(f'KPI {i}', [[(lab, 'semi', 7.5, mu)], [('{' + v + '}', 'semi', 18, col)], [('{' + note + '}', 'book', 8, mu)]], tooltip=tp)
 
     # ---------------------------------------------------------------- rail
+    ORG_ACT = ('Toggle Pick', 'Pick B0 Default', 'Pick B1 Default', 'Close Panel')
     s = sh('Org Field')
-    s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ('Toggle Pick', 'Pick B0 Default', 'Pick B1 Default', 'Close Panel')],
-           valign='top', label=[[('L0   ', 'semi', 8.5, mu), ('{Org L0 Text}', 'book', 9, ink)],
-                                [('L1   ', 'semi', 8.5, ac), ('{Org L1 Text}', 'bold', 9.5, ink)],
-                                [('L2   ', 'semi', 8.5, mu), ('{Org L2 Text}', 'book', 9, ink)],
-                                [('{Org Below Text}', 'semi', 9, ac)]],
-           tooltip=[[('Open any leader\'s organization (L0, L1 or L2)', 'semi', 9, ink)]])
+    s.filter_member('Path Row', 'true')
+    dp = s.f('depth_from_top', 'ord')
+    s.rows = dp
+    s.hide_labels.append(dp)
+    no_field_labels(s, 'rows')
+    s.cell_size = (None, 18, dp)
+    s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='left',
+           label=[[('{Lvl}', 'semi', 7.5, mu), ('  ·  ', 'book', 8, P['line']), ('{Name Other}', 'book', 9, ink), ('{Name Focus}', 'bold', 9.5, ac)]],
+           tooltip=[[("Find any leader's organization", 'semi', 9, ink)]])
+    s = sh('Org Below')
+    s.filter_member('Focus Row', 'true')
+    s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='left',
+           label=[[('{Below Text}', 'book', 8, mu), ('  ·  ', 'book', 8, P['line']), ('Find ›', 'semi', 8, ac)]],
+           tooltip=[[("Find any leader's organization", 'semi', 9, ink)]])
 
     def seg_sheet(name, row_filter, key, shape, act_fields, size, tiptext):
         s = sh(name)
@@ -197,7 +206,7 @@ def page(th):
     seg_sheet('Worker Toggle', 'Worker Row', 'Worker Key', 'Worker Shape', ['worker_type'], SIZE['seg3'],
               'Count employees, contingent workers, or both')
     seg_sheet('Count Toggle', 'Seg Row', 'Seg Key', 'Count Shape', ['Count Option'], SIZE['seg'],
-              'Everyone in the organization, or only those at work on the chosen day')
+              "What the tree's circles count: everyone, or only those at work on the day below")
     seg_sheet('Tree Toggle', 'Seg Row', 'Seg Key', 'Tree Shape', ['Seg Mode'], SIZE['segs'],
               'Dynamic: one level at a time · Static: three levels at once')
     seg_sheet('Tree Toggle Wide', 'Seg Row', 'Seg Key', 'Tree Shape', ['Seg Mode'], SIZE['segs'],
@@ -206,7 +215,7 @@ def page(th):
 
     s = sh('Cal Field')
     s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ('Toggle Cal', 'Close Panel')], valign='top',
-           label=[[('{Day Lead}', 'bold', 9.5, ink)], [('{Cal Field Value}', 'semi', 9, ac)], [('{Cal Field Note}', 'book', 8, mu)]],
+           label=[[('{Day Lead}', 'bold', 9.5, ink), ('   ›', 'semi', 9.5, ac)], [('{Cal Field Value}', 'semi', 9, ac)], [('{Cal Field Note}', 'book', 8, mu)]],
            tooltip=[[('Pick a day in the next 30 days', 'semi', 9, ink)]])
 
     def button_sheet(name, shape, act_fields, size, tiptext, row='Focus Row'):
@@ -223,12 +232,12 @@ def page(th):
         button_sheet(f'{p} Close', 'Close Shape', ['Close Panel'], SIZE['button'], 'Close')
     button_sheet('Credit GitHub', 'GitHub Shape', [], SIZE['brand'], 'Thiago Alpoin on GitHub')
     button_sheet('Credit LinkedIn', 'LinkedIn Shape', [], SIZE['brand'], 'Thiago Alpoin on LinkedIn')
-    text_sheet('Rail As Of', [[('{Rail As Of}', 'book', 8, mu)], [('Executive officers lead but are not counted', 'book', 8, mu)]])
+    text_sheet('Rail As Of', [[('{Rail As Of}', 'book', 8, mu)]])
 
     # ---------------------------------------------------------------- the tree
     text_sheet('Tree Hint', [[('{Tree Hint}', 'book', 8.5, mu)]])
     text_sheet('Tree Hint Wide', [[('{Tree Hint}', 'book', 8.5, mu)]])
-    TIP = [[('{leader_name|attr}', 'bold', 10, ink), ('  {leader_level|attr}', 'semi', 9, ac)],
+    TIP = [[('{leader_name|attr}', 'bold', 10, ink), ('  {N Lvl}', 'semi', 9, ac)],
            [('{job_title|attr}', 'book', 9, mu)],
            [('{Tip People|attr}', 'book', 9, ink)],
            [('{Tip Gaps|attr}', 'semi', 9, gp)],
@@ -253,7 +262,7 @@ def page(th):
         s.pane('Automatic', pane_id=2, enc=[])
         s.pane('Line', pane_id=3, y_axis=yl, size='0.6', transparency='255',
                enc=ZZ + [('path', 'point_index', 'ord'), ('lod', 'node_id', 'dim'), ('lod', 'mark_type', 'dim'), ('color', 'Link Kind', 'dim')]
-               + [('lod', n, 'dim') for n in ACT], tooltip=TIP)
+               + [('lod', n, 'dim') for n in ACT])
         s.pane('Pie', pane_id=4, y_axis=yn, size=SIZE['pie'], transparency='255', stroke='false', align='center', valign='bottom',
                enc=ZZ + [('lod', 'Wedge Order', 'ord'), ('lod', 'node_id', 'dim'), ('color', 'Pie Color', 'dim'), ('size', 'Pie Size', 'min'), ('wedge-size', 'Pie Angle', 'sum')]
                + [('lod', n, 'dim') for n in ACT],
@@ -294,7 +303,7 @@ def page(th):
         s.pane('Shape', enc=ZZ + [('shape', 'Pick Shape', 'dim')] + [('lod', n, how(n)) for n in acts], size=SIZE['dot'],
                transparency='255', stroke='false', align='right',
                label=[[('{leader_name}', 'semi', 9.5, ink), ('   {Pick People}', 'book', 8.5, mu)]],
-               tooltip=[[('{leader_name}', 'bold', 10, ink), ('  {leader_level}', 'semi', 9, ac)], [('{Pick Sub}', 'book', 9, mu)],
+               tooltip=[[('{leader_name}', 'bold', 10, ink), ('  {Lvl}', 'semi', 9, ac)], [('{Pick Sub}', 'book', 9, mu)],
                         [('Click to open their organization' + ('' if col == 'Pick L2' else ' and see the leaders below'), 'semi', 9, ac)]],
                extra_mark_fmt="<format attr='mark-labels-mode' value='all' />")
     text_sheet('Pick Head L1', [[('{Pick Head L1}', 'semi', 7.5, mu)]])
@@ -455,64 +464,62 @@ def layout(th, S):
     pg.image(BRAND + P['logo'], 16, 20, 150, 41)
     pg.box(14, 76, 188, 1, P['line'])
     pg.text(14, 86, 196, 48, [('Who Leads Where', ink, 15, 'Bold'), ('\n', 0, 0, 0), ('Leadership scope & org design', mu, 9, 'Book')])
-    pg.box(14, 138, 188, 52, P['soft'], radius=9)
-    pg.text(20, 142, 180, 46, [('People Analytics · full company', ac, 8, 'Semibold'), ('\n', 0, 0, 0),
-                               ('Leaders see only their own branch', mu, 8, 'Book')])
-    for lab, y in (('ORGANIZATION', 200), ('COUNT', 312), ('SHOW', 372), ('AT WORK ON', 432)):
+    # rail: the organization (the path from the CEO to the leader on the page), the workforce, what the tree counts, the day
+    for lab, y in (('ORGANIZATION', 148), ('WORKFORCE', 358), ('TREE COUNTS', 418), ('DAY', 478)):
         pg.text(14, y, 190, 16, [(lab, mu, 7.5, 'Semibold')])
-    pg.box(14, 218, 188, 80, P['surface'], P['line'], 10)
-    pg.sheet(S['Org Field'], 22, 223, 176, 72)
-    pg.sheet(S['Worker Toggle'], 14, 330, 188, 30)
-    pg.sheet(S['Count Toggle'], 14, 390, 188, 30)
-    pg.box(14, 450, 188, 60, P['surface'], P['line'], 10)
-    pg.sheet(S['Cal Field'], 22, 455, 176, 52)
-    pg.sheet(S['Rail As Of'], 14, 716, 196, 34)
-    pg.box(14, 758, 188, 1, P['line'])
-    pg.text(14, 768, 196, 18, [('Built by ', mu, 8.5, 'Book'), ('Thiago Alpoin', ink, 8.5, 'Semibold')])
-    pg.sheet(S['Credit GitHub'], 14, 790, 30, 30)
-    pg.sheet(S['Credit LinkedIn'], 50, 790, 30, 30)
-    # headline, theme, KPIs
-    pg.sheet(S['Headline'], 240, 14, 990, 92)
-    pg.sheet(S['Theme Toggle'], 1240, 20, 136, 28)
-    pg.box(240, 116, 1136, 80, P['surface'], P['line'], 12)
+    pg.box(14, 166, 188, 178, P['surface'], P['line'], 10)
+    pg.sheet(S['Org Field'], 20, 171, 180, 146)
+    pg.box(22, 318, 172, 1, P['line'])
+    pg.sheet(S['Org Below'], 20, 321, 180, 20)
+    pg.sheet(S['Worker Toggle'], 14, 376, 188, 30)
+    pg.sheet(S['Count Toggle'], 14, 436, 188, 30)
+    pg.box(14, 496, 188, 60, P['surface'], P['line'], 10)
+    pg.sheet(S['Cal Field'], 22, 501, 176, 52)
+    pg.sheet(S['Rail As Of'], 14, 742, 196, 18)
+    pg.box(14, 764, 188, 1, P['line'])
+    pg.text(14, 772, 196, 18, [('Built by ', mu, 8.5, 'Book'), ('Thiago Alpoin', ink, 8.5, 'Semibold')])
+    pg.sheet(S['Credit GitHub'], 14, 794, 30, 30)
+    pg.sheet(S['Credit LinkedIn'], 50, 794, 30, 30)
+    # headline on one line across the page, the theme toggle above its right end; five KPI cards
+    pg.sheet(S['Headline'], 240, 8, 1136, 56)
+    pg.sheet(S['Theme Toggle'], 1240, 6, 136, 26)
+    kw = (1136 - 4 * 12) / 5
     for k in range(5):
-        if k:
-            pg.box(240 + round(1136 * k / 5), 117, 1, 78, P['line'])
-        pg.sheet(S[f'KPI {k + 1}'], 240 + round(1136 * k / 5) + 12, 122, round(1136 / 5) - 18, 70)
+        x0 = 240 + round(k * (kw + 12))
+        pg.box(x0, 72, round(kw), 76, P['surface'], P['line'], 12)
+        pg.sheet(S[f'KPI {k + 1}'], x0 + 12, 76, round(kw) - 18, 68)
     # tree card, narrow and wide
+    CY, CH = 160, 672
     for show, wcard in ((f'Show {T} Narrow', 806), (f'Show {T} Wide', 1136)):
         wide = wcard == 1136
-        pg.box(240, 210, wcard, 622, P['surface'], P['line'], 14, show=show)
-        pg.text(256, 220, 220, 24, [('The organization', ink, 11.5, 'Semibold')], show=show)
-        pg.sheet(S['Tree Toggle Wide' if wide else 'Tree Toggle'], 240 + wcard - 16 - 30 - 10 - 152, 218, 152, 28, show=show)
-        pg.sheet(S['Expand Wide' if wide else 'Expand'], 240 + wcard - 16 - 30, 217, 30, 30, show=show)
-        pg.sheet(S['Tree Hint Wide' if wide else 'Tree Hint'], 256, 248, wcard - 32, 20, show=show)
-        pg.sheet(S['Tree Wide' if wide else 'Tree'], 248, 270, wcard - 16, 530, show=show)
-        pg.text(256, 806, wcard - 32, 18, [('Circle size = people led  ·  ', mu, 8, 'Book'), ('amber slice', P['gap'], 8, 'Semibold'),
-                                           (' = share with an alignment gap  ·  click a leader to open their team, anyone above to go back up', mu, 8, 'Book')],
+        pg.box(240, CY, wcard, CH, P['surface'], P['line'], 14, show=show)
+        pg.text(256, CY + 10, 220, 24, [('The organization', ink, 11.5, 'Semibold')], show=show)
+        pg.sheet(S['Tree Toggle Wide' if wide else 'Tree Toggle'], 240 + wcard - 16 - 30 - 10 - 152, CY + 8, 152, 28, show=show)
+        pg.sheet(S['Expand Wide' if wide else 'Expand'], 240 + wcard - 16 - 30, CY + 7, 30, 30, show=show)
+        pg.sheet(S['Tree Hint Wide' if wide else 'Tree Hint'], 256, CY + 38, wcard - 32, 20, show=show)
+        pg.sheet(S['Tree Wide' if wide else 'Tree'], 248, CY + 60, wcard - 16, CH - 92, show=show)
+        pg.text(256, CY + CH - 26, wcard - 32, 18, [('Circle size = people led  ·  ', mu, 8, 'Book'), ('amber slice', P['gap'], 8, 'Semibold'),
+                                                   (' = share with an alignment gap  ·  click a leader to open their team, anyone above to go back up', mu, 8, 'Book')],
                 show=show)
     # alignment panel (narrow only)
     show = f'Show {T} Narrow'
-    pg.box(1060, 210, 316, 622, P['surface'], P['line'], 14, show=show)
-    pg.text(1076, 220, 250, 24, [('Org design alignment', ink, 11.5, 'Semibold')], show=show)
-    pg.sheet(S['Info'], 1338, 219, 26, 26, show=show)
-    pg.text(1076, 246, 290, 18, [('Where records differ from the org design', mu, 8.5, 'Book')], show=show)
-    y = 274
+    pg.box(1060, CY, 316, CH, P['surface'], P['line'], 14, show=show)
+    pg.text(1076, CY + 10, 250, 24, [('Org design alignment', ink, 11.5, 'Semibold')], show=show)
+    pg.sheet(S['Info'], 1338, CY + 9, 26, 26, show=show)
+    pg.text(1076, CY + 36, 290, 18, [('Where records differ from the org design', mu, 8.5, 'Book')], show=show)
+    y = CY + 64
     for key, n in (('Solid', 2), ('Matrix', 3), ('Role', 1)):
         pg.sheet(S[f'Align Head {key}'], 1076, y, 286, 18, show=show)
         pg.box(1076, y + 19, 286, 1, P['line'], show=show)
         pg.sheet(S[f'Align {key}'], 1072, y + 22, 292, 46 * n, show=show)
         y += 22 + 46 * n + 14
-    pg.box(1072, 716, 292, 104, P['chip'], radius=10, show=show)
-    pg.text(1082, 722, 274, 94, [('Leading people in other regions is expected at L0 to L2 and is never flagged. Signals are flags, not errors: '
-                                  'many have a good business reason. Hover a signal for when it shows and who to ask.', mu, 8.5, 'Book')], show=show)
     # popovers
     show = f'Show {T} Pick'
     pg.box(224, 96, 780, 590, P['pop'], P['line'], 16, show=show)
     pg.text(244, 108, 560, 24, [("Open any leader's organization", ink, 12, 'Semibold')], show=show)
     pg.text(244, 132, 640, 18, [('Click a name to open it and see the leaders below; the tree, KPIs and panel follow your pick', mu, 8.5, 'Book')], show=show)
     pg.sheet(S['Pick Close'], 968, 104, 28, 28, show=show)
-    pg.text(244, 160, 236, 18, [('L0 · EXECUTIVE LEADERSHIP', mu, 7.5, 'Semibold')], show=show)
+    pg.text(244, 160, 236, 18, [('CEO AND EXECUTIVES', mu, 7.5, 'Semibold')], show=show)
     pg.sheet(S['Pick Head L1'], 494, 160, 236, 18, show=show)
     pg.sheet(S['Pick Head L2'], 744, 160, 250, 18, show=show)
     pg.sheet(S['Pick L0'], 238, 180, 244, 460, show=show)
@@ -540,7 +547,7 @@ def layout(th, S):
         pg.text(x0, 160, w0, 18, [(lab, mu, 7.5, 'Semibold')], show=show)
     pg.box(322, 180, 960, 1, P['line'], show=show)
     rows = [(s[2], s[1], s[3], s[4]) for s in SIGNALS] + [('Geography', 'Leads people in other regions',
-                                                          'Context only (countries led): expected at L0, L1 and L2, never flagged.', '–')]
+                                                          'Context only (countries led): expected for executives, L1 and L2, never flagged.', '–')]
     for i, r in enumerate(rows):
         y0 = 186 + i * 54
         for (x0, w0, _), t, (c, f) in zip(cols, r, ((mu, 'Book'), (ink, 'Semibold'), (ink, 'Book'), (mu, 'Book'))):
@@ -584,6 +591,12 @@ for S in (L, D):
         T.append((f'{nm}{sfx}', S[nm], 'p_Tree', 'Seg Mode'))
     for nm in ('Expand', 'Expand Wide'):
         T.append((f'{nm}{sfx}', S[nm], 'p_Zoom', 'Toggle Zoom'))
+    for nm in ('Org Below',):
+        T += [(f'Open picker {nm}{sfx}', S[nm], 'p_PickOpen', 'Toggle Pick'),
+              (f'Picker L0 default {nm}{sfx}', S[nm], 'p_B0', 'Pick B0 Default'),
+              (f'Picker L1 default {nm}{sfx}', S[nm], 'p_B1', 'Pick B1 Default'),
+              (f'Picker closes cal {nm}{sfx}', S[nm], 'p_CalOpen', 'Close Panel'),
+              (f'Picker closes rules {nm}{sfx}', S[nm], 'p_RulesOpen', 'Close Panel')]
     T += [(f'Open picker{sfx}', S['Org Field'], 'p_PickOpen', 'Toggle Pick'),
           (f'Picker L0 default{sfx}', S['Org Field'], 'p_B0', 'Pick B0 Default'),
           (f'Picker L1 default{sfx}', S['Org Field'], 'p_B1', 'Pick B1 Default'),
@@ -648,7 +661,7 @@ def ws_window(name):
 
 
 names = list(SHEETS)
-LISTS = [n for n in names if n.startswith(('Pick L0', 'Pick L1', 'Pick L2', 'Align Solid', 'Align Matrix', 'Align Role'))]
+LISTS = [n for n in names if n.startswith(('Pick L0', 'Pick L1', 'Pick L2', 'Align Solid', 'Align Matrix', 'Align Role', 'Org Field'))]
 vps = '\n'.join(f"    <viewpoint name='{xesc(n)}'>\n      <zoom type='{'fit-width' if n in LISTS else 'entire-view'}' />\n    </viewpoint>" for n in sorted(names))
 dwin = (f"<window class='dashboard' maximized='true' name='{DASH}'>\n  <viewpoints>\n{vps}\n  </viewpoints>\n"
         f"  <active id='-1' />\n  <simple-id uuid='{uid()}' />\n</window>")

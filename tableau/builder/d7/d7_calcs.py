@@ -106,7 +106,10 @@ def all_calcs():
     a('F Gaps Txt', comma('[F Gaps]'))
     a('F Gap Pct Txt', pct1('[F Gaps]', '[F People]'))
     a('F Countries Txt', 'STR([F Countries]) + IF [F Countries] = 1 THEN " country" ELSE " countries" END')
-    a('Head Eyebrow', 'UPPER([F Name] + " · " + [F Level] + " · " + [F Title] + " · as of " + [Report Label])')
+    # the level a viewer reads comes from the depth below the CEO: CEO, EXEC (the function heads), then L1, L2, ...
+    # (the data's leader_level puts the CEO and the function heads together as L0)
+    a('F Lvl', 'CASE [F Depth] WHEN 0 THEN "CEO" WHEN 1 THEN "EXEC" ELSE "L" + STR([F Depth] - 1) END')
+    a('Head Eyebrow', 'UPPER([F Name] + " · " + [F Lvl] + " · " + [F Title] + " · as of " + [Report Label])')
     a('Head Leads', '[F Name] + " leads "')
     a('Head People', '[F People Txt] + " " + [Worker Words]')
     a('Head In', '" in " + [F Countries Txt] + ". "')
@@ -133,6 +136,17 @@ def all_calcs():
     a('Org L0 Text', 'IFNULL([Crumb L0], "–")')
     a('Org L1 Text', 'IFNULL([Crumb L1], IF [F Level] = "L0" THEN "All " + STR([F Child Leaders]) + " leaders" ELSE "–" END)')
     a('Org L2 Text', 'IFNULL([Crumb L2], IF [F Level] = "L1" THEN "All " + STR([F Child Leaders]) + " leaders" ELSE "–" END)')
+    # the rail's organization box: one row per level from the CEO down to the focus, the focus highlighted
+    a('Lvl', 'CASE [depth_from_top] WHEN 0 THEN "CEO" WHEN 1 THEN "EXEC" ELSE "L" + STR([depth_from_top] - 1) END')
+    a('Path Row', '[row_type] = "Node" AND [worker_type] = "All" AND CONTAINS([p_Path], "|" + [leader_id] + "|")')
+    a('Is Focus Row', '[leader_id] = [p_Focus]')
+    a('Name Focus', 'IF [Is Focus Row] THEN [leader_name] ELSE "" END')
+    a('Name Other', 'IF [Is Focus Row] THEN "" ELSE [leader_name] END')
+    a('Next Lvl', 'CASE ([F Depth] + 1) WHEN 0 THEN "CEO" WHEN 1 THEN "EXEC" ELSE "L" + STR(([F Depth] + 1) - 1) END')
+    a('Below Text', 'IF [F Child Leaders] > 0 THEN STR([F Child Leaders]) + " " + [Next Lvl] + " leader" + IIF([F Child Leaders] = 1, "", "s") + " below" '
+      'ELSE "No leaders below" END')
+    a('N Depth', '{FIXED [leader_id] : MAX(IF [row_type] = "Node" AND [worker_type] = "All" THEN [depth_from_top] END)}')
+    a('N Lvl', 'CASE [N Depth] WHEN 0 THEN "CEO" WHEN 1 THEN "EXEC" ELSE "L" + STR([N Depth] - 1) END')
     a('Org Below Text', 'IF [F Level] = "Manager" THEN "› " + [F Name] ELSE "" END')
     a('Pick B0 Default', 'IFNULL([Crumb L0 ID], [CEO ID])')
     a('Pick B1 Default', 'IFNULL([Crumb L1 ID], "")')
@@ -259,7 +273,7 @@ def all_calcs():
     a('Cal Title', '"Who is at work · " + [F Name] + "\'s organization"')
     a('Cal Field Value', 'IF [Day Weekend] = 1 THEN "Weekend" ELSE ' + comma('[F Day At Work]').replace('IF ISNULL', '(IF ISNULL', 1)
       + ') + " of " + ' + comma('[F Day People]') + ' END')
-    a('Cal Field Note', 'IF [Day Weekend] = 1 THEN "Pick a weekday" ELSE ' + comma('[F Day Off]').replace('IF ISNULL', '(IF ISNULL', 1)
+    a('Cal Field Note', 'IF [Day Weekend] = 1 THEN "Nobody is scheduled" ELSE ' + comma('[F Day Off]').replace('IF ISNULL', '(IF ISNULL', 1)
       + ') + " off: PTO, leave or a holiday" END')
     # ------------------------------------------------------------------ the alignment panel
     a('Sig Scaffold', '([row_type] = "Signal" OR [row_type] = "R1") AND [leader_id] = [CEO ID]')
@@ -295,7 +309,7 @@ def all_calcs():
 DTYPES = {'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Worker Key': 'integer', 'Sig Order': 'integer',
           'Pick Rank': 'integer', 'Day Weekend': 'integer', 'Sig Bar Len': 'integer', 'Cal Pos': 'integer', 'F Depth': 'integer',
           'F Child Leaders': 'integer', 'F R1': 'integer', 'Report Monday': 'date', 'Quiet Date': 'date', 'Day Date': 'date',
-          'Report Date': 'date', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Node X': 'real', 'X Plot': 'real', 'Pie Size': 'real',
+          'Report Date': 'date', 'N Depth': 'integer', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Node X': 'real', 'X Plot': 'real', 'Pie Size': 'real',
           # IFNULL() takes the type of its arguments; the writer cannot infer it, so these are named here
           'Org L0 Text': 'string', 'Org L1 Text': 'string', 'Org L2 Text': 'string', 'Pick B0 Default': 'string',
           'Pick B1 Default': 'string', 'Focus Target': 'string', 'Path Target': 'string', 'Seg Mode': 'string'}
