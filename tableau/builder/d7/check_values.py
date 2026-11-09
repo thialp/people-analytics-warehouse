@@ -59,12 +59,15 @@ SIG = rows('mart_alignment_detail')
 def leader(lid, wt='All'):
     n, a = NODE[(lid, wt)], NODE[(lid, 'All')]
     people, gaps = num(n['people']), num(n['gap_people'])
-    countries = num(n['countries'])
-    head = (f"{a['leader_name']} leads {comma(people)} {WORDS[wt]} in {countries} {'country' if countries == 1 else 'countries'}. "
+    head = (f"{a['leader_name']} leads {comma(people)} {WORDS[wt]}. "            # no countries: the page reads location as hubs
             f"{comma(gaps)} ({pct1(gaps, people)}) {'shows' if gaps == 1 else 'show'} an alignment gap.")
     today = DAY[(lid, wt)][0]
-    return dict(name=a['leader_name'], level=a['leader_level'], title=a['job_title'], head=head, people=people,
-                directs=num(n['directs']), indirects=num(n['indirects']), at_work=num(today['at_work']), off=num(today['off']),
+    depth = num(a['depth_from_top'])
+    level = 'CEO' if depth == 0 else 'EXEC' if depth == 1 else f'L{depth - 1}'      # the page's levels: CEO, EXEC, L1, L2, ...
+    # the CEO's direct reports are the executives: they lead but stay out of people counts, so the page adds them
+    directs = num(n['directs']) + (num(a['child_leaders']) if depth == 0 else 0)
+    return dict(name=a['leader_name'], level=level, title=a['job_title'], head=head, people=people,
+                directs=directs, indirects=num(n['indirects']), at_work=num(today['at_work']), off=num(today['off']),
                 layers=num(n['layers_below']), span=span(n['median_span']), mgr15=num(n['managers_15_plus']),
                 mgr1=num(n['managers_one_direct']), gaps=gaps, solid=num(n['solid_line_gap_people']),
                 matrix=num(n['matrix_gap_people']), r1=num(a['assignments_naming_former_leader']))
