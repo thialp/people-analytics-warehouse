@@ -115,7 +115,7 @@ def all_calcs():
     a('Head Eyebrow', 'UPPER([F Name] + " · " + [F Lvl] + " · " + [F Title] + " · as of " + [Report Label])')
     a('Head Leads', '[F Name] + " leads "')
     a('Head People', '[F People Txt] + " " + [Worker Words]')
-    a('Head In', '" in " + [F Countries Txt] + ". "')
+    a('Head In', '". "')                                          # no countries: location is read as function hubs
     a('Head Gaps', '[F Gaps Txt] + " (" + [F Gap Pct Txt] + ")"')
     a('Head Tail', 'IF [F Gaps] = 1 THEN " shows an alignment gap." ELSE " show an alignment gap." END')
     a('K1 Value', '[F People Txt]')
@@ -229,7 +229,7 @@ def all_calcs():
     a('N Child', node('child_leaders', '"All"'))
     a('N Directs Shown', '[N Directs] + IIF([N Depth] = 0, IFNULL([N Child], 0), 0)')
     a('Tip People', comma('[N People]') + ' + " " + [Worker Words] + " · " + ' + comma('[N Directs Shown]') + ' + " directs, " + '
-      + comma('[N Indirects]') + ' + " indirect · " + STR([N Countries]) + " countries"')
+      + comma('[N Indirects]') + ' + " indirect"')
     a('Tip Gaps', comma('[N Gaps]') + ' + " with an alignment gap (" + ' + pct1('[N Gaps]', '[N People]') + ' + ")"')
     a('Tip At Work', 'IF [Day Weekend] = 1 THEN [Day Text] + " is a weekend" ELSE ' + comma('[N At Work]').replace('IF ISNULL', '(IF ISNULL', 1)
       + ') + " at work on " + [Day Text] END')

@@ -66,6 +66,7 @@ for k, v in all_calcs():
     m.add(k, v, dtype=DTYPES.get(k), role=ROLES.get(k))
 
 SHEETS, ACTIONS = {}, {}
+HOVER_LINE = '24'                 # Tableau caps a line at about 30 px: one hover mark per card covers its value band
 HOVER_SIZE, HOVER_ALPHA, SPARK_SIZE, BAR_SIZE = '4.6', '1', '0.8', '3.4'    # hover: four 51 px squares cover a card; larger squares make the map fit wider and drift the texts
 SIZE = {'seg': '6.2', 'segs': '5.3', 'seg3': '4.5', 'button': '2', 'dot': '1.3', 'brand': '2.2', 'pie': '6'}
 
@@ -190,6 +191,12 @@ for k in range(5):
     # stops at the frame (centre at card x 1,075, edge 1,100)
     for j, f in enumerate((1 / 8, 3 / 8, 5 / 8, 7 / 8)):
         geo(f'KPI pt Hover {k + 1}{"abcd"[j]}', pt(min(KX[k] + KW[k] * f, 1075), 38, 'KPI', False))
+    # one hover mark per card: a thick invisible line across the card's middle, drawn through the 31 day rows every leader
+    # has (round ends ~32 px; the last card stops at the frame)
+    x0, x1 = KX[k] + 36, min(KX[k] + KW[k] - 36, 1068)
+    lon0 = _lon(x0, 'KPI', False)
+    geo(f'KPI pt Hover Line {k + 1}', f'IF [Renew Row] THEN MAKEPOINT({_lat(38, "KPI"):.6f}, {lon0:.6f} + '
+        f'{(x1 - x0) * SCALE * FIT_X / CAL[("KPI", "x")][1] / 30:.6f} * [day_offset]) END')
     geo(f'KPI pt Calib {k + 1}', pt(KX[k], 38, 'KPI', False))        # D7_CALIB=1 draws a dot here: each card's left edge
 TILE_KEYS = ('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')
 for i, key in enumerate(TILE_KEYS):
@@ -319,7 +326,7 @@ def page(th):
             [[('{K5 Value}', 'bold', 10, gp), (' {Worker Words} with at least one alignment signal', 'book', 10, ink)],
              [('Solid line: ', 'book', 9, mu), ('{F Solid Gaps}', 'semi', 9, ink), (' · Matrix line: ', 'book', 9, mu), ('{F Matrix Gaps}', 'semi', 9, ink)],
              [('Flags, not errors: see Org design alignment on the right.', 'book', 9, mu)]])]
-    # the five KPI cards: one map sheet (title, value and note per card; three invisible hover marks per card carry its tooltip)
+    # the five KPI cards: one map sheet (title, value and note per card; one invisible thick line per card carries its tooltip)
     s = sh('KPI Map')
     map_sheet(s, 'KPI')
     for i, (lab, v, note, col, tp) in enumerate(KPI, 1):
@@ -328,8 +335,8 @@ def page(th):
         map_layer(s, f'KPI pt Note {i}', label=[[('{' + note + '}', 'book', 8, mu)]])
         if os.environ.get('D7_CALIB'):
             map_layer(s, f'KPI pt Calib {i}', 'Circle', size='0.6', transparency='255', color='#FF00FF')
-        for j in 'abcd':
-            map_layer(s, f'KPI pt Hover {i}{j}', 'Square', size=HOVER_SIZE, tooltip=tp, transparency=HOVER_ALPHA, color=ink)
+        map_layer(s, f'KPI pt Hover Line {i}', 'Line', enc=[('path', 'day_offset', 'ord')], size=HOVER_LINE, tooltip=tp,
+                  transparency=HOVER_ALPHA, color=ink)
 
     # ---------------------------------------------------------------- rail
     ORG_ACT = ('Toggle Pick', 'Close Panel')
@@ -798,6 +805,7 @@ def layout(th, S):
         Sh(S['Pulse Hero'], 44),
         Sh(S['Pulse Week'], 92),
         Sh(S['Pulse Days'], 34),
+        Gap(12),
         Sh(S['Pulse Insight']),
     ], 272, bg=P['bg'], radius=12, pad=(8, 12, 4, 12))
     pulse = V([
