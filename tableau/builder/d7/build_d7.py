@@ -29,11 +29,11 @@ BRAND = os.environ.get('D7_BRAND', '/Users/thiagoalpoin/Documents/Claude/Profess
 PAL = {
     'l': dict(bg='#F4F7F6', rail='#FFFFFF', surface='#FFFFFF', pop='#FFFFFF', line='#DFE6E3', ink='#15201D', muted='#56635F',
               accent='#1F7560', soft='#E1F2EB', gap='#A3611A', chip='#EDF2F0', node='#D3E3DD', open='#A9D3C3', focus='#7DBCA5',
-              link='#C7D3CF', linksel='#1F7560', callow='#EEF6F2', calhigh='#9ACFBC', calsel='#F6DFC0', calwe='#F4F7F6', goldsoft='#E6C48E',
+              link='#C7D3CF', linksel='#1F7560', ring='#FFFFFF', callow='#EEF6F2', calhigh='#9ACFBC', calsel='#F6DFC0', calwe='#F4F7F6', goldsoft='#E6C48E',
               logo='arcadia_logo_horizontal.png', name=''),
     'd': dict(bg='#141A19', rail='#0F1413', surface='#1A2120', pop='#1E2725', line='#2A3532', ink='#E9EFEC', muted='#9AA9A4',
-              accent='#7FD1B9', soft='#1E3A33', gap='#E3B65C', chip='#202A28', node='#2C3D39', open='#36665A', focus='#4E9C86',
-              link='#33413D', linksel='#7FD1B9', callow='#1D2A27', calhigh='#2F6A5B', calsel='#5A4826', calwe='#161D1C', goldsoft='#8C6A34',
+              accent='#7FD1B9', soft='#1E3A33', gap='#E3B65C', chip='#202A28', node='#34504A', open='#3F7A6A', focus='#58A88F',
+              link='#3A4945', linksel='#7FD1B9', ring='#6E8F86', callow='#1D2A27', calhigh='#2F6A5B', calsel='#5A4826', calwe='#161D1C', goldsoft='#8C6A34',
               logo='arcadia_logo_horizontal_reverse.png', name=' (dark)'),
 }
 
@@ -182,10 +182,20 @@ def page(th):
     s.rows = dp
     s.hide_labels.append(dp)
     no_field_labels(s, 'rows')
-    s.cell_size = (None, 18, dp)
+    s.cell_size = (None, 20, dp)
     s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='left',
            label=[[('{Lvl}', 'semi', 7.5, mu), ('  ·  ', 'book', 8, P['line']), ('{Name Other}', 'book', 9, ink), ('{Name Focus}', 'bold', 9.5, ac)]],
            tooltip=[[("Find any leader's organization", 'semi', 9, ink)]])
+    s = sh('Org Count')
+    s.filter_member('Path Row', 'true')
+    dp = s.f('depth_from_top', 'ord')
+    s.rows = dp
+    s.hide_labels.append(dp)
+    no_field_labels(s, 'rows')
+    s.cell_size = (None, 20, dp)
+    s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='right',
+           label=[[('{Count Other}', 'book', 8.5, mu), ('{Count Focus}', 'bold', 9, ac)]],
+           tooltip=[[('People led, ', 'book', 9, mu), ('{Worker Words}', 'book', 9, mu), (' · click to find any leader', 'semi', 9, ink)]])
     s = sh('Org Below')
     s.filter_member('Focus Row', 'true')
     s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='left',
@@ -215,7 +225,7 @@ def page(th):
 
     s = sh('Cal Field')
     s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ('Toggle Cal', 'Close Panel')], valign='top',
-           label=[[('{Day Lead}', 'bold', 9.5, ink), ('   ›', 'semi', 9.5, ac)], [('{Cal Field Value}', 'semi', 9, ac)], [('{Cal Field Note}', 'book', 8, mu)]],
+           label=[[('{Day Lead}', 'bold', 9.5, ink), ('   ›', 'semi', 9.5, ac)], [('{Cal Field Value}', 'semi', 10, ac)]],
            tooltip=[[('Pick a day in the next 30 days', 'semi', 9, ink)]])
 
     def button_sheet(name, shape, act_fields, size, tiptext, row='Focus Row'):
@@ -263,18 +273,19 @@ def page(th):
         s.pane('Line', pane_id=3, y_axis=yl, size='0.6', transparency='255',
                enc=ZZ + [('path', 'point_index', 'ord'), ('lod', 'node_id', 'dim'), ('lod', 'mark_type', 'dim'), ('color', 'Link Kind', 'dim')]
                + [('lod', n, 'dim') for n in ACT])
-        s.pane('Pie', pane_id=4, y_axis=yn, size=SIZE['pie'], transparency='255', stroke='false', align='center', valign='bottom',
+        s.pane('Pie', pane_id=4, y_axis=yn, size=SIZE['pie'], transparency='255', stroke='true' if th == 'd' else 'false', align='center', valign='bottom',
                enc=ZZ + [('lod', 'Wedge Order', 'ord'), ('lod', 'node_id', 'dim'), ('color', 'Pie Color', 'dim'), ('size', 'Pie Size', 'min'), ('wedge-size', 'Pie Angle', 'sum')]
                + [('lod', n, 'dim') for n in ACT],
                label=[[('{Node Label Name}', 'semi', 8.5, ink)], [('{Node Label Count}', 'book', 8, mu)]], tooltip=TIP,
-               extra_mark_fmt="<format attr='mark-labels-mode' value='all' />")
+               extra_mark_fmt="<format attr='mark-labels-mode' value='all' />" + (f"<format attr='stroke-color' value='{P['ring']}' />" if th == 'd' else ''))
 
     # ---------------------------------------------------------------- the Team pulse card
     good, bad, neutral = ac, gp, mu
     text_sheet('Pulse Sub', [[('{Pulse Sub}', 'book', 8.5, mu)]])
+    text_sheet('Pulse State', [[('{Cov State Good}', 'semi', 8, good), ('{Cov State Bad}', 'semi', 8, bad)]], valign='center', align='center')
     text_sheet('Pulse Hero', [
-        [('TEAM COVERAGE · TODAY      ', 'semi', 7.5, mu), ('{Cov State Good}', 'semi', 8, good), ('{Cov State Bad}', 'semi', 8, bad)],
-        [('{Cov Value Good}', 'bold', 22, good), ('{Cov Value Bad}', 'bold', 22, bad), ('   ', 'book', 9, mu), ('{Cov Sub}', 'book', 9, mu)]],
+        [('{Cov Value Good}', 'bold', 24, good), ('{Cov Value Bad}', 'bold', 24, bad), ('{Cov Sub}', 'book', 9.5, mu)]],
+        valign='center',
         tooltip=[[('Share of the team at work today, after time off, leave and public holidays', 'semi', 9, ink)],
                  [('The floor (', 'book', 9, mu), ('{Floor Txt}', 'semi', 9, ink), (') is the coverage a leader plans to keep; a Tableau Pulse threshold on Tableau Cloud', 'book', 9, mu)]])
     s = sh('Pulse Week')
@@ -287,11 +298,19 @@ def page(th):
     s.rows = cv
     hide_axis(s, cv, 0.5, 1.06, scope='rows')
     fl = s.f('Floor Mark', 'agg')
-    s.pane('Bar', enc=ZZ + [('color', 'Cov Kind', 'dim'), ('lod', 'Floor Mark', 'agg')], size='0.55', transparency='255', stroke='false',
-           align='center', valign='top', refs=[s.refline(0, cv, fl, mu, 1, 'dashed')],
-           label=[[('{Cov Day Label}', 'semi', 8, ink)], [('{Cov Day Pct}', 'book', 8, mu)]],
+    s.pane('Bar', enc=ZZ + [('color', 'Cov Kind', 'dim'), ('lod', 'Floor Mark', 'agg')], size='1.3', transparency='255', stroke='false',
+           align='center', refs=[s.refline(0, cv, fl, mu, 1, 'dashed')],
            tooltip=[[('{Cov Day Label}', 'bold', 10, ink), ('  {Cov Day Pct} at work', 'book', 10, ink)],
                     [('{at_work|sum}', 'semi', 9, ink), (' of ', 'book', 9, mu), ('{people|sum}', 'semi', 9, ink), (' · floor ', 'book', 9, mu), ('{Floor Txt}', 'semi', 9, ink)]])
+    s = sh('Pulse Days')
+    s.filter_member('Week Row', 'true')
+    do = s.f('day_offset', 'ord')
+    s.cols = do
+    s.hide_labels.append(do)
+    no_field_labels(s, 'cols')
+    s.pane('Text', enc=ZZ, valign='top', align='center',
+           label=[[('{Cov Day Label}', 'semi', 8.5, ink)], [('{Cov Day Pct}', 'book', 8.5, mu)]])
+    s.tooltip_off = True
     text_sheet('Pulse Insight', [[('{Insight Lead}', 'bold', 9, ink), ('{Insight Body}', 'book', 9, ink)]])
     TILES = [('Growth', 'TEAM GROWTH', '{Growth Txt}', [('  {Growth Chip Good}', 'semi', 8.5, good), ('{Growth Chip Bad}', 'semi', 8.5, bad)], '{Ago Label}'),
              ('Renew', 'RENEWALS AHEAD', '{Renew Txt}', [('  {Renew Chip}', 'semi', 8.5, neutral)], '{Renew Note}'),
@@ -300,7 +319,8 @@ def page(th):
              ('Coach', 'COACHING CAPACITY', '{Coach Txt}', [], '{Coach Note}'),
              ('Hub', 'IN THE HUB', '{Hub Txt}', [('  {Hub Chip Good}', 'semi', 8.5, good), ('{Hub Chip Bad}', 'semi', 8.5, bad)], '{Hub Note}')]
     for key, lab, val, chips, note in TILES:
-        text_sheet(f'Tile {key}', [[(lab, 'semi', 7.5, mu)], [(val, 'bold', 15, ink)] + chips, [(note, 'book', 7.5, mu)]])
+        text_sheet(f'Tile {key}', [[(lab, 'semi', 7.5, mu)], [(val, 'bold', 16, ink)] + chips])
+        text_sheet(f'Tile {key} Note', [[(note, 'book', 8, mu)]], valign='bottom')
     for key, row, xf, yf, kind in (('Growth', 'Pulse Row', 'month_index', 'people', None), ('Gap', 'Pulse Row', 'month_index', 'gap_people', 'Gap Trend Kind'),
                                    ('Renew', 'Renew Row', 'day_offset', 'left_team', None)):
         s = sh(f'Spark {key}')
@@ -321,7 +341,7 @@ def page(th):
         z0 = s.f('Bar Zero', 'agg')
         s.cols = z0
         hide_axis(s, z0, 0, 1)
-        s.pane('GanttBar', enc=ZZ + [('size', bar, 'agg')], size='1.6', transparency='255', stroke='false', color=good,
+        s.pane('GanttBar', enc=ZZ + [('size', bar, 'agg')], size='0.9', transparency='255', stroke='false', color=good,
                refs=s.refband(0, z0, 0, 1, P['chip']))
         s.tooltip_off = True
 
@@ -373,8 +393,9 @@ L, D = page('l'), page('d')
 # every sheet gets a context filter, so its FIXED reads scan only the rows it needs (see Ctx Leaders in d7_calcs.py)
 CTX = {'KPI 2': 'Ctx Days', 'Cal Field': 'Ctx Days', 'Calendar': 'Ctx Days', 'Cal Summary': 'Ctx Days',
        'Tree': 'Ctx Tree', 'Tree Wide': 'Ctx Tree'}
-CTX.update({n: 'Ctx Pulse' for n in ('Pulse Sub', 'Pulse Hero', 'Pulse Week', 'Pulse Insight', 'Tile Growth', 'Tile Renew', 'Tile Mix',
-                                     'Tile Gap', 'Tile Coach', 'Tile Hub', 'Spark Growth', 'Spark Gap', 'Spark Renew', 'Bar Mix', 'Bar Coach', 'Bar Hub')})
+CTX.update({n: 'Ctx Pulse' for n in ('Pulse Sub', 'Pulse State', 'Pulse Hero', 'Pulse Week', 'Pulse Days', 'Pulse Insight',
+                                     'Spark Growth', 'Spark Gap', 'Spark Renew', 'Bar Mix', 'Bar Coach', 'Bar Hub')})
+CTX.update({f'Tile {k}{n}': 'Ctx Pulse' for k in ('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub') for n in ('', ' Note')})
 for name, sh_ in SHEETS.items():
     sh_.filter_member(CTX.get(name.replace(' (dark)', ''), 'Ctx Leaders'), 'true')
     sh_.filters.insert(0, sh_.filters.pop().replace("'>\n", "' context='true'>\n", 1))
@@ -505,17 +526,21 @@ def layout(th, S):
     pg.image(BRAND + P['logo'], 16, 20, 150, 41)
     pg.box(14, 76, 188, 1, P['line'])
     pg.text(14, 86, 196, 48, [('Who Leads Where', ink, 15, 'Bold'), ('\n', 0, 0, 0), ('Leadership scope & org design', mu, 9, 'Book')])
-    # rail: the organization (the path from the CEO to the leader on the page), the workforce, what the tree counts, the day
-    for lab, y in (('ORGANIZATION', 148), ('WORKFORCE', 358), ('TREE COUNTS', 418), ('DAY', 478)):
-        pg.text(14, y, 190, 16, [(lab, mu, 7.5, 'Semibold')])
-    pg.box(14, 166, 188, 178, P['surface'], P['line'], 10)
-    pg.sheet(S['Org Field'], 20, 171, 180, 146)
-    pg.box(22, 318, 172, 1, P['line'])
-    pg.sheet(S['Org Below'], 20, 321, 180, 20)
-    pg.sheet(S['Worker Toggle'], 14, 376, 188, 30)
-    pg.sheet(S['Count Toggle'], 14, 436, 188, 30)
-    pg.box(14, 496, 188, 60, P['surface'], P['line'], 10)
-    pg.sheet(S['Cal Field'], 22, 501, 176, 52)
+    # rail: the organization (the path from the CEO to the leader on the page, people led on the right), the workforce,
+    # what the tree counts, the calendar; each section with room to breathe
+    pg.text(14, 152, 190, 16, [('ORGANIZATION', mu, 7.5, 'Semibold')])
+    pg.box(14, 172, 188, 200, P['surface'], P['line'], 10)
+    pg.sheet(S['Org Field'], 22, 178, 128, 160)
+    pg.sheet(S['Org Count'], 140, 178, 58, 160)
+    pg.box(22, 343, 172, 1, P['line'])
+    pg.sheet(S['Org Below'], 20, 347, 180, 22)
+    pg.text(14, 400, 190, 16, [('WORKFORCE', mu, 7.5, 'Semibold')])
+    pg.sheet(S['Worker Toggle'], 14, 418, 188, 30)
+    pg.text(14, 474, 190, 16, [('TREE COUNTS', mu, 7.5, 'Semibold')])
+    pg.sheet(S['Count Toggle'], 14, 492, 188, 30)
+    pg.text(14, 548, 190, 30, [('CALENDAR', mu, 7.5, 'Semibold'), ('\n', 0, 0, 0), ('Click the card to pick a day', mu, 7.5, 'Book')])
+    pg.box(14, 582, 188, 50, P['surface'], P['line'], 10)
+    pg.sheet(S['Cal Field'], 22, 587, 176, 42)
     pg.sheet(S['Rail As Of'], 14, 742, 196, 18)
     pg.box(14, 764, 188, 1, P['line'])
     pg.text(14, 772, 196, 18, [('Built by ', mu, 8.5, 'Book'), ('Thiago Alpoin', ink, 8.5, 'Semibold')])
@@ -531,7 +556,8 @@ def layout(th, S):
         pg.sheet(S[f'KPI {k + 1}'], x0 + 12, 76, round(kw) - 18, 68)
     # tree card, narrow and wide
     CY, CH = 160, 672
-    for show, wcard in ((f'Show {T} Narrow', 806), (f'Show {T} Wide', 1136)):
+    X0 = 240 + round(3 * (kw + 12))                                # the Team pulse card lines up with the fourth KPI card
+    for show, wcard in ((f'Show {T} Narrow', X0 - 12 - 240), (f'Show {T} Wide', 1136)):
         wide = wcard == 1136
         pg.box(240, CY, wcard, CH, P['surface'], P['line'], 14, show=show)
         pg.text(256, CY + 10, 220, 24, [('The organization', ink, 11.5, 'Semibold')], show=show)
@@ -544,27 +570,36 @@ def layout(th, S):
                 show=show)
     # the Team pulse card (narrow only): the coverage hero, then six tiles in two columns
     show = f'Show {T} Narrow'
-    X0, PW = 1060, 316
+    PW = 240 + 1136 - X0
     pg.box(X0, CY, PW, CH, P['surface'], P['line'], 14, show=show)
     pg.text(X0 + 16, CY + 10, 250, 24, [('Team pulse', ink, 11.5, 'Semibold')], show=show)
     pg.sheet(S['Info'], X0 + PW - 38, CY + 9, 26, 26, show=show)
     pg.sheet(S['Pulse Sub'], X0 + 14, CY + 34, PW - 28, 18, show=show)
-    hy = CY + 58
-    pg.box(X0 + 12, hy, PW - 24, 254, P['bg'], radius=12, show=show)
-    pg.sheet(S['Pulse Hero'], X0 + 20, hy + 6, PW - 40, 70, show=show)
-    pg.sheet(S['Pulse Week'], X0 + 18, hy + 76, PW - 36, 114, show=show)
-    pg.sheet(S['Pulse Insight'], X0 + 20, hy + 192, PW - 40, 58, show=show)
-    tw, th_, gx, gy = (PW - 24 - 8) // 2, 108, 8, 8
-    ty0 = hy + 254 + 10
+    # the hero: label and state chip, the big number, the next five weekdays against the floor, the day labels, the insight
+    hx, hy, hw, hh = X0 + 12, CY + 58, PW - 24, 272
+    pg.box(hx, hy, hw, hh, P['bg'], radius=12, show=show)
+    pg.text(hx + 12, hy + 12, 200, 16, [('TEAM COVERAGE · TODAY', mu, 7.5, 'Semibold')], show=show)
+    pg.box(hx + hw - 12 - 150, hy + 8, 150, 22, P['soft'], radius=11, show=show)
+    pg.sheet(S['Pulse State'], hx + hw - 12 - 148, hy + 9, 146, 20, show=show)
+    pg.sheet(S['Pulse Hero'], hx + 8, hy + 34, hw - 16, 42, show=show)
+    pg.sheet(S['Pulse Week'], hx + 6, hy + 80, hw - 12, 92, show=show)
+    pg.sheet(S['Pulse Days'], hx + 6, hy + 172, hw - 12, 34, show=show)
+    pg.sheet(S['Pulse Insight'], hx + 8, hy + 208, hw - 16, 60, show=show)
+    # six tiles in two columns: label and value, the trend, the note
+    gx = gy = 8
+    tw = (hw - gx) // 2
+    ty0 = hy + hh + 10
+    th_ = (CY + CH - 12 - ty0 - 2 * gy) // 3
     for i, key in enumerate(('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')):
-        x0 = X0 + 12 + (i % 2) * (tw + gx)
+        x0 = hx + (i % 2) * (tw + gx)
         y0 = ty0 + (i // 2) * (th_ + gy)
         pg.box(x0, y0, tw, th_, P['bg'], radius=10, show=show)
-        pg.sheet(S[f'Tile {key}'], x0 + 6, y0 + 4, tw - 10, 66, show=show)
+        pg.sheet(S[f'Tile {key}'], x0 + 6, y0 + 4, tw - 12, 44, show=show)
         if key in ('Growth', 'Gap', 'Renew'):
-            pg.sheet(S[f'Spark {key}'], x0 + 6, y0 + 70, tw - 12, 34, show=show)
+            pg.sheet(S[f'Spark {key}'], x0 + 10, y0 + 48, tw - 20, 28, show=show)
         else:
-            pg.sheet(S[f'Bar {key}'], x0 + 4, y0 + 72, tw - 8, 26, show=show)
+            pg.sheet(S[f'Bar {key}'], x0 + 10, y0 + 58, tw - 20, 9, show=show)
+        pg.sheet(S[f'Tile {key} Note'], x0 + 6, y0 + th_ - 24, tw - 12, 20, show=show)
     # popovers
     show = f'Show {T} Pick'
     pg.box(224, 96, 780, 590, P['pop'], P['line'], 16, show=show)
@@ -654,6 +689,11 @@ for S in (L, D):
           (f'Picker L1 default{sfx}', S['Org Field'], 'p_B1', 'Pick B1 Default'),
           (f'Picker closes cal{sfx}', S['Org Field'], 'p_CalOpen', 'Close Panel'),
           (f'Picker closes rules{sfx}', S['Org Field'], 'p_RulesOpen', 'Close Panel'),
+          (f'Open picker count{sfx}', S['Org Count'], 'p_PickOpen', 'Toggle Pick'),
+          (f'Picker L0 default count{sfx}', S['Org Count'], 'p_B0', 'Pick B0 Default'),
+          (f'Picker L1 default count{sfx}', S['Org Count'], 'p_B1', 'Pick B1 Default'),
+          (f'Picker closes cal count{sfx}', S['Org Count'], 'p_CalOpen', 'Close Panel'),
+          (f'Picker closes rules count{sfx}', S['Org Count'], 'p_RulesOpen', 'Close Panel'),
           (f'Open calendar{sfx}', S['Cal Field'], 'p_CalOpen', 'Toggle Cal'),
           (f'Calendar closes picker{sfx}', S['Cal Field'], 'p_PickOpen', 'Close Panel'),
           (f'Calendar closes rules{sfx}', S['Cal Field'], 'p_RulesOpen', 'Close Panel'),
@@ -713,7 +753,7 @@ def ws_window(name):
 
 
 names = list(SHEETS)
-LISTS = [n for n in names if n.startswith(('Pick L0', 'Pick L1', 'Pick L2', 'Align Solid', 'Align Matrix', 'Align Role', 'Org Field'))]
+LISTS = [n for n in names if n.startswith(('Pick L0', 'Pick L1', 'Pick L2', 'Align Solid', 'Align Matrix', 'Align Role', 'Org Field', 'Org Count'))]
 vps = '\n'.join(f"    <viewpoint name='{xesc(n)}'>\n      <zoom type='{'fit-width' if n in LISTS else 'entire-view'}' />\n    </viewpoint>" for n in sorted(names))
 dwin = (f"<window class='dashboard' maximized='true' name='{DASH}'>\n  <viewpoints>\n{vps}\n  </viewpoints>\n"
         f"  <active id='-1' />\n  <simple-id uuid='{uid()}' />\n</window>")
