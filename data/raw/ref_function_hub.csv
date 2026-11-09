@@ -1,0 +1,42 @@
+function_name,location_id,hub_name
+Technology,LOC-001,Austin engineering hub
+Technology,LOC-015,India engineering hub
+Technology,LOC-016,India engineering hub
+Technology,LOC-033,India engineering hub
+Technology,LOC-013,Poland engineering hub
+Technology,LOC-014,Poland engineering hub
+Operations,LOC-015,India operations hub
+Operations,LOC-016,India operations hub
+Operations,LOC-001,Austin headquarters
+Operations,LOC-013,Poland operations hub
+Operations,LOC-014,Poland operations hub
+Operations,LOC-036,Manila operations hub
+Product,LOC-001,Austin headquarters
+Product,LOC-015,India product hub
+Product,LOC-016,India product hub
+Product,LOC-009,London product hub
+Product,LOC-003,San Francisco product hub
+Commercial,LOC-001,Austin headquarters
+Commercial,LOC-009,London sales hub
+Commercial,LOC-002,New York sales hub
+Commercial,LOC-007,Sao Paulo sales hub
+Commercial,LOC-017,Singapore sales hub
+Commercial,LOC-015,India sales hub
+Commercial,LOC-016,India sales hub
+Marketing,LOC-001,Austin headquarters
+Marketing,LOC-002,New York marketing hub
+Marketing,LOC-009,London marketing hub
+Marketing,LOC-015,India marketing hub
+Finance,LOC-001,Austin headquarters
+Finance,LOC-009,London finance hub
+Finance,LOC-015,India finance hub
+Finance,LOC-016,India finance hub
+People,LOC-001,Austin headquarters
+People,LOC-009,London people hub
+People,LOC-015,India people hub
+People,LOC-016,India people hub
+Legal & Compliance,LOC-001,Austin headquarters
+Legal & Compliance,LOC-009,London legal hub
+Legal & Compliance,LOC-002,New York legal hub
+Legal & Compliance,LOC-015,India legal hub
+Executive,LOC-001,Austin headquarters

@@ -139,6 +139,7 @@ RAW_TABLE_LINEAGE = [
     ("ks_leave_of_absence", _KS, "Absence", "leave of absence", "Accumulating snapshot", 7),
     ("bw_time_off", _BW, "Time off", "time off booking", "Transaction", 7),
     ("ref_job_family_home", _WH, "Org design", "job family", "Type 1", 7),
+    ("ref_function_hub", _WH, "Org design", "function x hub office", "Type 1", 7),
     ("ref_public_holiday", _PUB, "Public holidays", "country x national holiday", "Transaction", 7),
     ("gen_org_drift_truth", _GEN, "Answer key", "seeded org design gap x continuous period", "Effective-dated", 7),
 ]
@@ -486,6 +487,11 @@ RAW_COLUMNS.update({
         ("job_family_code", "VARCHAR", "-> dim_job_profile"),
         ("home_function", "VARCHAR", "The function that usually hires the family; empty for a shared family"),
         ("is_shared", "BOOLEAN", "True for families every function hires (Data, Operations)"),
+    ],
+    "ref_function_hub": [
+        ("function_name", "VARCHAR", "-> dim_department.function_name"),
+        ("location_id", "VARCHAR", "-> dim_location: one of the function's hub offices"),
+        ("hub_name", "VARCHAR", "The hub the office belongs to (offices of one hub share a name)"),
     ],
     "ref_public_holiday": [
         ("country_code", "VARCHAR", "-> dim_country"),

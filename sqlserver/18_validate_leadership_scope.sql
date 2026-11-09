@@ -28,13 +28,14 @@ PRINT '1. Rows by type';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #w7) AS actual, 580222 AS expected
+              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #w7) AS actual, 707236 AS expected
     UNION ALL SELECT 'Node rows (leader x worker type)',     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Node'), 10518
     UNION ALL SELECT 'Tree rows (circles and link points)',  (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree'), 255219
     UNION ALL SELECT 'Tree rows, the company tree (Dynamic)', (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree' AND tree_mode = 'Dynamic'), 63091
     UNION ALL SELECT 'Day rows (31 days)',                   (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Day'), 300359
     UNION ALL SELECT 'Signal rows (person x signal x leader above)', (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Signal'), 14119
     UNION ALL SELECT 'R1 rows (assignment x leader above)',  (SELECT COUNT(*) FROM #w7 WHERE row_type = 'R1'), 7
+    UNION ALL SELECT 'Pulse rows (leader x worker type x month-end)', (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Pulse'), 127014
     UNION ALL SELECT 'leaders in the picker (L0 9, L1 20, L2 189)',
                      (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Node' AND worker_type = 'All' AND is_selectable = 1), 218
     UNION ALL SELECT 'rows without the report date label', (SELECT COUNT(*) FROM #w7 WHERE report_as_of_label IS NULL), 0
@@ -138,6 +139,11 @@ FROM (
                                             GROUP BY tree_mode, focus_leader_id, node_id HAVING COUNT(*) <> 17) AS x), 0
     UNION ALL SELECT 'static circles off the canvas (x outside 0 to 1)',
                      (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree' AND tree_mode = 'Static' AND (x < 0 OR x > 1)), 0
+    UNION ALL SELECT 'pulse rows with more hub people than people',
+                     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Pulse' AND hub_people > people), 0
+    UNION ALL SELECT 'pulse: dip or lightest team set on a month other than the report date',
+                     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Pulse' AND month_index < 12
+                      AND (dip_day IS NOT NULL OR lightest_team_leader_id IS NOT NULL)), 0
     UNION ALL SELECT 'weekdays where at work + off <> people',
                      (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Day' AND is_weekend = 0 AND at_work + [off] <> people), 0
 ) AS c;

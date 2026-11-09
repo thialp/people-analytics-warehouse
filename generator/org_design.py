@@ -100,6 +100,34 @@ JOB_FAMILY_HOME = [
     ("DAT", None, True), ("OPS", None, True),
 ]
 
+# Where each function means its people to sit: the offices that hold its training, its senior managers and its
+# support (release 7). A person is "in the hub" when their office is one of their own function's hubs. The hubs follow
+# where each function already concentrates; nobody is moved.
+FUNCTION_HUBS = [
+    ("Technology", "LOC-001", "Austin engineering hub"), ("Technology", "LOC-015", "India engineering hub"),
+    ("Technology", "LOC-016", "India engineering hub"), ("Technology", "LOC-033", "India engineering hub"),
+    ("Technology", "LOC-013", "Poland engineering hub"), ("Technology", "LOC-014", "Poland engineering hub"),
+    ("Operations", "LOC-015", "India operations hub"), ("Operations", "LOC-016", "India operations hub"),
+    ("Operations", "LOC-001", "Austin headquarters"), ("Operations", "LOC-013", "Poland operations hub"),
+    ("Operations", "LOC-014", "Poland operations hub"), ("Operations", "LOC-036", "Manila operations hub"),
+    ("Product", "LOC-001", "Austin headquarters"), ("Product", "LOC-015", "India product hub"),
+    ("Product", "LOC-016", "India product hub"), ("Product", "LOC-009", "London product hub"),
+    ("Product", "LOC-003", "San Francisco product hub"),
+    ("Commercial", "LOC-001", "Austin headquarters"), ("Commercial", "LOC-009", "London sales hub"),
+    ("Commercial", "LOC-002", "New York sales hub"), ("Commercial", "LOC-007", "Sao Paulo sales hub"),
+    ("Commercial", "LOC-017", "Singapore sales hub"), ("Commercial", "LOC-015", "India sales hub"),
+    ("Commercial", "LOC-016", "India sales hub"),
+    ("Marketing", "LOC-001", "Austin headquarters"), ("Marketing", "LOC-002", "New York marketing hub"),
+    ("Marketing", "LOC-009", "London marketing hub"), ("Marketing", "LOC-015", "India marketing hub"),
+    ("Finance", "LOC-001", "Austin headquarters"), ("Finance", "LOC-009", "London finance hub"),
+    ("Finance", "LOC-015", "India finance hub"), ("Finance", "LOC-016", "India finance hub"),
+    ("People", "LOC-001", "Austin headquarters"), ("People", "LOC-009", "London people hub"),
+    ("People", "LOC-015", "India people hub"), ("People", "LOC-016", "India people hub"),
+    ("Legal & Compliance", "LOC-001", "Austin headquarters"), ("Legal & Compliance", "LOC-009", "London legal hub"),
+    ("Legal & Compliance", "LOC-002", "New York legal hub"), ("Legal & Compliance", "LOC-015", "India legal hub"),
+    ("Executive", "LOC-001", "Austin headquarters"),
+]
+
 ONE_DAY = dt.timedelta(days=1)
 
 
@@ -597,8 +625,9 @@ def build(stream: np.random.Generator, job: pd.DataFrame, workers: pd.DataFrame,
     tr = pd.DataFrame(truth + t2 + t3)
     tr.insert(0, "drift_id", [f"OD{n:06d}" for n in range(1, len(tr) + 1)])
     home = pd.DataFrame(JOB_FAMILY_HOME, columns=["job_family_code", "home_function", "is_shared"])
+    hubs = pd.DataFrame(FUNCTION_HUBS, columns=["function_name", "location_id", "hub_name"])
     return {"fact_job_history": job7, "ks_matrix_org": mx, "ks_matrix_membership": mem,
-            "ks_role_assignment": ra, "ref_job_family_home": home, "gen_org_drift_truth": tr}
+            "ks_role_assignment": ra, "ref_job_family_home": home, "ref_function_hub": hubs, "gen_org_drift_truth": tr}
 
 
 if __name__ == "__main__":

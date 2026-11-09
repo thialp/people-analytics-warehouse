@@ -17,6 +17,7 @@
                   LeaderAvailability   at work / off per leader, worker type and day
                   OrgNode              the tree's nodes on the report date
                   OrgTreeLayout        the tree's coordinates: one company tree (dynamic), and three tiers below every leader (static)
+                  LeaderPulse          the Team pulse: 13 month-ends of people, gaps and hub people; the days ahead
                   AlignmentDetail      person x signal on the report date, with the L0 / L1 / L2 above
                   OrgEntitlement       row-level security for Tableau Cloud
 
@@ -147,6 +148,14 @@ SELECT
     CAST(CASE LOWER(is_shared) WHEN 'true' THEN 1 ELSE 0 END AS BIT) AS IsShared
 INTO dw.RefJobFamilyHome
 FROM raw.ref_job_family_home;
+
+DROP TABLE IF EXISTS dw.RefFunctionHub;
+SELECT
+    CAST(function_name AS VARCHAR(60))                            AS FunctionName,
+    CAST(location_id AS VARCHAR(20))                              AS LocationID,
+    CAST(hub_name AS VARCHAR(60))                                 AS HubName
+INTO dw.RefFunctionHub
+FROM raw.ref_function_hub;
 
 DROP TABLE IF EXISTS dw.RefPublicHoliday;
 SELECT
@@ -832,6 +841,115 @@ WHERE n.Tier >= 1;
 CREATE CLUSTERED INDEX CIX_OrgTreeLayout ON dw.OrgTreeLayout (FocusLeaderID, TreeMode, MarkType, NodeID, PointIndex);
 GO
 
+/* ------------------------------------------------------------------ LeaderPulse
+   The Team pulse card and the Tableau Cloud Pulse metrics: every leader on the report date x worker
+   type x month-end (13). People and alignment gaps as in LeaderOrg; HubPeople = people below whose
+   office is one of their own function's hubs (RefFunctionHub). On the report date's row only
+   (MonthIndex 12): the weekday with the lowest share at work in the next seven days, the public
+   holiday that keeps the most of the leader's people off that day, and the direct report leader
+   whose team has the lowest share at work that day. */
+DROP TABLE IF EXISTS #NowLeader;
+SELECT l.LeaderID, l.ParentLeaderID, l.LeaderName
+INTO #NowLeader
+FROM dw.OrgLeader AS l
+JOIN fc.report_calendar AS rc ON l.MonthEndDate = rc.report_as_of_date;
+
+DROP TABLE IF EXISTS #Month;
+SELECT MonthEndDate, CAST(ROW_NUMBER() OVER (ORDER BY MonthEndDate) - 1 AS INT) AS MonthIndex
+INTO #Month
+FROM (SELECT DISTINCT MonthEndDate FROM dw.LeaderOrg) AS m;
+
+DROP TABLE IF EXISTS #Hub;
+SELECT b.MonthEndDate, b.LeaderID, wt.WorkerType, CAST(SUM(b.InHub) AS BIGINT) AS HubPeople
+INTO #Hub
+FROM (
+    SELECT c.MonthEndDate, c.AncestorID AS LeaderID, d.WorkerType AS PersonType,
+           CASE WHEN h.LocationID IS NULL THEN 0 ELSE 1 END AS InHub
+    FROM dw.OrgClosure AS c
+    JOIN #NowLeader AS n ON n.LeaderID = c.AncestorID
+    JOIN dw.OrgLeader AS l ON l.MonthEndDate = c.MonthEndDate AND l.LeaderID = c.AncestorID
+    JOIN dw.PersonMonthEnd AS d ON d.MonthEndDate = c.MonthEndDate AND d.PersonID = c.DescendantID
+    LEFT JOIN dw.RefFunctionHub AS h ON h.FunctionName = d.FunctionName AND h.LocationID = d.LocationID
+    WHERE c.Depth >= 1 AND d.IsExecutiveOfficer = 0
+) AS b
+JOIN #Wt AS wt ON wt.WorkerType = 'All'
+              OR (wt.WorkerType = 'Employees' AND b.PersonType = 'Employee')
+              OR (wt.WorkerType = 'Contingent' AND b.PersonType = 'Contingent')
+GROUP BY b.MonthEndDate, b.LeaderID, wt.WorkerType;
+
+/* the weekdays of the next seven days; the dip is the lowest share at work (ties: the earlier day) */
+DROP TABLE IF EXISTS #Dip;
+SELECT LeaderID, WorkerType, DayOffset, Day, People, AtWork, OffPublicHoliday
+INTO #Dip
+FROM (
+    SELECT a.*, ROW_NUMBER() OVER (PARTITION BY a.LeaderID, a.WorkerType
+                                   ORDER BY CAST(a.AtWork AS FLOAT) / a.People, a.DayOffset) AS Rk
+    FROM dw.LeaderAvailability AS a
+    WHERE a.DayOffset BETWEEN 0 AND 6 AND a.IsWeekend = 0 AND a.People > 0
+) AS w
+WHERE Rk = 1;
+
+DROP TABLE IF EXISTS #DipHoliday;
+SELECT LeaderID, WorkerType, HolidayName, CountryCode
+INTO #DipHoliday
+FROM (
+    SELECT x.*, ROW_NUMBER() OVER (PARTITION BY x.LeaderID, x.WorkerType ORDER BY x.OffPeople DESC, x.CountryCode) AS Rk
+    FROM (
+        SELECT dp.LeaderID, dp.WorkerType, ph.HolidayName, ph.CountryCode, COUNT(*) AS OffPeople
+        FROM #Dip AS dp
+        JOIN dw.OrgClosure AS c ON c.AncestorID = dp.LeaderID AND c.Depth >= 1
+        JOIN fc.report_calendar AS rc ON c.MonthEndDate = rc.report_as_of_date
+        JOIN dw.PersonAvailabilityDay AS a
+          ON a.PersonID = c.DescendantID AND a.DayOffset = dp.DayOffset AND a.DayStatus = 'Public holiday'
+        JOIN dw.PersonMonthEnd AS d ON d.MonthEndDate = c.MonthEndDate AND d.PersonID = c.DescendantID
+        JOIN dw.RefPublicHoliday AS ph ON ph.CountryCode = d.CountryCode AND ph.HolidayDate = dp.Day
+        WHERE dp.WorkerType = 'All'
+           OR (dp.WorkerType = 'Employees' AND a.WorkerType = 'Employee')
+           OR (dp.WorkerType = 'Contingent' AND a.WorkerType = 'Contingent')
+        GROUP BY dp.LeaderID, dp.WorkerType, ph.HolidayName, ph.CountryCode
+    ) AS x
+) AS r
+WHERE Rk = 1;
+
+DROP TABLE IF EXISTS #Lightest;
+SELECT LeaderID, WorkerType, TeamLeaderID, TeamLeaderName, People, AtWork
+INTO #Lightest
+FROM (
+    SELECT dp.LeaderID, dp.WorkerType, k.LeaderID AS TeamLeaderID, k.LeaderName AS TeamLeaderName, a.People, a.AtWork,
+           ROW_NUMBER() OVER (PARTITION BY dp.LeaderID, dp.WorkerType
+                              ORDER BY CAST(a.AtWork AS FLOAT) / a.People, k.LeaderName, k.LeaderID) AS Rk
+    FROM #Dip AS dp
+    JOIN #NowLeader AS k ON k.ParentLeaderID = dp.LeaderID
+    JOIN dw.LeaderAvailability AS a ON a.LeaderID = k.LeaderID AND a.WorkerType = dp.WorkerType AND a.DayOffset = dp.DayOffset
+    WHERE a.People > 0
+) AS r
+WHERE Rk = 1;
+
+DROP TABLE IF EXISTS dw.LeaderPulse;
+SELECT o.MonthEndDate, m.MonthIndex, o.LeaderID, o.WorkerType, o.People, o.GapPeople,
+       ISNULL(h.HubPeople, 0)       AS HubPeople,
+       dp.DayOffset                 AS DipDayOffset,
+       dp.Day                       AS DipDay,
+       dp.People                    AS DipPeople,
+       dp.AtWork                    AS DipAtWork,
+       dp.OffPublicHoliday          AS DipOffPublicHoliday,
+       hol.HolidayName              AS DipHolidayName,
+       hol.CountryCode              AS DipHolidayCountryCode,
+       lt.TeamLeaderID              AS LightestTeamLeaderID,
+       lt.TeamLeaderName            AS LightestTeamLeaderName,
+       lt.People                    AS LightestTeamPeople,
+       lt.AtWork                    AS LightestTeamAtWork
+INTO dw.LeaderPulse
+FROM dw.LeaderOrg AS o
+JOIN #Month AS m ON m.MonthEndDate = o.MonthEndDate
+JOIN #NowLeader AS n ON n.LeaderID = o.LeaderID
+LEFT JOIN #Hub AS h ON h.MonthEndDate = o.MonthEndDate AND h.LeaderID = o.LeaderID AND h.WorkerType = o.WorkerType
+LEFT JOIN #Dip AS dp ON m.MonthIndex = 12 AND dp.LeaderID = o.LeaderID AND dp.WorkerType = o.WorkerType
+LEFT JOIN #DipHoliday AS hol ON m.MonthIndex = 12 AND hol.LeaderID = o.LeaderID AND hol.WorkerType = o.WorkerType
+LEFT JOIN #Lightest AS lt ON m.MonthIndex = 12 AND lt.LeaderID = o.LeaderID AND lt.WorkerType = o.WorkerType;
+CREATE CLUSTERED INDEX CIX_LeaderPulse ON dw.LeaderPulse (LeaderID, WorkerType, MonthIndex);
+GO
+
 /* ------------------------------------------------------------------ AlignmentDetail
    Person x signal on the report date, with the function head (the deepest L0), the L1 and the
    L2 above each person. */
@@ -889,4 +1007,6 @@ DECLARE @t INT = (SELECT COUNT(*) FROM dw.OrgTreeLayout);
 PRINT CONCAT('dw.OrgTreeLayout                  ', @t);
 DECLARE @a INT = (SELECT COUNT(*) FROM dw.LeaderAvailability);
 PRINT CONCAT('dw.LeaderAvailability             ', @a);
+DECLARE @p INT = (SELECT COUNT(*) FROM dw.LeaderPulse);
+PRINT CONCAT('dw.LeaderPulse                    ', @p);
 GO

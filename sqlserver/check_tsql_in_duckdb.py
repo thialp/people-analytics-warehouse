@@ -72,7 +72,8 @@ VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),
          ("mart_leader_availability", "rpt.vw_leader_availability"),
          ("mart_alignment_detail", "rpt.vw_alignment_detail"),
          ("mart_org_entitlement", "rpt.vw_org_entitlement"),
-         ("mart_org_tree_layout", "rpt.vw_org_tree_layout")]
+         ("mart_org_tree_layout", "rpt.vw_org_tree_layout"),
+         ("mart_leader_pulse", "rpt.vw_leader_pulse")]
 FORECAST = ["mart_pid_fill_quarter", "mart_fill_survival", "mart_pid_forecast_draws", "mart_pid_forecast_backtest",
             "mart_pid_forecast_accuracy", "mart_pid_forecast_model", "mart_pid_forecast_run", "mart_cw_budget_function"]
 SKIP = re.compile(r"^\s*(CREATE\s+(CLUSTERED\s+|UNIQUE\s+)?INDEX|ALTER\s+TABLE|SET\s+NOCOUNT|USE\s|PRINT\s|DECLARE\s"
@@ -420,6 +421,9 @@ def main() -> int:
             ok &= compare(con, mart, f"cs.w7_{row_type}")
         con.execute("CREATE OR REPLACE VIEW cs.w7_Tree AS SELECT * FROM cs.who_leads_where WHERE row_type = 'Tree'")
         ok &= compare(con, "mart_org_tree_layout", "cs.w7_Tree")
+        con.execute("CREATE OR REPLACE VIEW cs.w7_Pulse AS SELECT as_of_date AS month_end_date, * FROM cs.who_leads_where "
+                    "WHERE row_type = 'Pulse'")
+        ok &= compare(con, "mart_leader_pulse", "cs.w7_Pulse")
         con.execute("CREATE OR REPLACE TABLE tmp_w7 AS SELECT * FROM cs.who_leads_where")   # #w7 in 18_validate
         con.execute("CREATE OR REPLACE VIEW w7 AS SELECT * FROM tmp_w7")
         custom_sql(con, "custom_sql_compensation_walk.sql", "walk_fy26", "t2.MonthEndDate >= '2025-06-30'")
