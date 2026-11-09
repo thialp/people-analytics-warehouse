@@ -177,31 +177,15 @@ def page(th):
     # ---------------------------------------------------------------- rail
     ORG_ACT = ('Toggle Pick', 'Pick B0 Default', 'Pick B1 Default', 'Close Panel')
     s = sh('Org Field')
-    s.filter_member('Path Row', 'true')
+    s.filter_member('Org Row', 'true')
     dp = s.f('depth_from_top', 'ord')
     s.rows = dp
     s.hide_labels.append(dp)
     no_field_labels(s, 'rows')
     s.cell_size = (None, 20, dp)
     s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='left',
-           label=[[('{Lvl}', 'semi', 7.5, mu), ('  ·  ', 'book', 8, P['line']), ('{Name Other}', 'book', 9, ink), ('{Name Focus}', 'bold', 9.5, ac)]],
-           tooltip=[[("Find any leader's organization", 'semi', 9, ink)]])
-    s = sh('Org Count')
-    s.filter_member('Path Row', 'true')
-    dp = s.f('depth_from_top', 'ord')
-    s.rows = dp
-    s.hide_labels.append(dp)
-    no_field_labels(s, 'rows')
-    s.cell_size = (None, 20, dp)
-    s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='right',
-           label=[[('{Count Other}', 'book', 8.5, mu), ('{Count Focus}', 'bold', 9, ac)]],
-           tooltip=[[('People led, ', 'book', 9, mu), ('{Worker Words}', 'book', 9, mu), (' · click to find any leader', 'semi', 9, ink)]])
-    s = sh('Org Below')
-    s.filter_member('Focus Row', 'true')
-    s.pane('Text', enc=ZZ + [('lod', n, how(n)) for n in ORG_ACT], valign='center', align='left',
-           label=[[('{Below Text}', 'book', 8, mu), ('  ·  ', 'book', 8, P['line']), ('Find ›', 'semi', 8, ac)]],
-           tooltip=[[("Find any leader's organization", 'semi', 9, ink)]])
-
+           label=[[('{Lvl}', 'semi', 7.5, mu), ('{Org Row Other}', 'book', 9, ink), ('{Org Row Focus}', 'bold', 9.5, ac)]],
+           tooltip=[[('{Org Row Tip}', 'book', 9, ink)], [("Click to open any leader's organization", 'semi', 9, ac)]])
     def seg_sheet(name, row_filter, key, shape, act_fields, size, tiptext):
         s = sh(name)
         s.filter_member(row_filter, 'true')
@@ -243,6 +227,7 @@ def page(th):
     button_sheet('Credit GitHub', 'GitHub Shape', [], SIZE['brand'], 'Thiago Alpoin on GitHub')
     button_sheet('Credit LinkedIn', 'LinkedIn Shape', [], SIZE['brand'], 'Thiago Alpoin on LinkedIn')
     text_sheet('Rail As Of', [[('{Rail As Of}', 'book', 8, mu)]])
+    text_sheet('Footnote', [[('{Footnote}', 'book', 9, mu)]], valign='center')
 
     # ---------------------------------------------------------------- the tree
     text_sheet('Tree Hint', [[('{Tree Hint}', 'book', 8.5, mu)]])
@@ -483,34 +468,113 @@ def style(bg=None, border=None, radius=None, pad=None):
     return "<zone-style>\n" + indent('\n'.join(st), 2) + "\n</zone-style>"
 
 
+# ----------------------------------------------------------------- containers
+# Every card is one floating layout container; everything inside it is tiled. A node's `size` is its fixed size along
+# its parent's direction (height in a vertical container, width in a horizontal one); None shares what is left.
+HIDE = {}           # zone id -> hidden when the workbook opens
+
+
+class N:
+    def __init__(self, kind, size=None, kids=(), **kw):
+        self.kind, self.size, self.kids, self.kw = kind, size, list(kids), kw
+
+
+def V(kids, size=None, **kw):
+    return N('vert', size, kids, **kw)
+
+
+def Hz(kids, size=None, **kw):
+    return N('horz', size, kids, **kw)
+
+
+def Sh(name, size=None, **kw):
+    return N('sheet', size, name=name, **kw)
+
+
+def Tx(runs, size=None, **kw):
+    return N('text', size, runs=runs, **kw)
+
+
+def Gap(size=None, bg=None):
+    return N('empty', size, bg=bg)
+
+
+def Img(path, size=None):
+    return N('image', size, path=path)
+
+
+def place(n, x, y, w, h):
+    n.rect = (x, y, w, h)
+    if n.kind not in ('vert', 'horz'):
+        return
+    t, r, b, l = n.kw.get('pad') or (0, 0, 0, 0)
+    ix, iy, iw, ih = x + l, y + t, w - l - r, h - t - b
+    total = ih if n.kind == 'vert' else iw
+    fixed = sum(k.size for k in n.kids if k.size is not None)
+    flex = [k for k in n.kids if k.size is None]
+    left = total - fixed
+    assert left >= 0, (n.kw.get('fname'), total, fixed)
+    share = {id(k): left // len(flex) + (1 if i < left % len(flex) else 0) for i, k in enumerate(flex)} if flex else {}
+    pos = iy if n.kind == 'vert' else ix
+    for k in n.kids:
+        s = k.size if k.size is not None else share[id(k)]
+        if n.kind == 'vert':
+            place(k, ix, pos, iw, s)
+        else:
+            place(k, pos, iy, s, ih)
+        pos += s
+
+
+def emit(n, hide, in_flow):
+    x, y, w, h = n.rect
+    i = nid()
+    HIDE[str(i)] = hide
+    fx = f" fixed-size='{n.size}' is-fixed='true'" if in_flow and n.size is not None else ''
+    kw = n.kw
+    st = style(kw.get('bg'), kw.get('border'), kw.get('radius'), kw.get('pad'))
+    if n.kind in ('vert', 'horz'):
+        kids = '\n'.join(emit(k, hide, True) for k in n.kids)
+        fn = f" friendly-name='{xesc(kw['fname'])}'" if kw.get('fname') else ''
+        return (f"<zone{fn} {z(x, y, w, h)}{fx} id='{i}' param='{n.kind}' type-v2='layout-flow'>\n" + indent(kids, 2) + '\n'
+                + indent(st, 2) + "\n</zone>")
+    if n.kind == 'sheet':
+        return f"<zone {z(x, y, w, h)}{fx} id='{i}' name='{xesc(kw['name'])}' show-title='false'>\n" + indent(st, 2) + "\n</zone>"
+    if n.kind == 'empty':
+        return f"<zone {z(x, y, w, h)}{fx} id='{i}' type-v2='empty'>\n" + indent(st, 2) + "\n</zone>"
+    if n.kind == 'image':
+        return f"<zone {z(x, y, w, h)}{fx} id='{i}' is-centered='0' is-scaled='1' param='{xesc(kw['path'])}' type-v2='bitmap' />"
+    rr = []
+    al = kw.get('align')
+    for t, c, sz, f in kw['runs']:
+        if t == '\n':
+            rr.append("    <run>Æ&#10;</run>")
+        else:
+            a_ = f" fontalignment='{ {'left': 0, 'center': 1, 'right': 2}[al] }'" if al else ''
+            rr.append(f"    <run{a_} fontcolor='{c}' fontname='Tableau {f}' fontsize='{sz}'>{xesc(t)}</run>")
+    return f"<zone {z(x, y, w, h)}{fx} id='{i}' type-v2='text'>\n  <formatted-text>\n" + '\n'.join(rr) + "\n  </formatted-text>\n" + indent(st, 2) + "\n</zone>"
+
+
+def opens_hidden(show):
+    return not show.startswith('Show Light') or any(k in show for k in ('Wide', 'Pick', 'Cal', 'Rules'))
+
+
 class Page:
     def __init__(self, show):
         self.zones, self.show = [], show
 
-    def add(self, xml, show=None):
-        i = re.search(r" id='(\d+)'", xml).group(1)
-        VIS[i] = show or self.show
-        self.zones.append(xml)
+    def root(self, node, x, y, w, h, show=None):
+        """one floating container (or item); its visibility calc drives everything inside it"""
+        show = show or self.show
+        place(node, x, y, w, h)
+        start = zid[0] + 1
+        self.zones.append(emit(node, opens_hidden(show), False))
+        VIS[str(start)] = show
 
-    def sheet(self, name, px, py, pw, ph, show=None):
-        self.add(f"<zone {z(px, py, pw, ph)} id='{nid()}' name='{xesc(name)}' show-title='false'>\n" + indent(style(), 2) + "\n</zone>", show)
 
-    def box(self, px, py, pw, ph, bg, border=None, radius=None, show=None):
-        self.add(f"<zone {z(px, py, pw, ph)} id='{nid()}' type-v2='empty'>\n" + indent(style(bg, border, radius), 2) + "\n</zone>", show)
-
-    def text(self, px, py, pw, ph, runs, show=None, pad=(0, 0, 0, 0), align=None):
-        rr = []
-        for t, c, sz, f in runs:
-            if t == '\n':
-                rr.append("    <run>Æ&#10;</run>")
-            else:
-                al = f" fontalignment='{ {'left': 0, 'center': 1, 'right': 2}[align] }'" if align else ''
-                rr.append(f"    <run{al} fontcolor='{c}' fontname='Tableau {f}' fontsize='{sz}'>{xesc(t)}</run>")
-        self.add(f"<zone {z(px, py, pw, ph)} id='{nid()}' type-v2='text'>\n  <formatted-text>\n" + '\n'.join(rr)
-                 + "\n  </formatted-text>\n" + indent(style(pad=pad), 2) + "\n</zone>", show)
-
-    def image(self, path, px, py, pw, ph, show=None):
-        self.add(f"<zone {z(px, py, pw, ph)} id='{nid()}' is-centered='0' is-scaled='1' param='{xesc(path)}' type-v2='bitmap' />", show)
+KW = [218, 217, 218, 217, 218]                                   # the five KPI cards, 12 apart: 1,136 px
+X0 = 240 + sum(KW[:3]) + 3 * 12                                  # the Team pulse card lines up with the fourth KPI card
+PW = 240 + 1136 - X0
+CY, CH = 160, 662
 
 
 def layout(th, S):
@@ -518,131 +582,110 @@ def layout(th, S):
     T = 'Light' if th == 'l' else 'Dark'
     pg = Page(f'Show {T}')
     ink, mu, ac = P['ink'], P['muted'], P['accent']
+    lab = lambda t: Tx([(t, mu, 7.5, 'Semibold')], 18)
     if th == 'd':
-        pg.box(0, 0, W, H, P['bg'])                                     # the dark page covers the light dashboard background
-    # rail
-    pg.box(0, 0, 216, H, P['rail'])
-    pg.box(216, 0, 1, H, P['line'])
-    pg.image(BRAND + P['logo'], 16, 20, 150, 41)
-    pg.box(14, 76, 188, 1, P['line'])
-    pg.text(14, 86, 196, 48, [('Who Leads Where', ink, 15, 'Bold'), ('\n', 0, 0, 0), ('Leadership scope & org design', mu, 9, 'Book')])
-    # rail: the organization (the path from the CEO to the leader on the page, people led on the right), the workforce,
-    # what the tree counts, the calendar; each section with room to breathe
-    pg.text(14, 152, 190, 16, [('ORGANIZATION', mu, 7.5, 'Semibold')])
-    pg.box(14, 172, 188, 200, P['surface'], P['line'], 10)
-    pg.sheet(S['Org Field'], 22, 178, 128, 160)
-    pg.sheet(S['Org Count'], 140, 178, 58, 160)
-    pg.box(22, 343, 172, 1, P['line'])
-    pg.sheet(S['Org Below'], 20, 347, 180, 22)
-    pg.text(14, 400, 190, 16, [('WORKFORCE', mu, 7.5, 'Semibold')])
-    pg.sheet(S['Worker Toggle'], 14, 418, 188, 30)
-    pg.text(14, 474, 190, 16, [('TREE COUNTS', mu, 7.5, 'Semibold')])
-    pg.sheet(S['Count Toggle'], 14, 492, 188, 30)
-    pg.text(14, 548, 190, 30, [('CALENDAR', mu, 7.5, 'Semibold'), ('\n', 0, 0, 0), ('Click the card to pick a day', mu, 7.5, 'Book')])
-    pg.box(14, 582, 188, 50, P['surface'], P['line'], 10)
-    pg.sheet(S['Cal Field'], 22, 587, 176, 42)
-    pg.sheet(S['Rail As Of'], 14, 742, 196, 18)
-    pg.box(14, 764, 188, 1, P['line'])
-    pg.text(14, 772, 196, 18, [('Built by ', mu, 8.5, 'Book'), ('Thiago Alpoin', ink, 8.5, 'Semibold')])
-    pg.sheet(S['Credit GitHub'], 14, 794, 30, 30)
-    pg.sheet(S['Credit LinkedIn'], 50, 794, 30, 30)
-    # headline on one line across the page, the theme toggle above its right end; five KPI cards
-    pg.sheet(S['Headline'], 240, 8, 1136, 56)
-    pg.sheet(S['Theme Toggle'], 1240, 6, 136, 26)
-    kw = (1136 - 4 * 12) / 5
+        pg.root(Gap(bg=P['bg']), 0, 0, W, H)                         # the dark page covers the light dashboard background
+    # ---- the rail
+    rail = V([
+        Hz([Img(BRAND + P['logo'], 150), Gap()], 41),
+        Gap(15), Gap(1, P['line']), Gap(10),
+        Tx([('Who Leads Where', ink, 15, 'Bold'), ('\n', 0, 0, 0), ('Leadership scope & org design', mu, 9, 'Book')], 46),
+        Gap(18), lab('ORGANIZATION'), Gap(4),
+        V([Sh(S['Org Field'])], 196, bg=P['surface'], border=P['line'], radius=10, pad=(8, 8, 8, 8)),
+        Gap(24), lab('WORKFORCE'), Gap(2), Sh(S['Worker Toggle'], 30),
+        Gap(22), lab('TREE COUNTS'), Gap(2), Sh(S['Count Toggle'], 30),
+        Gap(22), Tx([('CALENDAR', mu, 7.5, 'Semibold'), ('\n', 0, 0, 0), ('Click the card to pick a day', mu, 7.5, 'Book')], 30), Gap(4),
+        V([Sh(S['Cal Field'])], 50, bg=P['surface'], border=P['line'], radius=10, pad=(5, 8, 3, 8)),
+        Gap(),
+        Sh(S['Rail As Of'], 18), Gap(4), Gap(1, P['line']), Gap(8),
+        Tx([('Built by ', mu, 8.5, 'Book'), ('Thiago Alpoin', ink, 8.5, 'Semibold')], 18), Gap(4),
+        Hz([Sh(S['Credit GitHub'], 30), Gap(6), Sh(S['Credit LinkedIn'], 30), Gap()], 30),
+    ], fname=f'Rail {T}', bg=P['rail'], pad=(20, 14, 26, 14))
+    pg.root(rail, 0, 0, 216, H)
+    pg.root(Gap(bg=P['line']), 216, 0, 1, H)
+    # ---- the headline on one line, the theme toggle at its right end; the five KPI cards
+    pg.root(Hz([Sh(S['Headline']), V([Sh(S['Theme Toggle'], 26), Gap()], 136)], fname=f'Header {T}'), 240, 6, 1136, 58)
+    kpis = []
     for k in range(5):
-        x0 = 240 + round(k * (kw + 12))
-        pg.box(x0, 72, round(kw), 76, P['surface'], P['line'], 12)
-        pg.sheet(S[f'KPI {k + 1}'], x0 + 12, 76, round(kw) - 18, 68)
-    # tree card, narrow and wide
-    CY, CH = 160, 672
-    X0 = 240 + round(3 * (kw + 12))                                # the Team pulse card lines up with the fourth KPI card
+        kpis += ([Gap(12)] if k else []) + [V([Sh(S[f'KPI {k + 1}'])], KW[k], bg=P['surface'], border=P['line'], radius=12, pad=(4, 6, 4, 12))]
+    pg.root(Hz(kpis, fname=f'KPIs {T}'), 240, 72, 1136, 76)
+    # ---- the tree card, narrow (beside the Team pulse) and wide
     for show, wcard in ((f'Show {T} Narrow', X0 - 12 - 240), (f'Show {T} Wide', 1136)):
-        wide = wcard == 1136
-        pg.box(240, CY, wcard, CH, P['surface'], P['line'], 14, show=show)
-        pg.text(256, CY + 10, 220, 24, [('The organization', ink, 11.5, 'Semibold')], show=show)
-        pg.sheet(S['Tree Toggle Wide' if wide else 'Tree Toggle'], 240 + wcard - 16 - 30 - 10 - 152, CY + 8, 152, 28, show=show)
-        pg.sheet(S['Expand Wide' if wide else 'Expand'], 240 + wcard - 16 - 30, CY + 7, 30, 30, show=show)
-        pg.sheet(S['Tree Hint Wide' if wide else 'Tree Hint'], 256, CY + 38, wcard - 32, 20, show=show)
-        pg.sheet(S['Tree Wide' if wide else 'Tree'], 248, CY + 60, wcard - 16, CH - 92, show=show)
-        pg.text(256, CY + CH - 26, wcard - 32, 18, [('Circle size = people led  ·  ', mu, 8, 'Book'), ('amber slice', P['gap'], 8, 'Semibold'),
-                                                   (' = share with an alignment gap  ·  click a leader to open their team, anyone above to go back up', mu, 8, 'Book')],
-                show=show)
-    # the Team pulse card (narrow only): the coverage hero, then six tiles in two columns
-    show = f'Show {T} Narrow'
-    PW = 240 + 1136 - X0
-    pg.box(X0, CY, PW, CH, P['surface'], P['line'], 14, show=show)
-    pg.text(X0 + 16, CY + 10, 250, 24, [('Team pulse', ink, 11.5, 'Semibold')], show=show)
-    pg.sheet(S['Info'], X0 + PW - 38, CY + 9, 26, 26, show=show)
-    pg.sheet(S['Pulse Sub'], X0 + 14, CY + 34, PW - 28, 18, show=show)
-    # the hero: label and state chip, the big number, the next five weekdays against the floor, the day labels, the insight
-    hx, hy, hw, hh = X0 + 12, CY + 58, PW - 24, 272
-    pg.box(hx, hy, hw, hh, P['bg'], radius=12, show=show)
-    pg.text(hx + 12, hy + 12, 200, 16, [('TEAM COVERAGE · TODAY', mu, 7.5, 'Semibold')], show=show)
-    pg.box(hx + hw - 12 - 150, hy + 8, 150, 22, P['soft'], radius=11, show=show)
-    pg.sheet(S['Pulse State'], hx + hw - 12 - 148, hy + 9, 146, 20, show=show)
-    pg.sheet(S['Pulse Hero'], hx + 8, hy + 34, hw - 16, 42, show=show)
-    pg.sheet(S['Pulse Week'], hx + 6, hy + 80, hw - 12, 92, show=show)
-    pg.sheet(S['Pulse Days'], hx + 6, hy + 172, hw - 12, 34, show=show)
-    pg.sheet(S['Pulse Insight'], hx + 8, hy + 208, hw - 16, 60, show=show)
-    # six tiles in two columns: label and value, the trend, the note
-    gx = gy = 8
-    tw = (hw - gx) // 2
-    ty0 = hy + hh + 10
-    th_ = (CY + CH - 12 - ty0 - 2 * gy) // 3
-    for i, key in enumerate(('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')):
-        x0 = hx + (i % 2) * (tw + gx)
-        y0 = ty0 + (i // 2) * (th_ + gy)
-        pg.box(x0, y0, tw, th_, P['bg'], radius=10, show=show)
-        pg.sheet(S[f'Tile {key}'], x0 + 6, y0 + 4, tw - 12, 44, show=show)
-        if key in ('Growth', 'Gap', 'Renew'):
-            pg.sheet(S[f'Spark {key}'], x0 + 10, y0 + 48, tw - 20, 28, show=show)
-        else:
-            pg.sheet(S[f'Bar {key}'], x0 + 10, y0 + 58, tw - 20, 9, show=show)
-        pg.sheet(S[f'Tile {key} Note'], x0 + 6, y0 + th_ - 24, tw - 12, 20, show=show)
-    # popovers
-    show = f'Show {T} Pick'
-    pg.box(224, 96, 780, 590, P['pop'], P['line'], 16, show=show)
-    pg.text(244, 108, 560, 24, [("Open any leader's organization", ink, 12, 'Semibold')], show=show)
-    pg.text(244, 132, 640, 18, [('Click a name to open it and see the leaders below; the tree, KPIs and panel follow your pick', mu, 8.5, 'Book')], show=show)
-    pg.sheet(S['Pick Close'], 968, 104, 28, 28, show=show)
-    pg.text(244, 160, 236, 18, [('CEO AND EXECUTIVES', mu, 7.5, 'Semibold')], show=show)
-    pg.sheet(S['Pick Head L1'], 494, 160, 236, 18, show=show)
-    pg.sheet(S['Pick Head L2'], 744, 160, 250, 18, show=show)
-    pg.sheet(S['Pick L0'], 238, 180, 244, 460, show=show)
-    pg.sheet(S['Pick L1'], 488, 180, 244, 460, show=show)
-    pg.sheet(S['Pick L2'], 738, 180, 256, 460, show=show)
-    pg.text(244, 650, 740, 30, [('On Tableau Cloud a leader sees only their own branch (row-level security on their work email); '
-                                 'People Analytics sees every branch.', mu, 8, 'Book')], show=show)
-    show = f'Show {T} Cal'
-    pg.box(224, 300, 540, 500, P['pop'], P['line'], 16, show=show)
-    pg.sheet(S['Cal Title'], 244, 312, 470, 44, show=show)
-    pg.sheet(S['Cal Close'], 728, 308, 28, 28, show=show)
-    for i, d in enumerate(('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')):
-        pg.text(238 + i * 73, 360, 73, 16, [(d, mu, 8, 'Book')], show=show, align='center')
-    pg.sheet(S['Calendar'], 238, 378, 512, 330, show=show)
-    pg.sheet(S['Cal Summary'], 244, 716, 506, 76, show=show)
-    show = f'Show {T} Rules'
-    pg.box(300, 64, 1000, 600, P['pop'], P['line'], 16, show=show)
-    pg.text(322, 78, 800, 26, [('Org design alignment', ink, 13, 'Semibold')], show=show)
-    pg.sheet(S['Rules Close'], 1262, 74, 28, 28, show=show)
-    pg.text(322, 108, 950, 44, [("A leader's org design is the org units they lead and the job families their function hires; the matrix line "
-                                 'follows where people sit. Each signal marks where a record departs from that design. Many have a good '
-                                 'business reason; the flag simply makes them visible.', mu, 9, 'Book')], show=show)
-    cols = ((322, 130, 'LINE'), (452, 230, 'SIGNAL'), (682, 430, 'WHEN IT SHOWS'), (1112, 170, 'GOOD PARTNER TO ASK'))
-    for x0, w0, lab in cols:
-        pg.text(x0, 160, w0, 18, [(lab, mu, 7.5, 'Semibold')], show=show)
-    pg.box(322, 180, 960, 1, P['line'], show=show)
+        wide = 'Wide' in show
+        w_ = ' Wide' if wide else ''
+        card = V([
+            Hz([Tx([('The organization', ink, 11.5, 'Semibold')]), Sh(S['Tree Toggle' + w_], 152), Gap(10), Sh(S['Expand' + w_], 30)], 30, pad=(0, 8, 0, 8)),
+            Gap(2),
+            Hz([Sh(S['Tree Hint' + w_])], 22, pad=(0, 8, 0, 8)),
+            Sh(S['Tree' + w_]),
+        ], fname=f'Card Tree{w_} {T}', bg=P['surface'], border=P['line'], radius=14, pad=(8, 8, 8, 8))
+        pg.root(card, 240, CY, wcard, CH, show=show)
+    # ---- the Team pulse card: the coverage hero, then six tiles in two columns
+    tiles = []
+    for r in range(3):
+        row = []
+        for c in range(2):
+            key = ('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')[2 * r + c]
+            viz = (Hz([Sh(S[f'Spark {key}'])], 28, pad=(0, 4, 0, 4)) if key in ('Growth', 'Gap', 'Renew')
+                   else V([Sh(S[f'Bar {key}'])], 28, pad=(10, 4, 9, 4)))
+            row += ([Gap(8)] if c else []) + [V([Sh(S[f'Tile {key}'], 44), viz, Sh(S[f'Tile {key} Note'])],
+                                                bg=P['bg'], radius=10, pad=(4, 6, 2, 6))]
+        tiles += ([Gap(8)] if r else []) + [Hz(row)]
+    hero = V([
+        Hz([Tx([('TEAM COVERAGE · TODAY', mu, 7.5, 'Semibold')], pad=(3, 0, 0, 0)), V([Sh(S['Pulse State'])], 150, bg=P['soft'], radius=11, pad=(1, 2, 1, 2))], 22),
+        Sh(S['Pulse Hero'], 44),
+        Sh(S['Pulse Week'], 92),
+        Sh(S['Pulse Days'], 34),
+        Sh(S['Pulse Insight']),
+    ], 272, bg=P['bg'], radius=12, pad=(8, 12, 4, 12))
+    pulse = V([
+        Hz([Tx([('Team pulse', ink, 11.5, 'Semibold')], pad=(2, 0, 0, 4)), Sh(S['Info'], 26)], 26),
+        Sh(S['Pulse Sub'], 20), Gap(6),
+        hero, Gap(10),
+        V(tiles),
+    ], fname=f'Card Team pulse {T}', bg=P['surface'], border=P['line'], radius=14, pad=(10, 12, 12, 12))
+    pg.root(pulse, X0, CY, PW, CH, show=f'Show {T} Narrow')
+    # ---- the footnote
+    pg.root(Sh(S['Footnote']), 240, CY + CH + 4, 1136, 18)
+    # ---- popovers
+    pick = V([
+        Hz([Tx([("Open any leader's organization", ink, 12, 'Semibold')]), Sh(S['Pick Close'], 28)], 28),
+        Tx([('Click a name to open it and see the leaders below; the tree, KPIs and panel follow your pick', mu, 8.5, 'Book')], 22),
+        Gap(8),
+        Hz([Tx([('CEO AND EXECUTIVES', mu, 7.5, 'Semibold')], 250), Sh(S['Pick Head L1'], 250), Sh(S['Pick Head L2'])], 18),
+        Hz([Sh(S['Pick L0'], 250), Sh(S['Pick L1'], 250), Sh(S['Pick L2'])], 460),
+        Tx([('On Tableau Cloud a leader sees only their own branch (row-level security on their work email); '
+             'People Analytics sees every branch.', mu, 8, 'Book')], pad=(8, 0, 0, 0)),
+    ], fname=f'Popover Pick {T}', bg=P['pop'], border=P['line'], radius=16, pad=(10, 12, 8, 16))
+    pg.root(pick, 224, 96, 780, 590, show=f'Show {T} Pick')
+    cal = V([
+        Hz([Sh(S['Cal Title']), V([Sh(S['Cal Close'], 28), Gap()], 28)], 44),
+        Hz([Tx([(d, mu, 8, 'Book')], 73, align='center') for d in ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat')]
+           + [Tx([('Sun', mu, 8, 'Book')], align='center')], 18),
+        Sh(S['Calendar'], 330),
+        Sh(S['Cal Summary'], pad=(8, 6, 0, 6)),
+    ], fname=f'Popover Calendar {T}', bg=P['pop'], border=P['line'], radius=16, pad=(10, 14, 8, 14))
+    pg.root(cal, 224, 300, 540, 500, show=f'Show {T} Cal')
+    cols = (130, 230, 430, None)
+    heads = ('LINE', 'SIGNAL', 'WHEN IT SHOWS', 'GOOD PARTNER TO ASK')
     rows = [(s[2], s[1], s[3], s[4]) for s in SIGNALS] + [('Geography', 'Leads people in other regions',
                                                           'Context only (countries led): expected for executives, L1 and L2, never flagged.', '–')]
-    for i, r in enumerate(rows):
-        y0 = 186 + i * 54
-        for (x0, w0, _), t, (c, f) in zip(cols, r, ((mu, 'Book'), (ink, 'Semibold'), (ink, 'Book'), (mu, 'Book'))):
-            pg.text(x0, y0, w0 - 10, 50, [(t, c, 9, f)], show=show)
-        pg.box(322, y0 + 50, 960, 1, P['line'], show=show)
-    pg.text(322, 572, 960, 80, [('Spans and layers (15 or more directs, one direct) appear in the KPIs as information. Executive officers are leaders here '
-                                 'but stay out of every count. Matrix signals apply to people Keystone holds; a contingent worker Keystone does not know '
-                                 'is case study 4\'s reconciliation gap.', mu, 8.5, 'Book')], show=show)
+    body = [Hz([Tx([(h_, mu, 7.5, 'Semibold')], w0) for w0, h_ in zip(cols, heads)], 18), Gap(1, P['line']), Gap(5)]
+    for r in rows:
+        body += [Hz([Tx([(t, c, 9, f)], w0, pad=(0, 10, 0, 0)) for w0, t, (c, f) in
+                     zip(cols, r, ((mu, 'Book'), (ink, 'Semibold'), (ink, 'Book'), (mu, 'Book')))], 48), Gap(1, P['line']), Gap(5)]
+    rules = V([
+        Hz([Tx([('Org design alignment', ink, 13, 'Semibold')]), Sh(S['Rules Close'], 28)], 28),
+        Tx([("A leader's org design is the org units they lead and the job families their function hires; the matrix line "
+             'follows where people sit. Each signal marks where a record departs from that design. Many have a good '
+             'business reason; the flag simply makes them visible.', mu, 9, 'Book')], 48),
+        Gap(8),
+        *body,
+        Tx([('Spans and layers (15 or more directs, one direct) appear in the KPIs as information. Executive officers are leaders here '
+             'but stay out of every count. Matrix signals apply to people Keystone holds; a contingent worker Keystone does not know '
+             "is case study 4's reconciliation gap.", mu, 8.5, 'Book')], pad=(4, 0, 0, 0)),
+    ], fname=f'Popover Alignment {T}', bg=P['pop'], border=P['line'], radius=16, pad=(12, 14, 8, 22))
+    pg.root(rules, 300, 64, 1000, 600, show=f'Show {T} Rules')
     return pg.zones
 
 
@@ -652,8 +695,7 @@ dash = (f"  <dashboards>\n    <dashboard enable-sort-zone-taborder='true' name='
         f"      <style>\n        <style-rule element='table'>\n          <format attr='background-color' value='{PAL['l']['bg']}' />\n        </style-rule>\n      </style>\n"
         f"      <size maxheight='{H}' maxwidth='{W}' minheight='{H}' minwidth='{W}' sizing-mode='fixed' />\n      <zones>\n"
         + indent('\n'.join(zones), 8) + f"\n      </zones>\n      <simple-id uuid='{DASH_UID}' />\n    </dashboard>\n  </dashboards>\n")
-dash = re.sub(r"<zone (?=[^>]*id='(\d+)')", lambda mm: "<zone hidden-by-user='true' " if not VIS[mm.group(1)].startswith('Show Light') or
-              any(k in VIS[mm.group(1)] for k in ('Wide', 'Pick', 'Cal', 'Rules')) else "<zone ", dash)
+dash = re.sub(r"<zone (?=[^>]*id='(\d+)')", lambda mm: "<zone hidden-by-user='true' " if HIDE[mm.group(1)] else "<zone ", dash)
 
 # ===================================================================================================== actions
 acts = []
@@ -678,22 +720,11 @@ for S in (L, D):
         T.append((f'{nm}{sfx}', S[nm], 'p_Tree', 'Seg Mode'))
     for nm in ('Expand', 'Expand Wide'):
         T.append((f'{nm}{sfx}', S[nm], 'p_Zoom', 'Toggle Zoom'))
-    for nm in ('Org Below',):
-        T += [(f'Open picker {nm}{sfx}', S[nm], 'p_PickOpen', 'Toggle Pick'),
-              (f'Picker L0 default {nm}{sfx}', S[nm], 'p_B0', 'Pick B0 Default'),
-              (f'Picker L1 default {nm}{sfx}', S[nm], 'p_B1', 'Pick B1 Default'),
-              (f'Picker closes cal {nm}{sfx}', S[nm], 'p_CalOpen', 'Close Panel'),
-              (f'Picker closes rules {nm}{sfx}', S[nm], 'p_RulesOpen', 'Close Panel')]
     T += [(f'Open picker{sfx}', S['Org Field'], 'p_PickOpen', 'Toggle Pick'),
           (f'Picker L0 default{sfx}', S['Org Field'], 'p_B0', 'Pick B0 Default'),
           (f'Picker L1 default{sfx}', S['Org Field'], 'p_B1', 'Pick B1 Default'),
           (f'Picker closes cal{sfx}', S['Org Field'], 'p_CalOpen', 'Close Panel'),
           (f'Picker closes rules{sfx}', S['Org Field'], 'p_RulesOpen', 'Close Panel'),
-          (f'Open picker count{sfx}', S['Org Count'], 'p_PickOpen', 'Toggle Pick'),
-          (f'Picker L0 default count{sfx}', S['Org Count'], 'p_B0', 'Pick B0 Default'),
-          (f'Picker L1 default count{sfx}', S['Org Count'], 'p_B1', 'Pick B1 Default'),
-          (f'Picker closes cal count{sfx}', S['Org Count'], 'p_CalOpen', 'Close Panel'),
-          (f'Picker closes rules count{sfx}', S['Org Count'], 'p_RulesOpen', 'Close Panel'),
           (f'Open calendar{sfx}', S['Cal Field'], 'p_CalOpen', 'Toggle Cal'),
           (f'Calendar closes picker{sfx}', S['Cal Field'], 'p_PickOpen', 'Close Panel'),
           (f'Calendar closes rules{sfx}', S['Cal Field'], 'p_RulesOpen', 'Close Panel'),
@@ -753,7 +784,7 @@ def ws_window(name):
 
 
 names = list(SHEETS)
-LISTS = [n for n in names if n.startswith(('Pick L0', 'Pick L1', 'Pick L2', 'Align Solid', 'Align Matrix', 'Align Role', 'Org Field', 'Org Count'))]
+LISTS = [n for n in names if n.startswith(('Pick L0', 'Pick L1', 'Pick L2', 'Align Solid', 'Align Matrix', 'Align Role', 'Org Field'))]
 vps = '\n'.join(f"    <viewpoint name='{xesc(n)}'>\n      <zoom type='{'fit-width' if n in LISTS else 'entire-view'}' />\n    </viewpoint>" for n in sorted(names))
 dwin = (f"<window class='dashboard' maximized='true' name='{DASH}'>\n  <viewpoints>\n{vps}\n  </viewpoints>\n"
         f"  <active id='-1' />\n  <simple-id uuid='{uid()}' />\n</window>")

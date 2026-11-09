@@ -116,7 +116,8 @@ def all_calcs():
     a('Head Gaps', '[F Gaps Txt] + " (" + [F Gap Pct Txt] + ")"')
     a('Head Tail', 'IF [F Gaps] = 1 THEN " shows an alignment gap." ELSE " show an alignment gap." END')
     a('K1 Value', '[F People Txt]')
-    a('K1 Note', comma('[F Directs]') + ' + " directs · " + ' + comma('[F Indirects]') + ' + " indirect"')
+    a('F Directs Shown', '[F Directs] + IIF([F Depth] = 0, [F Child Leaders], 0)')
+    a('K1 Note', comma('[F Directs Shown]') + ' + " directs · " + ' + comma('[F Indirects]') + ' + " indirect"')
     a('K2 Value', 'IF [Day Weekend] = 1 THEN "Weekend" ELSE ' + comma('[F Day At Work]').replace('IF ISNULL', '(IF ISNULL', 1) + ') END')
     a('K2 Note', 'IF [Day Weekend] = 1 THEN [Day Text] + " · nobody is scheduled" ELSE ' + comma('[F Day Off]').replace('IF ISNULL', '(IF ISNULL', 1)
       + ') + " off · " + IF [p_Day] = 0 THEN "today" ELSE [Day Text] END END')
@@ -142,8 +143,17 @@ def all_calcs():
     a('Is Focus Row', '[leader_id] = [p_Focus]')
     a('Name Focus', 'IF [Is Focus Row] THEN [leader_name] ELSE "" END')
     a('Name Other', 'IF [Is Focus Row] THEN "" ELSE [leader_name] END')
-    a('Count Focus', 'IF [Is Focus Row] THEN ' + comma('[N People]') + ' ELSE "" END')
-    a('Count Other', 'IF [Is Focus Row] THEN "" ELSE ' + comma('[N People]') + ' END')
+    # the rail's organization box: the CEO down to the focus by name, then every level below the focus with its number of leaders
+    a('Org Row', '[row_type] = "Node" AND [worker_type] = "All" AND (CONTAINS([p_Path], "|" + [leader_id] + "|") '
+      'OR CONTAINS([path], "|" + [p_Focus] + "|"))')
+    a('Org Row Focus', 'IF MIN([depth_from_top]) = MIN([F Depth]) THEN "   " + MAX([leader_name]) ELSE "" END')
+    a('Org Row Count', 'COUNTD([leader_id])')
+    a('Org Row Other', 'IF MIN([depth_from_top]) < MIN([F Depth]) THEN "   " + MAX([leader_name]) '
+      'ELSEIF MIN([depth_from_top]) > MIN([F Depth]) THEN "   " + STR([Org Row Count]) + " " + '
+      'IIF(MIN([depth_from_top]) = 1, IIF([Org Row Count] = 1, "executive", "executives"), IIF([Org Row Count] = 1, "leader", "leaders")) '
+      'ELSE "" END')
+    a('Org Row Tip', 'IF MIN([depth_from_top]) <= MIN([F Depth]) THEN MAX([leader_name]) + " · " + MAX([job_title]) '
+      'ELSE STR([Org Row Count]) + " leaders at this level in " + MIN([F Name]) + "\'s organization" END')
     a('Next Lvl', 'CASE ([F Depth] + 1) WHEN 0 THEN "CEO" WHEN 1 THEN "EXEC" ELSE "L" + STR(([F Depth] + 1) - 1) END')
     a('Below Text', 'IF [F Child Leaders] > 0 THEN STR([F Child Leaders]) + " " + [Next Lvl] + " leader" + IIF([F Child Leaders] = 1, "", "s") + " below" '
       'ELSE "No leaders below" END')
@@ -212,7 +222,9 @@ def all_calcs():
       'ELSEIF [tree_mode] = "Static" THEN "Click to go up to " + [N Parent Name] ELSE "Open now: click anyone above to go back up" END) '
       'ELSEIF [tree_mode] = "Dynamic" AND [On Path] THEN "Click to go back up to " + [leader_name] '
       'ELSE "Click to open their organization" END')
-    a('Tip People', comma('[N People]') + ' + " " + [Worker Words] + " · " + ' + comma('[N Directs]') + ' + " directs, " + '
+    a('N Child', node('child_leaders', '"All"'))
+    a('N Directs Shown', '[N Directs] + IIF([N Depth] = 0, IFNULL([N Child], 0), 0)')
+    a('Tip People', comma('[N People]') + ' + " " + [Worker Words] + " · " + ' + comma('[N Directs Shown]') + ' + " directs, " + '
       + comma('[N Indirects]') + ' + " indirect · " + STR([N Countries]) + " countries"')
     a('Tip Gaps', comma('[N Gaps]') + ' + " with an alignment gap (" + ' + pct1('[N Gaps]', '[N People]') + ' + ")"')
     a('Tip At Work', 'IF [Day Weekend] = 1 THEN [Day Text] + " is a weekend" ELSE ' + comma('[N At Work]').replace('IF ISNULL', '(IF ISNULL', 1)
@@ -394,6 +406,10 @@ def all_calcs():
     a('Ctx Pulse', '([row_type] = "Node" AND [leader_id] = [p_Focus]) OR ([row_type] = "Day" AND [leader_id] = [p_Focus] '
       'AND [worker_type] = [p_Worker]) OR ([row_type] = "Pulse" AND [leader_id] = [p_Focus])')
     a('Rail As Of', '"Synthetic data as of " + [Report Label]')
+    for n, wt in (('Foot All', 'All'), ('Foot Employees', 'Employees'), ('Foot Contingent', 'Contingent')):
+        a(n, '{FIXED : MAX(IF [row_type] = "Node" AND [depth_from_top] = 0 AND [worker_type] = "' + wt + '" THEN [people] END)}')
+    a('Footnote', '"Arcadia Systems is fictional; all data is synthetic. " + ' + comma('[Foot All]') + ' + " people on " + [Report Label] + ": " + '
+      + comma('[Foot Employees]') + ' + " employees and " + ' + comma('[Foot Contingent]') + ' + " contingent workers."')
     return c
 
 
