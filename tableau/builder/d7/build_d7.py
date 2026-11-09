@@ -66,7 +66,7 @@ for k, v in all_calcs():
     m.add(k, v, dtype=DTYPES.get(k), role=ROLES.get(k))
 
 SHEETS, ACTIONS = {}, {}
-HOVER_SIZE, HOVER_ALPHA, SPARK_SIZE, BAR_SIZE = '4.6', '1', '0.8', '3.4'
+HOVER_SIZE, HOVER_ALPHA, SPARK_SIZE, BAR_SIZE = '4.6', '1', '0.8', '3.4'    # hover: four 51 px squares cover a card; larger squares make the map fit wider and drift the texts
 SIZE = {'seg': '6.2', 'segs': '5.3', 'seg3': '4.5', 'button': '2', 'dot': '1.3', 'brand': '2.2', 'pie': '6'}
 
 
@@ -149,9 +149,9 @@ TX = [0, TW[0] + TGX]
 TY = [0, TH + TGY, 2 * (TH + TGY)]
 
 
-# measured on the dashboard (Nov 8): where a label lands = a + b x where it was aimed, per sheet and axis (the label
-# gap right of its point and the map's fit padding); every position is aimed at (x - a) / b so it lands on x
-CAL = {('KPI', 'x'): (2.5, 1.0), ('KPI', 'y'): (0.0, 1.0), ('Tiles', 'x'): (0.0, 1.0), ('Tiles', 'y'): (0.0, 1.0)}
+# measured on the dashboard (Nov 8, with D7_CALIB=1 dots on the card edges): with every mark inside the corners' frame the
+# map is exact, and a label lands about 5 px right of its point; positions are aimed at (x - a) / b so each lands on x
+CAL = {('KPI', 'x'): (5.0, 1.0), ('KPI', 'y'): (0.0, 1.0), ('Tiles', 'x'): (0.0, 1.0), ('Tiles', 'y'): (0.0, 1.0)}
 OFF = {'KPI': KOX, 'Tiles': TOX}                                 # card x = sheet x - OFF
 _W = {'KPI': (KPI_SW, KPI_H), 'Tiles': (TILES_SW, TILES_H)}
 
@@ -185,8 +185,12 @@ for nm, w, h in (('KPI', KPI_SW, KPI_H), ('Tiles', TILES_SW, TILES_H)):
 for k in range(5):
     for row, y in (('Title', 15), ('Value', 38), ('Note', 61)):
         geo(f'KPI pt {row} {k + 1}', pt(KX[k] + 12, y, 'KPI'))
-    for j, f in enumerate((1 / 6, 1 / 2, 5 / 6)):
-        geo(f'KPI pt Hover {k + 1}{"abc"[j]}', pt(KX[k] + KW[k] * f, 38, 'KPI', False))
+    # every mark must stay inside the corners' frame (about 55 px in from each sheet edge, the room Tableau's fit padding
+    # takes): one mark outside and Tableau refits the map to the marks, and every text drifts. So card 5's last square
+    # stops at the frame (centre at card x 1,075, edge 1,100)
+    for j, f in enumerate((1 / 8, 3 / 8, 5 / 8, 7 / 8)):
+        geo(f'KPI pt Hover {k + 1}{"abcd"[j]}', pt(min(KX[k] + KW[k] * f, 1075), 38, 'KPI', False))
+    geo(f'KPI pt Calib {k + 1}', pt(KX[k], 38, 'KPI', False))        # D7_CALIB=1 draws a dot here: each card's left edge
 TILE_KEYS = ('Growth', 'Renew', 'Mix', 'Gap', 'Coach', 'Hub')
 for i, key in enumerate(TILE_KEYS):
     x0, y0, w0 = TX[i % 2], TY[i // 2], TW[i % 2]
@@ -242,16 +246,16 @@ def map_sheet(s, nm):
     s.styles.append("<style-rule element='map'>\n  <format attr='washout' value='0' />\n</style-rule>")
     s.is_map = True
     s.pane('Circle', pane_id=1)
-    for c in ('TL', 'BR'):
-        map_layer(s, f'{nm} Corner {c}', 'Circle')
+    for c in ('TL', 'BR'):                      # not inert: a map fits its interactive marks, so the corners set the extent
+        map_layer(s, f'{nm} Corner {c}', 'Circle', inert=False, transparency='1')   # alpha 0 marks are left out of the fit
 
 
 def map_layer(s, point, mark='Circle', label=None, enc=(), size='0.01', color=None, align='right', valign='center', tooltip=None,
-              transparency='0'):
+              transparency='0', inert=None):
     pid = len(s.panes) + 1
-    s.pane(mark, pane_id=pid, enc=list(enc) + [('lod', point, 'clct')], label=label, tooltip=tooltip, size=size,
+    s.pane(mark, pane_id=pid, enc=ZZ + list(enc) + [('lod', point, 'clct')], label=label, tooltip=tooltip, size=size,
            transparency=transparency, color=color, align=align, valign=valign, stroke='false' if mark != 'Line' else None)
-    inert = '' if tooltip else " inert='true'"
+    inert = '' if (tooltip or inert is False) else " inert='true'"
     s.panes[-1] = s.panes[-1].replace(f"<pane id='{pid}' ", f"<pane generated-title='{xesc(point)}' id='{pid}'{inert} ", 1)
 
 
@@ -316,13 +320,15 @@ def page(th):
              [('Solid line: ', 'book', 9, mu), ('{F Solid Gaps}', 'semi', 9, ink), (' · Matrix line: ', 'book', 9, mu), ('{F Matrix Gaps}', 'semi', 9, ink)],
              [('Flags, not errors: see Org design alignment on the right.', 'book', 9, mu)]])]
     # the five KPI cards: one map sheet (title, value and note per card; three invisible hover marks per card carry its tooltip)
-    s = sh('KPI Map', deselect=False)
+    s = sh('KPI Map')
     map_sheet(s, 'KPI')
     for i, (lab, v, note, col, tp) in enumerate(KPI, 1):
         map_layer(s, f'KPI pt Title {i}', label=[[(lab, 'semi', 7.5, mu)]])
         map_layer(s, f'KPI pt Value {i}', label=[[('{' + v + '}', 'semi', 18, col)]])
         map_layer(s, f'KPI pt Note {i}', label=[[('{' + note + '}', 'book', 8, mu)]])
-        for j in 'abc':
+        if os.environ.get('D7_CALIB'):
+            map_layer(s, f'KPI pt Calib {i}', 'Circle', size='0.6', transparency='255', color='#FF00FF')
+        for j in 'abcd':
             map_layer(s, f'KPI pt Hover {i}{j}', 'Square', size=HOVER_SIZE, tooltip=tp, transparency=HOVER_ALPHA, color=ink)
 
     # ---------------------------------------------------------------- rail
@@ -377,7 +383,6 @@ def page(th):
         button_sheet(f'{p} Close', 'Close Shape', ['Close Panel'], SIZE['button'], 'Close')
     button_sheet('Credit GitHub', 'GitHub Shape', [], SIZE['brand'], 'Thiago Alpoin on GitHub')
     button_sheet('Credit LinkedIn', 'LinkedIn Shape', [], SIZE['brand'], 'Thiago Alpoin on LinkedIn')
-    text_sheet('Rail As Of', [[('{Rail As Of}', 'book', 8, mu)]])
     text_sheet('Org Sub', [[('{Org Sub}', 'book', 7.5, mu)]])
     text_sheet('Footnote', [[('{Footnote}', 'book', 9, mu)]], valign='center')
 
@@ -456,7 +461,7 @@ def page(th):
              ('Coach', 'COACHING CAPACITY', '{Coach Txt}', [], '{Coach Note}'),
              ('Hub', 'IN THE HUB', '{Hub Txt}', [('  {Hub Chip Good}', 'semi', 8.5, good), ('{Hub Chip Bad}', 'semi', 8.5, bad)], '{Hub Note}')]
     # the six tiles: one map sheet (label, value and chips, note; sparks and bars as line layers)
-    s = sh('Tiles Map', deselect=False)
+    s = sh('Tiles Map')
     map_sheet(s, 'Tiles')
     for key, lab, val, chips, note in TILES:
         map_layer(s, f'Tiles pt Label {key}', label=[[(lab, 'semi', 7.5, mu)]])
@@ -767,7 +772,7 @@ def layout(th, S):
         Gap(22), Tx([('CALENDAR', mu, 7.5, 'Semibold'), ('\n', 0, 0, 0), ('Click the card to pick a day', mu, 7.5, 'Book')], 30), Gap(4),
         V([Sh(S['Cal Field'])], 50, bg=P['surface'], border=P['line'], radius=10, pad=(5, 8, 3, 8)),
         Gap(),
-        Sh(S['Rail As Of'], 18), Gap(4), Gap(1, P['line']), Gap(8),
+        Gap(1, P['line']), Gap(8),
         Tx([('Built by ', mu, 8.5, 'Book'), ('Thiago Alpoin', ink, 8.5, 'Semibold')], 18), Gap(4),
         Hz([Sh(S['Credit GitHub'], 30), Gap(6), Sh(S['Credit LinkedIn'], 30), Gap()], 30),
     ], fname=f'Rail {T}', bg=P['rail'], pad=(20, 14, 26, 14))
