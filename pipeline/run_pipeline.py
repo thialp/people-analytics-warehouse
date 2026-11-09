@@ -81,6 +81,7 @@ EXPORTS = [
     "mart_alignment_detail",
     "mart_org_entitlement",
     "mart_org_tree_layout",
+    "mart_leader_pulse",
 ]
 
 

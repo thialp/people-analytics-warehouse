@@ -7,13 +7,20 @@
     Node    leader x worker type (All, Employees, Contingent) on the report date: the rail picker,
             the headline, the five KPIs, the breadcrumb and every tooltip
     Tree    where the Canopy tree's circles (mark_type Node) and links (mark_type Link, 17 points
-            each) sit, for every leader as the focus, in both modes (tree_mode Dynamic, Static);
-            x 0 to 1 left to right, y 0 to 3 top to bottom (reverse the axis); leader_id = node_id
+            each) sit; leader_id = node_id; y top to bottom (reverse the axis).
+            tree_mode Dynamic: one tree for the whole company (focus_leader_id NULL), tier = depth
+            below the CEO; the page shows the chain from the CEO to the focus and the focus's team.
+            tree_mode Static: three tiers below every leader as the focus, x 0 to 1.
+            path is the node's path (the CEO down to the node), so a click can set the page's path
     Day     the "At work on" calendar: leader x worker type x day, the report date and 30 days after
     Signal  each person with an alignment gap, once under every leader above them (leader_id), with
             depth_below_leader; worker_type is the person's (Employees or Contingent)
     R1      role assignments still naming a former leader, under every leader above the org unit's
             leader today (person_* is the assignee)
+    Pulse   the Team pulse card: leader x worker type x month-end (13), as_of_date the month-end,
+            people, gap_people, hub_people (people in their function's hubs) and month_index (0 a
+            year ago, 12 the report date); on month 12 the dip day of the next seven days (dip_*)
+            and the lightest direct team that day (lightest_team_*)
 
   Columns a row type does not use are NULL. Built from the reporting views of 04d and the dw tables
   of 03g; 18_validate_leadership_scope.sql runs it inside SQL Server and checks every row type.
@@ -92,7 +99,20 @@ SELECT
     CAST(NULL AS VARCHAR(4))                                               AS signal_code,
     CAST(NULL AS VARCHAR(60))                                              AS signal_name,
     CAST(NULL AS VARCHAR(20))                                              AS signal_line,
-    CAST(NULL AS NVARCHAR(300))                                            AS signal_detail
+    CAST(NULL AS NVARCHAR(300))                                            AS signal_detail,
+    CAST(NULL AS INT)                                                      AS month_index,
+    CAST(NULL AS INT)                                                      AS hub_people,
+    CAST(NULL AS INT)                                                      AS dip_day_offset,
+    CAST(NULL AS DATE)                                                     AS dip_day,
+    CAST(NULL AS INT)                                                      AS dip_people,
+    CAST(NULL AS INT)                                                      AS dip_at_work,
+    CAST(NULL AS INT)                                                      AS dip_off_public_holiday,
+    CAST(NULL AS NVARCHAR(80))                                             AS dip_holiday_name,
+    CAST(NULL AS VARCHAR(3))                                               AS dip_holiday_country_code,
+    CAST(NULL AS VARCHAR(20))                                              AS lightest_team_leader_id,
+    CAST(NULL AS NVARCHAR(100))                                            AS lightest_team_leader_name,
+    CAST(NULL AS INT)                                                      AS lightest_team_people,
+    CAST(NULL AS INT)                                                      AS lightest_team_at_work
 FROM rpt.vw_org_node AS n
 CROSS JOIN fc.report_calendar AS rc
 UNION ALL
@@ -110,7 +130,7 @@ SELECT
     NULL                                                                   AS parent_leader_id,
     NULL                                                                   AS parent_leader_name,
     NULL                                                                   AS depth_from_top,
-    NULL                                                                   AS path,
+    n.path                                                                 AS path,
     NULL                                                                   AS child_leaders,
     NULL                                                                   AS department_name,
     NULL                                                                   AS function_name,
@@ -169,7 +189,20 @@ SELECT
     NULL                                                                   AS signal_code,
     NULL                                                                   AS signal_name,
     NULL                                                                   AS signal_line,
-    NULL                                                                   AS signal_detail
+    NULL                                                                   AS signal_detail,
+    NULL                                                                   AS month_index,
+    NULL                                                                   AS hub_people,
+    NULL                                                                   AS dip_day_offset,
+    NULL                                                                   AS dip_day,
+    NULL                                                                   AS dip_people,
+    NULL                                                                   AS dip_at_work,
+    NULL                                                                   AS dip_off_public_holiday,
+    NULL                                                                   AS dip_holiday_name,
+    NULL                                                                   AS dip_holiday_country_code,
+    NULL                                                                   AS lightest_team_leader_id,
+    NULL                                                                   AS lightest_team_leader_name,
+    NULL                                                                   AS lightest_team_people,
+    NULL                                                                   AS lightest_team_at_work
 FROM rpt.vw_org_tree_layout AS t
 JOIN rpt.vw_org_node AS n ON n.leader_id = t.node_id AND n.worker_type = 'All'
 CROSS JOIN fc.report_calendar AS rc
@@ -247,7 +280,20 @@ SELECT
     NULL                                                                   AS signal_code,
     NULL                                                                   AS signal_name,
     NULL                                                                   AS signal_line,
-    NULL                                                                   AS signal_detail
+    NULL                                                                   AS signal_detail,
+    NULL                                                                   AS month_index,
+    NULL                                                                   AS hub_people,
+    NULL                                                                   AS dip_day_offset,
+    NULL                                                                   AS dip_day,
+    NULL                                                                   AS dip_people,
+    NULL                                                                   AS dip_at_work,
+    NULL                                                                   AS dip_off_public_holiday,
+    NULL                                                                   AS dip_holiday_name,
+    NULL                                                                   AS dip_holiday_country_code,
+    NULL                                                                   AS lightest_team_leader_id,
+    NULL                                                                   AS lightest_team_leader_name,
+    NULL                                                                   AS lightest_team_people,
+    NULL                                                                   AS lightest_team_at_work
 FROM rpt.vw_leader_availability AS a
 CROSS JOIN fc.report_calendar AS rc
 UNION ALL
@@ -324,7 +370,20 @@ SELECT
     s.signal_code                                                          AS signal_code,
     s.signal_name                                                          AS signal_name,
     s.signal_line                                                          AS signal_line,
-    s.signal_detail                                                        AS signal_detail
+    s.signal_detail                                                        AS signal_detail,
+    NULL                                                                   AS month_index,
+    NULL                                                                   AS hub_people,
+    NULL                                                                   AS dip_day_offset,
+    NULL                                                                   AS dip_day,
+    NULL                                                                   AS dip_people,
+    NULL                                                                   AS dip_at_work,
+    NULL                                                                   AS dip_off_public_holiday,
+    NULL                                                                   AS dip_holiday_name,
+    NULL                                                                   AS dip_holiday_country_code,
+    NULL                                                                   AS lightest_team_leader_id,
+    NULL                                                                   AS lightest_team_leader_name,
+    NULL                                                                   AS lightest_team_people,
+    NULL                                                                   AS lightest_team_at_work
 FROM rpt.vw_alignment_detail AS s
 JOIN dw.OrgClosure AS c ON c.MonthEndDate = s.as_of_date AND c.DescendantID = s.person_id AND c.Depth >= 1
 JOIN dw.OrgLeader AS l ON l.MonthEndDate = c.MonthEndDate AND l.LeaderID = c.AncestorID
@@ -405,7 +464,20 @@ SELECT
     a.SignalCode                                                           AS signal_code,
     a.SignalName                                                           AS signal_name,
     a.SignalLine                                                           AS signal_line,
-    CONCAT(a.RoleName, ' for ', a.TargetOrgName, ' still names ', ISNULL(nl.PersonName, 'no one'), '; the leader today is ', cl.PersonName) AS signal_detail
+    CONCAT(a.RoleName, ' for ', a.TargetOrgName, ' still names ', ISNULL(nl.PersonName, 'no one'), '; the leader today is ', cl.PersonName) AS signal_detail,
+    NULL                                                                   AS month_index,
+    NULL                                                                   AS hub_people,
+    NULL                                                                   AS dip_day_offset,
+    NULL                                                                   AS dip_day,
+    NULL                                                                   AS dip_people,
+    NULL                                                                   AS dip_at_work,
+    NULL                                                                   AS dip_off_public_holiday,
+    NULL                                                                   AS dip_holiday_name,
+    NULL                                                                   AS dip_holiday_country_code,
+    NULL                                                                   AS lightest_team_leader_id,
+    NULL                                                                   AS lightest_team_leader_name,
+    NULL                                                                   AS lightest_team_people,
+    NULL                                                                   AS lightest_team_at_work
 FROM dw.AssignmentSignal AS a
 JOIN dw.OrgClosure AS c ON c.MonthEndDate = a.MonthEndDate AND c.DescendantID = a.CurrentLeaderID
 JOIN dw.OrgLeader AS l ON l.MonthEndDate = c.MonthEndDate AND l.LeaderID = c.AncestorID
@@ -414,3 +486,93 @@ JOIN dw.PersonMonthEnd AS cl ON cl.MonthEndDate = a.MonthEndDate AND cl.PersonID
 LEFT JOIN dw.PersonMonthEnd AS nl ON nl.MonthEndDate = a.MonthEndDate AND nl.PersonID = a.NamedLeaderWorkerID
 CROSS JOIN fc.report_calendar AS rc
 WHERE a.MonthEndDate = rc.report_as_of_date
+UNION ALL
+SELECT
+    'Pulse'                                                                AS row_type,
+    rc.report_as_of_label                                                  AS report_as_of_label,
+    p.month_end_date                                                       AS as_of_date,
+    p.leader_id                                                            AS leader_id,
+    p.worker_type                                                          AS worker_type,
+    NULL                                                                   AS leader_name,
+    NULL                                                                   AS job_title,
+    NULL                                                                   AS leader_level,
+    NULL                                                                   AS grade,
+    NULL                                                                   AS is_selectable,
+    NULL                                                                   AS parent_leader_id,
+    NULL                                                                   AS parent_leader_name,
+    NULL                                                                   AS depth_from_top,
+    NULL                                                                   AS path,
+    NULL                                                                   AS child_leaders,
+    NULL                                                                   AS department_name,
+    NULL                                                                   AS function_name,
+    NULL                                                                   AS office_name,
+    NULL                                                                   AS country_name,
+    NULL                                                                   AS region,
+    NULL                                                                   AS leads_org_unit_id,
+    NULL                                                                   AS leads_org_unit_name,
+    p.people                                                               AS people,
+    NULL                                                                   AS directs,
+    NULL                                                                   AS indirects,
+    NULL                                                                   AS managers_below,
+    NULL                                                                   AS layers_below,
+    NULL                                                                   AS countries,
+    NULL                                                                   AS median_span,
+    NULL                                                                   AS managers_15_plus,
+    NULL                                                                   AS managers_one_direct,
+    p.gap_people                                                           AS gap_people,
+    NULL                                                                   AS solid_line_gap_people,
+    NULL                                                                   AS matrix_gap_people,
+    NULL                                                                   AS s1_budgeted_elsewhere,
+    NULL                                                                   AS s2_role_other_function,
+    NULL                                                                   AS m1_country_leader_other_country,
+    NULL                                                                   AS m2_not_one_country_matrix,
+    NULL                                                                   AS m3_matrix_inactive_or_leaderless,
+    NULL                                                                   AS assignments_naming_former_leader,
+    NULL                                                                   AS at_work_today,
+    NULL                                                                   AS off_today,
+    NULL                                                                   AS tree_mode,
+    NULL                                                                   AS focus_leader_id,
+    NULL                                                                   AS mark_type,
+    NULL                                                                   AS tier,
+    NULL                                                                   AS node_id,
+    NULL                                                                   AS parent_node_id,
+    NULL                                                                   AS tier1_node_id,
+    NULL                                                                   AS slot,
+    NULL                                                                   AS slots,
+    NULL                                                                   AS point_index,
+    NULL                                                                   AS x,
+    NULL                                                                   AS y,
+    NULL                                                                   AS day,
+    NULL                                                                   AS day_offset,
+    NULL                                                                   AS is_weekend,
+    NULL                                                                   AS at_work,
+    NULL                                                                   AS [off],
+    NULL                                                                   AS off_time_off,
+    NULL                                                                   AS off_leave,
+    NULL                                                                   AS off_public_holiday,
+    NULL                                                                   AS left_team,
+    NULL                                                                   AS person_id,
+    NULL                                                                   AS person_name,
+    NULL                                                                   AS depth_below_leader,
+    NULL                                                                   AS manager_name,
+    NULL                                                                   AS manager_department_name,
+    NULL                                                                   AS manager_source,
+    NULL                                                                   AS signal_code,
+    NULL                                                                   AS signal_name,
+    NULL                                                                   AS signal_line,
+    NULL                                                                   AS signal_detail,
+    p.month_index                                                          AS month_index,
+    p.hub_people                                                           AS hub_people,
+    p.dip_day_offset                                                       AS dip_day_offset,
+    p.dip_day                                                              AS dip_day,
+    p.dip_people                                                           AS dip_people,
+    p.dip_at_work                                                          AS dip_at_work,
+    p.dip_off_public_holiday                                               AS dip_off_public_holiday,
+    p.dip_holiday_name                                                     AS dip_holiday_name,
+    p.dip_holiday_country_code                                             AS dip_holiday_country_code,
+    p.lightest_team_leader_id                                              AS lightest_team_leader_id,
+    p.lightest_team_leader_name                                            AS lightest_team_leader_name,
+    p.lightest_team_people                                                 AS lightest_team_people,
+    p.lightest_team_at_work                                                AS lightest_team_at_work
+FROM rpt.vw_leader_pulse AS p
+CROSS JOIN fc.report_calendar AS rc

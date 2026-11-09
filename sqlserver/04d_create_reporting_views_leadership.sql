@@ -175,3 +175,28 @@ SELECT
     Y                 AS y
 FROM dw.OrgTreeLayout;
 GO
+
+/* The Team pulse: every leader x worker type x month-end (13), people, gaps and hub people; on the
+   report date's row, the dip day in the next seven days and the lightest direct team that day */
+CREATE OR ALTER VIEW rpt.vw_leader_pulse AS
+SELECT
+    MonthEndDate            AS month_end_date,
+    MonthIndex              AS month_index,
+    LeaderID                AS leader_id,
+    WorkerType              AS worker_type,
+    People                  AS people,
+    GapPeople               AS gap_people,
+    HubPeople               AS hub_people,
+    DipDayOffset            AS dip_day_offset,
+    DipDay                  AS dip_day,
+    DipPeople               AS dip_people,
+    DipAtWork               AS dip_at_work,
+    DipOffPublicHoliday     AS dip_off_public_holiday,
+    DipHolidayName          AS dip_holiday_name,
+    DipHolidayCountryCode   AS dip_holiday_country_code,
+    LightestTeamLeaderID    AS lightest_team_leader_id,
+    LightestTeamLeaderName  AS lightest_team_leader_name,
+    LightestTeamPeople      AS lightest_team_people,
+    LightestTeamAtWork      AS lightest_team_at_work
+FROM dw.LeaderPulse;
+GO

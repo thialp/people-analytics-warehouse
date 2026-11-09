@@ -271,6 +271,9 @@ bw_time_off|11|approved_at|TIMESTAMP|When the manager approved it in Bridgeway
 ref_job_family_home|1|job_family_code|VARCHAR|-> dim_job_profile
 ref_job_family_home|2|home_function|VARCHAR|The function that usually hires the family; empty for a shared family
 ref_job_family_home|3|is_shared|BOOLEAN|True for families every function hires (Data, Operations)
+ref_function_hub|1|function_name|VARCHAR|-> dim_department.function_name
+ref_function_hub|2|location_id|VARCHAR|-> dim_location: one of the function's hub offices
+ref_function_hub|3|hub_name|VARCHAR|The hub the office belongs to (offices of one hub share a name)
 ref_public_holiday|1|country_code|VARCHAR|-> dim_country
 ref_public_holiday|2|holiday_date|DATE|The holiday (including observed days)
 ref_public_holiday|3|holiday_name|VARCHAR|Name

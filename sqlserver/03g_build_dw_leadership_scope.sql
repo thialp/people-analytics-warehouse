@@ -16,7 +16,8 @@
                   PersonAvailabilityDay  the report date and the 30 days after it
                   LeaderAvailability   at work / off per leader, worker type and day
                   OrgNode              the tree's nodes on the report date
-                  OrgTreeLayout        the tree's coordinates (dynamic and static) for every leader
+                  OrgTreeLayout        the tree's coordinates: one company tree (dynamic), and three tiers below every leader (static)
+                  LeaderPulse          the Team pulse: 13 month-ends of people, gaps and hub people; the days ahead
                   AlignmentDetail      person x signal on the report date, with the L0 / L1 / L2 above
                   OrgEntitlement       row-level security for Tableau Cloud
 
@@ -147,6 +148,14 @@ SELECT
     CAST(CASE LOWER(is_shared) WHEN 'true' THEN 1 ELSE 0 END AS BIT) AS IsShared
 INTO dw.RefJobFamilyHome
 FROM raw.ref_job_family_home;
+
+DROP TABLE IF EXISTS dw.RefFunctionHub;
+SELECT
+    CAST(function_name AS VARCHAR(60))                            AS FunctionName,
+    CAST(location_id AS VARCHAR(20))                              AS LocationID,
+    CAST(hub_name AS VARCHAR(60))                                 AS HubName
+INTO dw.RefFunctionHub
+FROM raw.ref_function_hub;
 
 DROP TABLE IF EXISTS dw.RefPublicHoliday;
 SELECT
@@ -690,14 +699,17 @@ LEFT JOIN dw.LeaderAvailability AS t ON t.LeaderID = l.LeaderID AND t.WorkerType
 GO
 
 /* ------------------------------------------------------------------ OrgTreeLayout
-   Where every circle and link sits, for every leader as the tree's focus, so Tableau only plots
-   x and y. The canvas is x 0 to 1 (left to right) and y 0 to 3 (top to bottom: reverse the axis).
+   Where every circle and link sits, so Tableau only plots x and y (y top to bottom: reverse the axis).
 
-     Dynamic  tier 0 the focus; tier 1 the leaders who report to them, evenly spaced, biggest
-              first; tier 2 the leaders under each tier-1 leader, centered under it (the page
-              shows one tier-1 leader's row at a time: the open one, the biggest by default)
-     Static   tiers 1 to 3 at once: tier 1 at the centers of equal shares of the width, tier 2
-              fanned under its parent in a zigzag, tier 3 as small dots under theirs
+     Dynamic  ONE tree for the whole company (FocusLeaderID NULL): Tier = depth below the CEO
+              (Y = Tier); each leader's child leaders one unit apart, biggest first, centered
+              under it (X = the parent's X + Slot - (Slots - 1) / 2). Nothing moves when the
+              focus changes: the page shows the chain from the CEO to the focus with each
+              level's leaders and the focus's own team, so Tableau can animate a click instead of
+              redrawing the tree. Built one level at a time, like the closure.
+     Static   for every leader as the focus, tiers 1 to 3 at once on a 0 to 1 canvas: tier 1 at
+              the centers of equal shares of the width, tier 2 fanned under its parent in a
+              zigzag, tier 3 as small dots under theirs
 
    A link is the curve from the parent's circle to the child's: a cubic Bezier through
    (x1, y1), (x1, ym), (x2, ym), (x2, y2), drawn as 17 points (PointIndex 0 to 16). */
@@ -718,38 +730,72 @@ FROM #TreeLeader AS t
 WHERE t.ParentLeaderID IS NOT NULL;
 
 DROP TABLE IF EXISTS #TreeNode;
-/* tier 0: the focus */
-SELECT 'Dynamic' AS TreeMode, t.LeaderID AS FocusLeaderID, 0 AS Tier, t.LeaderID AS NodeID,
-       CAST(NULL AS VARCHAR(20)) AS ParentNodeID, CAST(NULL AS VARCHAR(20)) AS Tier1NodeID,
-       0 AS Slot, 1 AS Slots, CAST(0.5 AS FLOAT) AS X, CAST(0 AS FLOAT) AS Y
+/* dynamic: the company tree from the CEO, one level at a time (12 levels; deepest today: 7) */
+SELECT CAST('Dynamic' AS VARCHAR(8)) AS TreeMode, CAST(NULL AS VARCHAR(20)) AS FocusLeaderID, 0 AS Tier,
+       t.LeaderID AS NodeID, CAST(NULL AS VARCHAR(20)) AS ParentNodeID, CAST(NULL AS VARCHAR(20)) AS Tier1NodeID,
+       CAST(0 AS BIGINT) AS Slot, 1 AS Slots, CAST(0 AS FLOAT) AS X, CAST(0 AS FLOAT) AS Y
 INTO #TreeNode
 FROM #TreeLeader AS t
-UNION ALL
+WHERE t.ParentLeaderID IS NULL;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 1, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 1
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 0;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 2, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 2
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 1;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 3, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 3
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 2;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 4, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 4
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 3;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 5, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 5
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 4;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 6, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 6
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 5;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 7, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 7
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 6;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 8, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 8
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 7;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 9, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 9
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 8;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 10, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 10
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 9;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 11, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 11
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 10;
+INSERT INTO #TreeNode
+SELECT 'Dynamic', NULL, 12, s.LeaderID, s.ParentLeaderID, NULL, s.Slot, s.Slots, p.X + (s.Slot - (s.Slots - 1) / 2.0), 12
+FROM #TreeNode AS p JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
+WHERE p.TreeMode = 'Dynamic' AND p.Tier = 11;
+
+/* static tier 0: the focus */
+INSERT INTO #TreeNode
 SELECT 'Static', t.LeaderID, 0, t.LeaderID, NULL, NULL, 0, 1, 0.5, 0 FROM #TreeLeader AS t;
 
-/* tier 1: the focus's child leaders. Dynamic: evenly spaced from 0.03 to 0.97. Static: each at the
-   center of an equal share of the width, so the fan below it stays inside its share */
+/* static tier 1: the focus's child leaders, each at the center of an equal share of the width, so
+   the fan below it stays inside its share */
 INSERT INTO #TreeNode
-SELECT m.TreeMode, s.ParentLeaderID, 1, s.LeaderID, s.ParentLeaderID, s.LeaderID, s.Slot, s.Slots,
-       CASE WHEN m.TreeMode = 'Static' THEN (s.Slot + 0.5) / s.Slots
-            WHEN s.Slots = 1 THEN 0.5 ELSE 0.03 + 0.94 * s.Slot / (s.Slots - 1.0) END, 1
-FROM #Sib AS s
-CROSS JOIN (VALUES ('Dynamic'), ('Static')) AS m (TreeMode);
-
-/* dynamic tier 2: centered under its tier-1 parent, 0.125 apart (closer when there are many),
-   kept inside 0.03 to 0.97 */
-INSERT INTO #TreeNode
-SELECT 'Dynamic', p.FocusLeaderID, 2, s.LeaderID, s.ParentLeaderID, s.ParentLeaderID, s.Slot, s.Slots,
-       z.X0 + s.Slot * z.Step, 2
-FROM #TreeNode AS p
-JOIN #Sib AS s ON s.ParentLeaderID = p.NodeID
-CROSS APPLY (SELECT CASE WHEN s.Slots <= 1 THEN 0.125 WHEN 0.94 / (s.Slots - 1.0) < 0.125 THEN 0.94 / (s.Slots - 1.0)
-                         ELSE 0.125 END AS Step) AS st
-CROSS APPLY (SELECT st.Step AS Step,
-                    CASE WHEN p.X - (s.Slots - 1) / 2.0 * st.Step < 0.03 THEN 0.03
-                         WHEN p.X + (s.Slots - 1) / 2.0 * st.Step > 0.97 THEN 0.97 - (s.Slots - 1) * st.Step
-                         ELSE p.X - (s.Slots - 1) / 2.0 * st.Step END AS X0) AS z
-WHERE p.TreeMode = 'Dynamic' AND p.Tier = 1;
+SELECT 'Static', s.ParentLeaderID, 1, s.LeaderID, s.ParentLeaderID, s.LeaderID, s.Slot, s.Slots,
+       (s.Slot + 0.5) / s.Slots, 1
+FROM #Sib AS s;
 
 /* static tier 2: fanned under its parent within the parent's share of the width, zigzag in y */
 INSERT INTO #TreeNode
@@ -787,11 +833,121 @@ SELECT n.TreeMode, n.FocusLeaderID, 'Link', n.Tier, n.NodeID, n.ParentNodeID, n.
        CAST(ROUND(POWER(1 - u.T, 3) * p.Y + 3 * POWER(1 - u.T, 2) * u.T * (p.Y + n.Y) / 2
                   + 3 * (1 - u.T) * POWER(u.T, 2) * (p.Y + n.Y) / 2 + POWER(u.T, 3) * n.Y, 6) AS FLOAT)
 FROM #TreeNode AS n
-JOIN #TreeNode AS p ON p.TreeMode = n.TreeMode AND p.FocusLeaderID = n.FocusLeaderID AND p.NodeID = n.ParentNodeID
+JOIN #TreeNode AS p ON p.TreeMode = n.TreeMode AND p.NodeID = n.ParentNodeID
+                  AND (p.FocusLeaderID = n.FocusLeaderID OR (p.FocusLeaderID IS NULL AND n.FocusLeaderID IS NULL))
 JOIN dw.RefDayNumber AS k ON k.N <= 16
 CROSS APPLY (SELECT CAST(k.N AS FLOAT) / 16 AS T) AS u
 WHERE n.Tier >= 1;
 CREATE CLUSTERED INDEX CIX_OrgTreeLayout ON dw.OrgTreeLayout (FocusLeaderID, TreeMode, MarkType, NodeID, PointIndex);
+GO
+
+/* ------------------------------------------------------------------ LeaderPulse
+   The Team pulse card and the Tableau Cloud Pulse metrics: every leader on the report date x worker
+   type x month-end (13). People and alignment gaps as in LeaderOrg; HubPeople = people below whose
+   office is one of their own function's hubs (RefFunctionHub). On the report date's row only
+   (MonthIndex 12): the weekday with the lowest share at work in the next seven days, the public
+   holiday that keeps the most of the leader's people off that day, and the direct report leader
+   whose team has the lowest share at work that day. */
+DROP TABLE IF EXISTS #NowLeader;
+SELECT l.LeaderID, l.ParentLeaderID, l.LeaderName
+INTO #NowLeader
+FROM dw.OrgLeader AS l
+JOIN fc.report_calendar AS rc ON l.MonthEndDate = rc.report_as_of_date;
+
+DROP TABLE IF EXISTS #Month;
+SELECT MonthEndDate, CAST(ROW_NUMBER() OVER (ORDER BY MonthEndDate) - 1 AS INT) AS MonthIndex
+INTO #Month
+FROM (SELECT DISTINCT MonthEndDate FROM dw.LeaderOrg) AS m;
+
+DROP TABLE IF EXISTS #Hub;
+SELECT b.MonthEndDate, b.LeaderID, wt.WorkerType, CAST(SUM(b.InHub) AS BIGINT) AS HubPeople
+INTO #Hub
+FROM (
+    SELECT c.MonthEndDate, c.AncestorID AS LeaderID, d.WorkerType AS PersonType,
+           CASE WHEN h.LocationID IS NULL THEN 0 ELSE 1 END AS InHub
+    FROM dw.OrgClosure AS c
+    JOIN #NowLeader AS n ON n.LeaderID = c.AncestorID
+    JOIN dw.OrgLeader AS l ON l.MonthEndDate = c.MonthEndDate AND l.LeaderID = c.AncestorID
+    JOIN dw.PersonMonthEnd AS d ON d.MonthEndDate = c.MonthEndDate AND d.PersonID = c.DescendantID
+    LEFT JOIN dw.RefFunctionHub AS h ON h.FunctionName = d.FunctionName AND h.LocationID = d.LocationID
+    WHERE c.Depth >= 1 AND d.IsExecutiveOfficer = 0
+) AS b
+JOIN #Wt AS wt ON wt.WorkerType = 'All'
+              OR (wt.WorkerType = 'Employees' AND b.PersonType = 'Employee')
+              OR (wt.WorkerType = 'Contingent' AND b.PersonType = 'Contingent')
+GROUP BY b.MonthEndDate, b.LeaderID, wt.WorkerType;
+
+/* the weekdays of the next seven days; the dip is the lowest share at work (ties: the earlier day) */
+DROP TABLE IF EXISTS #Dip;
+SELECT LeaderID, WorkerType, DayOffset, Day, People, AtWork, OffPublicHoliday
+INTO #Dip
+FROM (
+    SELECT a.*, ROW_NUMBER() OVER (PARTITION BY a.LeaderID, a.WorkerType
+                                   ORDER BY CAST(a.AtWork AS FLOAT) / a.People, a.DayOffset) AS Rk
+    FROM dw.LeaderAvailability AS a
+    WHERE a.DayOffset BETWEEN 0 AND 6 AND a.IsWeekend = 0 AND a.People > 0
+) AS w
+WHERE Rk = 1;
+
+DROP TABLE IF EXISTS #DipHoliday;
+SELECT LeaderID, WorkerType, HolidayName, CountryCode
+INTO #DipHoliday
+FROM (
+    SELECT x.*, ROW_NUMBER() OVER (PARTITION BY x.LeaderID, x.WorkerType ORDER BY x.OffPeople DESC, x.CountryCode) AS Rk
+    FROM (
+        SELECT dp.LeaderID, dp.WorkerType, ph.HolidayName, ph.CountryCode, COUNT(*) AS OffPeople
+        FROM #Dip AS dp
+        JOIN dw.OrgClosure AS c ON c.AncestorID = dp.LeaderID AND c.Depth >= 1
+        JOIN fc.report_calendar AS rc ON c.MonthEndDate = rc.report_as_of_date
+        JOIN dw.PersonAvailabilityDay AS a
+          ON a.PersonID = c.DescendantID AND a.DayOffset = dp.DayOffset AND a.DayStatus = 'Public holiday'
+        JOIN dw.PersonMonthEnd AS d ON d.MonthEndDate = c.MonthEndDate AND d.PersonID = c.DescendantID
+        JOIN dw.RefPublicHoliday AS ph ON ph.CountryCode = d.CountryCode AND ph.HolidayDate = dp.Day
+        WHERE dp.WorkerType = 'All'
+           OR (dp.WorkerType = 'Employees' AND a.WorkerType = 'Employee')
+           OR (dp.WorkerType = 'Contingent' AND a.WorkerType = 'Contingent')
+        GROUP BY dp.LeaderID, dp.WorkerType, ph.HolidayName, ph.CountryCode
+    ) AS x
+) AS r
+WHERE Rk = 1;
+
+DROP TABLE IF EXISTS #Lightest;
+SELECT LeaderID, WorkerType, TeamLeaderID, TeamLeaderName, People, AtWork
+INTO #Lightest
+FROM (
+    SELECT dp.LeaderID, dp.WorkerType, k.LeaderID AS TeamLeaderID, k.LeaderName AS TeamLeaderName, a.People, a.AtWork,
+           ROW_NUMBER() OVER (PARTITION BY dp.LeaderID, dp.WorkerType
+                              ORDER BY CAST(a.AtWork AS FLOAT) / a.People, k.LeaderName, k.LeaderID) AS Rk
+    FROM #Dip AS dp
+    JOIN #NowLeader AS k ON k.ParentLeaderID = dp.LeaderID
+    JOIN dw.LeaderAvailability AS a ON a.LeaderID = k.LeaderID AND a.WorkerType = dp.WorkerType AND a.DayOffset = dp.DayOffset
+    WHERE a.People > 0
+) AS r
+WHERE Rk = 1;
+
+DROP TABLE IF EXISTS dw.LeaderPulse;
+SELECT o.MonthEndDate, m.MonthIndex, o.LeaderID, o.WorkerType, o.People, o.GapPeople,
+       ISNULL(h.HubPeople, 0)       AS HubPeople,
+       dp.DayOffset                 AS DipDayOffset,
+       dp.Day                       AS DipDay,
+       dp.People                    AS DipPeople,
+       dp.AtWork                    AS DipAtWork,
+       dp.OffPublicHoliday          AS DipOffPublicHoliday,
+       hol.HolidayName              AS DipHolidayName,
+       hol.CountryCode              AS DipHolidayCountryCode,
+       lt.TeamLeaderID              AS LightestTeamLeaderID,
+       lt.TeamLeaderName            AS LightestTeamLeaderName,
+       lt.People                    AS LightestTeamPeople,
+       lt.AtWork                    AS LightestTeamAtWork
+INTO dw.LeaderPulse
+FROM dw.LeaderOrg AS o
+JOIN #Month AS m ON m.MonthEndDate = o.MonthEndDate
+JOIN #NowLeader AS n ON n.LeaderID = o.LeaderID
+LEFT JOIN #Hub AS h ON h.MonthEndDate = o.MonthEndDate AND h.LeaderID = o.LeaderID AND h.WorkerType = o.WorkerType
+LEFT JOIN #Dip AS dp ON m.MonthIndex = 12 AND dp.LeaderID = o.LeaderID AND dp.WorkerType = o.WorkerType
+LEFT JOIN #DipHoliday AS hol ON m.MonthIndex = 12 AND hol.LeaderID = o.LeaderID AND hol.WorkerType = o.WorkerType
+LEFT JOIN #Lightest AS lt ON m.MonthIndex = 12 AND lt.LeaderID = o.LeaderID AND lt.WorkerType = o.WorkerType;
+CREATE CLUSTERED INDEX CIX_LeaderPulse ON dw.LeaderPulse (LeaderID, WorkerType, MonthIndex);
 GO
 
 /* ------------------------------------------------------------------ AlignmentDetail
@@ -851,4 +1007,6 @@ DECLARE @t INT = (SELECT COUNT(*) FROM dw.OrgTreeLayout);
 PRINT CONCAT('dw.OrgTreeLayout                  ', @t);
 DECLARE @a INT = (SELECT COUNT(*) FROM dw.LeaderAvailability);
 PRINT CONCAT('dw.LeaderAvailability             ', @a);
+DECLARE @p INT = (SELECT COUNT(*) FROM dw.LeaderPulse);
+PRINT CONCAT('dw.LeaderPulse                    ', @p);
 GO

@@ -899,6 +899,19 @@ DECLARE @n_ref_fringe_source INT = (SELECT COUNT(*) FROM raw.ref_fringe_source);
 PRINT CONCAT('raw.ref_fringe_source', '               ', @n_ref_fringe_source, ' rows');
 GO
 
+DROP TABLE IF EXISTS raw.ref_function_hub;
+CREATE TABLE raw.ref_function_hub (
+    [function_name] NVARCHAR(400) NULL,
+    [location_id]   NVARCHAR(400) NULL,
+    [hub_name]      NVARCHAR(400) NULL
+);
+BULK INSERT raw.ref_function_hub
+FROM '/repo/data/raw/ref_function_hub.csv'
+WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK);
+DECLARE @n_ref_function_hub INT = (SELECT COUNT(*) FROM raw.ref_function_hub);
+PRINT CONCAT('raw.ref_function_hub', '                ', @n_ref_function_hub, ' rows');
+GO
+
 DROP TABLE IF EXISTS raw.ref_fx_rate_constant;
 CREATE TABLE raw.ref_fx_rate_constant (
     [rate_set]      NVARCHAR(400) NULL,
