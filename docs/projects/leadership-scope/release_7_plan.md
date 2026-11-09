@@ -42,7 +42,7 @@ This page tracks the release from the data the generator writes to the published
 | 5 | Check tables with real numbers; refresh the design canvas | Claude, reviewed by Thiago | To do | Canvas shows generated values |
 | 6 | Figma spec | Thiago, with Claude | To do | Spec matches the approved canvas |
 | 7 | Build guide and workbook, light and dark | Claude, then Thiago | **Done** 2026-11-09: workbook built by `tableau/builder/d7` (92 sheets, 180 actions) and checked in Tableau Desktop 2026.2; guide `who_leads_where_build.md` | Check tables and click tests pass on Tableau Public |
-| 8 | Publish; Tableau Cloud with row-level security and Pulse | Both | Publishing to Tableau Public 2026-11-09; Tableau Cloud to do | Live link; Pulse metrics followed per L1 |
+| 8 | Publish; Tableau Cloud with row-level security and Pulse | Both Tableau Public **done** 2026-11-09: [live](https://public.tableau.com/app/profile/thialp/viz/WhoLeadsWhereArcadiaSystems/WhoLeadsWhere). Tableau Cloud to do | Live link; Pulse metrics followed per L1 |
 
 ---
 

@@ -42,7 +42,7 @@ Total workforce cost: **$4.65 billion a year** at run-rate: $3.41B for employees
 | 🔍 **4. [Contingent Workforce](#case-study-4-contingent-workforce-reconciliation)** | *Do our HR system and our supplier system agree on who works here?* | Every disagreement found, explained, aged and routed to who can fix it | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/ContingentWorkforceReconciliationArcadiaSystems/Dashboard)** |
 | 🔮 **5. [Seats to Fill](#case-study-5-seats-to-fill-hiring-forecast)** | *How many PIDs will we fill next year, how many will still be vacant, and can we trust it?* | A survival model of time to fill and 100 simulated futures, against the Budget, tested on eight past quarters | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/SeatstoFillArcadiaSystems/Dashboard)** |
 | 🧮 **6. [Workforce Cost Bridge](#case-study-6-workforce-cost-bridge)** | *Why did total workforce cost grow?* | More people, pricier people, a different mix, or currency? Split fairly, to the cent | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WorkforceCostBridgeShapleyCostDecompositionArcadiaSystems/Dashboard)** |
-| 🗺️ **7. [Global Workforce Footprint](#case-study-7-global-workforce-footprint)** | *Where are our people, and where are they moving?* | Office-level growth and every relocation, on a map | *coming soon* |
+| 🧭 **7. [Who Leads Where](#case-study-7-who-leads-where)** | *Who leads whom, how many people, and where do the records depart from the org design?* | Every leader's organization, employees and contingent workers, three reporting lines checked against each other, and a daily Team pulse of who is at work | **[Live on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WhoLeadsWhereArcadiaSystems/WhoLeadsWhere)** |
 
 ### How it works, in one picture
 
@@ -51,7 +51,7 @@ flowchart LR
     BW["🟠 <b>Bridgeway VMS</b><br/>the supplier system<br/>contract orders, rates, timesheets"]
     subgraph ARC["Arcadia's own systems"]
         KS["🔵 <b>Keystone HR</b><br/>Arcadia's system of record<br/>every employee and contractor,<br/>an Arcadia ID and a PID each<br/>pay, jobs, hiring, the plan"]
-        WH["🟣 <b>The warehouse</b><br/>cleans, connects, checks<br/>88 automated tests"]
+        WH["🟣 <b>The warehouse</b><br/>cleans, connects, checks<br/>102 automated tests"]
         DASH["🔷 <b>Dashboards</b><br/>Tableau"]
     end
     PUB["🟢 <b>Public data</b><br/>exchange rates, employer costs,<br/>postal codes"]
@@ -122,13 +122,14 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 - **Total cost grew $403M (+9.5%).** A fair split ([Shapley values](#growth-mix-why-did-total-workforce-cost-change)) shows **$307M came from having more people** and **$140M from paying people more**, while currency moves *saved* $52M.
 - **270 contractors became employees.** Each conversion lowered run-rate cost: on average $121k a year of supplier billing was replaced by $73k of employee pay and employer costs.
 - **At the June close, 383 contractors (3.21%) have a mismatch that puts Finance's month-end report at risk**, below the provisional 3.5% target and falling at every close since December: 407 gaps, 194 to align in the supplier system, 151 in the HR system, 62 in the feed between them. Counting every disagreement, including manager and office, 416 contractors (3.5%) differ; the largest group is 219 changed by hand in the HR system only.
+- **2,057 of the 41,934 people the CEO leads (4.9%) show an alignment gap** on Jun 30, 2026: a reporting line borrowed from another org, a role from another function, or a country matrix that doesn't match where they sit. On the same day 37,972 are at work; on Friday Jul 3 (Independence Day observed) coverage dips to 67%.
 - **Arcadia holds 51,163 PIDs**: 30,005 filled by employees, 11,941 by contractors, and 9,217 vacant (8,689 that someone left, 528 new ones waiting for a first hire). Hiring followed the plan at 79% for new PIDs and 93% for backfills.
 
 ### Why it is built this way
 
 | Principle | What it means here |
 |---|---|
-| ✅ **Every number reconciles** | Start + changes = end, for every team, month and currency, checked by 88 automated tests on every change |
+| ✅ **Every number reconciles** | Start + changes = end, for every team, month and currency, checked by 102 automated tests on every change |
 | 🔁 **One company, many questions** | All the case studies read the same people, the same history and the same month-end snapshots, so two dashboards never tell different stories |
 | 🏢 **Built like an enterprise stack** | The same model runs on DuckDB (for Tableau Public) and SQL Server (for a live Tableau connection), and is proven identical row for row |
 | 🧭 **Explain, don't just report** | Every case study answers *why*, not only *how much* |
@@ -136,15 +137,15 @@ Thirteen kinds of disagreement are tracked, from *a change still on its way* to 
 | | |
 |---|---|
 | **Stack** | SQL (DuckDB and SQL Server) · Python · Tableau · Docker · GitHub Actions |
-| **Scale** | 47,056 employees and 43,484 contractors over five years · 61 month-ends, and every day to the Jul 5, 2026 extract · 64,914 PIDs (33,650 employee, 31,264 contractor) · 31,614 requisitions · 189,964 applicants · 58,276 supplier orders · 632,504 timesheets |
-| **Output** | 28 Tableau-ready marts and 7 dimension files in [`data/marts/`](data/marts/); 19 Tableau Custom SQL queries and 18 reporting views on SQL Server |
-| **Controls** | 88 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
+| **Scale** | 47,056 employees and 43,484 contractors over five years · 61 month-ends, and every day to the Jul 5, 2026 extract · 64,914 PIDs (33,650 employee, 31,264 contractor) · 31,614 requisitions · 189,964 applicants · 58,276 supplier orders · 632,504 timesheets · 363,620 time-off requests · 70,311 matrix memberships |
+| **Output** | 44 Tableau-ready marts and 7 dimension files in [`data/marts/`](data/marts/); 21 Tableau Custom SQL queries and 25 reporting views on SQL Server |
+| **Controls** | 102 automated data tests; the build stops if any fails. The SQL Server build is checked against the same values |
 
 ---
 
 # Technical deep dive
 
-**Contents:** [The platform](#the-platform) · [Case study 1](#case-study-1-headcount--fte-walk) · [2](#case-study-2-compensation-walk) · [3](#case-study-3-workforce-planning) · [4](#case-study-4-contingent-workforce-reconciliation) · [5](#case-study-5-seats-to-fill-hiring-forecast) · [6](#case-study-6-workforce-cost-bridge) · [7](#case-study-7-global-workforce-footprint) · [Run it yourself](#run-it-yourself) · [SQL Server](#run-it-on-sql-server-with-tableau) · [Repository layout](#repository-layout)
+**Contents:** [The platform](#the-platform) · [Case study 1](#case-study-1-headcount--fte-walk) · [2](#case-study-2-compensation-walk) · [3](#case-study-3-workforce-planning) · [4](#case-study-4-contingent-workforce-reconciliation) · [5](#case-study-5-seats-to-fill-hiring-forecast) · [6](#case-study-6-workforce-cost-bridge) · [7](#case-study-7-who-leads-where) · [Run it yourself](#run-it-yourself) · [SQL Server](#run-it-on-sql-server-with-tableau) · [Repository layout](#repository-layout)
 
 ## The platform
 
@@ -157,8 +158,8 @@ The case studies share one warehouse. This section covers what they have in comm
 ```mermaid
 flowchart LR
     subgraph Sources["Source systems (simulated, fictional)"]
-        HR["Keystone HR<br/>employees · jobs · pay · PIDs · requisitions · applicants · plan<br/>contingent workers: Arcadia ID and PID"]
-        VMS["Bridgeway VMS<br/>suppliers · contingent workers · service orders · rates · timesheets"]
+        HR["Keystone HR<br/>employees · jobs · pay · PIDs · requisitions · applicants · plan<br/>contingent workers: Arcadia ID and PID<br/>matrix orgs · role assignments · time off and leave"]
+        VMS["Bridgeway VMS<br/>suppliers · contingent workers · service orders · rates · timesheets · time off"]
         FEED["Integration log<br/>Bridgeway → Keystone, one way<br/>sent and applied, by the hour"]
         HLX["Helix Service Desk<br/>tickets · state changes · links"]
     end
@@ -166,14 +167,15 @@ flowchart LR
         ECB["ECB daily FX rates"]
         FRG["Fringe research<br/>OECD · BLS · statutes"]
         GEO["GeoNames<br/>postal codes"]
+        HOL["Public holidays<br/>by country"]
     end
     subgraph WH["DuckDB warehouse"]
         RAW["raw<br/>files land as text"]
         STG["staging<br/>types · dedup · corrections"]
-        INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain<br/>identity resolution · discrepancy rules<br/>close runs · flags and routing · ticket replay"]
+        INT["intermediate<br/>month-end snapshots · pay ledger · seat fills · reporting chain<br/>identity resolution · discrepancy rules<br/>close runs · flags and routing · ticket replay<br/>org closure · alignment signals · days off"]
         LOG["load log<br/>every scheduled read"]
-        MART["marts<br/>walks · fills · plan vs actual · cost · reconciliation"]
-        TEST{{"88 data tests"}}
+        MART["marts<br/>walks · fills · plan vs actual · cost · reconciliation<br/>leaders · org tree · availability · Team pulse"]
+        TEST{{"102 data tests"}}
     end
     TAB["Tableau Public"]
     VMS -. feed .-> HR
@@ -185,6 +187,7 @@ flowchart LR
     ECB --> RAW
     FRG --> RAW
     GEO --> RAW
+    HOL --> RAW
     RAW --> STG --> INT --> MART --> TEST --> TAB
 
     classDef hr fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
@@ -198,7 +201,7 @@ flowchart LR
     class VMS vms
     class FEED feed
     class HLX hlx
-    class ECB,FRG,GEO pub
+    class ECB,FRG,GEO,HOL pub
     class RAW,STG,INT,MART,TEST,LOG wh
     class TAB dash
 ```
@@ -209,7 +212,7 @@ Colors as in the [executive summary](#how-it-works-in-one-picture): 🔵 Keyston
 |---|---|---|
 | **raw** | CSVs load as text, untouched, like a landing zone; every table names its source system ([lineage](docs/warehouse/source_systems.md)) | [`data/raw/`](data/raw/) |
 | **staging** | Data types set; same-day pay corrections resolved; job level renamed `grade` once | [`sql/01_staging/`](sql/01_staging/) |
-| **intermediate** | Pay valued at its posting-date FX rate; effective-dated history turned into one row per worker (and per seat, and per contingent worker as Bridgeway held it) per month-end; a running pay ledger; seat fills and vacancy chains; the reporting chain walked to the CEO; Keystone people matched to Bridgeway workers and the two systems compared | [`sql/02_intermediate/`](sql/02_intermediate/) |
+| **intermediate** | Pay valued at its posting-date FX rate; effective-dated history turned into one row per worker (and per seat, and per contingent worker as Bridgeway held it) per month-end; a running pay ledger; seat fills and vacancy chains; the reporting chain walked to the CEO; Keystone people matched to Bridgeway workers and the two systems compared; every person's leaders (solid line), country matrix and role assignments compared with the org design; time off expanded to days | [`sql/02_intermediate/`](sql/02_intermediate/) |
 | **marts** | Business-ready tables for Tableau | [`sql/03_marts/`](sql/03_marts/) |
 | **tests** | Each test returns rule-breaking rows; zero rows = pass | [`tests/`](tests/) |
 
@@ -228,6 +231,8 @@ The same model is built in T-SQL on **SQL Server** for a live Tableau connection
 | **Transfers between groups** | If movers are valued at new pay on the way in and old pay on the way out, transfers stop netting to zero for the company. | Transfers move at **prior** pay; any raise shows up as its own driver in the new group |
 | **Order of attribution** | A worker can get promoted *and* see FX move in the same month; a re-levelled seat can also move office. The split must not double-count. | Decompositions whose terms always sum exactly to the change, with the rounding absorbed by one named term ([case study 6](#case-study-6-workforce-cost-bridge), [case study 3](#case-study-3-workforce-planning)) |
 | **Two systems of record** | Contractors live in the vendor system (Bridgeway); managers see them in the HR system (Keystone), filled by a one-way feed that can be late, fail or be overridden by hand. Their IDs, supplier names and dates disagree. | Identity resolution in three confidence tiers; a side-by-side snapshot of what Keystone *should* hold (everything Bridgeway sent) against what it holds; rules that name the cause of each difference ([case study 4](#case-study-4-contingent-workforce-reconciliation)) |
+| **Three reporting lines** | A person reports to a manager (solid line), belongs to a country matrix and is served by HR and Finance partners assigned to org units. Each is kept in its own effective-dated table, and after a reorg they drift apart without anyone noticing. | One closure table of every person under every leader per month-end; seven alignment signals that compare the three lines with the org design and the job family's home function, flags rather than errors ([case study 7](#case-study-7-who-leads-where)) |
+| **Who is at work** | Time off lives in two systems: employees request it in Keystone, contingent workers book it in Bridgeway and the feed copies it over. Requests are ranges in hours or days, with corrections; leave has estimated and actual returns; holidays depend on the country. | Requests expanded to weekdays in SQL, corrections netted, Bridgeway bookings checked against what Keystone holds, public holidays by country; at work + off = people for every leader and day (test 99) |
 | **Attribution bias** | Splitting a cost change into volume, mix, rate and currency gives a different answer depending on which factor is moved first. | Shapley values: each factor's average contribution over every order of the six factors, beside the sequential split and its bias ([growth mix](#growth-mix-why-did-total-workforce-cost-change)) |
 | **Privacy** | Pay for groups under 5 people can identify individuals, and what counts as a group depends on how a dashboard slices the data. | Suppression applied in Tableau at the level of the view; executive officers excluded from pay in SQL |
 
@@ -239,8 +244,9 @@ The same model is built in T-SQL on **SQL Server** for a live Tableau connection
    - **The org stays valid every day:** when a manager leaves, a successor or the next manager up takes the team the next day, and teams over 9 are split by appointing a new manager.
    - **Two events give the history a story:** a **FY24 restructuring** in Commercial and Marketing, and a **FY25 reorganization** that moved data teams into a new *Data & AI Platform* department.
    - **Contingent workers (release 3):** suppliers submit workers on service orders that are approved, extended, renewed, re-rated and closed in Bridgeway VMS, with monthly timesheets. A one-way feed copies each change into Keystone HR, late, partly or not at all, and people edit Keystone by hand. Some contractors are converted into employees. Every planted discrepancy is written to an **answer key** that only the scoring model reads.
+   - **Org design and time off (release 7):** after the simulation, [`generator/leadership_scope.py`](generator/leadership_scope.py) adds country and region matrices with their leaders, HR and Finance partner assignments on every org unit, and time off and leave for every employee and contingent worker. It seeds the drift a real HR system shows: people who kept their old manager after the FY25 reorganization, matrix changes that lag an international move, a matrix ended with members still in it, a leader seat left open. Every seeded gap goes into its own answer key.
    - **Each domain draws from its own seeded random stream** (people, seats, recruiting, plan, contingent workers, the feed), so adding a domain never changes the draws of another.
-2. **Land it as a warehouse would.** Forty raw tables from five source systems ([lineage](docs/warehouse/source_systems.md)), with deliberate source quirks: same-day corrections, compensation history that only starts at a March 2021 system conversion, FX that exists only on ECB business days, a pegged currency, hand-typed supplier names and feed failures.
+2. **Land it as a warehouse would.** Sixty-one raw tables, each tagged with its source system ([lineage](docs/warehouse/source_systems.md)), with deliberate source quirks: same-day corrections, compensation history that only starts at a March 2021 system conversion, FX that exists only on ECB business days, a pegged currency, hand-typed supplier names and feed failures.
 3. **Model in layers** with plain SQL files in run order, so each step can be read and tested on its own.
 4. **Test everything that must be true**, and fail the build if it isn't.
 5. **Export flat marts** that Tableau Public can read directly, and generate each dashboard's check table from them.
@@ -290,6 +296,27 @@ erDiagram
     bw_service_order_revision }o--|| dim_cost_center : "billed to"
 ```
 
+Org design and time off (release 7) add a second and third reporting line beside the manager on each job record, and the days people are away:
+
+```mermaid
+erDiagram
+    ks_matrix_org ||--o{ ks_matrix_membership : "members"
+    ks_matrix_org }o--o| dim_worker : "led by (seat can be open)"
+    ks_matrix_org }o--o{ dim_country : "covers"
+    ks_matrix_membership }o--|| dim_worker : "employee"
+    ks_matrix_membership }o--|| ks_contingent_worker : "or contingent worker"
+    ks_role_assignment }o--|| dim_org_unit : "HR or Finance partner on"
+    ks_role_assignment }o--|| dim_worker : "assignee"
+    dim_job_profile }o--|| ref_job_family_home : "family's home function"
+    dim_worker ||--o{ ks_time_off_request : "requests"
+    dim_worker ||--o{ ks_leave_of_absence : "takes leave"
+    bw_contingent_worker ||--o{ bw_time_off : "books"
+    bw_time_off ||--o| ks_time_off_request : "fed to Keystone as"
+    dim_country ||--o{ ref_public_holiday : "observes"
+    dim_location ||--o{ ref_function_hub : "hub for a function"
+    gen_org_drift_truth }o--o| dim_worker : "seeded gap (answer key)"
+```
+
 | Raw table | Grain | Rows |
 |---|---|---:|
 | `dim_worker` | worker (fictional names) | 47,056 |
@@ -329,13 +356,23 @@ erDiagram
 | `feed_bridgeway_keystone_event` | change sent from Bridgeway to Keystone: sent, applied, failed, queued | 106,357 |
 | `ref_cw_discrepancy_type` | discrepancy type CW00–CW12: what happened, what a manager sees, severity, who fixes it | 13 |
 | `gen_cw_discrepancy_truth` | the answer key: every planted discrepancy and its dates (a test fixture) | 28,948 |
-| `ref_source_system`, `ref_raw_table_lineage`, `ref_raw_column` | source systems, the source of every raw table, the column contract of the release 3 extracts | 6 / 40 / 128 |
+| `ks_matrix_org` | matrix org × effective-dated record: 5 region and 14 country or cluster matrices, the leader, the countries covered | 37 |
+| `ks_matrix_membership` | person (employee or contingent) × country matrix × dates, from the Jul 1, 2023 go-live | 70,311 |
+| `ks_role_assignment` | HR and Finance partner × org unit × dates, direct or inherited, with the leader the org's name carried | 115 |
+| `ref_job_family_home` | job family → the function that usually hires it (shared families flagged) | 14 |
+| `ks_time_off_request` | time-off request: employees in Keystone, contingent workers as fed from Bridgeway; hours or days, corrections | 363,620 |
+| `ks_leave_of_absence` | leave: type, last day of work, estimated and actual return | 1,771 |
+| `bw_time_off` | contingent worker's booking in Bridgeway | 72,949 |
+| `ref_public_holiday` | country × public holiday, Jul 2025 to Aug 2026 | 276 |
+| `ref_function_hub` | function × the offices that are its hubs | 41 |
+| `gen_org_drift_truth` | the answer key: every seeded org-design gap, its cause and dates (a test fixture) | 999 |
+| `ref_source_system`, `ref_raw_table_lineage`, `ref_raw_column` | source systems, the source of every raw table, the column contract of every extract | 8 / 61 / 308 |
 
 Full column definitions: [`docs/warehouse/data_dictionary.md`](docs/warehouse/data_dictionary.md).
 
 ### Validation strategy
 
-Every test is a SQL query that returns the rows breaking a rule. The pipeline runs all 88 after every build and refuses to export if any returns rows.
+Every test is a SQL query that returns the rows breaking a rule. The pipeline runs all 102 after every build and refuses to export if any returns rows.
 
 | # | Test | Guards against |
 |---|---|---|
@@ -427,6 +464,20 @@ Every test is a SQL query that returns the rows breaking a rule. The pipeline ru
 | 86 | Every ID a ticket carries points at a real Bridgeway worker, Keystone person or failed load run | Tickets linked to nobody, counted as work on a gap |
 | 87 | Failed-load gaps exist only at closes whose load failed and route to Integration as alerts; feed gaps are "clears on its own" only when sent in the 24 hours before the close run | A data engineering alert for a gap that was a real record problem, or the reverse |
 | 88 | Feed and Keystone times fall on the release 3 dates; one load run per source per schedule; Keystone reads after Bridgeway; a failed run reads nothing | Times that contradict the dates the reconciliation was built on |
+| 89 | The report calendar matches the data: the as-of date is the last month-end covered, 24 quarters with no gap | Every dashboard label off by a period |
+| 90 | The forward year has exactly one Budget, complete for every active cost center, and never reaches plan vs actual | A forecast compared with a plan nobody had yet |
+| 91 | Requisitions are approved on or before the fill; a backfill no earlier than two weeks before the leaver's last day | Time to fill that starts before the vacancy could be known |
+| 92 | The daily headcount equals the month-end snapshot by department on every month-end, and stops at the data-through date | Daily and monthly counts telling different stories |
+| 93 | Every borrowed reporting line is in the answer key, with the original manager kept | A job history changed in ways nobody can put back |
+| 94 | **Every seeded org-design gap is found on every month-end, and nothing unseeded** (recall 100%) | Alignment signals that look plausible but miss what happened |
+| 95 | Matrix records never overlap; an open leader seat has an answer-key row; every country has exactly one active country matrix | Two matrices claiming one country, or none |
+| 96 | Role assignments run forward and name a former leader exactly when seeded | A stale-assignment flag with nothing behind it |
+| 97 | **Every chain ends at the CEO, and for every leader directs + indirects = people** | A tree whose branches don't add up to the trunk |
+| 98 | Time off sits inside employment, no one is off twice on a day, and Keystone holds exactly the days Bridgeway booked | Absences counted twice, or lost in the feed |
+| 99 | **At work + off = people** for every leader, worker type and weekday; the three reasons add up to the off | A calendar that drops or invents people |
+| 100 | Leaders' people = the month-end snapshot's employees and Bridgeway's contingent workers, every month-end | A leadership view that disagrees with every other dashboard |
+| 101 | The tree holds every leader once at its depth, no two siblings share a spot, every link has 17 points | Circles drawn on top of each other, or links that miss their circle |
+| 102 | The Team pulse: one row per leader, worker type and month; people and gaps equal the leader mart; the dip day is the lowest weekday ahead | Pulse tiles that disagree with the KPIs above them |
 
 Tests were checked against deliberately broken builds, to make sure they fail. Examples:
 
@@ -452,6 +503,8 @@ Tests were checked against deliberately broken builds, to make sure they fail. E
 - **Separate random streams before adding a domain.** Splitting the generator's draws by domain first, and proving the output unchanged, meant seats and requisitions could be added without moving a single existing hire.
 - **A translator checks logic, not the engine.** Running the T-SQL through sqlglot on DuckDB caught every logic difference, but not SQL Server's own rules: a primary key compiled in the same batch as its `ALTER COLUMN`, a `PRINT` holding a subquery, two `STRING_AGG`s with different orderings in one `SELECT` (Msg 8711). Those now have static checks, and the real engine still gets the last word. It also gets the last word on speed: a view that took DuckDB under a second ran 18 minutes on SQL Server under emulation, until it was precomputed into a table.
 - **Compare with what the source *sent*, not what it holds now.** The first reconciliation compared Keystone with the Bridgeway order in force and found 54 differences no cause could explain: Keystone had applied a renewal on approval, weeks before the new order started. Comparing with everything Bridgeway had sent by the month-end made every difference explainable.
+- **In Tableau, every sheet refreshes on every click, hidden or not.** Performance Recording showed 133 sheets redrawn per click at about 45 ms each, not slow queries. Folding the five KPI cards and six pulse tiles into two map-layer sheets, and giving each hidden sheet a context filter that is simply false, cut a click from 16–18 s to about 12 s in Desktop ([case study 7](#case-study-7-who-leads-where)).
+- **A gap is a flag, not an error.** A leader can have a good reason for every person who reports across an org line. Calling them alignment gaps, with the cause beside each, gets them looked at instead of argued with.
 - **Score the rules against an answer key, and keep the false flags honest.** Recall is 100%; the 42 false flags are two different people with the same name at the same supplier and cost center, a day apart. Nothing in either system tells them apart, so the work list says so instead of hiding them.
 
 ---
@@ -1020,17 +1073,83 @@ Step-by-step connection guide: [`docs/setup/tableau_public_guide.md`](docs/setup
 
 ---
 
-## Case study 7: Global Workforce Footprint
+## Case study 7: Who Leads Where
 
-![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
+**Published:** [Who Leads Where: Leadership Scope & Org Design on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WhoLeadsWhereArcadiaSystems/WhoLeadsWhere) (release 7 data, one Custom SQL extract of 707,236 rows).
 
-*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The interactive office-level map is on Tableau Public (coming soon); a version of it also runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard).*
+[![Who Leads Where on Tableau Public](docs/images/who_leads_where_dashboard.png)](https://public.tableau.com/app/profile/thialp/viz/WhoLeadsWhereArcadiaSystems/WhoLeadsWhere)
+
+*Jun 30, 2026, the CEO's organization. **[Open the interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WhoLeadsWhereArcadiaSystems/WhoLeadsWhere)**: click any leader in the tree to open their team and anyone above to go back up, or pick any leader down to L6 from the rail; switch employees and contingent workers, count everyone or only those at work, pick a day in the next 30, and read the Team pulse in light or dark.*
 
 ### Business problem
 
-Location strategy questions (where to hire next, which hubs are growing, whether people are moving toward engineering centers or away from headquarters) are usually answered from a country column. A country hides the difference between two offices in the same country, and it can't show movement. This case study answers them at the office level, with every number tied back to the headcount walk.
+"Who rolls up to her, and how many people is that?" sounds like one query. In an enterprise HR system it is three: the **solid line** (each person's manager, on their job record), the **matrix line** (the country or region leader they belong to) and **role assignments** (the HR and Finance partners on each org unit). Each lives in its own effective-dated table and changes on its own schedule, so after a reorganization or an international move they quietly disagree: a team moved to a new department still reports to its old manager, a person who relocated is still in the old country's matrix, a matrix is closed with members still in it. A leader also wants the people who aren't employees (contingent workers report to the same managers) and who will actually be there on a given day.
 
 ### Approach
+
+```mermaid
+flowchart LR
+    JH["job history<br/>(solid line)"] --> PME["int_person_month_end<br/>employees and contingent<br/>workers, one row each"]
+    CW["Bridgeway workers<br/>+ Keystone profile"] --> PME
+    PME --> CL["int_org_closure<br/>every person under<br/>every leader"]
+    MX["matrix orgs and<br/>membership"] --> SIG["int_alignment_signal<br/>7 signals"]
+    RA["role assignments"] --> SIG
+    PME --> SIG
+    TO["time off · leave ·<br/>Bridgeway bookings ·<br/>public holidays"] --> DAY["int_time_off_day"]
+    CL --> MART["leader marts<br/>org · tree · availability<br/>pulse · entitlement"]
+    SIG --> MART
+    DAY --> MART
+    MART --> TAB["Tableau<br/>one Custom SQL"]
+```
+
+| Model | What it does |
+|---|---|
+| [`int_person_month_end`](sql/02_intermediate/int_person_month_end.sql) | One row per employee and contingent worker per month-end with department, office, job family and manager. Contingent workers count from Bridgeway (11,941, as on every dashboard) and take their manager from their Keystone profile through case study 4's identity resolution |
+| [`int_org_closure`](sql/02_intermediate/int_org_closure.sql) | A recursive walk up the solid line: every person × every leader above × depth, per month-end, so "everyone in her organization" is one equality join |
+| [`int_alignment_signal`](sql/02_intermediate/int_alignment_signal.sql) | Seven signals on three lines: budgeted in another org, role from another function (against `ref_job_family_home`), country leader for another country, in two country matrices or none, matrix inactive or without a leader, still naming a former leader, and leads people in other regions (context, never a gap) |
+| [`int_time_off_day`](sql/02_intermediate/int_time_off_day.sql) | Time-off requests and leave expanded to weekdays, corrections netted, Bridgeway bookings for contingent workers |
+| [`mart_leader_org`](sql/03_marts/mart_leader_org.sql) | Leader × month-end × worker type: people, directs, indirects, layers below, median span, gaps by signal |
+| [`mart_org_tree_layout`](sql/03_marts/mart_org_tree_layout.sql) | The tree's coordinates, in SQL: one company tree where every leader has a fixed place (Dynamic), and three levels below any focus (Static); 17 points per link |
+| [`mart_leader_availability`](sql/03_marts/mart_leader_availability.sql) | Leader × day for the 30 days from the report date: people, at work, off by reason (time off, leave, public holiday), left the team |
+| [`mart_leader_pulse`](sql/03_marts/mart_leader_pulse.sql) | The Team pulse: 13 month-ends of people, gaps and people in their function's hubs, plus the week's dip day, its holiday and the lightest team |
+| [`mart_alignment_detail`](sql/03_marts/mart_alignment_detail.sql), [`mart_org_entitlement`](sql/03_marts/mart_org_entitlement.sql) | The roster behind every gap, and viewer × person for row-level security on Tableau Cloud |
+
+Gaps are **flags, never errors**: a leader can have a good business reason for each one. The simulation seeded 999 of them, and test 94 proves every seeded person gap is found on every month-end and nothing unseeded is. Ten tests (93 to 102) cover the release: the closure adds up (directs + indirects = people), at work + off = people for every leader and day, and every leader total ties to the numbers every other dashboard shows.
+
+### Results (Jun 30, 2026)
+
+| Finding | Number |
+|---|---|
+| People in the CEO's organization | 41,934: 30,005 employees and 11,929 contingent workers (12 more have no manager employed that day) |
+| Leaders | 8 executives, 20 L1, 189 L2, and 3,288 more down to L6; median span 10; 666 managers lead 15 or more |
+| People with an alignment gap | **2,057 (4.9%)**: 1,206 on the solid line (258 budgeted in another org, 958 in a role from another function), 876 on the matrix line (817 in a matrix that ended or has no leader) |
+| The widest L1 organization | Isaac Holland, Software Engineering: 13,248 people, 866 (6.5%) with a gap, mostly roles from another function |
+| At work today | 37,972 of 41,934 (91%), against an 85% floor |
+| The day to plan for | Friday, Jul 3: coverage dips to 67% for Independence Day (observed) in the US |
+| Renewals ahead | 2,495 contingent assignments end in the next 30 days, 1,972 this week (the fiscal year-end) |
+
+### Tableau
+
+One dashboard, **1400 x 850**, light and dark, built by a Python script ([`tableau/builder/d7/`](tableau/builder/d7/)) and published as an extract. Step-by-step build, check tables and click tests: [`who_leads_where_build.md`](docs/projects/leadership-scope/who_leads_where_build.md).
+
+- **A tree that grows.** One company tree where every leader has a fixed place; a click opens a leader's team below them and anyone above closes it again, with Tableau's animation showing the move. One parameter (`p_Path`, the chain from the CEO) drives every click; the leader on the page is its last ID, read with `REGEXP_EXTRACT`. Each circle is a pie: size is people led, the amber slice is the share with a gap.
+- **KPI cards and Team pulse tiles as map layers.** Every title, value, sparkline and bar is a mark on an invisible `MAKEPOINT` map laid over a card picture, so 23 sheets became two.
+- **Measured, then made faster.** Performance Recording showed every click redraws every sheet, hidden ones included. Fewer sheets, and a context filter that is false whenever a sheet is hidden, took a tree click from 16–18 s to about 12 s and opening from 17 s to 10 s in Desktop.
+- **Tableau Cloud next:** row-level security from `mart_org_entitlement` (each leader sees their own branch) and the Team pulse tiles as Tableau Pulse metrics.
+
+On SQL Server: [`03g_build_dw_leadership_scope.sql`](sqlserver/03g_build_dw_leadership_scope.sql), seven views in [`04d`](sqlserver/04d_create_reporting_views_leadership.sql), the Custom SQL [`tableau/custom_sql_who_leads_where.sql`](tableau/custom_sql_who_leads_where.sql) and 40 checks in [`18_validate_leadership_scope.sql`](sqlserver/18_validate_leadership_scope.sql) ([run guide](docs/projects/leadership-scope/sql_server_release_7_run.md)). Plan and decisions: [release 7](docs/projects/leadership-scope/release_7_plan.md).
+
+## Also in the warehouse: Global Workforce Footprint
+
+![Global Workforce Footprint preview](docs/images/workforce_map_preview.png)
+
+*Static preview drawn from the marts by [`docs/brand/build/`](docs/brand/build/). The office-level map runs as the office-moves panel of the [Compensation Walk](https://public.tableau.com/app/profile/thialp/viz/ArcadiaCompensationWalk/Dashboard); the marts below feed it.*
+
+#### Business problem
+
+Location strategy questions (where to hire next, which hubs are growing, whether people are moving toward engineering centers or away from headquarters) are usually answered from a country column. A country hides the difference between two offices in the same country, and it can't show movement. This case study answers them at the office level, with every number tied back to the headcount walk.
+
+#### Approach
 
 | Model | What it does |
 |---|---|
@@ -1041,7 +1160,7 @@ Location strategy questions (where to hire next, which hubs are growing, whether
 
 A relocation is any change of office between two month-ends, including between two offices in the same country, which the slice-level walk in case study 1 can't see (Bengaluru to Hyderabad is the busiest corridor, and both are in India). Four tests (19 to 22) tie the office walk to the company walk and the flows to the office walk.
 
-### Results (FY26)
+#### Results (FY26)
 
 | Finding | Number |
 |---|---|
@@ -1052,7 +1171,7 @@ A relocation is any change of office between two month-ends, including between t
 | Busiest corridor | Bengaluru ↔ Hyderabad, 122 moves |
 | Within 1,000 km of London | Paris, Amsterdam, Dublin, Zurich, Munich and Berlin: 4,240 people across seven offices, London included |
 
-### Tableau
+#### Tableau
 
 Step-by-step build: [`docs/projects/workforce-footprint/tableau_workforce_map_guide.md`](docs/projects/workforce-footprint/tableau_workforce_map_guide.md). One map with four layers (countries, relocation paths with `MAKELINE`, a `BUFFER` radius around the selected office, offices with `MAKEPOINT`), a parameter action that moves the radius when an office is clicked, `DISTANCE` to count the people inside it, and the 2025 viewport parameter and dynamic color range where Tableau Public supports them.
 
@@ -1068,7 +1187,7 @@ pip install -r requirements.txt
 python generator/generate_data.py      # optional: rebuild the raw data (same seed, same output)
 python generator/core_hr_extract.py    # then extend Core HR to the data-through date (release 6)
 python generator/leadership_scope.py   # then add org design and time off (release 7)
-python pipeline/run_pipeline.py        # build the warehouse, run the 101 tests, export the marts,
+python pipeline/run_pipeline.py        # build the warehouse, run the 102 tests, export the marts,
                                        # the org chart and the dashboards' check tables
 
 python benchmarks/benchmark_headcount_walk.py   # optional: the grain benchmark (case study 1)
@@ -1087,11 +1206,12 @@ The same warehouse also builds on **SQL Server** (in Docker) for a live Tableau 
 - [`03b_build_dw_workforce_planning.sql`](sqlserver/03b_build_dw_workforce_planning.sql) builds the seat layer (positions, seat assignments, requisitions, the workforce plan, candidates, a seat month-end snapshot, seat fills with the pay walk, vacancy chains with a recursive CTE, plan vs actual) and four reporting views; [`08_validate_workforce_planning.sql`](sqlserver/08_validate_workforce_planning.sql) checks it.
 - [`03c_build_dw_contingent.sql`](sqlserver/03c_build_dw_contingent.sql) (release 3) brings in the contingent workforce: Bridgeway VMS and Keystone HR's contingent records, the contingent month-end snapshot, conversions and movement, and case study 4's identity resolution and discrepancy rules, where DuckDB's `ASOF JOIN` becomes a range join on each feed change and the date of the next one. [`04b`](sqlserver/04b_create_reporting_views_contingent.sql) adds six views (contingent spend, the Shapley growth mix in T-SQL, precomputed in `dw.WorkforceCostGrowthMix` by [`03f`](sqlserver/03f_build_dw_cost_growth_mix.sql), and the case study 4 marts), each with a matching Tableau Custom SQL file (`tableau/custom_sql_cw_*.sql`, `custom_sql_workforce_cost_growth_mix.sql`); [`12_validate_contingent_workforce.sql`](sqlserver/12_validate_contingent_workforce.sql) checks them.
 - [`03d_build_dw_cw_reconciliation.sql`](sqlserver/03d_build_dw_cw_reconciliation.sql) (release 4) adds case study 4's month-end close view: the load log and the close runs, the 12 flags with their routing, Keystone job data, the Helix ticket replay and the three Dashboard #4 marts; [`04c`](sqlserver/04c_create_reporting_views_reconciliation.sql) exposes them as views, [`tableau/custom_sql_cw_reconciliation_dashboard.sql`](tableau/custom_sql_cw_reconciliation_dashboard.sql) unions them into the page's one data source, and [`15_validate_cw_reconciliation.sql`](sqlserver/15_validate_cw_reconciliation.sql) checks them.
+- [`03g_build_dw_leadership_scope.sql`](sqlserver/03g_build_dw_leadership_scope.sql) (release 7) adds case study 7: the person month-end with contingent workers, the org closure with a recursive CTE, the alignment signals, days off, the tree layout and the Team pulse; [`04d`](sqlserver/04d_create_reporting_views_leadership.sql) adds seven views, [`tableau/custom_sql_who_leads_where.sql`](tableau/custom_sql_who_leads_where.sql) stacks them into the dashboard's one data source (707,236 rows), and [`18_validate_leadership_scope.sql`](sqlserver/18_validate_leadership_scope.sql) runs 40 checks.
 - [`tableau/custom_sql_workforce_cost_bridge.sql`](tableau/custom_sql_workforce_cost_bridge.sql) is the cost bridge as **Tableau Custom SQL**: one `SELECT` with no CTEs, using derived tables and `CROSS APPLY (VALUES …)` to unpivot each employee and contingent worker into walk lines.
 - [`tableau/custom_sql_headcount_fte_walk.sql`](tableau/custom_sql_headcount_fte_walk.sql) is the headcount & FTE walk for Dashboard #1: the walk rebuilt from the SQL Server snapshot with the five dimensions joined in, keeping every CSV column name so the workbook moves over with *Replace Data Source* ([field mapping](docs/projects/workforce-planning/release_2_replace_references.md)); [`10_validate_headcount_fte_walk.sql`](sqlserver/10_validate_headcount_fte_walk.sql) runs it and checks it.
 - [`tableau/custom_sql_compensation_walk.sql`](tableau/custom_sql_compensation_walk.sql) is the compensation walk, built on `dw.WorkerPayLedger`; [`06_validate_compensation_walk.sql`](sqlserver/06_validate_compensation_walk.sql) runs that exact file inside SQL Server (about 45 seconds), times it and checks it.
 - [`tableau/custom_sql_office_moves.sql`](tableau/custom_sql_office_moves.sql), [`custom_sql_region_walk.sql`](tableau/custom_sql_region_walk.sql) and [`custom_sql_career_moves.sql`](tableau/custom_sql_career_moves.sql) are keyed like the walk, so one set of dashboard parameters drives all four queries; [`07`](sqlserver/07_validate_office_moves.sql) and [`09`](sqlserver/09_validate_region_walk_and_career_moves.sql) run them and tie them to the walk.
-- All the Custom SQL files and the 13 reporting views reproduce their DuckDB marts row for row, to the cent, and [`05_validate.sql`](sqlserver/05_validate.sql) checks the SQL Server build's row counts and control totals against the DuckDB values. Release 3 on SQL Server: [run guide and results](docs/projects/contingent-workforce/sql_server_release_3_run.md).
+- All the Custom SQL files and the reporting views reproduce their DuckDB marts row for row, to the cent, and [`05_validate.sql`](sqlserver/05_validate.sql) checks the SQL Server build's row counts and control totals against the DuckDB values. Release 3 on SQL Server: [run guide and results](docs/projects/contingent-workforce/sql_server_release_3_run.md).
 - [`check_tsql_in_duckdb.py`](sqlserver/check_tsql_in_duckdb.py) checks all of the above without a SQL Server: it translates the T-SQL to DuckDB with sqlglot, runs it on the same CSVs and compares every view and Custom SQL with the pipeline's marts, row for row. It also checks the SQL Server rules DuckDB doesn't enforce (key columns made `NOT NULL` in an earlier batch, text that fits its column, no subquery in `PRINT`, one ordering for every `STRING_AGG` in a `SELECT`). Views and marts share column names, so a workbook can switch between SQL Server and the CSVs with *Replace Data Source*.
 
 Step-by-step setup, with expected output at each step: [`docs/setup/sql_server_local_setup.md`](docs/setup/sql_server_local_setup.md).
@@ -1110,7 +1230,7 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 ```
 ├── generator/            synthetic company simulation (people, seats, recruiting, plan, contingent workers,
 │                         the Bridgeway → Keystone feed, its times, Keystone job data, the load log,
-│                         Helix tickets), fringe research, FX loader (Python)
+│                         Helix tickets, matrix orgs, role assignments, time off), fringe research, FX loader (Python)
 ├── reference/            public reference data: ECB daily FX extract and the script that builds it
 ├── data/
 │   ├── raw/              raw warehouse tables (CSV)
@@ -1120,25 +1240,28 @@ Details: [`docs/setup/docker_compose_guide.md`](docs/setup/docker_compose_guide.
 │   ├── 02_intermediate/  calendar, pay in USD, worker, seat and contingent month-end snapshots, pay ledger,
 │   │                     movement, conversions, seat fills, vacancy chains, reporting chain and line,
 │   │                     supplier alias, identity resolution, reconciliation snapshot, discrepancy rules,
-│   │                     close runs, flags and routing, load gaps, ticket state and links
+│   │                     close runs, flags and routing, load gaps, ticket state and links,
+│   │                     person month-end, org closure, alignment signals, days off
 │   └── 03_marts/         fills, vacancy pool, plan vs actual, seat corridors, headcount & FTE walk, office walk,
 │                         mobility flows, compensation walk, region walk, career moves, cost bridge,
 │                         growth mix, contingent spend, discrepancy work list, reconciliation trend,
 │                         engagement cap, detection score, gaps and gap rate at each close, open tickets,
-│                         cost snapshot, org chart, fringe, dimensions
-├── tests/                88 data-quality and reconciliation tests, and 6 forecast tests (SQL)
+│                         cost snapshot, org chart, leaders, org tree, availability, Team pulse,
+│                         org entitlement, fringe, dimensions
+├── tests/                102 data-quality and reconciliation tests, and 6 forecast tests (SQL)
 ├── pipeline/             build runner, control totals, org chart and dashboard check-table writers
 ├── forecast/             the PID fill forecast: survival model, simulation, backtest, check tables (Python)
 ├── benchmarks/           grain benchmark for the headcount walk
 ├── sqlserver/            SQL Server (T-SQL) build: raw → dw → rpt, validation, and the DuckDB checker
 ├── compose.yaml          SQL Server + warehouse build as a Docker Compose stack
-├── tableau/              Tableau Custom SQL, connection settings and the workbook builders (Seats to Fill, Cost Bridge)
+├── tableau/              Tableau Custom SQL, connection settings and the workbook builders (Seats to Fill, Cost Bridge, Who Leads Where)
 └── docs/                 documentation, grouped by project (see docs/README.md)
     ├── company/          Arcadia profile, org chart, organization and pay model
     ├── warehouse/        data dictionary, source systems and lineage
     ├── setup/            SQL Server, Docker Compose and Tableau Public guides
     ├── projects/         one folder per case study: workforce-planning, headcount-fte-walk,
-    │                     workforce-footprint, compensation-walk, workforce-cost-bridge, contingent-workforce
+    │                     workforce-footprint, compensation-walk, workforce-cost-bridge, contingent-workforce,
+    │                     leadership-scope
     ├── brand/            Arcadia logo, color palettes (Tableau Preferences.tps), style rules
     └── images/           dashboard previews
 ```

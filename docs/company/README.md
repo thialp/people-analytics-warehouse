@@ -91,5 +91,6 @@ The same company feeds every case study in this repository:
 
 - [Workforce Cost Bridge](../projects/workforce-cost-bridge/methodology.md)
 - [Headcount & FTE Walk](../projects/headcount-fte-walk/executive_summary_build_book.md)
+- [Who Leads Where](../projects/leadership-scope/who_leads_where_build.md)
 - [Global Workforce Footprint](../projects/workforce-footprint/tableau_workforce_map_guide.md)
 - [Compensation Walk](../projects/compensation-walk/compensation_walk.md)

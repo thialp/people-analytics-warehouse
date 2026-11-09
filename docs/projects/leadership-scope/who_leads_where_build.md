@@ -221,6 +221,8 @@ Run these in Tableau Desktop, then again on Tableau Public after publishing.
 
 ## 8. Publish to Tableau Public
 
+**Published 2026-11-09:** [Who Leads Where on Tableau Public](https://public.tableau.com/app/profile/thialp/viz/WhoLeadsWhereArcadiaSystems/WhoLeadsWhere).
+
 1. In Tableau Desktop, right-click the **Who Leads Where** dashboard tab and choose **Hide All Sheets**. The 92 worksheets stay in the workbook, but only the dashboard shows.
 2. Make sure the page is on Grace Ramsey, Dynamic, All, Everyone, today, Light, with no popover open. Tableau Public opens on the state you publish.
 3. **File › Save to Tableau Public As…** and name it **Who Leads Where | Leadership Scope & Org Design | Arcadia Systems**. Tableau packages the extract, the shapes, the logos and the card pictures with it.
