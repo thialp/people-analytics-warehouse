@@ -55,14 +55,14 @@ then, after the release 6 tables:
 ```
 dw.PersonMonthEnd                 523466
 dw.OrgClosure                     3845721
-dw.OrgTreeLayout                  321670
+dw.OrgTreeLayout                  255219
 dw.LeaderAvailability             300359
 ```
 
 and at the end:
 
 ```
-Who Leads Where Custom SQL returned 646673 rows in N seconds
+Who Leads Where Custom SQL returned 580222 rows in N seconds
 1. Rows by type
 2. Ties to the published dashboards
 3. Alignment gaps on the report date (people)
@@ -89,12 +89,12 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 3. Rename the data source **Who Leads Where**.
 4. Switch the connection to **Extract** and save the extract next to the workbook.
 
-You should see 646,673 rows and these row types (`row_type`):
+You should see 580,222 rows and these row types (`row_type`):
 
 | row_type | Rows | What it feeds |
 |---|---:|---|
 | Node | 10,518 | the rail picker, headline, five KPIs, breadcrumb and tooltips (leader × All / Employees / Contingent) |
-| Tree | 321,670 | the Canopy tree: circles (`mark_type` Node) and link curves (`mark_type` Link, 17 points each), for every leader as the focus, Dynamic and Static |
+| Tree | 255,219 | the Canopy tree: circles (`mark_type` Node) and link curves (`mark_type` Link, 17 points each). Dynamic: one tree for the whole company (63,091); Static: three levels below every leader as the focus (192,128) |
 | Day | 300,359 | the "At work on" calendar: leader × worker type × the report date and the 30 days after it |
 | Signal | 14,119 | the Org design alignment panel: each person with a gap, once under every leader above them |
 | R1 | 7 | role assignments still naming a former leader |

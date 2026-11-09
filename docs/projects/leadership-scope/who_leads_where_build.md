@@ -46,12 +46,12 @@ The builder writes everything except the connection. Tableau makes the connectio
 3. Switch the connection to **Extract**. Go to **Sheet 1** and save the extract next to the workbook.
 4. Save as `…/tableau/7 Who Leads Where/who_leads_where.twb` and close Tableau.
 
-The extract should hold 646,673 rows:
+The extract should hold 580,222 rows:
 
 | row_type | Rows | Feeds |
 |---|---:|---|
 | Node | 10,518 | headline, KPIs, rail, picker, toggles, alignment totals, tree counts (leader × All / Employees / Contingent) |
-| Tree | 321,670 | the tree: circles (`mark_type` Node) and 17-point link curves (`mark_type` Link), every leader as the focus, Dynamic and Static |
+| Tree | 255,219 | the tree: circles (`mark_type` Node) and 17-point link curves (`mark_type` Link). Dynamic: one tree for the whole company (63,091 rows). Static: three levels below every leader as the focus (192,128) |
 | Day | 300,359 | "At work on": leader × worker type × the report date and the 30 days after it |
 | Signal | 14,119 | the alignment panel: each person with a gap, once under every leader above them |
 | R1 | 7 | role assignments still naming a former leader |
@@ -90,7 +90,7 @@ D7_BRAND="$P/Shared/Brand/" \
 python3 tableau/builder/d7/build_d7.py "$P/7 Who Leads Where/who_leads_where.twb" "$P/7 Who Leads Where/Who Leads Where.twb"
 ```
 
-Expected: `calcs 196 sheets 80 zones 263 actions 168 (84 parameter)`.
+Expected: `calcs 200 sheets 80 zones 263 actions 168 (84 parameter)`.
 
 The builder reads the shape file names from `tableau/builder/d7/shapes/`. Pass `D7_SHAPES=<folder>` to use another folder.
 
@@ -168,10 +168,10 @@ Run these in Tableau Desktop, then again on Tableau Public after publishing.
 
 | # | Do | Expect |
 |---:|---|---|
-| 1 | Open the page | Isaac Holland, Dynamic tree, his five L2 leaders below him; the largest (Caldwell) is open with their team below |
-| 2 | Click Guerra in the tree | Her team appears below her and her link turns teal; nothing else changes |
-| 3 | Click Guerra again | The whole page moves to Daniela Guerra: headline, KPIs, rail (L2 Daniela Guerra), tree and alignment panel |
-| 4 | Click the top circle | Back up to Isaac Holland |
+| 1 | Open the page | Isaac Holland, Dynamic tree: the chain from the CEO (Grace Ramsey) through Marcus Carter (L0) to him, the other leaders of each level small and unlabeled, and his five L2 leaders below him |
+| 2 | Click Guerra in the tree | One click: her team grows out below her and the whole page moves to Daniela Guerra (headline, KPIs, rail, alignment panel). The window keeps four rows, so the CEO scrolls off the top |
+| 3 | Click Joshi (her largest team member) | Wei Joshi (manager, 1,245 people): Holland, Guerra and Joshi down the middle, his nine leaders below; labels of a team larger than four alternate between two heights |
+| 4 | Click Guerra, then Holland, higher up the chain | Back up one click at a time: everything below the clicked leader closes |
 | 5 | **Static** | Three levels of leaders below the focus at once; small circles at the third level carry no labels; clicking a circle opens that leader |
 | 6 | **Employees**, then **Contingent**, then **All** | Every number follows the worker toggle table above; the headline says "employees", "contingent workers", "people" |
 | 7 | **At work** under Show | Tree counts change to the number at work on the chosen day; tooltips say "at work" |
@@ -184,7 +184,7 @@ Run these in Tableau Desktop, then again on Tableau Public after publishing.
 | 14 | Open one popover, then another | Only one popover is open at a time |
 | 15 | Hover a circle, a KPI, a signal, a calendar day | Detailed tooltips, with no `*` or `Null` anywhere |
 | 16 | GitHub and LinkedIn tiles in the rail | Open github.com/thialp and the LinkedIn profile |
-| 17 | Timing | A toggle or a tree click updates in a few seconds; opening a new leader takes up to about 12 seconds in Desktop, with the tree last |
+| 17 | Timing | In Desktop a click takes about 10 seconds: the 78 queries finish in about 2 seconds; the rest is Desktop laying out the 263 dashboard zones (the light and dark copies). Check the time again on Tableau Public |
 
 ## 8. Publish to Tableau Public
 
@@ -198,7 +198,7 @@ Run these in Tableau Desktop, then again on Tableau Public after publishing.
 5. Run the click tests (section 7) on Tableau Public.
 6. Record the live link in this page, the case study README and the portfolio site.
 
-The extract (646,673 rows) is well inside Tableau Public's limits. Parameter actions, Dynamic Zone Visibility, custom shapes and context filters all work on Tableau Public.
+The extract (580,222 rows) is well inside Tableau Public's limits. Parameter actions, Dynamic Zone Visibility, custom shapes and context filters all work on Tableau Public.
 
 Tableau Cloud with row-level security (each leader sees only their own branch) and Pulse metrics are phase 8 of the release plan.
 
@@ -212,13 +212,13 @@ Tableau Cloud with row-level security (each leader sees only their own branch) a
 
 so that any sheet can show them, with no blend and no filter.
 
-**Context filters for speed.** A FIXED expression reads every row that reaches it. Without help, each of the page's 35 or so queries scanned all 646,673 rows, and a click took 20 to 30 seconds. Each sheet now carries one context filter, which Tableau applies before any FIXED expression:
+**Context filters for speed.** A FIXED expression reads every row that reaches it. Without help, each of the page's 35 or so queries scanned all 646,673 rows (the extract before the company tree), and a click took 20 to 30 seconds. Each sheet now carries one context filter, which Tableau applies before any FIXED expression:
 
 | Context | Rows kept | Sheets |
 |---|---|---|
 | Ctx Leaders | Node, Signal and R1 rows: about 12,600 | headline, KPIs 1, 3, 4, 5, rail, toggles, buttons, picker, alignment panel |
 | Ctx Days | the focus leader's 31 Day rows for the chosen worker type | KPI 2, the At work box, the calendar and its summary |
-| Ctx Tree | the focus leader's tree rows in the chosen mode, Node rows, and one day's Day rows | the tree, normal and expanded |
+| Ctx Tree | Dynamic: the company tree's rows whose manager is on the focus's path (`p_Path`), a few hundred of 63,091. Static: the focus's rows. Plus Node rows and one day's Day rows | the tree, normal and expanded |
 
 The Count, Tree and Theme toggles draw their two segments from the focus leader's All and Employees Node rows (`Seg Mode`), so they live in the small Leaders context too.
 
@@ -229,7 +229,7 @@ The Count, Tree and Theme toggles draw their two segments from the focus leader'
 | Parameter | What it holds |
 |---|---|
 | `p_Focus` | the leader |
-| `p_Open` | the open circle in the Dynamic tree |
+| `p_Path` | the focus's path, the CEO down to the focus (`|W100001|W100002|W100010|`); set by the same click as `p_Focus` |
 | `p_Tree` | Dynamic or Static |
 | `p_Worker` | the worker type |
 | `p_Count` | Everyone or At work |
@@ -241,7 +241,17 @@ The Count, Tree and Theme toggles draw their two segments from the focus leader'
 
 84 parameter actions set them. 80 deselect actions clear each selection right after a click, so a second click on the same mark fires again and no mark stays highlighted. Opening one popover closes the others.
 
-**The tree.** The tree is a dual axis on the same x:
+**The tree, Dynamic: one company tree that grows.** The idea comes from The Information Lab's org chart with dynamic drill-down. Every leader has one fixed place: `tier` is the depth below the CEO, and a leader's child leaders sit one unit apart, biggest first, centered under them. Nothing moves when the focus changes, so a click grows the tree out of the leader instead of drawing a new picture, and the workbook's animation (switched on in its `<style>`) shows the move. What shows:
+
+- a circle whose manager is on the focus's path: the chain from the CEO to the focus, every leader of each of those levels, and the focus's own team (`Parent On Path` = `CONTAINS([p_Path], "|" + [parent_node_id] + "|")`);
+- four rows at most: two levels above the focus, the focus's row and the team (`[tier] >= [F Depth] - 2`);
+- labels on the path and the team; the other leaders of each level small (35% size) and unlabeled, named on hover.
+
+One click sets `p_Focus` and `p_Path` together (the clicked leader's id and path), so the tree, KPIs, rail and panel all follow. Clicking anyone higher up the chain closes everything below them. The axes are automatic without zero (`domain-expand='false'`), so the view pans and zooms to what is on the page. `p_Path` keeps the rule a plain row test: inside the context filter, a FIXED lookup of the path would run again inside each of the tree's FIXED reads.
+
+**The tree, Static:** three levels of leaders below the focus at once, on a 0 to 1 canvas; clicking a circle opens that leader, clicking the focus goes up one.
+
+**Drawing it.** The tree is a dual axis on the same x (`X Plot`):
 - **Lines:** the link curves, 17 points per link, drawn on `Y Link`.
 - **Pies:** the circles, drawn on `Y Node`. The circle size is the people led; the amber slice is the share with an alignment gap.
 
@@ -249,13 +259,13 @@ Each pie is three wedges:
 - the Node row: people without a gap;
 - points 15 and 16 of the link into the circle, each carrying half the gap.
 
-Tableau labels a wedge at its middle angle. Splitting the gap around 12 o'clock centers the big wedge, and with it the leader's name, at 6 o'clock, straight below the circle.
+Tableau labels a wedge at its middle angle. Splitting the gap around 12 o'clock centers the big wedge, and with it the leader's name, at 6 o'clock, straight below the circle. Point 15 is plotted at the circle's center (`X Plot`): a few pixels off and Tableau would draw the two halves as a second pie on top.
 
 **The code.** In `tableau/builder/d7/`:
 
 | File | What it does |
 |---|---|
-| `d7_calcs.py` | every calculation (196) |
+| `d7_calcs.py` | every calculation (200) |
 | `build_d7.py` | sheets, dashboard zones, actions and visibility |
 | `make_shapes_d7.py` | the shapes |
 | `check_values.py` | the check tables in section 6 |

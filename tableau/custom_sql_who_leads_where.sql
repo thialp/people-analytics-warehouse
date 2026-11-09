@@ -7,8 +7,11 @@
     Node    leader x worker type (All, Employees, Contingent) on the report date: the rail picker,
             the headline, the five KPIs, the breadcrumb and every tooltip
     Tree    where the Canopy tree's circles (mark_type Node) and links (mark_type Link, 17 points
-            each) sit, for every leader as the focus, in both modes (tree_mode Dynamic, Static);
-            x 0 to 1 left to right, y 0 to 3 top to bottom (reverse the axis); leader_id = node_id
+            each) sit; leader_id = node_id; y top to bottom (reverse the axis).
+            tree_mode Dynamic: one tree for the whole company (focus_leader_id NULL), tier = depth
+            below the CEO; the page shows the chain from the CEO to the focus and the focus's team.
+            tree_mode Static: three tiers below every leader as the focus, x 0 to 1.
+            path is the node's path (the CEO down to the node), so a click can set the page's path
     Day     the "At work on" calendar: leader x worker type x day, the report date and 30 days after
     Signal  each person with an alignment gap, once under every leader above them (leader_id), with
             depth_below_leader; worker_type is the person's (Employees or Contingent)
@@ -110,7 +113,7 @@ SELECT
     NULL                                                                   AS parent_leader_id,
     NULL                                                                   AS parent_leader_name,
     NULL                                                                   AS depth_from_top,
-    NULL                                                                   AS path,
+    n.path                                                                 AS path,
     NULL                                                                   AS child_leaders,
     NULL                                                                   AS department_name,
     NULL                                                                   AS function_name,

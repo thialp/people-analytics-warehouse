@@ -46,7 +46,7 @@ DS = re.search(r"<datasource caption='[^']*' inline='true' name='(federated\.[a-
 
 PARAMS = {
     'p_Focus': {'dtype': 'string', 'value': 'W100010'},          # Isaac Holland, L1, Software Engineering
-    'p_Open': {'dtype': 'string', 'value': ''},
+    'p_Path': {'dtype': 'string', 'value': '|W100001|W100002|W100010|'},   # his path: the CEO, his L0, him
     'p_Tree': {'dtype': 'string', 'value': 'Dynamic'},
     'p_Worker': {'dtype': 'string', 'value': 'All'},
     'p_Count': {'dtype': 'string', 'value': 'Everyone'},
@@ -234,18 +234,20 @@ def page(th):
            [('{Tip Gaps|attr}', 'semi', 9, gp)],
            [('{Tip At Work|attr}', 'book', 9, ink)],
            [('{Tip Action|attr}', 'semi', 9, ac)]]
-    ACT = ['Focus Target', 'Open Target', 'Dynamic Text']
+    ACT = ['Focus Target', 'Path Target', 'Dynamic Text']
     for name in ('Tree', 'Tree Wide'):
         s = sh(name, deselect=True)
         s.filter_member('In Tree View', 'true')
-        x = s.f('x', 'min')
+        x = s.f('X Plot', 'min')
         yl, yn = s.f('Y Link', 'min'), s.f('Y Node', 'min')
         s.cols, s.rows = x, f'({yl} + {yn})'
-        s.axis_rules += [f"<encoding attr='space' class='0' field='{x}' field-type='quantitative' max='1.04' min='-0.04' range-type='fixed' scope='cols' type='space' />",
+        # automatic ranges without zero: Dynamic is one company tree, so the view pans and zooms to the part on the page
+        # (Tableau animates the move); Static fits its 0 to 1 canvas
+        s.axis_rules += [f"<encoding attr='space' class='0' domain-expand='false' field='{x}' field-type='quantitative' scope='cols' type='space' />",
                          f"<format attr='display' class='0' field='{x}' scope='cols' value='false' />",
-                         f"<encoding attr='space' class='0' field='{yl}' field-type='quantitative' max='0.42' min='-3.42' range-type='fixed' scope='rows' type='space' />",
+                         f"<encoding attr='space' class='0' domain-expand='false' field='{yl}' field-type='quantitative' scope='rows' type='space' />",
                          f"<format attr='display' class='0' field='{yl}' scope='rows' value='false' />",
-                         f"<encoding attr='space' class='0' field='{yn}' field-type='quantitative' fold='true' max='0.42' min='-3.42' range-type='fixed' scope='rows' synchronized='true' type='space' />",
+                         f"<encoding attr='space' class='0' domain-expand='false' field='{yn}' field-type='quantitative' fold='true' scope='rows' synchronized='true' type='space' />",
                          f"<format attr='display' class='0' field='{yn}' scope='rows' value='false' />",
                          "<format attr='tick-color' value='#00000000' />"]
         s.pane('Automatic', pane_id=2, enc=[])
@@ -288,7 +290,7 @@ def page(th):
         tx = s.f('Tick X', 'agg')
         s.cols = tx
         hide_axis(s, tx, 0, 10)
-        acts = {'Pick L0': ['leader_id', 'Empty Text'], 'Pick L1': ['leader_id', 'Empty Text'], 'Pick L2': ['leader_id', 'Empty Text', 'Close Panel']}[col]
+        acts = {'Pick L0': ['leader_id', 'path', 'Empty Text'], 'Pick L1': ['leader_id', 'path', 'Empty Text'], 'Pick L2': ['leader_id', 'path', 'Empty Text', 'Close Panel']}[col]
         s.pane('Shape', enc=ZZ + [('shape', 'Pick Shape', 'dim')] + [('lod', n, how(n)) for n in acts], size=SIZE['dot'],
                transparency='255', stroke='false', align='right',
                label=[[('{leader_name}', 'semi', 9.5, ink), ('   {Pick People}', 'book', 8.5, mu)]],
@@ -368,6 +370,10 @@ out = re.sub(r"<datasource caption='[^']*' inline='true' name='" + re.escape(DS)
 pds = ("    <datasource hasconnection='false' inline='true' name='Parameters' version='18.1'>\n      <aliases enabled='yes' />\n"
        + indent('\n'.join(m.param_decl(p) for p in m.params), 6) + "\n    </datasource>\n")
 out = out.replace("  <datasources>\n", "  <datasources>\n" + pds, 1)
+# animations on for the whole workbook: a click grows the tree out of the leader instead of redrawing it
+assert out.count("  </preferences>\n") == 1
+out = out.replace("  </preferences>\n", "  </preferences>\n  <style>\n    <style-rule element='animation'>\n"
+                  "      <format attr='animation-on' value='ao-on' />\n    </style-rule>\n  </style>\n", 1)
 ext = "      <extract "
 assert out.count(ext) == 1
 out = out.replace(ext, indent(calc_decls + '\n' + raw_over + '\n' + ds_insts + '\n' + group, 6) + '\n' + ext, 1)   # after every base column
@@ -483,7 +489,7 @@ def layout(th, S):
         pg.sheet(S['Tree Hint Wide' if wide else 'Tree Hint'], 256, 248, wcard - 32, 20, show=show)
         pg.sheet(S['Tree Wide' if wide else 'Tree'], 248, 270, wcard - 16, 530, show=show)
         pg.text(256, 806, wcard - 32, 18, [('Circle size = people led  ·  ', mu, 8, 'Book'), ('amber slice', P['gap'], 8, 'Semibold'),
-                                           (' = share with an alignment gap  ·  click a leader to show their team, again to open it', mu, 8, 'Book')],
+                                           (' = share with an alignment gap  ·  click a leader to open their team, anyone above to go back up', mu, 8, 'Book')],
                 show=show)
     # alignment panel (narrow only)
     show = f'Show {T} Narrow'
@@ -594,18 +600,18 @@ for S in (L, D):
           (f'Close rules{sfx}', S['Rules Close'], 'p_RulesOpen', 'Close Panel'),
           (f'Pick L0 browse{sfx}', S['Pick L0'], 'p_B0', 'leader_id'),
           (f'Pick L0 focus{sfx}', S['Pick L0'], 'p_Focus', 'leader_id'),
-          (f'Pick L0 open{sfx}', S['Pick L0'], 'p_Open', 'Empty Text'),
+          (f'Pick L0 path{sfx}', S['Pick L0'], 'p_Path', 'path'),
           (f'Pick L0 clears L1{sfx}', S['Pick L0'], 'p_B1', 'Empty Text'),
           (f'Pick L1 browse{sfx}', S['Pick L1'], 'p_B1', 'leader_id'),
           (f'Pick L1 focus{sfx}', S['Pick L1'], 'p_Focus', 'leader_id'),
-          (f'Pick L1 open{sfx}', S['Pick L1'], 'p_Open', 'Empty Text'),
+          (f'Pick L1 path{sfx}', S['Pick L1'], 'p_Path', 'path'),
           (f'Pick L2 focus{sfx}', S['Pick L2'], 'p_Focus', 'leader_id'),
-          (f'Pick L2 open{sfx}', S['Pick L2'], 'p_Open', 'Empty Text'),
+          (f'Pick L2 path{sfx}', S['Pick L2'], 'p_Path', 'path'),
           (f'Pick L2 closes{sfx}', S['Pick L2'], 'p_PickOpen', 'Close Panel'),
           (f'Pick day{sfx}', S['Calendar'], 'p_Day', 'day_offset'),
           (f'Pick day closes{sfx}', S['Calendar'], 'p_CalOpen', 'Close Panel')]
     for nm in ('Tree', 'Tree Wide'):
-        T += [(f'{nm} focus{sfx}', S[nm], 'p_Focus', 'Focus Target'), (f'{nm} open{sfx}', S[nm], 'p_Open', 'Open Target'),
+        T += [(f'{nm} focus{sfx}', S[nm], 'p_Focus', 'Focus Target'), (f'{nm} path{sfx}', S[nm], 'p_Path', 'Path Target'),
               (f'{nm} mode{sfx}', S[nm], 'p_Tree', 'Dynamic Text')]
     for cap, sheet, url in (('GitHub', S['Credit GitHub'], 'https://github.com/thialp'),
                             ('LinkedIn', S['Credit LinkedIn'], 'https://www.linkedin.com/in/thiagoalpoin')):

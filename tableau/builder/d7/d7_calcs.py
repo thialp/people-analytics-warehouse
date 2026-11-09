@@ -138,16 +138,25 @@ def all_calcs():
     a('Pick B1 Default', 'IFNULL([Crumb L1 ID], "")')
     a('Crumb Chain', 'IFNULL([Crumb L0] + " (L0)", "") + IF ISNULL([Crumb L1]) THEN "" ELSE " › " + [Crumb L1] + " (L1)" END '
       '+ IF ISNULL([Crumb L2]) THEN "" ELSE " › " + [Crumb L2] + " (L2)" END + IF [F Level] = "Manager" THEN " › " + [F Name] ELSE "" END')
-    a('Tree Hint', 'IF [p_Tree] = "Dynamic" THEN "Dynamic · " + [Crumb Chain] + " · click a leader to show their team, again to open it; '
-      'the top circle goes back up" ELSE "Static · three levels of leaders below " + [F Name] + " at once · click a circle to open it" END')
+    a('Tree Hint', 'IF [p_Tree] = "Dynamic" THEN "Dynamic · the chain from the top to " + [F Name] + ", and their team · '
+      'click anyone above to go back up" ELSE "Static · three levels of leaders below " + [F Name] + " at once · click a circle to open it" END')
     # ------------------------------------------------------------------ the tree
-    a('Open Pick', '{FIXED : MAX(IF [row_type] = "Tree" AND [tree_mode] = "Dynamic" AND [focus_leader_id] = [p_Focus] AND [tier] = 1 '
-      'AND [mark_type] = "Node" AND [node_id] = [p_Open] THEN [node_id] END)}')
-    a('Open Default', '{FIXED : MAX(IF [row_type] = "Tree" AND [tree_mode] = "Dynamic" AND [focus_leader_id] = [p_Focus] AND [tier] = 1 '
-      'AND [mark_type] = "Node" AND [slot] = 0 THEN [node_id] END)}')
-    a('Open Node', 'IFNULL([Open Pick], [Open Default])')
-    a('In Tree View', '[row_type] = "Tree" AND [focus_leader_id] = [p_Focus] AND [tree_mode] = [p_Tree] '
-      'AND ([tree_mode] = "Static" OR [tier] < 2 OR [tier1_node_id] = [Open Node])')
+    # Dynamic is ONE tree for the whole company (tier = depth below the CEO). A circle shows when its manager is on the
+    # focus leader's path (F Path lists the CEO down to the focus, the focus included), so the page shows the chain from
+    # the top, every level's leaders, and the focus's own team. Nothing in the layout moves, so Tableau animates a click.
+    # Four rows at most: two levels above the focus, the focus's row and their team; a link shows only when its upper
+    # circle is on the page too, except its points 15 and 16 (the gap halves of the circle's pie, under the circle).
+    # p_Path holds the focus's path and is set by the same click as p_Focus, so these are plain row tests: inside the
+    # context filter, a FIXED lookup of the path would run again inside every FIXED read of the tree
+    a('On Path', 'CONTAINS([p_Path], "|" + [node_id] + "|")')
+    a('Parent On Path', 'ISNULL([parent_node_id]) OR CONTAINS([p_Path], "|" + [parent_node_id] + "|")')
+    # the path a tree click sets: the clicked leader's, or in Static, the focus circle's manager's (it goes up one)
+    a('Path Target', 'IF [tree_mode] = "Static" AND [tier] = 0 AND NOT ISNULL([N Parent]) '
+      'THEN LEFT([path], LEN([path]) - LEN([node_id]) - 1) ELSE [path] END')
+    a('In Team', 'IFNULL([parent_node_id] = [p_Focus], FALSE)')
+    a('In Tree View', '[row_type] = "Tree" AND [tree_mode] = [p_Tree] AND ('
+      '([tree_mode] = "Static" AND [focus_leader_id] = [p_Focus]) '
+      'OR ([tree_mode] = "Dynamic" AND [Parent On Path] AND [tier] >= [F Depth] - 2 + IIF([mark_type] = "Link" AND [point_index] < 15, 1, 0)))')
     for n, f in (('N People', 'people'), ('N Gaps', 'gap_people'), ('N Directs', 'directs'), ('N Indirects', 'indirects'),
                  ('N Countries', 'countries')):
         a(n, node(f))
@@ -161,23 +170,31 @@ def all_calcs():
     # other half (point 16). Tableau labels a wedge at its middle angle, so splitting the gap around 12 o'clock centers
     # the big wedge, and its name label, on 6 o'clock: straight below the circle.
     a('Node Y', '{FIXED [tree_mode], [focus_leader_id], [node_id] : MIN(IF [mark_type] = "Node" THEN [y] END)}')
+    a('Node X', '{FIXED [tree_mode], [focus_leader_id], [node_id] : MIN(IF [mark_type] = "Node" THEN [x] END)}')
+    # the x of every mark: point 15 of a link sits on its circle's center, so its gap half joins the circle's pie (a few
+    # pixels off and Tableau would draw a second pie on top); the link's last stretch runs under the circle anyway
+    a('X Plot', 'IF [mark_type] = "Link" AND [point_index] = 15 THEN [Node X] ELSE [x] END')
     a('Y Node', 'IF [mark_type] = "Node" OR [point_index] = 16 THEN -[y] ELSEIF [point_index] = 15 THEN -[Node Y] END')
     a('Wedge Order', 'IF [mark_type] = "Node" THEN 2 ELSEIF [point_index] = 15 THEN 1 ELSE 3 END')
     a('Pie Angle', 'IF [mark_type] = "Node" THEN [N People] - [N Gaps] ELSEIF [point_index] >= 15 THEN [N Gaps] / 2 END')
     a('Pie Size', 'IF [tree_mode] = "Static" AND [tier] = 3 THEN 1 ELSEIF [tree_mode] = "Static" AND [tier] = 2 THEN [N People] * 0.35 '
-      'ELSE [N People] END')
+      'ELSEIF [tree_mode] = "Dynamic" AND NOT [On Path] AND NOT [In Team] THEN [N People] * 0.35 ELSE [N People] END')
     a('Row Count', 'IIF(ISNULL([row_type]), 1, 1)')
-    a('Pie Color', '(IF [mark_type] <> "Node" AND [point_index] < 15 THEN "none" ELSEIF [mark_type] <> "Node" THEN "gap" ELSEIF [tier] = 0 THEN "focus" '
-      'ELSEIF [tree_mode] = "Dynamic" AND [node_id] = [Open Node] THEN "open" ELSE "node" END) + [Theme Key]')
-    a('Link Kind', '(IF [tree_mode] = "Dynamic" AND ([node_id] = [Open Node] OR [tier] = 2) THEN "sel" ELSE "link" END) + [Theme Key]')
-    a('Node Label Name', 'IF [mark_type] <> "Node" OR ([tree_mode] = "Static" AND [tier] >= 2) THEN "" '
-      'ELSEIF [tier] = 0 THEN [leader_name] ELSE SPLIT([leader_name], " ", -1) END')
-    a('Node Label Count', 'IF [mark_type] <> "Node" OR ([tree_mode] = "Static" AND [tier] >= 2) THEN "" ELSE [N Shown Txt] END')
-    a('Focus Target', 'IF [tier] = 0 THEN IFNULL([N Parent], [node_id]) '
-      'ELSEIF [tree_mode] = "Dynamic" AND [tier] = 1 AND [node_id] <> [Open Node] THEN [p_Focus] ELSE [node_id] END')
-    a('Open Target', 'IF [tree_mode] = "Dynamic" AND [tier] = 1 AND [node_id] <> [Open Node] THEN [node_id] ELSE "" END')
-    a('Tip Action', 'IF [tier] = 0 THEN (IF ISNULL([N Parent]) THEN "The top of Arcadia" ELSE "Click to go up to " + [N Parent Name] END) '
-      'ELSEIF [tree_mode] = "Dynamic" AND [tier] = 1 AND [node_id] <> [Open Node] THEN "Click to show their team below; click again to open it" '
+    a('Pie Color', '(IF [mark_type] <> "Node" AND [point_index] < 15 THEN "none" ELSEIF [mark_type] <> "Node" THEN "gap" '
+      'ELSEIF [node_id] = [p_Focus] THEN "focus" ELSEIF [tree_mode] = "Dynamic" AND [On Path] THEN "open" ELSE "node" END) + [Theme Key]')
+    a('Link Kind', '(IF [tree_mode] = "Dynamic" AND ([On Path] OR [In Team]) THEN "sel" ELSE "link" END) + [Theme Key]')
+    # labels: the path and the focus's team in Dynamic (the other leaders of each level stay small and quiet: hover names
+    # them); tiers 0 and 1 in Static
+    a('Show Label', '[mark_type] = "Node" AND IIF([tree_mode] = "Static", [tier] < 2, [On Path] OR [In Team])')
+    # a team of more than four is one unit apart: every other label drops two lines, so neighbors never collide
+    a('Label Drop', 'IF [tree_mode] = "Dynamic" AND [In Team] AND [slots] > 4 AND [slot] % 2 = 1 THEN CHAR(10) + CHAR(10) ELSE "" END')
+    a('Node Label Name', 'IF NOT [Show Label] THEN "" ELSEIF [node_id] = [p_Focus] THEN [leader_name] '
+      'ELSE [Label Drop] + SPLIT([leader_name], " ", -1) END')
+    a('Node Label Count', 'IF NOT [Show Label] THEN "" ELSE [N Shown Txt] END')
+    a('Focus Target', 'IF [tree_mode] = "Static" AND [tier] = 0 THEN IFNULL([N Parent], [node_id]) ELSE [node_id] END')
+    a('Tip Action', 'IF [node_id] = [p_Focus] THEN (IF ISNULL([N Parent]) THEN "The top of Arcadia" '
+      'ELSEIF [tree_mode] = "Static" THEN "Click to go up to " + [N Parent Name] ELSE "Open now: click anyone above to go back up" END) '
+      'ELSEIF [tree_mode] = "Dynamic" AND [On Path] THEN "Click to go back up to " + [leader_name] '
       'ELSE "Click to open their organization" END')
     a('Tip People', comma('[N People]') + ' + " " + [Worker Words] + " · " + ' + comma('[N Directs]') + ' + " directs, " + '
       + comma('[N Indirects]') + ' + " indirect · " + STR([N Countries]) + " countries"')
@@ -264,10 +281,11 @@ def all_calcs():
     a('Role Total', 'STR([F R1]) + IF [F R1] = 1 THEN " ASSIGNMENT" ELSE " ASSIGNMENTS" END')
     # ------------------------------------------------------------------ context: each sheet reads only the rows it needs
     # A context filter runs before every FIXED expression, so the page's many FIXED reads scan a small slice of the
-    # 646,673 rows instead of all of them.
+    # 580,222 rows instead of all of them.
     a('Ctx Leaders', '[row_type] = "Node" OR [row_type] = "Signal" OR [row_type] = "R1"')
     a('Ctx Days', '[row_type] = "Day" AND [leader_id] = [p_Focus] AND [worker_type] = [p_Worker]')
-    a('Ctx Tree', '([row_type] = "Tree" AND [focus_leader_id] = [p_Focus] AND [tree_mode] = [p_Tree]) '
+    # the company tree enters the context only where its manager is on the focus's path: a few hundred rows of 63,091
+    a('Ctx Tree', '([row_type] = "Tree" AND [tree_mode] = [p_Tree] AND IIF([tree_mode] = "Dynamic", [Parent On Path], [focus_leader_id] = [p_Focus])) '
       'OR ([row_type] = "Node" AND ([worker_type] = [p_Worker] OR [worker_type] = "All")) '
       'OR ([row_type] = "Day" AND [worker_type] = [p_Worker] AND [day_offset] = [p_Day])')
     a('Rail As Of', '"Synthetic data as of " + [Report Label]')
@@ -277,9 +295,9 @@ def all_calcs():
 DTYPES = {'Cal DOW': 'integer', 'Cal Week': 'integer', 'Seg Key': 'integer', 'Worker Key': 'integer', 'Sig Order': 'integer',
           'Pick Rank': 'integer', 'Day Weekend': 'integer', 'Sig Bar Len': 'integer', 'Cal Pos': 'integer', 'F Depth': 'integer',
           'F Child Leaders': 'integer', 'F R1': 'integer', 'Report Monday': 'date', 'Quiet Date': 'date', 'Day Date': 'date',
-          'Report Date': 'date', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Pie Size': 'real',
+          'Report Date': 'date', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Node X': 'real', 'X Plot': 'real', 'Pie Size': 'real',
           # IFNULL() takes the type of its arguments; the writer cannot infer it, so these are named here
           'Org L0 Text': 'string', 'Org L1 Text': 'string', 'Org L2 Text': 'string', 'Pick B0 Default': 'string',
-          'Pick B1 Default': 'string', 'Open Node': 'string', 'Focus Target': 'string', 'Seg Mode': 'string'}
+          'Pick B1 Default': 'string', 'Focus Target': 'string', 'Path Target': 'string', 'Seg Mode': 'string'}
 ROLES = {'Cal DOW': ('dimension', 'ordinal'), 'Cal Week': ('dimension', 'ordinal'), 'Seg Key': ('dimension', 'ordinal'),
          'Worker Key': ('dimension', 'ordinal'), 'Sig Order': ('dimension', 'ordinal'), 'Pick Rank': ('dimension', 'ordinal'), 'Wedge Order': ('dimension', 'ordinal')}

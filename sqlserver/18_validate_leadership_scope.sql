@@ -28,9 +28,10 @@ PRINT '1. Rows by type';
 SELECT check_name, actual, expected,
        CASE WHEN actual = expected THEN 'PASS' ELSE 'FAIL' END AS result
 FROM (
-              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #w7) AS actual, 646673 AS expected
+              SELECT 'all rows' AS check_name, (SELECT COUNT(*) FROM #w7) AS actual, 580222 AS expected
     UNION ALL SELECT 'Node rows (leader x worker type)',     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Node'), 10518
-    UNION ALL SELECT 'Tree rows (circles and link points)',  (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree'), 321670
+    UNION ALL SELECT 'Tree rows (circles and link points)',  (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree'), 255219
+    UNION ALL SELECT 'Tree rows, the company tree (Dynamic)', (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree' AND tree_mode = 'Dynamic'), 63091
     UNION ALL SELECT 'Day rows (31 days)',                   (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Day'), 300359
     UNION ALL SELECT 'Signal rows (person x signal x leader above)', (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Signal'), 14119
     UNION ALL SELECT 'R1 rows (assignment x leader above)',  (SELECT COUNT(*) FROM #w7 WHERE row_type = 'R1'), 7
@@ -123,16 +124,20 @@ FROM (
                      (SELECT COUNT(*) FROM dw.OrgClosure AS c
                       JOIN dw.PersonMonthEnd AS p ON p.MonthEndDate = c.MonthEndDate AND p.PersonID = c.AncestorID
                       WHERE c.Depth = 12 AND p.ManagerWorkerID IS NOT NULL) AS actual, 0 AS expected
-    UNION ALL SELECT 'leaders who cannot be the dynamic tree''s focus',
+    UNION ALL SELECT 'leaders not in the company tree exactly once',
                      (SELECT COUNT(*) FROM #w7 AS n WHERE n.row_type = 'Node' AND n.worker_type = 'All'
-                      AND NOT EXISTS (SELECT 1 FROM #w7 AS t WHERE t.row_type = 'Tree' AND t.tree_mode = 'Dynamic'
+                      AND (SELECT COUNT(*) FROM #w7 AS t WHERE t.row_type = 'Tree' AND t.tree_mode = 'Dynamic'
+                           AND t.mark_type = 'Node' AND t.node_id = n.leader_id) <> 1), 0
+    UNION ALL SELECT 'leaders who cannot be the static tree''s focus',
+                     (SELECT COUNT(*) FROM #w7 AS n WHERE n.row_type = 'Node' AND n.worker_type = 'All'
+                      AND NOT EXISTS (SELECT 1 FROM #w7 AS t WHERE t.row_type = 'Tree' AND t.tree_mode = 'Static'
                                       AND t.focus_leader_id = n.leader_id AND t.tier = 0)), 0
     UNION ALL SELECT 'links without 17 points',
                      (SELECT COUNT(*) FROM (SELECT tree_mode, focus_leader_id, node_id FROM #w7
                                             WHERE row_type = 'Tree' AND mark_type = 'Link'
                                             GROUP BY tree_mode, focus_leader_id, node_id HAVING COUNT(*) <> 17) AS x), 0
-    UNION ALL SELECT 'circles off the canvas (x outside 0 to 1)',
-                     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree' AND (x < 0 OR x > 1)), 0
+    UNION ALL SELECT 'static circles off the canvas (x outside 0 to 1)',
+                     (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Tree' AND tree_mode = 'Static' AND (x < 0 OR x > 1)), 0
     UNION ALL SELECT 'weekdays where at work + off <> people',
                      (SELECT COUNT(*) FROM #w7 WHERE row_type = 'Day' AND is_weekend = 0 AND at_work + [off] <> people), 0
 ) AS c;
