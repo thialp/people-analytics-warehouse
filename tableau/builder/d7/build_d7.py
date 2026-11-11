@@ -516,12 +516,16 @@ def page(th):
     s.hide_labels += [wk, dw]
     no_field_labels(s, 'rows'); no_field_labels(s, 'cols')
     s.pane('Square', enc=ZZ + [('color', 'Cal Kind', 'dim'), ('lod', 'day_offset', 'ord'), ('lod', 'Close Panel', 'dim')],
-           size='4.2', transparency='255', stroke='false', align='center', valign='center',
+           size='1.8', transparency='255', stroke='false', align='center', valign='center',
            label=[[('{Cal Day Label}', 'book', 7.5, mu)], [('{Cal Value}', 'bold', 9.5, ink)], [('{Cal Off}', 'book', 7.5, mu)]],
            tooltip=[[('{Cal Tip}', 'bold', 10, ink)], [('{Cal Value}', 'semi', 9, ac), (' at work of ', 'book', 9, ink), ('{people|sum}', 'semi', 9, ink)],
                     [('Off: ', 'book', 9, mu), ('{off_time_off|sum}', 'semi', 9, ink), (' time off · ', 'book', 9, mu), ('{off_leave|sum}', 'semi', 9, ink),
                      (' leave · ', 'book', 9, mu), ('{off_public_holiday|sum}', 'semi', 9, ink), (' holiday', 'book', 9, mu)],
                     [('Left the team by then: ', 'book', 9, mu), ('{left_team|sum}', 'semi', 9, ink)]])
+    # one tile per day: with marks scaling on, a square's size follows the cell, so the tiles keep their place and their
+    # gaps at any rendering scale. A fixed size (marks scaling off) drew past the cells and over the next days on Tableau
+    # Public and in Desktop. Size 1.8 fills the cell with a small gap (checked in Desktop 2026.2: 3 overlaps, 1.5 leaves wide gaps)
+    s.panes[-1] = s.panes[-1].replace("\n  <mark-sizing mark-sizing-setting='marks-scaling-off' />", '')
     text_sheet('Cal Summary', [[('{Quiet Text}', 'semi', 9, ac)], [('{Left Text}', 'book', 8.5, mu)],
                                [('Requests are known only once they are made, so days further out show fewer people off.', 'book', 8, mu)]])
     return S

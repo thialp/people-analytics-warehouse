@@ -286,7 +286,7 @@ def all_calcs():
       'ELSEIF [off] >= 0.12 * [people] THEN "high" ELSE "low" END) + [Theme Key]')
     a('Cal Day Label', 'IF [day_offset] = 0 OR DAY([day]) = 1 THEN LEFT(DATENAME("month", [day]), 3) + " " + STR(DAY([day])) ELSE STR(DAY([day])) END')
     a('Cal Value', 'IF [is_weekend] THEN "Weekend" ELSE ' + comma('[at_work]').replace('IF ISNULL', '(IF ISNULL', 1) + ') END')
-    a('Cal Off', 'IF [is_weekend] THEN "" ELSE ' + comma('[off]').replace('IF ISNULL', '(IF ISNULL', 1) + ') + " off" END')
+    a('Cal Off', 'IF [is_weekend] THEN CHAR(160) ELSE ' + comma('[off]').replace('IF ISNULL', '(IF ISNULL', 1) + ') + " off" END')
     a('Cal Tip', 'LEFT(DATENAME("weekday", [day]), 3) + ", " + LEFT(DATENAME("month", [day]), 3) + " " + STR(DAY([day]))')
     a('Quiet At Work', '{FIXED : MIN(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND NOT [is_weekend] THEN [at_work] END)}')
     a('Quiet Date', '{FIXED : MIN(IF [row_type] = "Day" AND [leader_id] = [Focus ID] AND [worker_type] = [p_Worker] AND NOT [is_weekend] '
@@ -430,6 +430,6 @@ DTYPES = {'Focus ID': 'string', 'Cal DOW': 'integer', 'Cal Week': 'integer', 'Se
           'Report Date': 'date', 'N Depth': 'integer', 'Floor': 'real', 'P Dip Day': 'date', 'Cov Day': 'real', 'Growth': 'integer', 'Gap Change': 'integer', 'Hub Delta': 'real', 'Renew 30': 'integer', 'Renew 7': 'integer', 'Pie Angle': 'real', 'Wedge Order': 'integer', 'Node Y': 'real', 'Node X': 'real', 'X Plot': 'real', 'Pie Size': 'real',
           # IFNULL() takes the type of its arguments; the writer cannot infer it, so these are named here
           'Org L0 Text': 'string', 'Org L1 Text': 'string', 'Org L2 Text': 'string', 'Pick B0 Default': 'string',
-          'Pick B1 Default': 'string', 'Focus Target': 'string', 'Path Target': 'string', 'Seg Mode': 'string'}
+          'Pick B1 Default': 'string', 'Cal Off': 'string', 'Focus Target': 'string', 'Path Target': 'string', 'Seg Mode': 'string'}
 ROLES = {'Cal DOW': ('dimension', 'ordinal'), 'Cal Week': ('dimension', 'ordinal'), 'Seg Key': ('dimension', 'ordinal'),
          'Worker Key': ('dimension', 'ordinal'), 'Sig Order': ('dimension', 'ordinal'), 'Pick Rank': ('dimension', 'ordinal'), 'Wedge Order': ('dimension', 'ordinal')}

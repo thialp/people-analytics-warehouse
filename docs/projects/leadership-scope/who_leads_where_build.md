@@ -338,6 +338,8 @@ The .twb writer is Dashboard #6's (`tableau/builder/d6/twb.py`).
 
 ## 10. When something goes wrong
 
+**Calendar tiles overlap or sit off their day.** The Calendar sheet's squares must scale with the cell (no `marks-scaling-off`, size 1.8). A fixed square size looks right at one rendering scale and spills over the next days at another (Tableau Public, full screen).
+
 | What you see | Why | Fix |
 |---|---|---|
 | "element 'column' not allowed" on open | Calculations placed after a group in the data source | Rebuild with the current `build_d7.py`; it places them before `<extract>` |
