@@ -167,7 +167,7 @@ Part A builds the workbook shell, the parameters, the rail's lists (with the gre
 
 ### 3.0 The workbook and the five sources
 
-1. **File > New**, then connect to SQL Server as in [tableau_first_sheets_guide.md](tableau_first_sheets_guide.md), section 1 (server `localhost, 1433`, database `ArcadiaHR`, user `sa`, Require SSL unchecked).
+1. **File > New**, then connect to SQL Server as in [tableau_first_sheets_guide.md](tableau_first_sheets_guide.md), section 1 (server `localhost,1433`, database `ArcadiaHR`, user `sa`, Require SSL unchecked).
 2. Drag **New Custom SQL** onto the canvas and paste `custom_sql_wfp_summary.sql` (from the folder you copied in 2.3). Rename the source **WFP Summary**.
 3. **Data > New Data Source** for `custom_sql_plan_vs_actual.sql` (**Plan vs Actual**), `custom_sql_position_fill.sql` (**Position Fill**), `custom_sql_vacancy_pool.sql` (**Vacancy Pool**) and `custom_sql_seat_corridors.sql` (**Seat Corridors**).
 4. **Extract all five** (Data Source tab > Connection: Extract > Edit > keep defaults). WFP Summary takes about 30 seconds live, and every click on the rail would wait that long. Save as `Arcadia Workforce Planning.twb`.

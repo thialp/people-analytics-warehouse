@@ -58,7 +58,7 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
   -i /repo/sqlserver/build_all.sql
 ```
 
-This drops and recreates every table and view (5–10 minutes under emulation). Look for these lines:
+This drops and recreates every table and view (5–10 minutes on a 2019 Intel MacBook Pro). Look for these lines:
 
 ```
 raw.dim_worker                      46980 rows

@@ -228,6 +228,6 @@ In `compose.yaml`, the build job connects to `-S sqlserver`, the service name, n
 | `required variable MSSQL_SA_PASSWORD is missing` | No `.env` file | Step 3 |
 | `registry access to mcr.microsoft.com is not allowed` | Your organization's Docker settings block Microsoft's image registry | Ask IT to allow `mcr.microsoft.com` |
 | `x509: certificate signed by unknown authority` | A corporate network inspects encrypted traffic | Try off VPN, or ask IT for Docker's proxy settings |
-| `Bind for 0.0.0.0:1433 failed: port is already allocated` | Something else uses port 1433, such as an old `arcadia-sql` | `docker rm -f arcadia-sql`, or change `"1433:1433"` to `"14333:1433"` and use `localhost, 14333` in Tableau |
+| `Bind for 0.0.0.0:1433 failed: port is already allocated` | Something else uses port 1433, such as an old `arcadia-sql` | `docker rm -f arcadia-sql`, or change `"1433:1433"` to `"14333:1433"` and use `localhost,14333` in Tableau |
 | `arcadia-sql` stays `unhealthy` | Usually a password that breaks SQL Server's rules | `docker compose logs sqlserver`, fix `.env`, then `docker compose down -v && docker compose up -d` |
 | `arcadia-build` shows `Exited (1)` | A build script failed | `docker compose logs build` shows which one |

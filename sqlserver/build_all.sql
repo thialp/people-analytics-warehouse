@@ -18,6 +18,7 @@
 :r /repo/sqlserver/03e_build_dw_forecast.sql
 :r /repo/sqlserver/03f_build_dw_cost_growth_mix.sql
 :r /repo/sqlserver/03g_build_dw_leadership_scope.sql
+:r /repo/sqlserver/03h_build_dw_headcount_walk.sql
 :r /repo/sqlserver/04_create_reporting_views.sql
 :r /repo/sqlserver/04b_create_reporting_views_contingent.sql
 :r /repo/sqlserver/04c_create_reporting_views_reconciliation.sql

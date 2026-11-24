@@ -83,7 +83,7 @@ The first run downloads about 1.5 GB. When it finishes, Docker prints a long con
 docker logs -f arcadia-sql
 ```
 
-Wait for this line (30–90 seconds under emulation), then press `Ctrl+C` to stop following the log:
+Wait for this line (30–90 seconds on a laptop), then press `Ctrl+C` to stop following the log:
 
 ```
 SQL Server is now ready for client connections.
@@ -112,7 +112,7 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
 | `08_validate_workforce_planning.sql` | Checks the seat layer: row counts, one incumbent per seat, filled seats = headcount, the seat pay walk, FY26 fills, the vacancy pool and plan vs actual |
 | `12_validate_contingent_workforce.sql` | Checks the contingent workforce: every raw row landed, the population and spend, identity resolution, the discrepancies open on 30 Jun 2026 and the detection score, and that the cost bridge Custom SQL closes and the growth mix effects add up |
 
-Expected output, abbreviated (5–10 minutes under emulation):
+Expected output, abbreviated (5–10 minutes on a laptop):
 
 ```
 Created database ArcadiaHR
@@ -322,7 +322,7 @@ In Tableau Desktop:
 
 1. **Connect → To a Server → Microsoft SQL Server.**
 2. Fill in the dialog:
-   - **Server:** `localhost, 1433`
+   - **Server:** `localhost,1433`
    - **Database:** `ArcadiaHR`
    - **Authentication:** *Use a specific username and password*
    - **Username:** `sa`
@@ -342,7 +342,7 @@ You should land on the Data Source page with `ArcadiaHR` selected and the `dw`, 
 4. Rename the data source (top left) to **Workforce Cost Bridge (SQL Server)**.
 5. Set the connection to **Extract** (top right), then go to a sheet. Tableau saves the extract.
 
-Expected: 20 columns and 13,835 rows. The extract takes about a minute under emulation.
+Expected: 20 columns and 13,835 rows. The extract takes about a minute on a laptop.
 
 Why it's written this way: Tableau wraps Custom SQL in a subquery, so CTEs, `ORDER BY` and trailing `--` comments all break it. The query uses derived tables and `CROSS APPLY` instead. Comments at the top of the file explain each layer.
 

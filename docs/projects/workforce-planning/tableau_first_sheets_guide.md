@@ -22,7 +22,7 @@ Docker running, `arcadia-sql` up, and the warehouse built (your last `build_all`
 ## 1. Connect and add the four sources
 
 1. **File > New.** On the Connect pane: **To a Server > Microsoft SQL Server.**
-2. Server `localhost, 1433` · Database `ArcadiaHR` · Authentication *Use a specific username and password* · Username `sa` · Password: the container password (the 17-character one) · Require SSL unchecked > **Sign In**.
+2. Server `localhost,1433` · Database `ArcadiaHR` · Authentication *Use a specific username and password* · Username `sa` · Password: the container password (the 17-character one) · Require SSL unchecked > **Sign In**.
 3. On the Data Source page, drag **New Custom SQL** onto the canvas. Paste the whole of `custom_sql_position_fill.sql` > **OK**.
 4. Rename the source: double-click the name at the top left ("Custom SQL Query (ArcadiaHR)") and type **Position Fill**.
 5. **Data > New Data Source** and repeat steps 1 to 4 for `custom_sql_vacancy_pool.sql` (**Vacancy Pool**), `custom_sql_plan_vs_actual.sql` (**Plan vs Actual**) and `custom_sql_seat_corridors.sql` (**Seat Corridors**). Tableau keeps the server sign-in, so each takes a few seconds.

@@ -21,7 +21,7 @@ GO
    The weights |S|! (5 - |S|)! for |S| = 0..5 are 120, 24, 12, 12, 24, 120; the 64 subsets are
    six 0/1 bits cross-joined. Methodology: docs/projects/workforce-cost-bridge/methodology.md
    Precomputed here and read by rpt.vw_workforce_cost_growth_mix, like PlanVsActual: as a view
-   it recomputed 64 subsets over every worker on every query (over 18 minutes under emulation).
+   it recomputed 64 subsets over every worker on every query (over 18 minutes on a laptop SQL Server).
    The population is first counted per month-end and segment (#GmPopulation), then joined to
    each pair's two dates on equality (a join on "date IN (from, to)" cannot be a hash join). */
 DROP TABLE IF EXISTS #GmPopulation;

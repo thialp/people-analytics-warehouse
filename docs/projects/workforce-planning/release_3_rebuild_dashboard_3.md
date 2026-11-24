@@ -230,7 +230,7 @@ Expected: `d3_field_capsule.png  d3_reset.png`. In Tableau: Shape > More Shapes 
 
 1. Close Tableau. Move `Arcadia Workforce Planning.twb` to `_archive/2026-10-23/Arcadia Workforce Planning - first build.twb`.
 2. **File > New**; save as `Arcadia Workforce Planning.twb` in the same folder.
-3. Connect to SQL Server (`localhost, 1433`, `ArcadiaHR`, `sa`, Require SSL off). Add four Custom SQL sources named **WFP Summary**, **Plan vs Actual**, **Position Fill** and **Vacancy Pool**.
+3. Connect to SQL Server (`localhost,1433`, `ArcadiaHR`, `sa`, Require SSL off). Add four Custom SQL sources named **WFP Summary**, **Plan vs Actual**, **Position Fill** and **Vacancy Pool**.
 4. Data source filters: `version_type` = Budget on WFP Summary and Plan vs Actual.
 5. Extract all four. On Vacancy Pool, Extract > Edit > Add > `month_end_date` > **Months** > March, June, September, December.
 
