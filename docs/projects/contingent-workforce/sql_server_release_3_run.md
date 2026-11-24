@@ -49,7 +49,7 @@ docker exec -it arcadia-sql /opt/mssql-tools18/bin/sqlcmd \
   -i /repo/sqlserver/build_all.sql
 ```
 
-10 to 15 minutes under emulation. `build_all` now also runs 03c, 04b and 12. Look for:
+10 to 15 minutes on a 2019 Intel MacBook Pro. `build_all` now also runs 03c, 04b and 12. Look for:
 
 ```
 raw.bw_contingent_worker            43484 rows

@@ -46,7 +46,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PIPELINE_DB = ROOT / "warehouse" / "arcadia.duckdb"
 BUILD = ["03_build_dw.sql", "03b_build_dw_workforce_planning.sql", "03c_build_dw_contingent.sql",
          "03d_build_dw_cw_reconciliation.sql", "03e_build_dw_forecast.sql", "03f_build_dw_cost_growth_mix.sql",
-         "03g_build_dw_leadership_scope.sql",
+         "03g_build_dw_leadership_scope.sql", "03h_build_dw_headcount_walk.sql",
          "04_create_reporting_views.sql", "04b_create_reporting_views_contingent.sql",
          "04c_create_reporting_views_reconciliation.sql", "04d_create_reporting_views_leadership.sql"]
 VIEWS = [("mart_workforce_cost_snapshot", "rpt.vw_workforce_cost_snapshot"),

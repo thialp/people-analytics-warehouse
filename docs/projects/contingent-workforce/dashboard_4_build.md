@@ -135,7 +135,7 @@ Each flag has exactly one risk; a flag's gaps can be aligned in more than one pl
 
 ### 2.2 Connect and extract
 
-1. **File > New.** Connect > To a Server > **Microsoft SQL Server**: server `localhost, 1433`, database `ArcadiaHR`, authentication *Use a specific username and password*, user `sa`, the password from the repo's `.env`, **Require SSL** unchecked.
+1. **File > New.** Connect > To a Server > **Microsoft SQL Server**: server `localhost,1433`, database `ArcadiaHR`, authentication *Use a specific username and password*, user `sa`, the password from the repo's `.env`, **Require SSL** unchecked.
 2. Drag **New Custom SQL** onto the canvas and paste `tableau/custom_sql_cw_reconciliation_dashboard.sql` in full. OK.
 3. Rename the data source **CW Reconciliation** (double-click its name top left).
 4. **Extract** (Connection: Extract). Tableau Public needs an extract, and every click on the page would otherwise wait for SQL Server. Save as `Arcadia CW Reconciliation.twb`; the extract goes in a `Data Source Hyper` folder beside it.

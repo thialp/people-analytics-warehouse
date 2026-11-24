@@ -104,7 +104,7 @@ If any line fails, stop and send me the output.
 ## Part 2. Copy the workbook and connect the new query
 
 1. Open the Compensation Walk workbook. **File > Save As...** `Arcadia Workforce Footprint.twb` in a new folder. From here on, work only in the copy.
-2. **Data > New Data Source > Microsoft SQL Server**: `localhost, 1433`, database `ArcadiaHR`, `sa`, Require SSL off (use the `.tdc` file if a certificate error appears), **Sign In**.
+2. **Data > New Data Source > Microsoft SQL Server**: `localhost,1433`, database `ArcadiaHR`, `sa`, Require SSL off (use the `.tdc` file if a certificate error appears), **Sign In**.
 3. Drag **New Custom SQL** onto the canvas, paste the whole of `tableau/custom_sql_workforce_footprint.sql`, **OK**.
 4. Rename the data source (top left of the Data Source tab) to **`Footprint`**.
 5. In the data grid, check types (click the icon above a column to change it):
